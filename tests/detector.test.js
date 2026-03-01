@@ -1,0 +1,53 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const { detectFramework } = require('../src/detector');
+
+async function makeTempDir() {
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-detector-'));
+}
+
+test('detects Laravel by artisan file', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'artisan'), '', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Laravel');
+  assert.equal(out.installed, true);
+});
+
+test('detects Laravel by composer dependency', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'composer.json'), JSON.stringify({ dependencies: {}, require: { 'laravel/framework': '^11.0' } }), 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Laravel');
+});
+
+test('detects Next.js by package dependency', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ dependencies: { next: '15.0.0' } }), 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Next.js');
+});
+
+test('falls back to Node with generic package.json', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ name: 'x' }), 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Node');
+  assert.equal(out.confidence, 'low');
+});
+
+test('returns not installed for empty directory', async () => {
+  const dir = await makeTempDir();
+  const out = await detectFramework(dir);
+  assert.equal(out.installed, false);
+  assert.equal(out.framework, null);
+});

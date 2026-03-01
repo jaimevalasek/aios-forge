@@ -1,0 +1,6 @@
+name = "aios-qa"
+description = "Revisao de qualidade"
+instruction_file = ".aios-lite/agents/qa.md"
+requires_context = [
+  ".aios-lite/context/discovery.md"
+]

@@ -1,0 +1,7 @@
+name = "aios-architect"
+description = "Arquitetura do projeto"
+instruction_file = ".aios-lite/agents/architect.md"
+requires_context = [
+  ".aios-lite/context/project.context.md",
+  ".aios-lite/context/discovery.md"
+]

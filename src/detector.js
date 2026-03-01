@@ -1,0 +1,136 @@
+'use strict';
+
+const path = require('node:path');
+const { exists, readTextIfExists } = require('./utils');
+
+function safeJsonParse(input) {
+  try {
+    return JSON.parse(input);
+  } catch {
+    return null;
+  }
+}
+
+function dependencyExists(pkg, names) {
+  if (!pkg) return false;
+  const sections = [
+    pkg.require || {},
+    pkg['require-dev'] || {},
+    pkg.dependencies || {},
+    pkg.devDependencies || {},
+    pkg.peerDependencies || {},
+    pkg.optionalDependencies || {}
+  ];
+
+  return sections.some((section) => names.some((name) => Object.prototype.hasOwnProperty.call(section, name)));
+}
+
+function includesToken(text, token) {
+  if (!text) return false;
+  return text.toLowerCase().includes(token.toLowerCase());
+}
+
+async function detectFramework(projectDir) {
+  const checks = [];
+
+  const packageJsonPath = path.join(projectDir, 'package.json');
+  const composerJsonPath = path.join(projectDir, 'composer.json');
+  const gemfilePath = path.join(projectDir, 'Gemfile');
+  const requirementsPath = path.join(projectDir, 'requirements.txt');
+  const pyprojectPath = path.join(projectDir, 'pyproject.toml');
+
+  const [packageText, composerText, gemfileText, requirementsText, pyprojectText] = await Promise.all([
+    readTextIfExists(packageJsonPath),
+    readTextIfExists(composerJsonPath),
+    readTextIfExists(gemfilePath),
+    readTextIfExists(requirementsPath),
+    readTextIfExists(pyprojectPath)
+  ]);
+
+  const packageJson = safeJsonParse(packageText || '');
+  const composerJson = safeJsonParse(composerText || '');
+
+  const hasArtisan = await exists(path.join(projectDir, 'artisan'));
+  const hasLaravelComposer = dependencyExists(composerJson, ['laravel/framework']);
+  if (hasArtisan || hasLaravelComposer) {
+    checks.push({ framework: 'Laravel', installed: true, evidence: hasArtisan ? 'artisan' : 'composer.json:laravel/framework', confidence: 'high' });
+  }
+
+  const hasSymfonyConsole = await exists(path.join(projectDir, 'bin/console'));
+  const hasSymfonyComposer = dependencyExists(composerJson, ['symfony/framework-bundle']);
+  if (hasSymfonyConsole || hasSymfonyComposer) {
+    checks.push({ framework: 'Symfony', installed: true, evidence: hasSymfonyConsole ? 'bin/console' : 'composer.json:symfony/framework-bundle', confidence: 'high' });
+  }
+
+  const hasRailsApp = await exists(path.join(projectDir, 'config/application.rb'));
+  const hasRailsGem = includesToken(gemfileText, 'gem "rails"') || includesToken(gemfileText, "gem 'rails'");
+  if (hasRailsApp || hasRailsGem) {
+    checks.push({ framework: 'Rails', installed: true, evidence: hasRailsApp ? 'config/application.rb' : 'Gemfile:rails', confidence: hasRailsApp ? 'high' : 'medium' });
+  }
+
+  const hasManagePy = await exists(path.join(projectDir, 'manage.py'));
+  const hasDjangoReq = includesToken(requirementsText, 'django');
+  const hasDjangoPyproject = includesToken(pyprojectText, 'django');
+  if (hasManagePy || hasDjangoReq || hasDjangoPyproject) {
+    checks.push({ framework: 'Django', installed: true, evidence: hasManagePy ? 'manage.py' : hasDjangoReq ? 'requirements.txt:django' : 'pyproject.toml:django', confidence: hasManagePy ? 'high' : 'medium' });
+  }
+
+  const hasNextConfig = (await exists(path.join(projectDir, 'next.config.js'))) || (await exists(path.join(projectDir, 'next.config.ts')));
+  const hasNextDep = dependencyExists(packageJson, ['next']);
+  if (hasNextConfig || hasNextDep) {
+    checks.push({ framework: 'Next.js', installed: true, evidence: hasNextConfig ? 'next.config.*' : 'package.json:next', confidence: hasNextConfig ? 'high' : 'medium' });
+  }
+
+  const hasNuxtConfig = (await exists(path.join(projectDir, 'nuxt.config.js'))) || (await exists(path.join(projectDir, 'nuxt.config.ts')));
+  const hasNuxtDep = dependencyExists(packageJson, ['nuxt']);
+  if (hasNuxtConfig || hasNuxtDep) {
+    checks.push({ framework: 'Nuxt', installed: true, evidence: hasNuxtConfig ? 'nuxt.config.*' : 'package.json:nuxt', confidence: hasNuxtConfig ? 'high' : 'medium' });
+  }
+
+  const hasSvelteConfig = await exists(path.join(projectDir, 'svelte.config.js'));
+  const hasSvelteKitDep = dependencyExists(packageJson, ['@sveltejs/kit']);
+  if (hasSvelteConfig || hasSvelteKitDep) {
+    checks.push({ framework: 'SvelteKit', installed: true, evidence: hasSvelteConfig ? 'svelte.config.js' : 'package.json:@sveltejs/kit', confidence: hasSvelteConfig ? 'high' : 'medium' });
+  }
+
+  const hasRemixConfig = (await exists(path.join(projectDir, 'remix.config.js'))) || (await exists(path.join(projectDir, 'remix.config.ts')));
+  const hasRemixDep = dependencyExists(packageJson, ['@remix-run/react', '@remix-run/node']);
+  if (hasRemixConfig || hasRemixDep) {
+    checks.push({ framework: 'Remix', installed: true, evidence: hasRemixConfig ? 'remix.config.*' : 'package.json:@remix-run/*', confidence: hasRemixConfig ? 'high' : 'medium' });
+  }
+
+  const hasAdonisAce = await exists(path.join(projectDir, 'ace'));
+  const hasAdonisDep = dependencyExists(packageJson, ['@adonisjs/core']);
+  if (hasAdonisAce || hasAdonisDep) {
+    checks.push({ framework: 'AdonisJS', installed: true, evidence: hasAdonisAce ? 'ace' : 'package.json:@adonisjs/core', confidence: hasAdonisAce ? 'high' : 'medium' });
+  }
+
+  const hasNodePackage = await exists(packageJsonPath);
+  if (checks.length === 0 && hasNodePackage) {
+    checks.push({ framework: 'Node', installed: true, evidence: 'package.json', confidence: 'low' });
+  }
+
+  if (checks.length === 0) {
+    return {
+      framework: null,
+      installed: false,
+      evidence: null,
+      confidence: 'none',
+      matches: []
+    };
+  }
+
+  return {
+    framework: checks[0].framework,
+    installed: true,
+    evidence: checks[0].evidence,
+    confidence: checks[0].confidence,
+    matches: checks
+  };
+}
+
+module.exports = {
+  detectFramework,
+  safeJsonParse,
+  dependencyExists
+};

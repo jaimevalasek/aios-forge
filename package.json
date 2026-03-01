@@ -1,0 +1,42 @@
+{
+  "name": "aios-lite",
+  "version": "0.1.0",
+  "description": "Lightweight AI agent framework for software projects.",
+  "keywords": [
+    "ai",
+    "agents",
+    "claude",
+    "codex",
+    "gemini",
+    "opencode",
+    "cli",
+    "framework"
+  ],
+  "license": "MIT",
+  "main": "src/cli.js",
+  "bin": {
+    "aios-lite": "bin/aios-lite.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "template/",
+    "docs/",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check src/*.js src/commands/*.js src/i18n/*.js src/i18n/messages/*.js bin/*.js",
+    "ci": "npm run lint && npm test"
+  }
+}

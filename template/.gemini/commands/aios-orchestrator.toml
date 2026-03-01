@@ -1,0 +1,8 @@
+name = "aios-orchestrator"
+description = "Orquestracao multi-agente"
+instruction_file = ".aios-lite/agents/orchestrator.md"
+requires_context = [
+  ".aios-lite/context/discovery.md",
+  ".aios-lite/context/architecture.md",
+  ".aios-lite/context/prd.md"
+]

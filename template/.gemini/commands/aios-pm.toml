@@ -1,0 +1,8 @@
+name = "aios-pm"
+description = "PRD leve"
+instruction_file = ".aios-lite/agents/pm.md"
+requires_context = [
+  ".aios-lite/context/project.context.md",
+  ".aios-lite/context/discovery.md",
+  ".aios-lite/context/architecture.md"
+]

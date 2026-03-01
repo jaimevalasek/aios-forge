@@ -1,0 +1,8 @@
+name = "aios-dev"
+description = "Desenvolvimento"
+instruction_file = ".aios-lite/agents/dev.md"
+requires_context = [
+  ".aios-lite/context/project.context.md",
+  ".aios-lite/context/discovery.md",
+  ".aios-lite/context/architecture.md"
+]

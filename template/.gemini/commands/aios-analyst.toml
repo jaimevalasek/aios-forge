@@ -1,0 +1,4 @@
+name = "aios-analyst"
+description = "Analise de requisitos"
+instruction_file = ".aios-lite/agents/analyst.md"
+requires_context = [".aios-lite/context/project.context.md"]
