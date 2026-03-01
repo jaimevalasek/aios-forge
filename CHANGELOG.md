@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
   - `opencode.json`
 - New MCP validation command:
   - `aios-lite mcp:doctor [path] [--strict-env] [--json]`
+- New parallel orchestration bootstrap command:
+  - `aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]`
 - Optional `mcp:init` tool filter:
   - `--tool=claude|codex|gemini|opencode`
 - `test:smoke` mixed monorepo profile:
@@ -28,6 +30,7 @@ All notable changes to this project will be documented in this file.
   - `docs/en/schemas/index.json`
   - `docs/en/schemas/*.schema.json` for each JSON command contract
   - includes `docs/en/schemas/mcp-doctor.schema.json`
+  - includes `docs/en/schemas/parallel-init.schema.json`
 
 ### Changed
 - Locale resolution now supports canonical fallback for Portuguese:
@@ -50,6 +53,7 @@ All notable changes to this project will be documented in this file.
   - `tests/agent-contracts.test.js`
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`
   - `tests/mcp-doctor.test.js`
+  - `tests/parallel-init.test.js`
   - `tests/json-output.test.js` now covers `mcp:doctor --json`
   - `tests/package-test.test.js`
   - `tests/workflow-plan.test.js`

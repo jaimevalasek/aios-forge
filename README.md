@@ -25,6 +25,7 @@ npx aios-lite install
 - `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed] [--keep] [--json]`
 - `aios-lite test:package [source-path] [--keep] [--dry-run] [--json]`
 - `aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
+- `aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]`
 - `aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
 - `aios-lite mcp:doctor [path] [--strict-env] [--json]`
 
@@ -41,6 +42,7 @@ aios-lite test:smoke --web3=ethereum
 aios-lite test:smoke --profile=mixed
 aios-lite test:package --dry-run
 aios-lite workflow:plan --classification=SMALL
+aios-lite parallel:init --workers=3
 aios-lite mcp:init --dry-run
 aios-lite mcp:doctor --strict-env
 ```
@@ -51,6 +53,7 @@ Use `--json` on selected commands:
 - `aios-lite doctor --json`
 - `aios-lite context:validate --json`
 - `aios-lite test:smoke --json`
+- `aios-lite parallel:init --json`
 - `aios-lite mcp:doctor --json`
 
 ## i18n
@@ -93,6 +96,7 @@ aios-lite i18n:add fr
 ## Docs
 - i18n guide: `docs/en/i18n.md`
 - JSON schemas: `docs/en/json-schemas.md`
+- parallel guide: `docs/en/parallel.md`
 - MCP guide: `docs/en/mcp.md`
 - web3 guide: `docs/en/web3.md`
 - release guide: `docs/en/release.md`

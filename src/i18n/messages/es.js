@@ -23,6 +23,8 @@ module.exports = {
       'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=es]',
     help_workflow_plan:
       'aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=es]',
+    help_parallel_init:
+      'aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=es]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=es]',
     help_mcp_doctor:
@@ -230,6 +232,22 @@ module.exports = {
       'Archivo de contexto no encontrado. Usando workflow de respaldo segun la clasificacion indicada/predeterminada.',
     title: 'Workflow recomendado para clasificacion {classification}:',
     notes: 'Notas:'
+  },
+  parallel_init: {
+    context_missing:
+      'Archivo de contexto no encontrado: {path}. Ejecuta setup:context primero.',
+    context_invalid: 'Archivo de contexto invalido o no parseable: {path}.',
+    requires_medium:
+      'La inicializacion paralela solo esta soportada para clasificacion MEDIUM (actual: {classification}). Usa --force para forzar.',
+    invalid_workers:
+      'Valor invalido para --workers. Usa un entero entre {min} y {max}.',
+    already_exists:
+      'Los archivos de contexto paralelo ya existen ({count}). Usa --force para sobrescribir.',
+    prepared: 'Workspace paralelo inicializado en: {path}',
+    dry_run_prepared: '[dry-run] El workspace paralelo se inicializaria en: {path}',
+    workers_count: 'Workers: {count}',
+    files_count: 'Archivos preparados: {count}',
+    missing_prereq_count: 'Archivos de contexto prerequisito faltantes: {count}'
   },
   mcp_init: {
     context_missing:

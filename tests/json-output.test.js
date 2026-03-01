@@ -136,6 +136,27 @@ test('workflow:plan --json returns workflow payload', async () => {
   assert.equal(parsed.commands.includes('@architect'), true);
 });
 
+test('parallel:init --json returns structured parallel workspace payload', async () => {
+  const dir = await makeTempDir();
+  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  await fs.mkdir(path.dirname(contextPath), { recursive: true });
+  await fs.writeFile(
+    contextPath,
+    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n`,
+    'utf8'
+  );
+
+  const cli = await runCli(['parallel:init', dir, '--json', '--workers=2']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.workers, 2);
+  assert.equal(parsed.classification, 'MEDIUM');
+  assert.equal(Array.isArray(parsed.files), true);
+  assert.equal(parsed.files.length, 3);
+});
+
 test('unknown command with --json returns structured error', async () => {
   const cli = await runCli(['unknown', '--json']);
   assert.equal(cli.code, 1);

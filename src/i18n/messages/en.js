@@ -23,6 +23,8 @@ module.exports = {
       'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=en]',
     help_workflow_plan:
       'aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=en]',
+    help_parallel_init:
+      'aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=en]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=en]',
     help_mcp_doctor:
@@ -226,6 +228,20 @@ module.exports = {
       'Context file not found. Using fallback workflow based on provided/default classification.',
     title: 'Recommended workflow for classification {classification}:',
     notes: 'Notes:'
+  },
+  parallel_init: {
+    context_missing: 'Context file not found: {path}. Run setup:context first.',
+    context_invalid: 'Context file is invalid or not parseable: {path}.',
+    requires_medium:
+      'Parallel initialization is only supported for MEDIUM classification (current: {classification}). Use --force to override.',
+    invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',
+    already_exists:
+      'Parallel context files already exist ({count}). Use --force to overwrite existing files.',
+    prepared: 'Parallel workspace initialized at: {path}',
+    dry_run_prepared: '[dry-run] Parallel workspace would be initialized at: {path}',
+    workers_count: 'Workers: {count}',
+    files_count: 'Files prepared: {count}',
+    missing_prereq_count: 'Missing prerequisite context files: {count}'
   },
   mcp_init: {
     context_missing:

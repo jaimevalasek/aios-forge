@@ -48,6 +48,11 @@
       "file": "workflow-plan.schema.json"
     },
     {
+      "id": "parallel_init",
+      "command": "aios-lite parallel:init --json",
+      "file": "parallel-init.schema.json"
+    },
+    {
       "id": "cli_error",
       "command": "aios-lite <unknown> --json",
       "file": "error.schema.json"

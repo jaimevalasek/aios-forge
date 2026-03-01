@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/parallel-init.schema.json",
+  "title": "AIOS Lite parallel:init --json output",
+  "type": "object",
+  "required": [
+    "ok",
+    "targetDir",
+    "classification",
+    "workers",
+    "dryRun",
+    "force",
+    "generatedAt",
+    "files",
+    "existingFiles",
+    "prerequisites",
+    "missingPrerequisites"
+  ],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "classification": { "type": "string" },
+    "workers": { "type": "integer", "minimum": 2, "maximum": 6 },
+    "dryRun": { "type": "boolean" },
+    "force": { "type": "boolean" },
+    "generatedAt": { "type": "string" },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "existingFiles": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "exists"],
+        "properties": {
+          "path": { "type": "string" },
+          "exists": { "type": "boolean" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "missingPrerequisites": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}
