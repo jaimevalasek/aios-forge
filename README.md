@@ -27,6 +27,7 @@ npx aios-lite install
 - `aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
 - `aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]`
 - `aios-lite parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json]`
+- `aios-lite parallel:status [path] [--json]`
 - `aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
 - `aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
 - `aios-lite mcp:doctor [path] [--strict-env] [--json]`
@@ -46,6 +47,7 @@ aios-lite test:package --dry-run
 aios-lite workflow:plan --classification=SMALL
 aios-lite parallel:init --workers=3
 aios-lite parallel:assign --source=architecture --workers=3
+aios-lite parallel:status
 aios-lite parallel:doctor --fix --dry-run
 aios-lite mcp:init --dry-run
 aios-lite mcp:doctor --strict-env
@@ -59,6 +61,7 @@ Use `--json` on selected commands:
 - `aios-lite test:smoke --json`
 - `aios-lite parallel:init --json`
 - `aios-lite parallel:assign --json`
+- `aios-lite parallel:status --json`
 - `aios-lite parallel:doctor --json`
 - `aios-lite mcp:doctor --json`
 

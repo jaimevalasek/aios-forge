@@ -47,6 +47,23 @@ Behavior:
 - Updates `## Scope` section and `updated_at` in each lane file.
 - Appends a decision-log entry to `shared-decisions.md` when present.
 
+## Status overview
+
+```bash
+aios-lite parallel:status
+aios-lite parallel:status --json
+```
+
+Aliases:
+- `aios-lite orchestrator:status`
+- `aios-lite parallel-status`
+
+Behavior:
+- Reads all `agent-N.status.md` lane files under `.aios-lite/context/parallel`.
+- Aggregates lane status counts, scope counts, blocker counts, and deliverable progress.
+- Includes shared decision log entry count from `shared-decisions.md` when present.
+- Returns a structured machine-readable report with `--json`.
+
 ## Diagnose and repair
 
 ```bash

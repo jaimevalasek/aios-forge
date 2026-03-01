@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/parallel-status.schema.json",
+  "title": "AIOS Lite parallel:status --json output",
+  "type": "object",
+  "required": [
+    "ok",
+    "targetDir",
+    "parallelDir",
+    "laneCount",
+    "statusCounts",
+    "scopeCount",
+    "blockerCount",
+    "deliverables",
+    "sharedDecisions",
+    "lanes"
+  ],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "parallelDir": { "type": "string" },
+    "laneCount": { "type": "integer", "minimum": 1 },
+    "statusCounts": {
+      "type": "object",
+      "required": ["pending", "in_progress", "completed", "blocked", "other"],
+      "properties": {
+        "pending": { "type": "integer", "minimum": 0 },
+        "in_progress": { "type": "integer", "minimum": 0 },
+        "completed": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "other": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "scopeCount": { "type": "integer", "minimum": 0 },
+    "blockerCount": { "type": "integer", "minimum": 0 },
+    "deliverables": {
+      "type": "object",
+      "required": ["completed", "total"],
+      "properties": {
+        "completed": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "sharedDecisions": {
+      "type": "object",
+      "required": ["exists", "entries"],
+      "properties": {
+        "exists": { "type": "boolean" },
+        "entries": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "lane",
+          "file",
+          "status",
+          "owner",
+          "priority",
+          "updatedAt",
+          "scopeCount",
+          "blockerCount",
+          "deliverables"
+        ],
+        "properties": {
+          "lane": { "type": "integer", "minimum": 1 },
+          "file": { "type": "string" },
+          "status": { "type": "string" },
+          "owner": { "type": "string" },
+          "priority": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "scopeCount": { "type": "integer", "minimum": 0 },
+          "blockerCount": { "type": "integer", "minimum": 0 },
+          "deliverables": {
+            "type": "object",
+            "required": ["completed", "total"],
+            "properties": {
+              "completed": { "type": "integer", "minimum": 0 },
+              "total": { "type": "integer", "minimum": 0 }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

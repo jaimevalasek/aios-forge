@@ -29,6 +29,8 @@ module.exports = {
       'aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json] [--locale=en]',
     help_parallel_assign:
       'aios-lite parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=en]',
+    help_parallel_status:
+      'aios-lite parallel:status [path] [--json] [--locale=en]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=en]',
     help_mcp_doctor:
@@ -271,6 +273,17 @@ module.exports = {
     source_info: 'Source document: {source}',
     workers_count: 'Workers: {count}',
     files_count: 'Files updated: {count}'
+  },
+  parallel_status: {
+    parallel_missing: 'Parallel directory not found: {path}. Run parallel:init first.',
+    no_lanes: 'No lane status files were found in .aios-lite/context/parallel.',
+    title: 'Parallel status report: {path}',
+    lanes_count: 'Lanes: {count}',
+    statuses_title: 'Statuses:',
+    scopes_count: 'Total scope items: {count}',
+    deliverables_progress: 'Deliverables: {completed}/{total} completed',
+    blockers_count: 'Open blockers: {count}',
+    shared_decisions: 'Shared decision log entries: {count}'
   },
   mcp_init: {
     context_missing:

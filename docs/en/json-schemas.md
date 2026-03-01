@@ -17,6 +17,7 @@ This folder provides formal schemas for automation:
 - `aios-lite workflow:plan --json`
 - `aios-lite parallel:init --json`
 - `aios-lite parallel:assign --json`
+- `aios-lite parallel:status --json`
 - `aios-lite parallel:doctor --json`
 - Generic CLI JSON errors (`unknown_command`, `command_error`)
 

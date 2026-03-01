@@ -29,6 +29,8 @@ module.exports = {
       'aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json] [--locale=fr]',
     help_parallel_assign:
       'aios-lite parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=fr]',
+    help_parallel_status:
+      'aios-lite parallel:status [path] [--json] [--locale=fr]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=fr]',
     help_mcp_doctor:
@@ -281,6 +283,18 @@ module.exports = {
     source_info: 'Document source : {source}',
     workers_count: 'Workers : {count}',
     files_count: 'Fichiers mis a jour : {count}'
+  },
+  parallel_status: {
+    parallel_missing:
+      'Repertoire parallele introuvable : {path}. Executez parallel:init avant.',
+    no_lanes: 'Aucun fichier de lane trouve dans .aios-lite/context/parallel.',
+    title: 'Rapport de statut parallele : {path}',
+    lanes_count: 'Lanes : {count}',
+    statuses_title: 'Statuts :',
+    scopes_count: 'Total des elements de scope : {count}',
+    deliverables_progress: 'Livrables : {completed}/{total} termines',
+    blockers_count: 'Blocages ouverts : {count}',
+    shared_decisions: 'Entrees du journal de decisions partagees : {count}'
   },
   mcp_init: {
     context_missing:

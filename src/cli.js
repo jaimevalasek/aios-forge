@@ -21,6 +21,7 @@ const { runWorkflowPlan } = require('./commands/workflow-plan');
 const { runParallelInit } = require('./commands/parallel-init');
 const { runParallelDoctor } = require('./commands/parallel-doctor');
 const { runParallelAssign } = require('./commands/parallel-assign');
+const { runParallelStatus } = require('./commands/parallel-status');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'info',
@@ -39,12 +40,16 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'parallel-doctor',
   'parallel:assign',
   'parallel-assign',
+  'parallel:status',
+  'parallel-status',
   'orchestrator:init',
   'orchestrator-init',
   'orchestrator:doctor',
   'orchestrator-doctor',
   'orchestrator:assign',
   'orchestrator-assign',
+  'orchestrator:status',
+  'orchestrator-status',
   'mcp:init',
   'mcp-init',
   'mcp:doctor',
@@ -90,6 +95,7 @@ function printHelp(t, logger) {
   logger.log(`  ${t('cli.help_parallel_init')}`);
   logger.log(`  ${t('cli.help_parallel_doctor')}`);
   logger.log(`  ${t('cli.help_parallel_assign')}`);
+  logger.log(`  ${t('cli.help_parallel_status')}`);
   logger.log(`  ${t('cli.help_mcp_init')}`);
   logger.log(`  ${t('cli.help_mcp_doctor')}`);
 }
@@ -175,6 +181,13 @@ async function main() {
       command === 'orchestrator-assign'
     ) {
       result = await runParallelAssign({ args, options, logger, t });
+    } else if (
+      command === 'parallel:status' ||
+      command === 'parallel-status' ||
+      command === 'orchestrator:status' ||
+      command === 'orchestrator-status'
+    ) {
+      result = await runParallelStatus({ args, options, logger, t });
     } else if (command === 'mcp:init' || command === 'mcp-init') {
       result = await runMcpInit({ args, options, logger, t });
     } else if (command === 'mcp:doctor' || command === 'mcp-doctor') {
