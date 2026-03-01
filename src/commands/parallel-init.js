@@ -210,7 +210,7 @@ async function runParallelInit({ args, options = {}, logger, t }) {
     );
   }
   for (const file of output.files) {
-    logger.log(`- ${file}`);
+    logger.log(t('parallel_init.file_line', { file }));
   }
 
   return output;

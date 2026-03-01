@@ -19,6 +19,19 @@ function createQuietLogger() {
   };
 }
 
+function createCollectLogger() {
+  const lines = [];
+  return {
+    lines,
+    log(line) {
+      lines.push(String(line));
+    },
+    error(line) {
+      lines.push(String(line));
+    }
+  };
+}
+
 async function writeContext(dir, classification = 'MEDIUM') {
   const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
@@ -133,5 +146,27 @@ test('parallel:init dry-run does not write files', async () => {
   assert.equal(result.files.length, 3);
   await assert.rejects(() =>
     fs.access(path.join(dir, '.aios-lite/context/parallel/shared-decisions.md'))
+  );
+});
+
+test('parallel:init localizes file listing lines in pt-BR', async () => {
+  const dir = await makeTempDir();
+  await writeContext(dir, 'MEDIUM');
+  const { t } = createTranslator('pt-BR');
+  const logger = createCollectLogger();
+
+  const result = await runParallelInit({
+    args: [dir],
+    options: { workers: 2 },
+    logger,
+    t
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(
+    logger.lines.some((line) =>
+      line.includes('Arquivo: .aios-lite/context/parallel/shared-decisions.md')
+    ),
+    true
   );
 });

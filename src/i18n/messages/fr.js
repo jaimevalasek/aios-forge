@@ -133,6 +133,11 @@ module.exports = {
     active_path: 'Chemin actif',
     depends: 'Depend de',
     output: 'Sortie',
+    agent_line: '- Agent : {command} ({id})',
+    path_line: '  Chemin : {path}',
+    active_path_line: '  Chemin actif : {path}',
+    depends_line: '  Depend de : {value}',
+    output_line: '  Sortie : {value}',
     none: 'aucun',
     prompt_usage_error:
       'Utilisation : aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=fr]',
@@ -234,7 +239,8 @@ module.exports = {
     applied: 'Pack locale applique : {locale}',
     dry_run_applied: '[dry-run] Le pack locale serait applique : {locale}',
     copied_count: 'Fichiers copies : {count}',
-    missing_count: 'Fichiers locale manquants : {count}'
+    missing_count: 'Fichiers locale manquants : {count}',
+    copy_line: '  Fichier : {source} -> {target}'
   },
   smoke: {
     start: 'Execution du smoke test dans : {projectDir}',
@@ -305,6 +311,8 @@ module.exports = {
       'Fichier contexte introuvable. Utilisation du workflow de secours selon la classification fournie/par defaut.',
     title: 'Workflow recommande pour la classification {classification} :',
     notes: 'Notes :',
+    command_line: '  Commande : {command}',
+    note_line: '  Note : {note}',
     note_framework_not_installed:
       'Le framework n est pas encore installe ; terminez l installation du stack avant @dev.',
     note_dapp_context:
@@ -327,7 +335,8 @@ module.exports = {
     dry_run_prepared: '[dry-run] Le workspace parallele serait initialise dans : {path}',
     workers_count: 'Workers : {count}',
     files_count: 'Fichiers prepares : {count}',
-    missing_prereq_count: 'Fichiers de contexte prerequis manquants : {count}'
+    missing_prereq_count: 'Fichiers de contexte prerequis manquants : {count}',
+    file_line: '  Fichier : {file}'
   },
   parallel_doctor: {
     prefix_ok: 'OK',

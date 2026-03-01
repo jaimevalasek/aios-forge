@@ -38,11 +38,11 @@ async function runAgentsList({ args, options, logger, t }) {
   for (const agent of agents) {
     const deps = agent.dependsOn.length > 0 ? agent.dependsOn.join(', ') : t('agents.none');
     const instructionPath = await resolveExistingInstructionPath(targetDir, agent, locale);
-    logger.log(`- ${agent.command} (${agent.id})`);
-    logger.log(`  ${t('agents.path')}: ${instructionPath}`);
-    logger.log(`  ${t('agents.active_path')}: ${agent.path}`);
-    logger.log(`  ${t('agents.depends')}: ${deps}`);
-    logger.log(`  ${t('agents.output')}: ${agent.output}`);
+    logger.log(t('agents.agent_line', { command: agent.command, id: agent.id }));
+    logger.log(t('agents.path_line', { path: instructionPath }));
+    logger.log(t('agents.active_path_line', { path: agent.path }));
+    logger.log(t('agents.depends_line', { value: deps }));
+    logger.log(t('agents.output_line', { value: agent.output }));
   }
 
   return { count: agents.length, agents, locale };

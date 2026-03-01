@@ -31,7 +31,12 @@ async function runLocaleApply({ args, options, logger, t }) {
   }
 
   for (const item of result.copied) {
-    logger.log(`- ${item.source} -> ${item.target}`);
+    logger.log(
+      t('locale_apply.copy_line', {
+        source: item.source,
+        target: item.target
+      })
+    );
   }
 
   return result;
@@ -40,4 +45,3 @@ async function runLocaleApply({ args, options, logger, t }) {
 module.exports = {
   runLocaleApply
 };
-

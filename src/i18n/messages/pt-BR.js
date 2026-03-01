@@ -135,6 +135,11 @@ module.exports = {
     active_path: 'Caminho ativo',
     depends: 'Depende de',
     output: 'Saida',
+    agent_line: '- Agente: {command} ({id})',
+    path_line: '  Caminho: {path}',
+    active_path_line: '  Caminho ativo: {path}',
+    depends_line: '  Depende de: {value}',
+    output_line: '  Saida: {value}',
     none: 'nenhum',
     prompt_usage_error:
       'Uso: aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
@@ -234,7 +239,8 @@ module.exports = {
     applied: 'Pacote de locale aplicado: {locale}',
     dry_run_applied: '[dry-run] Pacote de locale seria aplicado: {locale}',
     copied_count: 'Arquivos copiados: {count}',
-    missing_count: 'Arquivos de locale ausentes: {count}'
+    missing_count: 'Arquivos de locale ausentes: {count}',
+    copy_line: '  Arquivo: {source} -> {target}'
   },
   smoke: {
     start: 'Executando smoke test em: {projectDir}',
@@ -303,6 +309,8 @@ module.exports = {
       'Arquivo de contexto nao encontrado. Usando workflow de fallback com base na classificacao informada/padrao.',
     title: 'Workflow recomendado para classificacao {classification}:',
     notes: 'Notas:',
+    command_line: '  Comando: {command}',
+    note_line: '  Nota: {note}',
     note_framework_not_installed:
       'Framework ainda nao esta instalado; conclua a instalacao da stack antes de @dev.',
     note_dapp_context:
@@ -325,7 +333,8 @@ module.exports = {
     dry_run_prepared: '[dry-run] Workspace paralelo seria inicializado em: {path}',
     workers_count: 'Workers: {count}',
     files_count: 'Arquivos preparados: {count}',
-    missing_prereq_count: 'Arquivos de contexto prerequisitos ausentes: {count}'
+    missing_prereq_count: 'Arquivos de contexto prerequisitos ausentes: {count}',
+    file_line: '  Arquivo: {file}'
   },
   parallel_doctor: {
     prefix_ok: 'OK',

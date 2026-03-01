@@ -23,6 +23,19 @@ function createQuietLogger() {
   };
 }
 
+function createCollectLogger() {
+  const lines = [];
+  return {
+    lines,
+    log(line) {
+      lines.push(String(line));
+    },
+    error(line) {
+      lines.push(String(line));
+    }
+  };
+}
+
 test('normalizeClassification supports known values and fallback', () => {
   assert.equal(normalizeClassification('micro'), 'MICRO');
   assert.equal(normalizeClassification('small'), 'SMALL');
@@ -88,4 +101,21 @@ test('runWorkflowPlan works without context using fallback classification', asyn
   assert.equal(result.classification, 'MEDIUM');
   assert.equal(result.commands[0], '@setup');
   assert.equal(result.commands[result.commands.length - 1], '@qa');
+});
+
+test('runWorkflowPlan localizes command and note line formatting in pt-BR', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+  const logger = createCollectLogger();
+
+  const result = await runWorkflowPlan({
+    args: [dir],
+    options: { classification: 'MICRO', 'framework-installed': 'false' },
+    logger,
+    t
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(logger.lines.some((line) => line.includes('Comando: @setup')), true);
+  assert.equal(logger.lines.some((line) => line.includes('Nota: ')), true);
 });

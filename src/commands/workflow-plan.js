@@ -84,12 +84,12 @@ async function runWorkflowPlan({ args, options = {}, logger, t }) {
   }
   logger.log(t('workflow_plan.title', { classification: plan.classification }));
   for (const command of plan.commands) {
-    logger.log(`- ${command}`);
+    logger.log(t('workflow_plan.command_line', { command }));
   }
   if (output.notes.length > 0) {
     logger.log(t('workflow_plan.notes'));
     for (const note of output.notes) {
-      logger.log(`- ${note}`);
+      logger.log(t('workflow_plan.note_line', { note }));
     }
   }
 

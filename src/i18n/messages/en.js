@@ -129,6 +129,11 @@ module.exports = {
     active_path: 'Active path',
     depends: 'Depends on',
     output: 'Output',
+    agent_line: '- Agent: {command} ({id})',
+    path_line: '  Path: {path}',
+    active_path_line: '  Active path: {path}',
+    depends_line: '  Depends on: {value}',
+    output_line: '  Output: {value}',
     none: 'none',
     prompt_usage_error:
       'Usage: aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=en]',
@@ -228,7 +233,8 @@ module.exports = {
     applied: 'Locale pack applied: {locale}',
     dry_run_applied: '[dry-run] Locale pack would be applied: {locale}',
     copied_count: 'Files copied: {count}',
-    missing_count: 'Missing locale files: {count}'
+    missing_count: 'Missing locale files: {count}',
+    copy_line: '  File: {source} -> {target}'
   },
   smoke: {
     start: 'Running smoke test in: {projectDir}',
@@ -297,6 +303,8 @@ module.exports = {
       'Context file not found. Using fallback workflow based on provided/default classification.',
     title: 'Recommended workflow for classification {classification}:',
     notes: 'Notes:',
+    command_line: '  Command: {command}',
+    note_line: '  Note: {note}',
     note_framework_not_installed:
       'Framework is not installed yet; complete stack installation before @dev.',
     note_dapp_context:
@@ -316,7 +324,8 @@ module.exports = {
     dry_run_prepared: '[dry-run] Parallel workspace would be initialized at: {path}',
     workers_count: 'Workers: {count}',
     files_count: 'Files prepared: {count}',
-    missing_prereq_count: 'Missing prerequisite context files: {count}'
+    missing_prereq_count: 'Missing prerequisite context files: {count}',
+    file_line: '  File: {file}'
   },
   parallel_doctor: {
     prefix_ok: 'OK',
