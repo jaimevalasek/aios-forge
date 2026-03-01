@@ -354,7 +354,7 @@ async function runParallelDoctor({ args, options = {}, logger, t }) {
     if (classification !== 'MEDIUM' && !force) {
       throw new Error(
         t('parallel_doctor.requires_medium', {
-          classification: classification || 'unknown'
+          classification: classification || t('parallel_doctor.classification_unknown')
         })
       );
     }

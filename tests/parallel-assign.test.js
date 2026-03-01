@@ -189,3 +189,20 @@ test('parallel:assign localizes lane scope summary in pt-BR', async () => {
 
   assert.equal(logger.lines.some((line) => line.includes('item(ns) de escopo')), true);
 });
+
+test('parallel:assign localizes unknown classification fallback in pt-BR', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+  await writeContext(dir, '');
+  await writeArchitecture(dir);
+
+  await assert.rejects(
+    runParallelAssign({
+      args: [dir],
+      options: { source: 'architecture' },
+      logger: createQuietLogger(),
+      t
+    }),
+    /desconhecida/
+  );
+});

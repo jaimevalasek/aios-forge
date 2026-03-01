@@ -130,7 +130,7 @@ async function runParallelInit({ args, options = {}, logger, t }) {
   if (classification !== 'MEDIUM' && !force) {
     throw new Error(
       t('parallel_init.requires_medium', {
-        classification: classification || 'unknown'
+        classification: classification || t('parallel_init.classification_unknown')
       })
     );
   }

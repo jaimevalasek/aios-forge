@@ -308,6 +308,7 @@ module.exports = {
     context_missing:
       'Archivo de contexto no encontrado: {path}. Ejecuta setup:context primero.',
     context_invalid: 'Archivo de contexto invalido o no parseable: {path}.',
+    classification_unknown: 'desconocida',
     requires_medium:
       'La inicializacion paralela solo esta soportada para clasificacion MEDIUM (actual: {classification}). Usa --force para forzar.',
     invalid_workers:
@@ -326,6 +327,7 @@ module.exports = {
     prefix_fail: 'FALLO',
     invalid_workers:
       'Valor invalido para --workers. Usa un entero entre {min} y {max}.',
+    classification_unknown: 'desconocida',
     requires_medium:
       'El modo fix de parallel doctor requiere clasificacion MEDIUM (actual: {classification}). Usa --force para forzar.',
     report_title: 'Reporte de parallel doctor: {path}',
@@ -369,6 +371,7 @@ module.exports = {
       'Valor invalido para --workers. Usa un entero entre {min} y {max}.',
     context_missing: 'Archivo de contexto no encontrado: {path}.',
     context_invalid: 'Archivo de contexto invalido o no parseable: {path}.',
+    classification_unknown: 'desconocida',
     requires_medium:
       'La asignacion paralela requiere clasificacion MEDIUM (actual: {classification}). Usa --force para forzar.',
     parallel_missing:

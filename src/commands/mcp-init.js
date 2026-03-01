@@ -3,6 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { validateProjectContextFile } = require('../context');
+const { createTranslator } = require('../i18n');
 const { ensureDir, readTextIfExists } = require('../utils');
 
 const TOOL_PRESET_DEFINITIONS = [
@@ -242,15 +243,13 @@ function resolveToolDefinitions(tool, t) {
   const found = TOOL_PRESET_DEFINITIONS.find((item) => item.id === normalized);
   if (!found) {
     const expected = TOOL_PRESET_DEFINITIONS.map((item) => item.id).join(', ');
-    if (typeof t === 'function') {
-      throw new Error(
-        t('mcp_init.invalid_tool', {
-          tool: String(tool || ''),
-          expected
-        })
-      );
-    }
-    throw new Error(`Invalid --tool value: ${tool}. Use one of: ${expected}.`);
+    const translate = typeof t === 'function' ? t : createTranslator('en').t;
+    throw new Error(
+      translate('mcp_init.invalid_tool', {
+        tool: String(tool || ''),
+        expected
+      })
+    );
   }
   return [found];
 }

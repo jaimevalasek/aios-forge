@@ -310,6 +310,7 @@ module.exports = {
     context_missing:
       'Arquivo de contexto nao encontrado: {path}. Execute setup:context primeiro.',
     context_invalid: 'Arquivo de contexto invalido ou nao parseavel: {path}.',
+    classification_unknown: 'desconhecida',
     requires_medium:
       'Inicializacao paralela so e suportada para classificacao MEDIUM (atual: {classification}). Use --force para sobrescrever.',
     invalid_workers:
@@ -328,6 +329,7 @@ module.exports = {
     prefix_fail: 'FALHA',
     invalid_workers:
       'Valor invalido para --workers. Use um inteiro entre {min} e {max}.',
+    classification_unknown: 'desconhecida',
     requires_medium:
       'Modo de correcao do parallel doctor requer classificacao MEDIUM (atual: {classification}). Use --force para sobrescrever.',
     report_title: 'Relatorio do parallel doctor: {path}',
@@ -371,6 +373,7 @@ module.exports = {
       'Valor invalido para --workers. Use um inteiro entre {min} e {max}.',
     context_missing: 'Arquivo de contexto nao encontrado: {path}.',
     context_invalid: 'Arquivo de contexto invalido ou nao parseavel: {path}.',
+    classification_unknown: 'desconhecida',
     requires_medium:
       'A atribuicao paralela requer classificacao MEDIUM (atual: {classification}). Use --force para sobrescrever.',
     parallel_missing:

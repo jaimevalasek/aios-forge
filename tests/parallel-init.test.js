@@ -100,6 +100,22 @@ test('parallel:init rejects non-medium classification unless force is enabled', 
   assert.equal(forced.files.length, 4);
 });
 
+test('parallel:init localizes unknown classification fallback in pt-BR', async () => {
+  const dir = await makeTempDir();
+  await writeContext(dir, '');
+  const { t } = createTranslator('pt-BR');
+
+  await assert.rejects(
+    runParallelInit({
+      args: [dir],
+      options: {},
+      logger: createQuietLogger(),
+      t
+    }),
+    /desconhecida/
+  );
+});
+
 test('parallel:init dry-run does not write files', async () => {
   const dir = await makeTempDir();
   await writeContext(dir, 'MEDIUM');

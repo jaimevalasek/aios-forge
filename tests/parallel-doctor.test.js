@@ -127,3 +127,19 @@ test('parallel:doctor --fix restores missing shared and lane files', async () =>
     fs.access(path.join(dir, '.aios-lite/context/parallel/agent-2.status.md'))
   );
 });
+
+test('parallel:doctor --fix localizes unknown classification fallback in pt-BR', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+  await writeContext(dir, '');
+
+  await assert.rejects(
+    runParallelDoctor({
+      args: [dir],
+      options: { fix: true },
+      logger: createQuietLogger(),
+      t
+    }),
+    /desconhecida/
+  );
+});

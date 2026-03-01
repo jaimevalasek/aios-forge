@@ -302,6 +302,7 @@ module.exports = {
   parallel_init: {
     context_missing: 'Context file not found: {path}. Run setup:context first.',
     context_invalid: 'Context file is invalid or not parseable: {path}.',
+    classification_unknown: 'unknown',
     requires_medium:
       'Parallel initialization is only supported for MEDIUM classification (current: {classification}). Use --force to override.',
     invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',
@@ -318,6 +319,7 @@ module.exports = {
     prefix_warn: 'WARN',
     prefix_fail: 'FAIL',
     invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',
+    classification_unknown: 'unknown',
     requires_medium:
       'Parallel doctor fix mode requires MEDIUM classification (current: {classification}). Use --force to override.',
     report_title: 'Parallel doctor report: {path}',
@@ -356,6 +358,7 @@ module.exports = {
     invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',
     context_missing: 'Context file not found: {path}.',
     context_invalid: 'Context file is invalid or not parseable: {path}.',
+    classification_unknown: 'unknown',
     requires_medium:
       'Parallel assignment requires MEDIUM classification (current: {classification}). Use --force to override.',
     parallel_missing: 'Parallel directory not found: {path}. Run parallel:init first.',

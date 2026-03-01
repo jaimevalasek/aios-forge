@@ -158,3 +158,31 @@ test('mcp:init rejects invalid --tool value', async () => {
     /Invalid --tool value/
   );
 });
+
+test('mcp:init rejects invalid --tool value with localized pt-BR message', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+
+  await assert.rejects(
+    runMcpInit({
+      args: [dir],
+      options: { tool: 'invalid-tool' },
+      logger: createQuietLogger(),
+      t
+    }),
+    /Valor invalido para --tool/
+  );
+});
+
+test('mcp:init invalid --tool fallback works without translator argument', async () => {
+  const dir = await makeTempDir();
+
+  await assert.rejects(
+    runMcpInit({
+      args: [dir],
+      options: { tool: 'invalid-tool' },
+      logger: createQuietLogger()
+    }),
+    /Invalid --tool value/
+  );
+});

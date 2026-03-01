@@ -239,7 +239,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
   if (classification !== 'MEDIUM' && !force) {
     throw new Error(
       t('parallel_assign.requires_medium', {
-        classification: classification || 'unknown'
+        classification: classification || t('parallel_assign.classification_unknown')
       })
     );
   }
