@@ -31,3 +31,10 @@ Ranges:
 - `classification`
 - `conversation_language` (BCP-47, for example `en`, `pt-BR`)
 - `aios_lite_version`
+
+## Agent locale packs
+- Localized agent prompts are stored in `.aios-lite/locales/<locale>/agents/`.
+- Active runtime prompts are in `.aios-lite/agents/`.
+- Apply locale pack using:
+  - `aios-lite locale:apply` (reads `conversation_language` from context)
+  - `aios-lite locale:apply --lang=pt-BR` (manual override)

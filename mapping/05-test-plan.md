@@ -27,8 +27,14 @@
 - `agents` lists known agents and dependencies.
 - `agent:prompt` generates tool-specific prompt text.
 - `context:validate` reports parse/contract issues directly.
+- `resolveAgentLocale` maps base tags (for example `pt` -> `pt-BR`) with safe fallback to `en`.
+- `applyAgentLocale` copies localized agent templates into active `.aios-lite/agents` paths.
 
 ## Manual
 - Empty folder: `npx aios-lite init demo`.
 - Existing project: `npx aios-lite install`.
 - Update: `npx aios-lite update` preserving local customizations.
+- Context bootstrap + language flow:
+  - `aios-lite setup:context --defaults --language=pt-BR`
+  - `aios-lite locale:apply`
+  - `aios-lite agent:prompt setup --tool=codex --lang=pt-BR`

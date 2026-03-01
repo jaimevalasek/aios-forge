@@ -11,6 +11,7 @@ const { runI18nAdd } = require('./commands/i18n-add');
 const { runAgentsList, runAgentPrompt } = require('./commands/agents');
 const { runContextValidate } = require('./commands/context-validate');
 const { runSetupContext } = require('./commands/setup-context');
+const { runLocaleApply } = require('./commands/locale-apply');
 
 function printHelp(t) {
   console.log(`${t('cli.title')}\n`);
@@ -25,6 +26,7 @@ function printHelp(t) {
   console.log(`  ${t('cli.help_agent_prompt')}`);
   console.log(`  ${t('cli.help_context_validate')}`);
   console.log(`  ${t('cli.help_setup_context')}`);
+  console.log(`  ${t('cli.help_locale_apply')}`);
 }
 
 async function main() {
@@ -82,6 +84,10 @@ async function main() {
     }
     if (command === 'setup:context' || command === 'setup-context') {
       await runSetupContext({ args, options, logger, t });
+      return;
+    }
+    if (command === 'locale:apply' || command === 'locale-apply') {
+      await runLocaleApply({ args, options, logger, t });
       return;
     }
 

@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const {
   normalizeAgentName,
   getAgentDefinition,
+  resolveInstructionPath,
   buildAgentPrompt,
   listAgentDefinitions
 } = require('../src/agents');
@@ -21,8 +22,11 @@ test('getAgentDefinition resolves known agent', () => {
 
 test('buildAgentPrompt includes target output', () => {
   const agent = getAgentDefinition('analyst');
-  const prompt = buildAgentPrompt(agent, 'codex');
+  const prompt = buildAgentPrompt(agent, 'codex', {
+    instructionPath: resolveInstructionPath(agent, 'pt-BR')
+  });
   assert.equal(prompt.includes(agent.output), true);
+  assert.equal(prompt.includes('.aios-lite/locales/pt-BR/agents/analyst.md'), true);
 });
 
 test('listAgentDefinitions returns non-empty list', () => {

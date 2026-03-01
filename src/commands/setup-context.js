@@ -9,6 +9,7 @@ const {
   renderProjectContext,
   writeProjectContext
 } = require('../context-writer');
+const { applyAgentLocale } = require('../locales');
 
 function resolveOption(options, name, fallback = '') {
   return options[name] !== undefined ? String(options[name]) : fallback;
@@ -52,7 +53,7 @@ async function runSetupContext({ args, options, logger, t }) {
     email: resolveOption(options, 'email', ''),
     payments: resolveOption(options, 'payments', ''),
     installCommands: resolveOption(options, 'install-commands', ''),
-    aiosLiteVersion: resolveOption(options, 'aios-lite-version', '0.1.2')
+    aiosLiteVersion: resolveOption(options, 'aios-lite-version', '0.1.3')
   };
 
   let userTypesCount = Number(options['user-types'] || 1);
@@ -105,6 +106,9 @@ async function runSetupContext({ args, options, logger, t }) {
 
   const content = renderProjectContext(data);
   const filePath = await writeProjectContext(targetDir, content);
+  const localeApplyResult = await applyAgentLocale(targetDir, data.conversationLanguage, {
+    dryRun: false
+  });
 
   logger.log(t('setup_context.written', { path: filePath }));
   logger.log(
@@ -113,15 +117,21 @@ async function runSetupContext({ args, options, logger, t }) {
       score: classificationResult.score
     })
   );
+  logger.log(
+    t('setup_context.locale_applied', {
+      locale: localeApplyResult.locale,
+      count: localeApplyResult.copied.length
+    })
+  );
 
   return {
     filePath,
     data,
-    classificationScore: classificationResult.score
+    classificationScore: classificationResult.score,
+    localeApplyResult
   };
 }
 
 module.exports = {
   runSetupContext
 };
-

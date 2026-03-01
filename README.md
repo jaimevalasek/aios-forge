@@ -21,6 +21,7 @@ npx aios-lite install
 - `aios-lite agents`
 - `aios-lite agent:prompt <agent> [--tool=codex|claude|gemini|opencode]`
 - `aios-lite context:validate [path]`
+- `aios-lite locale:apply [path] [--lang=en|pt-BR]`
 
 ## Agent usage helper
 If your AI CLI does not show a visual agent picker, use:
@@ -28,6 +29,7 @@ If your AI CLI does not show a visual agent picker, use:
 ```bash
 aios-lite agents
 aios-lite agent:prompt setup --tool=codex
+aios-lite locale:apply --lang=pt-BR
 ```
 
 ## i18n

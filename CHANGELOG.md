@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2026-03-01
+### Added
+- Localized agent prompt packs:
+  - `.aios-lite/locales/en/agents/*.md`
+  - `.aios-lite/locales/pt-BR/agents/*.md`
+- New command:
+  - `aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run]`
+- Agent path resolution now supports locale-aware prompts with fallback to active agent paths.
+- New locale test suite: `tests/locales.test.js`.
+
+### Changed
+- `setup:context` now applies localized agent prompts based on `conversation_language`.
+- Documentation updated for locale pack workflow.
+
 ## [0.1.2] - 2026-03-01
 ### Added
 - New commands:

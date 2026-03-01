@@ -10,10 +10,11 @@ module.exports = {
     help_info: 'aios-lite info [path] [--locale=en]',
     help_doctor: 'aios-lite doctor [path] [--locale=en]',
     help_i18n_add: 'aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=en]',
-    help_agents: 'aios-lite agents [--locale=en]',
-    help_agent_prompt: 'aios-lite agent:prompt <agent> [--tool=codex|claude|gemini|opencode] [--locale=en]',
+    help_agents: 'aios-lite agents [path] [--lang=en|pt-BR] [--locale=en]',
+    help_agent_prompt: 'aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR] [--locale=en]',
     help_context_validate: 'aios-lite context:validate [path] [--locale=en]',
     help_setup_context: 'aios-lite setup:context [path] [--defaults] [--project-name=...] [--language=en] [--locale=en]',
+    help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     error_prefix: 'Error: {message}'
   },
@@ -92,14 +93,15 @@ module.exports = {
     step_try: '2. Run the CLI with --locale={locale} to validate the new dictionary.'
   },
   agents: {
-    list_title: 'Available agents:',
+    list_title: 'Available agents (resolved locale: {locale}):',
     path: 'Path',
+    active_path: 'Active path',
     depends: 'Depends on',
     output: 'Output',
     none: 'none',
-    prompt_usage_error: 'Usage: aios-lite agent:prompt <agent> [--tool=codex|claude|gemini|opencode] [--locale=en]',
+    prompt_usage_error: 'Usage: aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR] [--locale=en]',
     prompt_unknown_agent: 'Unknown agent: {agent}',
-    prompt_title: 'Prompt for agent "{agent}" on tool "{tool}":'
+    prompt_title: 'Prompt for agent "{agent}" on tool "{tool}" (locale: {locale}):'
   },
   context_validate: {
     missing_file: 'Context file not found: {path}',
@@ -123,6 +125,13 @@ module.exports = {
     q_integrations: 'How many external integrations?',
     q_rules_complexity: 'Rules complexity (none|some|complex)',
     written: 'Context file written: {path}',
-    classification_result: 'Classification: {classification} (score={score}/6)'
+    classification_result: 'Classification: {classification} (score={score}/6)',
+    locale_applied: 'Localized agent pack applied: {locale} ({count} files)'
+  },
+  locale_apply: {
+    applied: 'Locale pack applied: {locale}',
+    dry_run_applied: '[dry-run] Locale pack would be applied: {locale}',
+    copied_count: 'Files copied: {count}',
+    missing_count: 'Missing locale files: {count}'
   }
 };

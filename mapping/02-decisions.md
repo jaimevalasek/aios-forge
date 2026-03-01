@@ -53,3 +53,7 @@
 ### D013 - CLI context bootstrap
 - Decision: add `setup:context` command to generate `project.context.md` from CLI questions/defaults.
 - Why: unblock users when agent setup flow is not yet fully automated in their AI client.
+
+### D014 - Agent locale packs and activation flow
+- Decision: ship localized agent prompt packs under `.aios-lite/locales/<locale>/agents`, add `locale:apply`, and auto-apply locale during `setup:context`.
+- Why: ensure end-to-end language consistency (agent instructions + user interaction) across Codex, Claude Code, Gemini CLI, and OpenCode.

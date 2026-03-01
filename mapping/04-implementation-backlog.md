@@ -26,11 +26,12 @@
 - [x] Initial CHANGELOG.
 - [x] CONTRIBUTING and CODE_OF_CONDUCT.
 - [x] GitHub Actions CI and npm release workflows.
-- [ ] npm release checklist completion.
+- [x] npm release checklist completion.
 
 ## Sprint 5 - Usability and language contract
 - [x] `agents` command to list agent contracts.
 - [x] `agent:prompt` command to generate copy-paste prompts per tool.
 - [x] `context:validate` command for explicit context checks.
-- [ ] Localized agent packs (`en`, `pt-BR`) with selection flow.
+- [x] Localized agent packs (`en`, `pt-BR`) with selection flow.
 - [x] Optional interactive CLI onboarding for `project.context.md` generation (`setup:context`).
+- [x] `locale:apply` command and setup auto-activation based on `conversation_language`.

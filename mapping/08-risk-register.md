@@ -12,8 +12,8 @@
 
 ## R003 - Partial i18n expectation mismatch (CLI vs agent conversation)
 - Severity: Medium
-- Probability: High
-- Mitigation: enforce `conversation_language` contract and implement localized agent packs in next cycle.
+- Probability: Medium
+- Mitigation: localized agent packs are active for `en` and `pt-BR` via `locale:apply` and `setup:context`; keep adding locale coverage and smoke tests for language flows.
 
 ## R004 - Release process inconsistency across local and CI
 - Severity: Medium
