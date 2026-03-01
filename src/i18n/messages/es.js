@@ -120,6 +120,18 @@ module.exports = {
     context_conversation_language_format: '`conversation_language` no es una etiqueta BCP-47 valida',
     context_conversation_language_format_hint: 'Usa valores como en, en-US, pt-BR.',
     node_version: 'Node.js >= 18 (actual: {version})',
+    gateway_claude_pointer: 'El gateway de CLAUDE referencia archivos compartidos de AIOS Lite',
+    gateway_claude_pointer_hint:
+      'Asegura que CLAUDE.md referencie .aios-lite/config.md y .aios-lite/agents/setup.md.',
+    gateway_codex_pointer: 'El gateway de Codex referencia archivos compartidos de AIOS Lite',
+    gateway_codex_pointer_hint:
+      'Asegura que AGENTS.md referencie .aios-lite/config.md y .aios-lite/agents/.',
+    gateway_gemini_pointer: 'El gateway de Gemini referencia rutas compartidas de comandos y agentes',
+    gateway_gemini_pointer_hint:
+      'Asegura que .gemini/GEMINI.md referencie .gemini/commands/ y .aios-lite/agents/.',
+    gateway_opencode_pointer: 'El gateway de OpenCode referencia archivos compartidos de AIOS Lite',
+    gateway_opencode_pointer_hint:
+      'Asegura que OPENCODE.md referencie .aios-lite/config.md y .aios-lite/agents/.',
     fix_start: 'Modo de correccion segura habilitado.',
     fix_start_dry_run: 'Modo de correccion segura habilitado (dry-run).',
     fix_action_required_files: 'Restaurar archivos gestionados faltantes desde la plantilla',

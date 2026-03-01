@@ -104,6 +104,18 @@ test('translator exposes localized doctor command wrapper keys', () => {
   assert.equal(fr.t('doctor.fix_action_line', { action: 'x' }), '- Action : x');
 });
 
+test('translator exposes localized doctor gateway contract keys', () => {
+  const en = createTranslator('en');
+  const pt = createTranslator('pt-BR');
+  const es = createTranslator('es');
+  const fr = createTranslator('fr');
+
+  assert.equal(en.t('doctor.gateway_codex_pointer').includes('Codex gateway'), true);
+  assert.equal(pt.t('doctor.gateway_codex_pointer').includes('Gateway do Codex'), true);
+  assert.equal(es.t('doctor.gateway_codex_pointer').includes('gateway de Codex'), true);
+  assert.equal(fr.t('doctor.gateway_codex_pointer').includes('passerelle Codex'), true);
+});
+
 test('translator exposes localized cli line wrapper keys', () => {
   const en = createTranslator('en');
   const pt = createTranslator('pt-BR');

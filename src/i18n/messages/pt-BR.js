@@ -121,6 +121,18 @@ module.exports = {
       '`conversation_language` nao e uma tag BCP-47 valida',
     context_conversation_language_format_hint: 'Use valores como en, en-US, pt-BR.',
     node_version: 'Node.js >= 18 (atual: {version})',
+    gateway_claude_pointer: 'Gateway do CLAUDE referencia arquivos compartilhados do AIOS Lite',
+    gateway_claude_pointer_hint:
+      'Garanta que CLAUDE.md referencie .aios-lite/config.md e .aios-lite/agents/setup.md.',
+    gateway_codex_pointer: 'Gateway do Codex referencia arquivos compartilhados do AIOS Lite',
+    gateway_codex_pointer_hint:
+      'Garanta que AGENTS.md referencie .aios-lite/config.md e .aios-lite/agents/.',
+    gateway_gemini_pointer: 'Gateway do Gemini referencia caminhos compartilhados de comandos e agentes',
+    gateway_gemini_pointer_hint:
+      'Garanta que .gemini/GEMINI.md referencie .gemini/commands/ e .aios-lite/agents/.',
+    gateway_opencode_pointer: 'Gateway do OpenCode referencia arquivos compartilhados do AIOS Lite',
+    gateway_opencode_pointer_hint:
+      'Garanta que OPENCODE.md referencie .aios-lite/config.md e .aios-lite/agents/.',
     fix_start: 'Modo de correcao segura habilitado.',
     fix_start_dry_run: 'Modo de correcao segura habilitado (dry-run).',
     fix_action_required_files: 'Restaurar arquivos gerenciados ausentes a partir do template',

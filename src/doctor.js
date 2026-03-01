@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const { REQUIRED_FILES } = require('./constants');
 const { installTemplate } = require('./installer');
@@ -13,6 +14,15 @@ function parseMajor(version) {
   return Number.isFinite(major) ? major : 0;
 }
 
+async function fileContainsAll(filePath, patterns) {
+  try {
+    const content = await fs.readFile(filePath, 'utf8');
+    return patterns.every((pattern) => content.includes(pattern));
+  } catch {
+    return false;
+  }
+}
+
 async function runDoctor(targetDir) {
   const checks = [];
 
@@ -23,6 +33,49 @@ async function runDoctor(targetDir) {
       key: 'doctor.required_file',
       params: { rel },
       ok: await exists(filePath)
+    });
+  }
+
+  const gatewayChecks = [
+    {
+      id: 'gateway:claude:contract',
+      rel: 'CLAUDE.md',
+      key: 'doctor.gateway_claude_pointer',
+      hintKey: 'doctor.gateway_claude_pointer_hint',
+      patterns: ['.aios-lite/config.md', '.aios-lite/agents/setup.md']
+    },
+    {
+      id: 'gateway:codex:contract',
+      rel: 'AGENTS.md',
+      key: 'doctor.gateway_codex_pointer',
+      hintKey: 'doctor.gateway_codex_pointer_hint',
+      patterns: ['.aios-lite/config.md', '.aios-lite/agents/']
+    },
+    {
+      id: 'gateway:gemini:contract',
+      rel: '.gemini/GEMINI.md',
+      key: 'doctor.gateway_gemini_pointer',
+      hintKey: 'doctor.gateway_gemini_pointer_hint',
+      patterns: ['.gemini/commands/', '.aios-lite/agents/']
+    },
+    {
+      id: 'gateway:opencode:contract',
+      rel: 'OPENCODE.md',
+      key: 'doctor.gateway_opencode_pointer',
+      hintKey: 'doctor.gateway_opencode_pointer_hint',
+      patterns: ['.aios-lite/config.md', '.aios-lite/agents/']
+    }
+  ];
+
+  for (const gatewayCheck of gatewayChecks) {
+    const gatewayPath = path.join(targetDir, gatewayCheck.rel);
+    if (!(await exists(gatewayPath))) continue;
+    checks.push({
+      id: gatewayCheck.id,
+      key: gatewayCheck.key,
+      params: {},
+      ok: await fileContainsAll(gatewayPath, gatewayCheck.patterns),
+      hintKey: gatewayCheck.hintKey
     });
   }
 

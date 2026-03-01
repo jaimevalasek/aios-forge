@@ -119,6 +119,18 @@ module.exports = {
     context_conversation_language_format: '`conversation_language` n est pas une balise BCP-47 valide',
     context_conversation_language_format_hint: 'Utilisez des valeurs comme en, en-US, pt-BR.',
     node_version: 'Node.js >= 18 (actuel : {version})',
+    gateway_claude_pointer: 'La passerelle CLAUDE reference les fichiers partages AIOS Lite',
+    gateway_claude_pointer_hint:
+      'Assurez-vous que CLAUDE.md reference .aios-lite/config.md et .aios-lite/agents/setup.md.',
+    gateway_codex_pointer: 'La passerelle Codex reference les fichiers partages AIOS Lite',
+    gateway_codex_pointer_hint:
+      'Assurez-vous que AGENTS.md reference .aios-lite/config.md et .aios-lite/agents/.',
+    gateway_gemini_pointer: 'La passerelle Gemini reference les chemins partages commandes et agents',
+    gateway_gemini_pointer_hint:
+      'Assurez-vous que .gemini/GEMINI.md reference .gemini/commands/ et .aios-lite/agents/.',
+    gateway_opencode_pointer: 'La passerelle OpenCode reference les fichiers partages AIOS Lite',
+    gateway_opencode_pointer_hint:
+      'Assurez-vous que OPENCODE.md reference .aios-lite/config.md et .aios-lite/agents/.',
     fix_start: 'Mode de correction sure active.',
     fix_start_dry_run: 'Mode de correction sure active (dry-run).',
     fix_action_required_files: 'Restaurer les fichiers geres manquants depuis le template',
