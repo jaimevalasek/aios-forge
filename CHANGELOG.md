@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - Unreleased
+### Added
+- New command:
+  - `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--keep]`
+- New smoke test suite: `tests/smoke.test.js`.
+
+### Changed
+- `doctor` now supports safe remediation mode:
+  - `aios-lite doctor --fix`
+  - `aios-lite doctor --fix --dry-run`
+- `setup:context` and setup templates now default `aios_lite_version` to `0.1.4`.
+
 ## [0.1.3] - 2026-03-01
 ### Added
 - Localized agent prompt packs:

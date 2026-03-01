@@ -8,13 +8,14 @@ module.exports = {
     help_install: 'aios-lite install [path] [--force] [--dry-run] [--locale=en]',
     help_update: 'aios-lite update [path] [--dry-run] [--locale=en]',
     help_info: 'aios-lite info [path] [--locale=en]',
-    help_doctor: 'aios-lite doctor [path] [--locale=en]',
+    help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--locale=en]',
     help_i18n_add: 'aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=en]',
     help_agents: 'aios-lite agents [path] [--lang=en|pt-BR] [--locale=en]',
     help_agent_prompt: 'aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR] [--locale=en]',
     help_context_validate: 'aios-lite context:validate [path] [--locale=en]',
     help_setup_context: 'aios-lite setup:context [path] [--defaults] [--project-name=...] [--language=en] [--locale=en]',
     help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run] [--locale=en]',
+    help_test_smoke: 'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--keep] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     error_prefix: 'Error: {message}'
   },
@@ -76,7 +77,18 @@ module.exports = {
     context_profile_value_hint: 'Use developer, beginner, or team exactly.',
     context_conversation_language_format: '`conversation_language` is not a valid BCP-47 tag',
     context_conversation_language_format_hint: 'Use values like en, en-US, pt-BR.',
-    node_version: 'Node.js >= 18 (current: {version})'
+    node_version: 'Node.js >= 18 (current: {version})',
+    fix_start: 'Safe fix mode enabled.',
+    fix_start_dry_run: 'Safe fix mode enabled (dry-run).',
+    fix_action_required_files: 'Restore missing managed files from template',
+    fix_action_locale_sync: 'Synchronize active agent prompts with context language',
+    fix_not_applicable: 'Not applicable for current state.',
+    fix_target_count: 'Targets identified: {count}',
+    fix_applied_count: 'Changes applied: {count}',
+    fix_planned_count: 'Changes planned: {count}',
+    fix_locale: 'Resolved locale: {locale}',
+    fix_summary: 'Safe fix changes applied: {count}',
+    fix_summary_dry_run: '[dry-run] Safe fix changes planned: {count}'
   },
   i18n_add: {
     usage_error: 'Usage: aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=en]',
@@ -133,5 +145,13 @@ module.exports = {
     dry_run_applied: '[dry-run] Locale pack would be applied: {locale}',
     copied_count: 'Files copied: {count}',
     missing_count: 'Missing locale files: {count}'
+  },
+  smoke: {
+    start: 'Running smoke test in: {projectDir}',
+    step_ok: 'OK: {step}',
+    completed: 'Smoke test completed successfully.',
+    steps_count: 'Validated steps: {count}',
+    workspace_kept: 'Workspace kept: {path}',
+    workspace_removed: 'Workspace removed: {path}'
   }
 };

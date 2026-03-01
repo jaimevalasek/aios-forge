@@ -19,3 +19,8 @@
 - Severity: Medium
 - Probability: Medium
 - Mitigation: keep release templates/checklists up to date and require CI green before publish.
+
+## R005 - Unsafe auto-fixes could overwrite user intent
+- Severity: High
+- Probability: Low
+- Mitigation: keep `doctor --fix` restricted to safe template restoration (no overwrite) and locale sync only; provide `--dry-run` preview.

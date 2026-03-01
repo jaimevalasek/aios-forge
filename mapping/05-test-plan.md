@@ -22,6 +22,8 @@
 - Validates minimum Node version.
 - Validates frontmatter contract and required context fields.
 - Validates `conversation_language` format.
+- `doctor --fix` restores missing managed files when safe.
+- `doctor --fix --dry-run` reports planned changes without writing.
 
 ### agent usability
 - `agents` lists known agents and dependencies.
@@ -29,6 +31,10 @@
 - `context:validate` reports parse/contract issues directly.
 - `resolveAgentLocale` maps base tags (for example `pt` -> `pt-BR`) with safe fallback to `en`.
 - `applyAgentLocale` copies localized agent templates into active `.aios-lite/agents` paths.
+
+### smoke
+- `test:smoke` runs install -> setup context -> locale apply -> agents -> prompt -> context validate -> doctor -> update.
+- Smoke command supports `--keep` to inspect generated workspace.
 
 ## Manual
 - Empty folder: `npx aios-lite init demo`.
@@ -38,3 +44,6 @@
   - `aios-lite setup:context --defaults --language=pt-BR`
   - `aios-lite locale:apply`
   - `aios-lite agent:prompt setup --tool=codex --lang=pt-BR`
+- Recovery flow:
+  - `aios-lite doctor --fix --dry-run`
+  - `aios-lite doctor --fix`

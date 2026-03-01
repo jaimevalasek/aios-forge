@@ -12,6 +12,7 @@ const { runAgentsList, runAgentPrompt } = require('./commands/agents');
 const { runContextValidate } = require('./commands/context-validate');
 const { runSetupContext } = require('./commands/setup-context');
 const { runLocaleApply } = require('./commands/locale-apply');
+const { runSmokeTest } = require('./commands/smoke');
 
 function printHelp(t) {
   console.log(`${t('cli.title')}\n`);
@@ -27,6 +28,7 @@ function printHelp(t) {
   console.log(`  ${t('cli.help_context_validate')}`);
   console.log(`  ${t('cli.help_setup_context')}`);
   console.log(`  ${t('cli.help_locale_apply')}`);
+  console.log(`  ${t('cli.help_test_smoke')}`);
 }
 
 async function main() {
@@ -88,6 +90,10 @@ async function main() {
     }
     if (command === 'locale:apply' || command === 'locale-apply') {
       await runLocaleApply({ args, options, logger, t });
+      return;
+    }
+    if (command === 'test:smoke' || command === 'test-smoke') {
+      await runSmokeTest({ args, options, logger, t });
       return;
     }
 

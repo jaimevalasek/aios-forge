@@ -35,3 +35,9 @@
 - [x] Localized agent packs (`en`, `pt-BR`) with selection flow.
 - [x] Optional interactive CLI onboarding for `project.context.md` generation (`setup:context`).
 - [x] `locale:apply` command and setup auto-activation based on `conversation_language`.
+
+## Sprint 6 - Reliability and self-healing
+- [x] `doctor --fix` safe remediation flow.
+- [x] `doctor --fix --dry-run` planning mode.
+- [x] `test:smoke` command for automated end-to-end checks.
+- [x] Automated tests for remediation and smoke flow.

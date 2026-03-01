@@ -53,7 +53,7 @@ async function runSetupContext({ args, options, logger, t }) {
     email: resolveOption(options, 'email', ''),
     payments: resolveOption(options, 'payments', ''),
     installCommands: resolveOption(options, 'install-commands', ''),
-    aiosLiteVersion: resolveOption(options, 'aios-lite-version', '0.1.3')
+    aiosLiteVersion: resolveOption(options, 'aios-lite-version', '0.1.4')
   };
 
   let userTypesCount = Number(options['user-types'] || 1);

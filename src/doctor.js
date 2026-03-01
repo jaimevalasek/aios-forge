@@ -2,8 +2,10 @@
 
 const path = require('node:path');
 const { REQUIRED_FILES } = require('./constants');
+const { installTemplate } = require('./installer');
 const { exists } = require('./utils');
 const { validateProjectContextFile } = require('./context');
+const { applyAgentLocale, resolveAgentLocale } = require('./locales');
 
 function parseMajor(version) {
   const cleaned = String(version || '').replace(/^v/, '');
@@ -72,7 +74,73 @@ async function runDoctor(targetDir) {
   };
 }
 
+async function applyDoctorFixes(targetDir, report, options = {}) {
+  const dryRun = Boolean(options.dryRun);
+  const actions = [];
+  let changedCount = 0;
+
+  const missingRequiredFiles = report.checks
+    .filter((check) => !check.ok && check.id.startsWith('file:'))
+    .map((check) => check.params.rel);
+
+  if (missingRequiredFiles.length > 0) {
+    const installResult = await installTemplate(targetDir, {
+      overwrite: false,
+      dryRun,
+      mode: 'install'
+    });
+    const copiedRequired = installResult.copied.filter((rel) => missingRequiredFiles.includes(rel));
+    if (copiedRequired.length > 0) changedCount += copiedRequired.length;
+    actions.push({
+      id: 'required_files',
+      applied: copiedRequired.length > 0,
+      count: copiedRequired.length,
+      missingCount: missingRequiredFiles.length
+    });
+  } else {
+    actions.push({
+      id: 'required_files',
+      applied: false,
+      skipped: true,
+      count: 0,
+      missingCount: 0
+    });
+  }
+
+  if (
+    report.contextValidation &&
+    report.contextValidation.parsed &&
+    report.contextValidation.valid &&
+    report.contextValidation.data &&
+    report.contextValidation.data.conversation_language
+  ) {
+    const locale = resolveAgentLocale(report.contextValidation.data.conversation_language);
+    const localeResult = await applyAgentLocale(targetDir, locale, { dryRun });
+    if (localeResult.copied.length > 0) changedCount += localeResult.copied.length;
+    actions.push({
+      id: 'locale_sync',
+      applied: localeResult.copied.length > 0,
+      count: localeResult.copied.length,
+      locale: localeResult.locale
+    });
+  } else {
+    actions.push({
+      id: 'locale_sync',
+      applied: false,
+      skipped: true,
+      count: 0
+    });
+  }
+
+  return {
+    dryRun,
+    actions,
+    changedCount
+  };
+}
+
 module.exports = {
   runDoctor,
-  parseMajor
+  parseMajor,
+  applyDoctorFixes
 };

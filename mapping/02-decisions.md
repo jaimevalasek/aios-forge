@@ -57,3 +57,7 @@
 ### D014 - Agent locale packs and activation flow
 - Decision: ship localized agent prompt packs under `.aios-lite/locales/<locale>/agents`, add `locale:apply`, and auto-apply locale during `setup:context`.
 - Why: ensure end-to-end language consistency (agent instructions + user interaction) across Codex, Claude Code, Gemini CLI, and OpenCode.
+
+### D015 - Safe doctor remediation and built-in smoke pipeline
+- Decision: implement `doctor --fix` with strictly safe actions (restore missing managed files and locale sync only), and add `test:smoke` command for end-to-end verification.
+- Why: reduce manual recovery friction while avoiding risky auto-edits to user business context or code.
