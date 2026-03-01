@@ -24,6 +24,9 @@ const { runParallelAssign } = require('./commands/parallel-assign');
 const { runParallelStatus } = require('./commands/parallel-status');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
+  'init',
+  'install',
+  'update',
   'info',
   'doctor',
   'context:validate',
@@ -75,6 +78,13 @@ function createLogger() {
   };
 }
 
+function createSilentLogger() {
+  return {
+    log() {},
+    error() {}
+  };
+}
+
 function logHelpLine(t, logger, key) {
   logger.log(t('cli.help_item_line', { text: t(key) }));
 }
@@ -119,6 +129,7 @@ async function main() {
   const jsonMode = Boolean(options.json);
   const { t } = createTranslator(locale);
   const logger = createLogger();
+  const silentLogger = createSilentLogger();
 
   if (command === 'help' || options.help || command === '--help' || command === '-h') {
     printHelp(t, logger);
@@ -135,67 +146,69 @@ async function main() {
 
   try {
     let result = null;
+    const commandLogger =
+      jsonMode && commandSupportsJson(command) ? silentLogger : logger;
 
     if (command === 'init') {
-      result = await runInit({ args, options, logger, t });
+      result = await runInit({ args, options, logger: commandLogger, t });
     } else if (command === 'install') {
-      result = await runInstall({ args, options, logger, t });
+      result = await runInstall({ args, options, logger: commandLogger, t });
     } else if (command === 'update') {
-      result = await runUpdate({ args, options, logger, t });
+      result = await runUpdate({ args, options, logger: commandLogger, t });
     } else if (command === 'info') {
-      result = await runInfo({ args, options, logger, t });
+      result = await runInfo({ args, options, logger: commandLogger, t });
     } else if (command === 'doctor') {
-      result = await runDoctorCommand({ args, options, logger, t });
+      result = await runDoctorCommand({ args, options, logger: commandLogger, t });
     } else if (command === 'i18n:add' || command === 'i18n-add') {
-      result = await runI18nAdd({ args, options, logger, t });
+      result = await runI18nAdd({ args, options, logger: commandLogger, t });
     } else if (command === 'agents') {
-      result = await runAgentsList({ args, options, logger, t });
+      result = await runAgentsList({ args, options, logger: commandLogger, t });
     } else if (command === 'agent:prompt' || command === 'agent-prompt') {
-      result = await runAgentPrompt({ args, options, logger, t });
+      result = await runAgentPrompt({ args, options, logger: commandLogger, t });
     } else if (command === 'context:validate' || command === 'context-validate') {
-      result = await runContextValidate({ args, options, logger, t });
+      result = await runContextValidate({ args, options, logger: commandLogger, t });
     } else if (command === 'setup:context' || command === 'setup-context') {
-      result = await runSetupContext({ args, options, logger, t });
+      result = await runSetupContext({ args, options, logger: commandLogger, t });
     } else if (command === 'locale:apply' || command === 'locale-apply') {
-      result = await runLocaleApply({ args, options, logger, t });
+      result = await runLocaleApply({ args, options, logger: commandLogger, t });
     } else if (command === 'test:smoke' || command === 'test-smoke') {
-      result = await runSmokeTest({ args, options, logger, t });
+      result = await runSmokeTest({ args, options, logger: commandLogger, t });
     } else if (command === 'test:package' || command === 'test-package') {
-      result = await runPackageTest({ args, options, logger, t });
+      result = await runPackageTest({ args, options, logger: commandLogger, t });
     } else if (command === 'workflow:plan' || command === 'workflow-plan') {
-      result = await runWorkflowPlan({ args, options, logger, t });
+      result = await runWorkflowPlan({ args, options, logger: commandLogger, t });
     } else if (
       command === 'parallel:init' ||
       command === 'parallel-init' ||
       command === 'orchestrator:init' ||
       command === 'orchestrator-init'
     ) {
-      result = await runParallelInit({ args, options, logger, t });
+      result = await runParallelInit({ args, options, logger: commandLogger, t });
     } else if (
       command === 'parallel:doctor' ||
       command === 'parallel-doctor' ||
       command === 'orchestrator:doctor' ||
       command === 'orchestrator-doctor'
     ) {
-      result = await runParallelDoctor({ args, options, logger, t });
+      result = await runParallelDoctor({ args, options, logger: commandLogger, t });
     } else if (
       command === 'parallel:assign' ||
       command === 'parallel-assign' ||
       command === 'orchestrator:assign' ||
       command === 'orchestrator-assign'
     ) {
-      result = await runParallelAssign({ args, options, logger, t });
+      result = await runParallelAssign({ args, options, logger: commandLogger, t });
     } else if (
       command === 'parallel:status' ||
       command === 'parallel-status' ||
       command === 'orchestrator:status' ||
       command === 'orchestrator-status'
     ) {
-      result = await runParallelStatus({ args, options, logger, t });
+      result = await runParallelStatus({ args, options, logger: commandLogger, t });
     } else if (command === 'mcp:init' || command === 'mcp-init') {
-      result = await runMcpInit({ args, options, logger, t });
+      result = await runMcpInit({ args, options, logger: commandLogger, t });
     } else if (command === 'mcp:doctor' || command === 'mcp-doctor') {
-      result = await runMcpDoctor({ args, options, logger, t });
+      result = await runMcpDoctor({ args, options, logger: commandLogger, t });
     } else {
       const message = t('cli.unknown_command', { command });
       if (jsonMode) {

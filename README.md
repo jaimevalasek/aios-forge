@@ -59,6 +59,9 @@ aios-lite mcp:doctor --strict-env
 
 ## JSON output for CI
 Use `--json` on selected commands:
+- `aios-lite init <project-name> --json`
+- `aios-lite install [path] --json`
+- `aios-lite update [path] --json`
 - `aios-lite info --json`
 - `aios-lite doctor --json`
 - `aios-lite context:validate --json`

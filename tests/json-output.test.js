@@ -41,6 +41,40 @@ test('info --json returns structured payload', async () => {
   assert.equal(parsed.targetDir, path.resolve(dir));
 });
 
+test('init --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const cli = await runCli(['init', 'demo-json-init', '--json'], dir);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(Array.isArray(parsed.copied), true);
+  assert.equal(typeof parsed.existingInstall, 'boolean');
+});
+
+test('install --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const cli = await runCli(['install', dir, '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(Array.isArray(parsed.copied), true);
+  assert.equal(typeof parsed.existingInstall, 'boolean');
+});
+
+test('update --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const install = await runCli(['install', dir, '--json']);
+  assert.equal(install.code, 0);
+
+  const update = await runCli(['update', dir, '--json']);
+  assert.equal(update.code, 0);
+  assert.equal(update.stderr.trim(), '');
+  const parsed = JSON.parse(update.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(Array.isArray(parsed.copied), true);
+  assert.equal(typeof parsed.existingInstall, 'boolean');
+});
+
 test('context:validate --json returns non-zero and reason for missing file', async () => {
   const dir = await makeTempDir();
   const cli = await runCli(['context:validate', dir, '--json']);
