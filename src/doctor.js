@@ -3,8 +3,8 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { REQUIRED_FILES } = require('./constants');
-const { installTemplate } = require('./installer');
-const { exists } = require('./utils');
+const { installTemplate, TEMPLATE_DIR } = require('./installer');
+const { exists, copyFileWithDir } = require('./utils');
 const { validateProjectContextFile } = require('./context');
 const { applyAgentLocale, resolveAgentLocale } = require('./locales');
 
@@ -32,6 +32,37 @@ const GEMINI_COMMAND_EXPECTATIONS = [
   { file: '.gemini/commands/aios-qa.toml', agent: 'qa' },
   { file: '.gemini/commands/aios-orchestrator.toml', agent: 'orchestrator' }
 ];
+
+const GATEWAY_FILE_BY_CHECK_ID = {
+  'gateway:claude:contract': 'CLAUDE.md',
+  'gateway:codex:contract': 'AGENTS.md',
+  'gateway:gemini:contract': '.gemini/GEMINI.md',
+  'gateway:opencode:contract': 'OPENCODE.md',
+  'gateway:gemini:command:setup': '.gemini/commands/aios-setup.toml',
+  'gateway:gemini:command:analyst': '.gemini/commands/aios-analyst.toml',
+  'gateway:gemini:command:architect': '.gemini/commands/aios-architect.toml',
+  'gateway:gemini:command:pm': '.gemini/commands/aios-pm.toml',
+  'gateway:gemini:command:dev': '.gemini/commands/aios-dev.toml',
+  'gateway:gemini:command:qa': '.gemini/commands/aios-qa.toml',
+  'gateway:gemini:command:orchestrator': '.gemini/commands/aios-orchestrator.toml'
+};
+
+async function restoreTemplateFiles(targetDir, relPaths, options = {}) {
+  const dryRun = Boolean(options.dryRun);
+  const restored = [];
+
+  for (const rel of relPaths) {
+    const source = path.join(TEMPLATE_DIR, rel);
+    const dest = path.join(targetDir, rel);
+    if (!(await exists(source))) continue;
+    if (!dryRun) {
+      await copyFileWithDir(source, dest);
+    }
+    restored.push(rel);
+  }
+
+  return restored;
+}
 
 async function runDoctor(targetDir) {
   const checks = [];
@@ -182,6 +213,34 @@ async function applyDoctorFixes(targetDir, report, options = {}) {
   } else {
     actions.push({
       id: 'required_files',
+      applied: false,
+      skipped: true,
+      count: 0,
+      missingCount: 0
+    });
+  }
+
+  const brokenGatewayFiles = Array.from(
+    new Set(
+      report.checks
+        .filter((check) => !check.ok)
+        .map((check) => GATEWAY_FILE_BY_CHECK_ID[check.id])
+        .filter(Boolean)
+    )
+  );
+
+  if (brokenGatewayFiles.length > 0) {
+    const restored = await restoreTemplateFiles(targetDir, brokenGatewayFiles, { dryRun });
+    if (restored.length > 0) changedCount += restored.length;
+    actions.push({
+      id: 'gateway_contracts',
+      applied: restored.length > 0,
+      count: restored.length,
+      missingCount: brokenGatewayFiles.length
+    });
+  } else {
+    actions.push({
+      id: 'gateway_contracts',
       applied: false,
       skipped: true,
       count: 0,

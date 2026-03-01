@@ -123,3 +123,45 @@ test('doctor validates Gemini command instruction mappings', async () => {
   assert.equal(report.ok, false);
   assert.equal(report.checks.some((c) => c.id === 'gateway:gemini:command:dev' && !c.ok), true);
 });
+
+test('doctor --fix restores broken gateway contract files safely', async () => {
+  const dir = await makeTempDir();
+  await installTemplate(dir, { mode: 'install' });
+  await writeValidContext(dir, 'en');
+
+  await fs.writeFile(path.join(dir, 'AGENTS.md'), '# broken gateway\n', 'utf8');
+
+  const before = await runDoctor(dir);
+  assert.equal(before.ok, false);
+  assert.equal(before.checks.some((c) => c.id === 'gateway:codex:contract' && !c.ok), true);
+
+  const fixResult = await applyDoctorFixes(dir, before);
+  assert.equal(
+    fixResult.actions.some((action) => action.id === 'gateway_contracts' && action.applied),
+    true
+  );
+
+  const after = await runDoctor(dir);
+  assert.equal(after.checks.some((c) => c.id === 'gateway:codex:contract' && !c.ok), false);
+  assert.equal(after.ok, true);
+});
+
+test('doctor --fix dry-run does not rewrite broken gateway files', async () => {
+  const dir = await makeTempDir();
+  await installTemplate(dir, { mode: 'install' });
+  await writeValidContext(dir, 'en');
+
+  await fs.writeFile(path.join(dir, 'AGENTS.md'), '# broken gateway\n', 'utf8');
+
+  const before = await runDoctor(dir);
+  assert.equal(before.ok, false);
+
+  const fixResult = await applyDoctorFixes(dir, before, { dryRun: true });
+  assert.equal(
+    fixResult.actions.some((action) => action.id === 'gateway_contracts' && action.applied),
+    true
+  );
+
+  const after = await runDoctor(dir);
+  assert.equal(after.checks.some((c) => c.id === 'gateway:codex:contract' && !c.ok), true);
+});

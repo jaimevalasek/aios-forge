@@ -131,6 +131,7 @@ module.exports = {
     fix_start: 'Safe fix mode enabled.',
     fix_start_dry_run: 'Safe fix mode enabled (dry-run).',
     fix_action_required_files: 'Restore missing managed files from template',
+    fix_action_gateway_contracts: 'Restore broken gateway contract files from template',
     fix_action_locale_sync: 'Synchronize active agent prompts with context language',
     fix_not_applicable: 'Not applicable for current state.',
     fix_target_count: 'Targets identified: {count}',

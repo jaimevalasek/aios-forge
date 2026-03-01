@@ -138,6 +138,8 @@ module.exports = {
     fix_start: 'Mode de correction sure active.',
     fix_start_dry_run: 'Mode de correction sure active (dry-run).',
     fix_action_required_files: 'Restaurer les fichiers geres manquants depuis le template',
+    fix_action_gateway_contracts:
+      'Restaurer les fichiers de contrat de passerelle casses depuis le template',
     fix_action_locale_sync: 'Synchroniser les prompts actifs des agents avec la langue du contexte',
     fix_not_applicable: 'Non applicable pour l etat actuel.',
     fix_target_count: 'Cibles identifiees : {count}',

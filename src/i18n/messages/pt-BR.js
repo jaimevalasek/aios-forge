@@ -140,6 +140,8 @@ module.exports = {
     fix_start: 'Modo de correcao segura habilitado.',
     fix_start_dry_run: 'Modo de correcao segura habilitado (dry-run).',
     fix_action_required_files: 'Restaurar arquivos gerenciados ausentes a partir do template',
+    fix_action_gateway_contracts:
+      'Restaurar arquivos de contrato de gateway quebrados a partir do template',
     fix_action_locale_sync: 'Sincronizar prompts ativos dos agentes com o idioma do contexto',
     fix_not_applicable: 'Nao aplicavel para o estado atual.',
     fix_target_count: 'Alvos identificados: {count}',

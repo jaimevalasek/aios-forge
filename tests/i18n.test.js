@@ -102,6 +102,10 @@ test('translator exposes localized doctor command wrapper keys', () => {
   assert.equal(pt.t('doctor.fix_action_line', { action: 'x' }), '- Acao: x');
   assert.equal(es.t('doctor.fix_action_line', { action: 'x' }), '- Accion: x');
   assert.equal(fr.t('doctor.fix_action_line', { action: 'x' }), '- Action : x');
+  assert.equal(
+    en.t('doctor.fix_action_gateway_contracts').includes('gateway contract files'),
+    true
+  );
 });
 
 test('translator exposes localized doctor gateway contract keys', () => {
