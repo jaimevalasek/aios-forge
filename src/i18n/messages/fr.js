@@ -7,9 +7,9 @@ module.exports = {
     usage: 'Utilisation :',
     help_item_line: '  {text}',
     help_init:
-      'aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
+      'aios-lite init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
     help_install:
-      'aios-lite install [path] [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
+      'aios-lite install [path] [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
     help_update: 'aios-lite update [path] [--dry-run] [--locale=fr]',
     help_info: 'aios-lite info [path] [--json] [--locale=fr]',
     help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--json] [--locale=fr]',
@@ -45,7 +45,7 @@ module.exports = {
   },
   init: {
     usage_error:
-      'Utilisation : aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
+      'Utilisation : aios-lite init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
     non_empty_dir: 'Le repertoire n est pas vide : {targetDir}. Utilisez --force pour continuer.',
     created_at: 'Projet cree dans : {targetDir}',
     files_copied: 'Fichiers copies : {count}',

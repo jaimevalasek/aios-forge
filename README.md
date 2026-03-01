@@ -11,8 +11,8 @@ npx aios-lite install
 ```
 
 ## Commands
-- `aios-lite init <project-name> [--tool=codex|claude|gemini|opencode]`
-- `aios-lite install [path] [--tool=codex|claude|gemini|opencode]`
+- `aios-lite init <project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
+- `aios-lite install [path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
 - `aios-lite update [path]`
 - `aios-lite info [path] [--json]`
 - `aios-lite doctor [path] [--fix] [--dry-run] [--json]`
@@ -38,6 +38,8 @@ If your AI CLI does not show a visual agent picker, use:
 ```bash
 aios-lite agents
 aios-lite agent:prompt setup --tool=codex
+aios-lite init my-project --lang=pt-BR --tool=codex
+aios-lite install --lang=es --tool=claude
 aios-lite locale:apply --lang=pt-BR
 aios-lite doctor --fix
 aios-lite test:smoke --lang=pt-BR

@@ -3,6 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { installTemplate } = require('../installer');
+const { applyAgentLocale } = require('../locales');
 const { resolvePromptTool } = require('../prompt-tool');
 
 async function directoryIsEmpty(dirPath) {
@@ -24,6 +25,7 @@ async function runInit({ args, options, logger, t }) {
   const targetDir = path.resolve(process.cwd(), projectName);
   const force = Boolean(options.force);
   const dryRun = Boolean(options['dry-run']);
+  const requestedLanguage = options.lang || options.language;
   const promptTool = resolvePromptTool(options.tool);
 
   await fs.mkdir(targetDir, { recursive: true });
@@ -38,6 +40,16 @@ async function runInit({ args, options, logger, t }) {
     mode: 'init'
   });
 
+  let localeApply = null;
+  if (requestedLanguage) {
+    localeApply = await applyAgentLocale(targetDir, requestedLanguage, { dryRun });
+    if (dryRun) {
+      logger.log(t('locale_apply.dry_run_applied', { locale: localeApply.locale }));
+    } else {
+      logger.log(t('locale_apply.applied', { locale: localeApply.locale }));
+    }
+  }
+
   logger.log(t('init.created_at', { targetDir }));
   logger.log(t('init.files_copied', { count: result.copied.length }));
   if (result.skipped.length > 0) {
@@ -49,7 +61,10 @@ async function runInit({ args, options, logger, t }) {
   logger.log(t('init.step_agents'));
   logger.log(t('init.step_agent_prompt', { tool: promptTool }));
 
-  return result;
+  return {
+    ...result,
+    localeApply
+  };
 }
 
 module.exports = {

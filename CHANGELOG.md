@@ -80,11 +80,13 @@ All notable changes to this project will be documented in this file.
 - `cli` help and unknown-command wrapper lines are now localized via i18n keys instead of inline formatting.
 - `init` and `install` now print explicit multi-IDE onboarding hints (`agents` + `agent:prompt setup`) with optional `--tool=codex|claude|gemini|opencode` guidance.
 - `doctor` now enforces multi-IDE gateway contracts (Claude/Codex/Gemini/OpenCode) and validates required Gemini/OpenCode files.
+- `init` and `install` now support `--lang=en|pt-BR|es|fr` to auto-apply localized agent packs during bootstrap.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`
   - `tests/init-install-guidance.test.js`
   - `tests/prompt-tool.test.js`
+  - `tests/init-install-guidance.test.js` now validates locale pack auto-apply on `init/install --lang`
   - `tests/locales.test.js`
   - `tests/agent-contracts.test.js`
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`

@@ -77,3 +77,50 @@ test('install prints agent onboarding hints and honors explicit --tool', async (
     true
   );
 });
+
+test('init applies localized agent pack when --lang is provided', async () => {
+  const tempDir = await makeTempDir();
+  const originalCwd = process.cwd();
+  process.chdir(tempDir);
+
+  try {
+    const { t } = createTranslator('en');
+    const logger = createCollectLogger();
+    const result = await runInit({
+      args: ['demo-lang'],
+      options: { lang: 'es' },
+      logger,
+      t
+    });
+
+    assert.equal(Boolean(result.localeApply), true);
+    assert.equal(result.localeApply.locale, 'es');
+    assert.equal(logger.lines.some((line) => line.includes('Locale pack applied: es')), true);
+
+    const setupPath = path.join(tempDir, 'demo-lang/.aios-lite/agents/setup.md');
+    const setupContent = await fs.readFile(setupPath, 'utf8');
+    assert.equal(setupContent.includes('(es)'), true);
+  } finally {
+    process.chdir(originalCwd);
+  }
+});
+
+test('install applies localized agent pack when --lang is provided', async () => {
+  const tempDir = await makeTempDir();
+  const { t } = createTranslator('en');
+  const logger = createCollectLogger();
+  const result = await runInstall({
+    args: [tempDir],
+    options: { lang: 'pt-BR' },
+    logger,
+    t
+  });
+
+  assert.equal(Boolean(result.localeApply), true);
+  assert.equal(result.localeApply.locale, 'pt-BR');
+  assert.equal(logger.lines.some((line) => line.includes('Locale pack applied: pt-BR')), true);
+
+  const setupPath = path.join(tempDir, '.aios-lite/agents/setup.md');
+  const setupContent = await fs.readFile(setupPath, 'utf8');
+  assert.equal(setupContent.includes('(pt-BR)'), true);
+});
