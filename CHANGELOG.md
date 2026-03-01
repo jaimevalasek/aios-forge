@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
   - `opencode.json`
 - Optional `mcp:init` tool filter:
   - `--tool=claude|codex|gemini|opencode`
+- `test:smoke` mixed monorepo profile:
+  - `--profile=mixed` for combined Web2 + Web3 workspace validation
 - Formal JSON schema documentation for automation:
   - `docs/en/json-schemas.md`
   - `docs/en/schemas/index.json`

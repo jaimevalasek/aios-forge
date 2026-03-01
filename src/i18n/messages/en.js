@@ -17,7 +17,7 @@ module.exports = {
       'aios-lite setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--language=en] [--web3-enabled=true|false] [--locale=en]',
     help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run] [--locale=en]',
     help_test_smoke:
-      'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep] [--json] [--locale=en]',
+      'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--profile=standard|mixed] [--keep] [--json] [--locale=en]',
     help_test_package:
       'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=en]',
     help_workflow_plan:
@@ -196,11 +196,16 @@ module.exports = {
   smoke: {
     start: 'Running smoke test in: {projectDir}',
     using_web3_profile: 'Using Web3 smoke profile: {target}',
+    using_mixed_profile: 'Using mixed Web2+Web3 monorepo smoke profile.',
     seeded_web3_workspace: 'Seeded workspace for Web3 target: {target}',
+    seeded_mixed_workspace: 'Seeded workspace for mixed Web2+Web3 profile.',
     step_ok: 'OK: {step}',
     web3_detected: 'Web3 framework detected: {framework} ({network})',
     web3_context_verified: 'Web3 context verified for network: {network}',
+    mixed_context_verified: 'Mixed profile context verified (framework: {framework}).',
     invalid_web3_target: 'Invalid --web3 target: {target}. Use ethereum, solana, or cardano.',
+    invalid_profile: 'Invalid --profile value: {profile}. Use standard or mixed.',
+    profile_conflict: 'Do not combine --profile=mixed with --web3. Choose one profile mode.',
     completed: 'Smoke test completed successfully.',
     steps_count: 'Validated steps: {count}',
     workspace_kept: 'Workspace kept: {path}',

@@ -67,6 +67,31 @@ test('test:smoke supports web3 profiles for ethereum, solana, and cardano', asyn
   }
 });
 
+test('test:smoke supports mixed Web2+Web3 monorepo profile', async () => {
+  const baseDir = await makeTempDir();
+  const { t } = createTranslator('en');
+  const logger = { log() {}, error() {} };
+
+  const result = await runSmokeTest({
+    args: [baseDir],
+    options: { profile: 'mixed', keep: true },
+    logger,
+    t
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.profile, 'mixed');
+  assert.equal(result.steps.includes('seed:mixed'), true);
+  assert.equal(result.steps.includes('verify:mixed-context'), true);
+
+  const context = await validateProjectContextFile(result.projectDir);
+  assert.equal(context.valid, true);
+  assert.equal(context.data.project_type, 'dapp');
+  assert.equal(context.data.web3_enabled, true);
+
+  await fs.rm(result.workspaceRoot, { recursive: true, force: true });
+});
+
 test('test:smoke rejects invalid web3 target', async () => {
   const baseDir = await makeTempDir();
   const { t } = createTranslator('en');
@@ -80,5 +105,21 @@ test('test:smoke rejects invalid web3 target', async () => {
       t
     }),
     /Invalid --web3 target/
+  );
+});
+
+test('test:smoke rejects invalid profile', async () => {
+  const baseDir = await makeTempDir();
+  const { t } = createTranslator('en');
+  const logger = { log() {}, error() {} };
+
+  await assert.rejects(
+    runSmokeTest({
+      args: [baseDir],
+      options: { profile: 'hybrid-plus' },
+      logger,
+      t
+    }),
+    /Invalid --profile value/
   );
 });

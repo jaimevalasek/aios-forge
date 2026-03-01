@@ -3,12 +3,13 @@
   "$id": "https://aios-lite.dev/schemas/smoke.schema.json",
   "title": "AIOS Lite test:smoke --json output",
   "type": "object",
-  "required": ["ok", "language", "targetDir", "web3Target", "steps", "stepCount", "workspaceRoot", "projectDir", "kept"],
+  "required": ["ok", "language", "targetDir", "web3Target", "profile", "steps", "stepCount", "workspaceRoot", "projectDir", "kept"],
   "properties": {
     "ok": { "type": "boolean", "const": true },
     "language": { "type": "string" },
     "targetDir": { "type": "string" },
     "web3Target": { "type": ["string", "null"] },
+    "profile": { "type": "string", "enum": ["standard", "mixed"] },
     "steps": {
       "type": "array",
       "items": { "type": "string" }

@@ -68,6 +68,7 @@ test('test:smoke --json returns structured success payload', async () => {
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.profile, 'standard');
   assert.equal(parsed.web3Target, 'ethereum');
   assert.equal(parsed.stepCount >= 10, true);
 });

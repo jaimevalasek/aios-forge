@@ -15,6 +15,7 @@ const { detectFramework } = require('../detector');
 const { validateProjectContextFile } = require('../context');
 
 const WEB3_SMOKE_TARGETS = ['ethereum', 'solana', 'cardano'];
+const SMOKE_PROFILES = ['standard', 'mixed'];
 const WEB3_PROFILE_BY_TARGET = {
   ethereum: {
     framework: 'Hardhat',
@@ -82,13 +83,52 @@ async function seedWeb3Workspace(projectDir, profile) {
   }
 }
 
+async function seedMixedWorkspace(projectDir) {
+  const rootPackage = {
+    name: 'demo-monorepo',
+    private: true,
+    workspaces: ['apps/web', 'packages/contracts'],
+    dependencies: {
+      next: '^15.0.0'
+    },
+    devDependencies: {
+      hardhat: '^2.24.0'
+    }
+  };
+
+  await ensureDir(path.join(projectDir, 'apps/web'));
+  await ensureDir(path.join(projectDir, 'packages/contracts'));
+
+  await fs.writeFile(path.join(projectDir, 'package.json'), `${JSON.stringify(rootPackage, null, 2)}\n`, 'utf8');
+  await fs.writeFile(path.join(projectDir, 'next.config.js'), 'module.exports = {};\n', 'utf8');
+  await fs.writeFile(path.join(projectDir, 'hardhat.config.ts'), 'export default {};\n', 'utf8');
+
+  await fs.writeFile(
+    path.join(projectDir, 'apps/web/package.json'),
+    `${JSON.stringify({ name: '@demo/web', private: true, dependencies: { next: '^15.0.0' } }, null, 2)}\n`,
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, 'packages/contracts/package.json'),
+    `${JSON.stringify({ name: '@demo/contracts', private: true, devDependencies: { hardhat: '^2.24.0' } }, null, 2)}\n`,
+    'utf8'
+  );
+}
+
 async function runSmokeTest({ args, options, logger, t }) {
   const language = String(options.language || options.lang || 'en');
   const keep = Boolean(options.keep);
   const jsonMode = Boolean(options.json);
+  const smokeProfile = String(options.profile || 'standard').trim().toLowerCase();
+  if (!SMOKE_PROFILES.includes(smokeProfile)) {
+    throw new Error(t('smoke.invalid_profile', { profile: smokeProfile }));
+  }
   const web3Profile = resolveWeb3Profile(options.web3);
   if (web3Profile && web3Profile.invalid) {
     throw new Error(t('smoke.invalid_web3_target', { target: web3Profile.target }));
+  }
+  if (smokeProfile === 'mixed' && web3Profile) {
+    throw new Error(t('smoke.profile_conflict'));
   }
 
   const baseDir = path.resolve(process.cwd(), args[0] || os.tmpdir());
@@ -109,6 +149,11 @@ async function runSmokeTest({ args, options, logger, t }) {
       await seedWeb3Workspace(projectDir, web3Profile);
       steps.push(`seed:web3:${web3Profile.target}`);
       log(t('smoke.seeded_web3_workspace', { target: web3Profile.target }));
+    } else if (smokeProfile === 'mixed') {
+      log(t('smoke.using_mixed_profile'));
+      await seedMixedWorkspace(projectDir);
+      steps.push('seed:mixed');
+      log(t('smoke.seeded_mixed_workspace'));
     }
 
     const installResult = await runInstall({
@@ -142,7 +187,7 @@ async function runSmokeTest({ args, options, logger, t }) {
         defaults: true,
         'project-name': 'demo',
         language,
-        ...(web3Profile
+        ...(web3Profile || smokeProfile === 'mixed'
           ? {}
           : {
               'project-type': 'web_app',
@@ -165,6 +210,12 @@ async function runSmokeTest({ args, options, logger, t }) {
         setupResult.data.framework === web3Profile.framework,
         'setup did not keep expected web3 framework'
       );
+    } else if (smokeProfile === 'mixed') {
+      assertStep(setupResult.data.projectType === 'dapp', 'mixed profile did not infer project_type=dapp');
+      assertStep(setupResult.data.web3Enabled === true, 'mixed profile did not infer web3_enabled=true');
+      assertStep(setupResult.data.framework === 'Hardhat', 'mixed profile did not prefer web3 framework');
+      steps.push('verify:mixed-context');
+      log(t('smoke.mixed_context_verified', { framework: setupResult.data.framework }));
     }
     steps.push('setup:context');
     log(t('smoke.step_ok', { step: 'setup:context' }));
@@ -244,6 +295,7 @@ async function runSmokeTest({ args, options, logger, t }) {
       language,
       targetDir: projectDir,
       web3Target: web3Profile ? web3Profile.target : null,
+      profile: smokeProfile,
       steps,
       stepCount: steps.length,
       workspaceRoot,
