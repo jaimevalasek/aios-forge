@@ -186,3 +186,27 @@ test('mcp:init invalid --tool fallback works without translator argument', async
     /Invalid --tool value/
   );
 });
+
+test('mcp:init localizes plan reasons and preset notes in pt-BR', async () => {
+  const dir = await makeTempDir();
+  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  await fs.mkdir(path.dirname(contextPath), { recursive: true });
+  await fs.writeFile(
+    contextPath,
+    `---\nproject_name: \"demo\"\nproject_type: \"dapp\"\nprofile: \"developer\"\nframework: \"Hardhat\"\nframework_installed: true\nclassification: \"SMALL\"\nconversation_language: \"pt-BR\"\nweb3_enabled: true\nweb3_networks: \"ethereum\"\ncontract_framework: \"Hardhat\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n\n## Stack\n- Database: PostgreSQL\n`,
+    'utf8'
+  );
+
+  const { t } = createTranslator('pt-BR');
+  const result = await runMcpInit({
+    args: [dir],
+    options: { 'dry-run': true },
+    logger: createQuietLogger(),
+    t
+  });
+
+  const chainRpc = result.plan.servers.find((server) => server.id === 'chain-rpc');
+  assert.equal(Boolean(chainRpc), true);
+  assert.equal(chainRpc.reason.includes('Contexto dApp detectado'), true);
+  assert.equal(result.presets[0].notes[0].includes('preset local de workspace'), true);
+});

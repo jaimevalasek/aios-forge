@@ -70,6 +70,7 @@ All notable changes to this project will be documented in this file.
 - `parallel:assign` lane scope summary lines are now localized in human-readable output.
 - Parallel commands now localize fallback `unknown` classification labels in human-readable errors.
 - `mcp:init` now avoids hardcoded fallback text for invalid `--tool` and uses i18n-backed messaging.
+- `mcp:init` now localizes generated server `reason` fields and preset `notes` content via i18n.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`

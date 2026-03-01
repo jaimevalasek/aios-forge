@@ -412,6 +412,20 @@ module.exports = {
     context_missing:
       'Arquivo de contexto nao encontrado. Gerando plano MCP base com suposicoes genericas.',
     invalid_tool: 'Valor invalido para --tool: {tool}. Use um de: {expected}.',
+    reason_filesystem: 'Acesso local obrigatorio ao workspace.',
+    reason_context7: 'Use documentacao oficial atualizada no momento da implementacao.',
+    reason_database_none: 'Nenhuma stack de banco de dados foi detectada ainda.',
+    reason_database_enabled:
+      'O contexto indica recursos com banco de dados (endpoint MCP remoto recomendado).',
+    reason_web_search: 'Util para avaliacao de pacotes e verificacao de release notes.',
+    reason_chain_rpc_disabled: 'Web3 esta desabilitado para este projeto.',
+    reason_chain_rpc_enabled: 'Contexto dApp detectado; acesso RPC de chain e necessario.',
+    reason_makopy: 'Integracao opcional de pipeline de conteudo.',
+    note_workspace_local: 'Este e um preset local de workspace gerado pelo AIOS Lite.',
+    note_replace_placeholders:
+      'Substitua comandos placeholder pelos servidores MCP que voce realmente usa.',
+    note_keep_secrets_env:
+      'Mantenha segredos em variaveis de ambiente, nunca inline tokens.',
     generated: 'Plano MCP escrito: {path}',
     dry_run_generated: '[dry-run] Plano MCP seria escrito: {path}',
     server_count: 'Servidores MCP no plano: {count}',
