@@ -27,3 +27,20 @@ The command reports whether these files are present:
 - `.aios-lite/context/prd.md`
 
 Missing prerequisites are reported but do not block file generation.
+
+## Diagnose and repair
+
+```bash
+aios-lite parallel:doctor
+aios-lite parallel:doctor --workers=3
+aios-lite parallel:doctor --fix
+aios-lite parallel:doctor --fix --dry-run
+```
+
+Aliases:
+- `aios-lite orchestrator:doctor`
+- `aios-lite parallel-doctor`
+
+Notes:
+- `--fix` can recreate missing `shared-decisions.md` and missing lane files.
+- For non-`MEDIUM` projects, `--fix` requires `--force`.

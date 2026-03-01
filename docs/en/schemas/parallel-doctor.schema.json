@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/parallel-doctor.schema.json",
+  "title": "AIOS Lite parallel:doctor --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "workers", "fix", "state", "checks", "summary"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "targetDir": { "type": "string" },
+    "workers": { "type": "integer", "minimum": 2, "maximum": 6 },
+    "fix": {
+      "type": "object",
+      "required": ["enabled", "dryRun", "force"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "dryRun": { "type": "boolean" },
+        "force": { "type": "boolean" },
+        "changedCount": { "type": "integer", "minimum": 0 },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "applied", "count"],
+            "properties": {
+              "id": { "type": "string" },
+              "applied": { "type": "boolean" },
+              "skipped": { "type": "boolean" },
+              "count": { "type": "integer", "minimum": 0 }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "state": {
+      "type": "object",
+      "required": ["parallelDir", "dirExists", "sharedExists", "laneFiles", "laneIndices", "missingLaneIndices"],
+      "properties": {
+        "parallelDir": { "type": "string" },
+        "dirExists": { "type": "boolean" },
+        "sharedExists": { "type": "boolean" },
+        "laneFiles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "laneIndices": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "missingLaneIndices": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "additionalProperties": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "ok", "severity", "message", "hint"],
+        "properties": {
+          "id": { "type": "string" },
+          "ok": { "type": "boolean" },
+          "severity": { "type": "string", "enum": ["info", "warn", "error"] },
+          "message": { "type": "string" },
+          "hint": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "passed", "failed", "warnings"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

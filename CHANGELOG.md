@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file.
   - `aios-lite mcp:doctor [path] [--strict-env] [--json]`
 - New parallel orchestration bootstrap command:
   - `aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]`
+- New parallel diagnosis/remediation command:
+  - `aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
 - Optional `mcp:init` tool filter:
   - `--tool=claude|codex|gemini|opencode`
 - `test:smoke` mixed monorepo profile:
@@ -31,6 +33,7 @@ All notable changes to this project will be documented in this file.
   - `docs/en/schemas/*.schema.json` for each JSON command contract
   - includes `docs/en/schemas/mcp-doctor.schema.json`
   - includes `docs/en/schemas/parallel-init.schema.json`
+  - includes `docs/en/schemas/parallel-doctor.schema.json`
 
 ### Changed
 - Locale resolution now supports canonical fallback for Portuguese:
@@ -54,6 +57,7 @@ All notable changes to this project will be documented in this file.
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`
   - `tests/mcp-doctor.test.js`
   - `tests/parallel-init.test.js`
+  - `tests/parallel-doctor.test.js`
   - `tests/json-output.test.js` now covers `mcp:doctor --json`
   - `tests/package-test.test.js`
   - `tests/workflow-plan.test.js`

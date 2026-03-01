@@ -25,6 +25,8 @@ module.exports = {
       'aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=fr]',
     help_parallel_init:
       'aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=fr]',
+    help_parallel_doctor:
+      'aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json] [--locale=fr]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=fr]',
     help_mcp_doctor:
@@ -248,6 +250,16 @@ module.exports = {
     workers_count: 'Workers : {count}',
     files_count: 'Fichiers prepares : {count}',
     missing_prereq_count: 'Fichiers de contexte prerequis manquants : {count}'
+  },
+  parallel_doctor: {
+    invalid_workers:
+      'Valeur --workers invalide. Utilisez un entier entre {min} et {max}.',
+    requires_medium:
+      'Le mode fix de parallel doctor exige la classification MEDIUM (actuelle : {classification}). Utilisez --force pour forcer.',
+    report_title: 'Rapport parallel doctor : {path}',
+    summary: 'Resume : {passed} valides, {failed} echecs, {warnings} avertissements.',
+    fix_summary: 'Corrections paralleles appliquees : {count}',
+    fix_summary_dry_run: '[dry-run] Corrections paralleles planifiees : {count}'
   },
   mcp_init: {
     context_missing:
