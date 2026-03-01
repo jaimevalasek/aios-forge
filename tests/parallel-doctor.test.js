@@ -57,6 +57,22 @@ test('parallel:doctor reports invalid state when context/parallel files are miss
   assert.equal(result.summary.failed >= 1, true);
 });
 
+test('parallel:doctor localizes check messages with pt-BR locale', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+
+  const result = await runParallelDoctor({
+    args: [dir],
+    options: {},
+    logger: createQuietLogger(),
+    t
+  });
+
+  const check = result.checks.find((item) => item.id === 'context.exists');
+  assert.equal(Boolean(check), true);
+  assert.equal(check.message.includes('ausente'), true);
+});
+
 test('parallel:doctor passes after parallel:init baseline', async () => {
   const dir = await makeTempDir();
   const { t } = createTranslator('en');

@@ -287,13 +287,43 @@ module.exports = {
     missing_prereq_count: 'Missing prerequisite context files: {count}'
   },
   parallel_doctor: {
+    prefix_ok: 'OK',
+    prefix_warn: 'WARN',
+    prefix_fail: 'FAIL',
     invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',
     requires_medium:
       'Parallel doctor fix mode requires MEDIUM classification (current: {classification}). Use --force to override.',
     report_title: 'Parallel doctor report: {path}',
     summary: 'Summary: {passed} passed, {failed} failed, {warnings} warnings.',
     fix_summary: 'Parallel fix changes applied: {count}',
-    fix_summary_dry_run: '[dry-run] Parallel fix changes planned: {count}'
+    fix_summary_dry_run: '[dry-run] Parallel fix changes planned: {count}',
+    check_context_exists_ok: 'project.context.md exists.',
+    check_context_exists_missing: 'project.context.md is missing.',
+    check_context_exists_hint: 'Run setup:context before parallel doctor.',
+    check_context_parsed_ok: 'project.context.md is parseable.',
+    check_context_parsed_invalid: 'project.context.md is invalid.',
+    check_context_parsed_hint: 'Fix context frontmatter before running parallel doctor.',
+    check_context_classification_ok:
+      'Parallel mode allowed for classification {classification}.',
+    check_context_classification_invalid:
+      'Parallel mode requires MEDIUM classification (current: {classification}).',
+    check_context_classification_hint: 'Use --force to override classification guard.',
+    check_parallel_dir_ok: '.aios-lite/context/parallel directory exists.',
+    check_parallel_dir_missing: '.aios-lite/context/parallel directory is missing.',
+    check_parallel_dir_hint: 'Run parallel:init or parallel:doctor --fix.',
+    check_parallel_shared_ok: 'shared-decisions.md is present.',
+    check_parallel_shared_missing: 'shared-decisions.md is missing.',
+    check_parallel_shared_hint: 'Run parallel:doctor --fix to restore baseline files.',
+    check_lanes_present_ok: 'Detected {count} lane file(s).',
+    check_lanes_present_missing: 'No agent lane status files found.',
+    check_lanes_present_hint: 'Run parallel:init or parallel:doctor --fix.',
+    check_lanes_sequence_ok: 'Lane sequence is contiguous (1..{workers}).',
+    check_lanes_sequence_missing: 'Missing lane files in sequence: {lanes}',
+    check_lanes_sequence_hint: 'Run parallel:doctor --fix to restore missing lane files.',
+    check_workers_option: 'Workers option requested: {workers}.',
+    check_prereq_ok: 'All prerequisite context files are present.',
+    check_prereq_missing: '{count} prerequisite context file(s) are missing.',
+    check_prereq_hint: 'Create discovery/architecture/prd context files before orchestration.'
   },
   parallel_assign: {
     invalid_workers: 'Invalid --workers value. Use an integer between {min} and {max}.',

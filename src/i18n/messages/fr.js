@@ -297,6 +297,9 @@ module.exports = {
     missing_prereq_count: 'Fichiers de contexte prerequis manquants : {count}'
   },
   parallel_doctor: {
+    prefix_ok: 'OK',
+    prefix_warn: 'AVERT',
+    prefix_fail: 'ECHEC',
     invalid_workers:
       'Valeur --workers invalide. Utilisez un entier entre {min} et {max}.',
     requires_medium:
@@ -304,7 +307,39 @@ module.exports = {
     report_title: 'Rapport parallel doctor : {path}',
     summary: 'Resume : {passed} valides, {failed} echecs, {warnings} avertissements.',
     fix_summary: 'Corrections paralleles appliquees : {count}',
-    fix_summary_dry_run: '[dry-run] Corrections paralleles planifiees : {count}'
+    fix_summary_dry_run: '[dry-run] Corrections paralleles planifiees : {count}',
+    check_context_exists_ok: 'project.context.md existe.',
+    check_context_exists_missing: 'project.context.md est manquant.',
+    check_context_exists_hint: 'Executez setup:context avant parallel doctor.',
+    check_context_parsed_ok: 'project.context.md est parseable.',
+    check_context_parsed_invalid: 'project.context.md est invalide.',
+    check_context_parsed_hint:
+      'Corrigez le frontmatter du contexte avant d executer parallel doctor.',
+    check_context_classification_ok:
+      'Mode parallele autorise pour la classification {classification}.',
+    check_context_classification_invalid:
+      'Mode parallele exige la classification MEDIUM (actuelle : {classification}).',
+    check_context_classification_hint:
+      'Utilisez --force pour outrepasser la regle de classification.',
+    check_parallel_dir_ok: 'Le repertoire .aios-lite/context/parallel existe.',
+    check_parallel_dir_missing: 'Le repertoire .aios-lite/context/parallel est manquant.',
+    check_parallel_dir_hint: 'Executez parallel:init ou parallel:doctor --fix.',
+    check_parallel_shared_ok: 'shared-decisions.md est present.',
+    check_parallel_shared_missing: 'shared-decisions.md est manquant.',
+    check_parallel_shared_hint:
+      'Executez parallel:doctor --fix pour restaurer les fichiers de base.',
+    check_lanes_present_ok: '{count} fichier(s) de lane detecte(s).',
+    check_lanes_present_missing: 'Aucun fichier de statut de lane n a ete trouve.',
+    check_lanes_present_hint: 'Executez parallel:init ou parallel:doctor --fix.',
+    check_lanes_sequence_ok: 'La sequence de lanes est continue (1..{workers}).',
+    check_lanes_sequence_missing: 'Fichiers de lane manquants dans la sequence : {lanes}',
+    check_lanes_sequence_hint:
+      'Executez parallel:doctor --fix pour restaurer les lanes manquantes.',
+    check_workers_option: 'Option workers demandee : {workers}.',
+    check_prereq_ok: 'Tous les fichiers de contexte prerequis sont presents.',
+    check_prereq_missing: '{count} fichier(s) de contexte prerequis manquant(s).',
+    check_prereq_hint:
+      'Creez les fichiers discovery/architecture/prd avant l orchestration.'
   },
   parallel_assign: {
     invalid_workers:

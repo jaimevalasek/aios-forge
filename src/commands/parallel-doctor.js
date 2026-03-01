@@ -55,10 +55,10 @@ function summarizeChecks(checks) {
   };
 }
 
-function formatCheckPrefix(check) {
-  if (check.ok) return 'OK';
-  if (check.severity === 'warn') return 'WARN';
-  return 'FAIL';
+function formatCheckPrefix(check, t) {
+  if (check.ok) return t('parallel_doctor.prefix_ok');
+  if (check.severity === 'warn') return t('parallel_doctor.prefix_warn');
+  return t('parallel_doctor.prefix_fail');
 }
 
 async function collectPrerequisites(targetDir) {
@@ -111,7 +111,7 @@ async function inspectParallelState(targetDir, workersOption) {
   };
 }
 
-function buildChecks(context, state, prerequisites, workersOption, force) {
+function buildChecks(context, state, prerequisites, workersOption, force, t) {
   const checks = [];
 
   checks.push(
@@ -119,8 +119,10 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       'context.exists',
       context.exists,
       'error',
-      context.exists ? 'project.context.md exists.' : 'project.context.md is missing.',
-      context.exists ? '' : 'Run setup:context before parallel doctor.'
+      context.exists
+        ? t('parallel_doctor.check_context_exists_ok')
+        : t('parallel_doctor.check_context_exists_missing'),
+      context.exists ? '' : t('parallel_doctor.check_context_exists_hint')
     )
   );
 
@@ -129,8 +131,10 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       'context.parsed',
       context.parsed,
       'error',
-      context.parsed ? 'project.context.md is parseable.' : 'project.context.md is invalid.',
-      context.parsed ? '' : 'Fix context frontmatter before running parallel doctor.'
+      context.parsed
+        ? t('parallel_doctor.check_context_parsed_ok')
+        : t('parallel_doctor.check_context_parsed_invalid'),
+      context.parsed ? '' : t('parallel_doctor.check_context_parsed_hint')
     )
   );
 
@@ -143,9 +147,13 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       classificationOk,
       'error',
       classificationOk
-        ? `Parallel mode allowed for classification ${classification || 'unknown'}.`
-        : `Parallel mode requires MEDIUM classification (current: ${classification || 'unknown'}).`,
-      classificationOk ? '' : 'Use --force to override classification guard.'
+        ? t('parallel_doctor.check_context_classification_ok', {
+            classification: classification || 'unknown'
+          })
+        : t('parallel_doctor.check_context_classification_invalid', {
+            classification: classification || 'unknown'
+          }),
+      classificationOk ? '' : t('parallel_doctor.check_context_classification_hint')
     )
   );
 
@@ -155,9 +163,9 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       state.dirExists,
       'error',
       state.dirExists
-        ? '.aios-lite/context/parallel directory exists.'
-        : '.aios-lite/context/parallel directory is missing.',
-      state.dirExists ? '' : 'Run parallel:init or parallel:doctor --fix.'
+        ? t('parallel_doctor.check_parallel_dir_ok')
+        : t('parallel_doctor.check_parallel_dir_missing'),
+      state.dirExists ? '' : t('parallel_doctor.check_parallel_dir_hint')
     )
   );
 
@@ -167,9 +175,9 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       state.sharedExists,
       'error',
       state.sharedExists
-        ? 'shared-decisions.md is present.'
-        : 'shared-decisions.md is missing.',
-      state.sharedExists ? '' : 'Run parallel:doctor --fix to restore baseline files.'
+        ? t('parallel_doctor.check_parallel_shared_ok')
+        : t('parallel_doctor.check_parallel_shared_missing'),
+      state.sharedExists ? '' : t('parallel_doctor.check_parallel_shared_hint')
     )
   );
 
@@ -179,9 +187,11 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       state.laneIndices.length > 0,
       'error',
       state.laneIndices.length > 0
-        ? `Detected ${state.laneIndices.length} lane file(s).`
-        : 'No agent lane status files found.',
-      state.laneIndices.length > 0 ? '' : 'Run parallel:init or parallel:doctor --fix.'
+        ? t('parallel_doctor.check_lanes_present_ok', {
+            count: state.laneIndices.length
+          })
+        : t('parallel_doctor.check_lanes_present_missing'),
+      state.laneIndices.length > 0 ? '' : t('parallel_doctor.check_lanes_present_hint')
     )
   );
 
@@ -191,9 +201,13 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       state.missingLaneIndices.length === 0,
       'error',
       state.missingLaneIndices.length === 0
-        ? `Lane sequence is contiguous (1..${state.expectedWorkers}).`
-        : `Missing lane files in sequence: ${state.missingLaneIndices.join(', ')}`,
-      state.missingLaneIndices.length === 0 ? '' : 'Run parallel:doctor --fix to restore missing lane files.'
+        ? t('parallel_doctor.check_lanes_sequence_ok', {
+            workers: state.expectedWorkers
+          })
+        : t('parallel_doctor.check_lanes_sequence_missing', {
+            lanes: state.missingLaneIndices.join(', ')
+          }),
+      state.missingLaneIndices.length === 0 ? '' : t('parallel_doctor.check_lanes_sequence_hint')
     )
   );
 
@@ -203,7 +217,7 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
         'parallel.workers.option',
         state.expectedWorkers === workersOption,
         'info',
-        `Workers option requested: ${workersOption}.`
+        t('parallel_doctor.check_workers_option', { workers: workersOption })
       )
     );
   }
@@ -215,9 +229,9 @@ function buildChecks(context, state, prerequisites, workersOption, force) {
       missingPrereq === 0,
       missingPrereq === 0 ? 'info' : 'warn',
       missingPrereq === 0
-        ? 'All prerequisite context files are present.'
-        : `${missingPrereq} prerequisite context file(s) are missing.`,
-      missingPrereq === 0 ? '' : 'Create discovery/architecture/prd context files before orchestration.'
+        ? t('parallel_doctor.check_prereq_ok')
+        : t('parallel_doctor.check_prereq_missing', { count: missingPrereq }),
+      missingPrereq === 0 ? '' : t('parallel_doctor.check_prereq_hint')
     )
   );
 
@@ -332,7 +346,7 @@ async function runParallelDoctor({ args, options = {}, logger, t }) {
   const context = await validateProjectContextFile(targetDir);
   const prerequisites = await collectPrerequisites(targetDir);
   let state = await inspectParallelState(targetDir, workersOption);
-  let checks = buildChecks(context, state, prerequisites, workersOption, force);
+  let checks = buildChecks(context, state, prerequisites, workersOption, force, t);
   let fixResult = null;
 
   if (fix) {
@@ -349,7 +363,7 @@ async function runParallelDoctor({ args, options = {}, logger, t }) {
     });
 
     state = await inspectParallelState(targetDir, workersOption);
-    checks = buildChecks(context, state, prerequisites, workersOption, force);
+    checks = buildChecks(context, state, prerequisites, workersOption, force, t);
   }
 
   const summary = summarizeChecks(checks);
@@ -386,7 +400,7 @@ async function runParallelDoctor({ args, options = {}, logger, t }) {
 
   logger.log(t('parallel_doctor.report_title', { path: targetDir }));
   for (const check of checks) {
-    logger.log(`[${formatCheckPrefix(check)}] ${check.id} - ${check.message}`);
+    logger.log(`[${formatCheckPrefix(check, t)}] ${check.id} - ${check.message}`);
     if (check.hint) {
       logger.log(`  -> ${check.hint}`);
     }

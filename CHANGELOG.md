@@ -62,6 +62,7 @@ All notable changes to this project will be documented in this file.
 - `workflow:plan` advisory notes are now localized from i18n keys instead of hardcoded English.
 - `setup:context` onboarding notes are now localized (including beginner recommendation notes and stack-option notes).
 - `test:package` failure messages are now localized via i18n dictionaries.
+- `parallel:doctor` check/hint messages are now fully localized (including severity labels).
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`
@@ -71,6 +72,7 @@ All notable changes to this project will be documented in this file.
   - `tests/mcp-doctor.test.js`
   - `tests/mcp-init.test.js` now covers invalid `--tool` handling
   - `tests/setup-context.test.js` now validates localized onboarding notes
+  - `tests/parallel-doctor.test.js` now validates localized check messages
   - `tests/parallel-init.test.js`
   - `tests/parallel-doctor.test.js`
   - `tests/parallel-assign.test.js`
