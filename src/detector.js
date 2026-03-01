@@ -38,13 +38,15 @@ async function detectFramework(projectDir) {
   const gemfilePath = path.join(projectDir, 'Gemfile');
   const requirementsPath = path.join(projectDir, 'requirements.txt');
   const pyprojectPath = path.join(projectDir, 'pyproject.toml');
+  const cargoTomlPath = path.join(projectDir, 'Cargo.toml');
 
-  const [packageText, composerText, gemfileText, requirementsText, pyprojectText] = await Promise.all([
+  const [packageText, composerText, gemfileText, requirementsText, pyprojectText, cargoTomlText] = await Promise.all([
     readTextIfExists(packageJsonPath),
     readTextIfExists(composerJsonPath),
     readTextIfExists(gemfilePath),
     readTextIfExists(requirementsPath),
-    readTextIfExists(pyprojectPath)
+    readTextIfExists(pyprojectPath),
+    readTextIfExists(cargoTomlPath)
   ]);
 
   const packageJson = safeJsonParse(packageText || '');
@@ -73,6 +75,83 @@ async function detectFramework(projectDir) {
   const hasDjangoPyproject = includesToken(pyprojectText, 'django');
   if (hasManagePy || hasDjangoReq || hasDjangoPyproject) {
     checks.push({ framework: 'Django', installed: true, evidence: hasManagePy ? 'manage.py' : hasDjangoReq ? 'requirements.txt:django' : 'pyproject.toml:django', confidence: hasManagePy ? 'high' : 'medium' });
+  }
+
+  const hasHardhatConfig =
+    (await exists(path.join(projectDir, 'hardhat.config.js'))) ||
+    (await exists(path.join(projectDir, 'hardhat.config.ts')));
+  const hasHardhatDep = dependencyExists(packageJson, ['hardhat']);
+  if (hasHardhatConfig || hasHardhatDep) {
+    checks.push({
+      framework: 'Hardhat',
+      installed: true,
+      evidence: hasHardhatConfig ? 'hardhat.config.*' : 'package.json:hardhat',
+      confidence: hasHardhatConfig ? 'high' : 'medium'
+    });
+  }
+
+  const hasFoundryToml = await exists(path.join(projectDir, 'foundry.toml'));
+  if (hasFoundryToml) {
+    checks.push({
+      framework: 'Foundry',
+      installed: true,
+      evidence: 'foundry.toml',
+      confidence: 'high'
+    });
+  }
+
+  const hasTruffleConfig =
+    (await exists(path.join(projectDir, 'truffle-config.js'))) ||
+    (await exists(path.join(projectDir, 'truffle-config.ts')));
+  const hasTruffleDep = dependencyExists(packageJson, ['truffle']);
+  if (hasTruffleConfig || hasTruffleDep) {
+    checks.push({
+      framework: 'Truffle',
+      installed: true,
+      evidence: hasTruffleConfig ? 'truffle-config.*' : 'package.json:truffle',
+      confidence: hasTruffleConfig ? 'high' : 'medium'
+    });
+  }
+
+  const hasAnchorToml = await exists(path.join(projectDir, 'Anchor.toml'));
+  const hasAnchorDep = dependencyExists(packageJson, ['@coral-xyz/anchor']);
+  const hasAnchorCargo = includesToken(cargoTomlText, 'anchor-lang');
+  if (hasAnchorToml || hasAnchorDep || hasAnchorCargo) {
+    checks.push({
+      framework: 'Anchor',
+      installed: true,
+      evidence: hasAnchorToml
+        ? 'Anchor.toml'
+        : hasAnchorDep
+          ? 'package.json:@coral-xyz/anchor'
+          : 'Cargo.toml:anchor-lang',
+      confidence: hasAnchorToml ? 'high' : 'medium'
+    });
+  }
+
+  const hasSolanaWeb3Dep = dependencyExists(packageJson, ['@solana/web3.js']);
+  if (hasSolanaWeb3Dep && !checks.some((check) => check.framework === 'Anchor')) {
+    checks.push({
+      framework: 'Solana Web3',
+      installed: true,
+      evidence: 'package.json:@solana/web3.js',
+      confidence: 'medium'
+    });
+  }
+
+  const hasAikenToml = await exists(path.join(projectDir, 'aiken.toml'));
+  const hasCardanoDep = dependencyExists(packageJson, [
+    'lucid-cardano',
+    '@meshsdk/core',
+    '@cardano-ogmios/client'
+  ]);
+  if (hasAikenToml || hasCardanoDep) {
+    checks.push({
+      framework: 'Cardano',
+      installed: true,
+      evidence: hasAikenToml ? 'aiken.toml' : 'package.json:cardano dependencies',
+      confidence: hasAikenToml ? 'high' : 'medium'
+    });
   }
 
   const hasNextConfig = (await exists(path.join(projectDir, 'next.config.js'))) || (await exists(path.join(projectDir, 'next.config.ts')));

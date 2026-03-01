@@ -2,7 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.4] - Unreleased
+## [0.1.5] - Unreleased
+### Added
+- Web3 framework detection:
+  - Ethereum: `Hardhat`, `Foundry`, `Truffle`
+  - Solana: `Anchor`, `Solana Web3`
+  - Cardano: `Cardano` (Aiken/Cardano SDK signals)
+- New Web3 skill templates:
+  - static: `web3-ethereum-patterns`, `web3-solana-patterns`, `web3-cardano-patterns`, `web3-security-checklist`, `node-typescript-patterns`
+  - dynamic: `ethereum-docs`, `solana-docs`, `cardano-docs`
+- New documentation page: `docs/en/web3.md`.
+
+### Changed
+- `project_type` now accepts `dapp`.
+- `setup:context` now supports Web3 context fields (`web3_enabled`, `web3_networks`, `contract_framework`, `wallet_provider`, `indexer`, `rpc_provider`).
+- `setup:context` and setup templates now default `aios_lite_version` to `0.1.5`.
+
+## [0.1.4] - 2026-03-01
 ### Added
 - New command:
   - `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--keep]`

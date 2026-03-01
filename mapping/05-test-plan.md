@@ -9,6 +9,9 @@
 - Detect Nuxt by `nuxt.config.*` or `nuxt` dependency.
 - Detect Rails by `Gemfile` with rails gem.
 - Detect Django by `manage.py` or requirements/pyproject.
+- Detect Hardhat by `hardhat.config.*` or `hardhat` dependency.
+- Detect Anchor by `Anchor.toml`, `@coral-xyz/anchor`, or `Cargo.toml:anchor-lang`.
+- Detect Cardano by `aiken.toml` or Cardano SDK dependencies.
 - Fall back to Node when only `package.json` exists.
 
 ### installer
@@ -24,6 +27,7 @@
 - Validates `conversation_language` format.
 - `doctor --fix` restores missing managed files when safe.
 - `doctor --fix --dry-run` reports planned changes without writing.
+- Accepts `project_type=dapp` in context contract validation.
 
 ### agent usability
 - `agents` lists known agents and dependencies.
@@ -44,6 +48,10 @@
   - `aios-lite setup:context --defaults --language=pt-BR`
   - `aios-lite locale:apply`
   - `aios-lite agent:prompt setup --tool=codex --lang=pt-BR`
+- Web3 bootstrap:
+  - create `hardhat.config.ts` + `package.json` with `hardhat`
+  - run `aios-lite install` and `aios-lite setup:context --defaults`
+  - verify `project_type: "dapp"` and Web3 frontmatter fields in `project.context.md`
 - Recovery flow:
   - `aios-lite doctor --fix --dry-run`
   - `aios-lite doctor --fix`

@@ -36,6 +36,32 @@ test('detects Next.js by package dependency', async () => {
   assert.equal(out.framework, 'Next.js');
 });
 
+test('detects Hardhat by config file', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ name: 'dapp' }), 'utf8');
+  await fs.writeFile(path.join(dir, 'hardhat.config.ts'), 'export default {};', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Hardhat');
+  assert.equal(out.evidence, 'hardhat.config.*');
+});
+
+test('detects Anchor by Anchor.toml', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'Anchor.toml'), '[provider]\ncluster="devnet"\n', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Anchor');
+});
+
+test('detects Cardano by aiken.toml', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'aiken.toml'), 'name = "demo"\nversion = "0.1.0"\n', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'Cardano');
+});
+
 test('falls back to Node with generic package.json', async () => {
   const dir = await makeTempDir();
   await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ name: 'x' }), 'utf8');

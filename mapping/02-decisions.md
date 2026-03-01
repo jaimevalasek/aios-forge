@@ -61,3 +61,11 @@
 ### D015 - Safe doctor remediation and built-in smoke pipeline
 - Decision: implement `doctor --fix` with strictly safe actions (restore missing managed files and locale sync only), and add `test:smoke` command for end-to-end verification.
 - Why: reduce manual recovery friction while avoiding risky auto-edits to user business context or code.
+
+### D016 - Web3-first dApp support
+- Decision: extend core context and detection to support `project_type=dapp` with chain-aware metadata for Ethereum, Solana, and Cardano.
+- Why: JS/TS-heavy Web3 projects need first-class support without forcing manual context patching.
+
+### D017 - Conservative Web3 scope in MVP+
+- Decision: include Web3 framework detection + context + skills/templates, but avoid automatic chain operations or deployment commands.
+- Why: keep AIOS Lite lightweight and safe while enabling clear guidance for developer-driven implementation.

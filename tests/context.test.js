@@ -42,11 +42,25 @@ test('validateProjectContextFile returns valid true for complete context', async
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(
     file,
-    `---\nproject_name: "demo"\nproject_type: "web_app"\nprofile: "developer"\nframework: "Node"\nframework_installed: true\nclassification: "MICRO"\nconversation_language: "en"\naios_lite_version: "0.1.1"\n---\n\n# Project Context\n`,
+    `---\nproject_name: "demo"\nproject_type: "dapp"\nprofile: "developer"\nframework: "Hardhat"\nframework_installed: true\nclassification: "MICRO"\nconversation_language: "en"\nweb3_enabled: true\nweb3_networks: "ethereum"\ncontract_framework: "Hardhat"\naios_lite_version: "0.1.5"\n---\n\n# Project Context\n`,
     'utf8'
   );
 
   const result = await validateProjectContextFile(dir);
   assert.equal(result.valid, true);
   assert.equal(result.issues.length, 0);
+});
+
+test('validateContextData accepts project_type dapp', () => {
+  const issues = validateContextData({
+    project_name: 'demo',
+    project_type: 'dapp',
+    profile: 'developer',
+    framework: 'Hardhat',
+    framework_installed: true,
+    classification: 'MICRO',
+    conversation_language: 'en',
+    aios_lite_version: '0.1.5'
+  });
+  assert.equal(issues.length, 0);
 });

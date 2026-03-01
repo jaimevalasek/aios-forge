@@ -39,12 +39,20 @@ const MANAGED_FILES = [
   '.aios-lite/skills/static/jetstream-setup.md',
   '.aios-lite/skills/static/rails-conventions.md',
   '.aios-lite/skills/static/node-express-patterns.md',
+  '.aios-lite/skills/static/node-typescript-patterns.md',
   '.aios-lite/skills/static/nextjs-patterns.md',
   '.aios-lite/skills/static/ui-ux-modern.md',
+  '.aios-lite/skills/static/web3-ethereum-patterns.md',
+  '.aios-lite/skills/static/web3-solana-patterns.md',
+  '.aios-lite/skills/static/web3-cardano-patterns.md',
+  '.aios-lite/skills/static/web3-security-checklist.md',
   '.aios-lite/skills/static/git-conventions.md',
   '.aios-lite/skills/dynamic/laravel-docs.md',
   '.aios-lite/skills/dynamic/flux-ui-docs.md',
   '.aios-lite/skills/dynamic/npm-packages.md',
+  '.aios-lite/skills/dynamic/ethereum-docs.md',
+  '.aios-lite/skills/dynamic/solana-docs.md',
+  '.aios-lite/skills/dynamic/cardano-docs.md',
   '.aios-lite/mcp/servers.md'
 ];
 
@@ -70,7 +78,7 @@ const CONTEXT_REQUIRED_FIELDS = [
 ];
 
 const CONTEXT_ALLOWED_CLASSIFICATIONS = ['MICRO', 'SMALL', 'MEDIUM'];
-const CONTEXT_ALLOWED_PROJECT_TYPES = ['web_app', 'api', 'site', 'script'];
+const CONTEXT_ALLOWED_PROJECT_TYPES = ['web_app', 'api', 'site', 'script', 'dapp'];
 const CONTEXT_ALLOWED_PROFILES = ['developer', 'beginner', 'team'];
 
 const AGENT_DEFINITIONS = [

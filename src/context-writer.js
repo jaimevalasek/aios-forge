@@ -63,6 +63,12 @@ function renderProjectContext(data) {
   const language = data.conversationLanguage || 'en';
   const codeCommentLanguage = data.codeCommentLanguage || language;
   const generatedAt = data.generatedAt || new Date().toISOString();
+  const web3Enabled = Boolean(data.web3Enabled);
+  const web3Networks = data.web3Networks || '';
+  const contractFramework = data.contractFramework || '';
+  const walletProvider = data.walletProvider || '';
+  const indexer = data.indexer || '';
+  const rpcProvider = data.rpcProvider || '';
 
   return `---
 project_name: "${data.projectName}"
@@ -72,6 +78,12 @@ framework: "${data.framework}"
 framework_installed: ${data.frameworkInstalled ? 'true' : 'false'}
 classification: "${data.classification}"
 conversation_language: "${language}"
+web3_enabled: ${web3Enabled ? 'true' : 'false'}
+web3_networks: "${web3Networks}"
+contract_framework: "${contractFramework}"
+wallet_provider: "${walletProvider}"
+indexer: "${indexer}"
+rpc_provider: "${rpcProvider}"
 aios_lite_version: "${data.aiosLiteVersion}"
 generated_at: "${generatedAt}"
 ---
@@ -90,6 +102,14 @@ generated_at: "${generatedAt}"
 - Storage: ${data.storage || ''}
 - Email: ${data.email || ''}
 - Payments: ${data.payments || ''}
+
+## Web3
+- Enabled: ${web3Enabled ? 'yes' : 'no'}
+- Networks: ${web3Networks || '[not applicable]'}
+- Contract framework: ${contractFramework || '[not applicable]'}
+- Wallet provider: ${walletProvider || '[not applicable]'}
+- Indexer: ${indexer || '[not applicable]'}
+- RPC provider: ${rpcProvider || '[not applicable]'}
 
 ## Installation commands
 ${data.installCommands || (data.frameworkInstalled ? '[already installed]' : '[add commands here]')}
@@ -121,4 +141,3 @@ module.exports = {
   renderProjectContext,
   writeProjectContext
 };
-

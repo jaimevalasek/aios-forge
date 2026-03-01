@@ -54,8 +54,23 @@ aios-lite i18n:add fr
 - Gemini CLI (`.gemini/GEMINI.md`)
 - OpenCode (`OPENCODE.md`)
 
+## Web3 support
+- `project_type=dapp` is supported in context validation and setup.
+- Framework detection now includes:
+  - Ethereum: `Hardhat`, `Foundry`, `Truffle`
+  - Solana: `Anchor`, `Solana Web3`
+  - Cardano: `Cardano` (Aiken/Cardano SDK signals)
+- `setup:context` supports Web3 fields:
+  - `--web3-enabled=true|false`
+  - `--web3-networks=ethereum,solana`
+  - `--contract-framework=Hardhat`
+  - `--wallet-provider=wagmi`
+  - `--indexer=The Graph`
+  - `--rpc-provider=Alchemy`
+
 ## Docs
 - i18n guide: `docs/en/i18n.md`
+- web3 guide: `docs/en/web3.md`
 - release guide: `docs/en/release.md`
 - release flow: `docs/en/release-flow.md`
 - release notes template: `docs/en/release-notes-template.md`

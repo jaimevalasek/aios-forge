@@ -31,13 +31,19 @@ Generate `.aios-lite/context/project.context.md` in this format:
 ```markdown
 ---
 project_name: "<name>"
-project_type: "web_app|api|site|script"
+project_type: "web_app|api|site|script|dapp"
 profile: "developer|beginner|team"
-framework: "Laravel|Rails|Django|Next.js|Nuxt|Node|..."
+framework: "Laravel|Rails|Django|Next.js|Nuxt|Node|Hardhat|Foundry|Truffle|Anchor|Solana Web3|Cardano|..."
 framework_installed: true
 classification: "MICRO|SMALL|MEDIUM"
 conversation_language: "en"
-aios_lite_version: "0.1.4"
+web3_enabled: false
+web3_networks: ""
+contract_framework: ""
+wallet_provider: ""
+indexer: ""
+rpc_provider: ""
+aios_lite_version: "0.1.5"
 generated_at: "ISO-8601"
 ---
 
@@ -55,6 +61,14 @@ generated_at: "ISO-8601"
 - Storage:
 - Email:
 - Payments:
+
+## Web3
+- Enabled:
+- Networks:
+- Contract framework:
+- Wallet provider:
+- Indexer:
+- RPC provider:
 
 ## Installation commands
 [Only if framework_installed=false]

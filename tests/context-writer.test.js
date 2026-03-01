@@ -44,16 +44,26 @@ test('normalizeBoolean supports common truthy/falsy forms', () => {
 test('renderProjectContext writes required frontmatter fields', () => {
   const markdown = renderProjectContext({
     projectName: 'demo',
-    projectType: 'web_app',
+    projectType: 'dapp',
     profile: 'developer',
-    framework: 'Node',
+    framework: 'Hardhat',
     frameworkInstalled: true,
     classification: 'MICRO',
     conversationLanguage: 'en',
-    aiosLiteVersion: '0.1.2'
+    web3Enabled: true,
+    web3Networks: 'ethereum',
+    contractFramework: 'Hardhat',
+    walletProvider: 'wagmi',
+    indexer: 'The Graph',
+    rpcProvider: 'Alchemy',
+    aiosLiteVersion: '0.1.5'
   });
 
   assert.equal(markdown.includes('conversation_language: "en"'), true);
+  assert.equal(markdown.includes('project_type: "dapp"'), true);
+  assert.equal(markdown.includes('web3_enabled: true'), true);
+  assert.equal(markdown.includes('contract_framework: "Hardhat"'), true);
+  assert.equal(markdown.includes('RPC provider: Alchemy'), true);
   assert.equal(markdown.includes('classification: "MICRO"'), true);
 });
 
@@ -63,4 +73,3 @@ test('writeProjectContext persists file on disk', async () => {
   const content = await fs.readFile(filePath, 'utf8');
   assert.equal(content, '# context');
 });
-

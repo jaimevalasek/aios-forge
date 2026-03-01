@@ -26,6 +26,13 @@ Coletar informacoes do projeto e gerar `.aios-lite/context/project.context.md`.
 - `framework_installed`
 - `classification`
 - `conversation_language`
+- Para `project_type=dapp`, incluir campos Web3:
+  - `web3_enabled`
+  - `web3_networks`
+  - `contract_framework`
+  - `wallet_provider`
+  - `indexer`
+  - `rpc_provider`
 
 ## Output obrigatorio
 Gerar `.aios-lite/context/project.context.md` com:

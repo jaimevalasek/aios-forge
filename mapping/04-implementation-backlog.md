@@ -41,3 +41,11 @@
 - [x] `doctor --fix --dry-run` planning mode.
 - [x] `test:smoke` command for automated end-to-end checks.
 - [x] Automated tests for remediation and smoke flow.
+
+## Sprint 7 - Web3 and JS/TS expansion
+- [x] Web3 framework detection (Hardhat, Foundry, Truffle, Anchor, Solana Web3, Cardano signals).
+- [x] Context contract expanded with `project_type=dapp`.
+- [x] `setup:context` Web3 fields (`web3_enabled`, `web3_networks`, `contract_framework`, `wallet_provider`, `indexer`, `rpc_provider`).
+- [x] Web3 static and dynamic skill templates (Ethereum, Solana, Cardano, security checklist).
+- [x] Web3 documentation (`docs/en/web3.md`) and README updates.
+- [x] Detector/context test coverage for Web3 paths.

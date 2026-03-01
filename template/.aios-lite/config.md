@@ -32,6 +32,21 @@ Ranges:
 - `conversation_language` (BCP-47, for example `en`, `pt-BR`)
 - `aios_lite_version`
 
+Allowed `project_type` values:
+- `web_app`
+- `api`
+- `site`
+- `script`
+- `dapp`
+
+Optional Web3 context fields (recommended for `project_type=dapp`):
+- `web3_enabled` (boolean)
+- `web3_networks` (for example `ethereum`, `solana`, `cardano`, `ethereum,solana`)
+- `contract_framework` (for example `Hardhat`, `Foundry`, `Anchor`, `Aiken`)
+- `wallet_provider` (for example `wagmi`, `RainbowKit`, `Phantom`, `Lace`)
+- `indexer` (for example `The Graph`, `Helius`, `Blockfrost`)
+- `rpc_provider` (for example `Alchemy`, `Infura`, `QuickNode`)
+
 ## Agent locale packs
 - Localized agent prompts are stored in `.aios-lite/locales/<locale>/agents/`.
 - Active runtime prompts are in `.aios-lite/agents/`.

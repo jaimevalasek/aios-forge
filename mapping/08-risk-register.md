@@ -24,3 +24,8 @@
 - Severity: High
 - Probability: Low
 - Mitigation: keep `doctor --fix` restricted to safe template restoration (no overwrite) and locale sync only; provide `--dry-run` preview.
+
+## R006 - Web3 framework mis-detection in mixed repos
+- Severity: Medium
+- Probability: Medium
+- Mitigation: keep explicit `--framework` and `--project-type` overrides in `setup:context`; document manual override flow in `docs/en/web3.md`.
