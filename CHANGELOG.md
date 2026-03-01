@@ -28,6 +28,9 @@ All notable changes to this project will be documented in this file.
   - `pt-BR` -> `pt-br`
   - `pt_br` -> `pt-br`
   - `pt` -> `pt-br`
+- Locale resolution now also supports regional fallback for:
+  - `es-*` -> `es`
+  - `fr-*` -> `fr`
 - `mcp:init` now writes both shared plan and tool-specific preset templates.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:

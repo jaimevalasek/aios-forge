@@ -55,9 +55,10 @@ CLI localization is supported with:
 - `--locale=<code>`
 - `AIOS_LITE_LOCALE=<code>`
 
-Built-in locales: `en`, `pt-BR`.
+Built-in locales: `en`, `pt-BR`, `es`, `fr`.
 Default locale is `en`.
 `pt`, `pt_br`, and `pt-BR` resolve to the same Portuguese dictionary.
+`es-*` resolves to `es`, and `fr-*` resolves to `fr`.
 
 Generate a new locale scaffold:
 

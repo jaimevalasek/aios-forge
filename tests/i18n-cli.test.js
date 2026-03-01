@@ -46,3 +46,17 @@ test('env locale pt resolves to pt-BR dictionary', async () => {
   assert.equal(cli.stdout.includes('Uso:'), true);
   assert.equal(cli.stdout.includes('CLI do AIOS Lite'), true);
 });
+
+test('regional locale es-MX resolves to es dictionary', async () => {
+  const cli = await runCli(['help', '--locale=es-MX']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stdout.includes('Uso:'), true);
+  assert.equal(cli.stdout.includes('AIOS Lite CLI'), true);
+});
+
+test('regional locale fr_CA resolves to fr dictionary', async () => {
+  const cli = await runCli(['help'], { env: { AIOS_LITE_LOCALE: 'fr_CA' } });
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stdout.includes('Utilisation :'), true);
+  assert.equal(cli.stdout.includes('AIOS Lite CLI'), true);
+});

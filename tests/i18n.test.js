@@ -8,6 +8,8 @@ test('normalizeLocale falls back to en', () => {
   assert.equal(normalizeLocale('pt-BR'), 'pt-br');
   assert.equal(normalizeLocale('pt_br'), 'pt-br');
   assert.equal(normalizeLocale('pt'), 'pt-br');
+  assert.equal(normalizeLocale('es-MX'), 'es');
+  assert.equal(normalizeLocale('fr-CA'), 'fr');
   assert.equal(normalizeLocale('EN-us'), 'en');
   assert.equal(normalizeLocale(undefined), 'en');
 });
@@ -28,4 +30,16 @@ test('translator resolves pt-BR dictionary', () => {
   assert.equal(locale, 'pt-br');
   assert.equal(t('cli.title'), 'CLI do AIOS Lite');
   assert.equal(t('cli.usage'), 'Uso:');
+});
+
+test('translator resolves regional variants to es and fr dictionaries', () => {
+  const es = createTranslator('es-MX');
+  assert.equal(es.locale, 'es');
+  assert.equal(es.t('cli.usage'), 'Uso:');
+  assert.equal(es.t('cli.unknown_command', { command: 'x' }), 'Comando desconocido: x');
+
+  const fr = createTranslator('fr_CA');
+  assert.equal(fr.locale, 'fr');
+  assert.equal(fr.t('cli.usage'), 'Utilisation :');
+  assert.equal(fr.t('cli.unknown_command', { command: 'x' }), 'Commande inconnue : x');
 });
