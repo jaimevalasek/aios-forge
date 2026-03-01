@@ -47,6 +47,7 @@ test('init --json returns structured payload without human logs', async () => {
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(Array.isArray(parsed.copied), true);
   assert.equal(typeof parsed.existingInstall, 'boolean');
 });
@@ -57,6 +58,7 @@ test('install --json returns structured payload without human logs', async () =>
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(Array.isArray(parsed.copied), true);
   assert.equal(typeof parsed.existingInstall, 'boolean');
 });
@@ -81,6 +83,7 @@ test('agents --json returns structured payload without human logs', async () => 
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(typeof parsed.count, 'number');
   assert.equal(Array.isArray(parsed.agents), true);
   assert.equal(typeof parsed.locale, 'string');
@@ -92,6 +95,7 @@ test('agent:prompt --json returns structured payload without human logs', async 
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(parsed.agent, 'setup');
   assert.equal(parsed.tool, 'codex');
   assert.equal(typeof parsed.locale, 'string');
@@ -107,6 +111,7 @@ test('locale:apply --json returns structured payload without human logs', async 
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(parsed.locale, 'fr');
   assert.equal(parsed.dryRun, true);
   assert.equal(Array.isArray(parsed.copied), true);
@@ -118,6 +123,7 @@ test('setup:context --defaults --json returns structured payload', async () => {
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(typeof parsed.filePath, 'string');
   assert.equal(typeof parsed.classificationScore, 'number');
   assert.equal(typeof parsed.data, 'object');
@@ -129,6 +135,7 @@ test('i18n:add --dry-run --json returns scaffold plan payload', async () => {
   assert.equal(cli.code, 0);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
   assert.equal(parsed.locale, 'zz');
   assert.equal(parsed.dryRun, true);
   assert.equal(typeof parsed.filePath, 'string');

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/setup-context.schema.json",
+  "title": "AIOS Lite setup:context --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "filePath", "data", "classificationScore", "localeApplyResult"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "filePath": { "type": "string" },
+    "classificationScore": { "type": "integer", "minimum": 0 },
+    "data": {
+      "type": "object",
+      "required": ["projectName", "projectType", "profile", "framework", "classification", "conversationLanguage", "aiosLiteVersion"],
+      "properties": {
+        "projectName": { "type": "string" },
+        "projectType": { "type": "string" },
+        "profile": { "type": "string" },
+        "framework": { "type": "string" },
+        "classification": { "type": "string" },
+        "conversationLanguage": { "type": "string" },
+        "aiosLiteVersion": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "localeApplyResult": {
+      "type": "object",
+      "required": ["locale", "copied", "missing", "dryRun"],
+      "properties": {
+        "locale": { "type": "string" },
+        "copied": { "type": "array" },
+        "missing": { "type": "array" },
+        "dryRun": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -39,7 +39,11 @@ async function runLocaleApply({ args, options, logger, t }) {
     );
   }
 
-  return result;
+  return {
+    ok: true,
+    targetDir,
+    ...result
+  };
 }
 
 module.exports = {

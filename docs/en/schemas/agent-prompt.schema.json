@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/agent-prompt.schema.json",
+  "title": "AIOS Lite agent:prompt --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "agent", "tool", "locale", "instructionPath", "prompt"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "agent": { "type": "string" },
+    "tool": { "type": "string" },
+    "locale": { "type": "string" },
+    "instructionPath": { "type": "string" },
+    "prompt": { "type": "string" }
+  },
+  "additionalProperties": true
+}

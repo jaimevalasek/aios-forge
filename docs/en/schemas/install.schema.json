@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/install.schema.json",
+  "title": "AIOS Lite install --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "detection", "existingInstall", "copied", "skipped", "backedUp", "dryRun", "localeApply"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "detection": {
+      "type": "object",
+      "required": ["framework", "installed", "evidence", "confidence", "matches"],
+      "properties": {
+        "framework": { "type": ["string", "null"] },
+        "installed": { "type": "boolean" },
+        "evidence": { "type": ["string", "null"] },
+        "confidence": { "type": "string" },
+        "matches": { "type": "array" }
+      },
+      "additionalProperties": true
+    },
+    "existingInstall": { "type": "boolean" },
+    "copied": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "backedUp": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "dryRun": { "type": "boolean" },
+    "localeApply": {
+      "type": ["object", "null"],
+      "required": ["locale", "copied", "missing", "dryRun"],
+      "properties": {
+        "locale": { "type": "string" },
+        "copied": { "type": "array" },
+        "missing": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "dryRun": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/i18n-add.schema.json",
+  "title": "AIOS Lite i18n:add --json output",
+  "type": "object",
+  "required": ["ok", "locale", "filePath", "overwritten", "dryRun"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "locale": { "type": "string" },
+    "filePath": { "type": "string" },
+    "overwritten": { "type": "boolean" },
+    "dryRun": { "type": "boolean" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/locale-apply.schema.json",
+  "title": "AIOS Lite locale:apply --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "locale", "copied", "missing", "dryRun"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "locale": { "type": "string" },
+    "dryRun": { "type": "boolean" },
+    "copied": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target"],
+        "properties": {
+          "source": { "type": "string" },
+          "target": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

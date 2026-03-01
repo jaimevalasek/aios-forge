@@ -62,6 +62,8 @@ async function runInit({ args, options, logger, t }) {
   logger.log(t('init.step_agent_prompt', { tool: promptTool }));
 
   return {
+    ok: true,
+    targetDir,
     ...result,
     localeApply
   };

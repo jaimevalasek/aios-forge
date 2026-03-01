@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aios-lite.dev/schemas/agents.schema.json",
+  "title": "AIOS Lite agents --json output",
+  "type": "object",
+  "required": ["ok", "targetDir", "count", "agents", "locale"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "targetDir": { "type": "string" },
+    "count": { "type": "integer", "minimum": 0 },
+    "locale": { "type": "string" },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "command", "path", "dependsOn", "output"],
+        "properties": {
+          "id": { "type": "string" },
+          "command": { "type": "string" },
+          "path": { "type": "string" },
+          "dependsOn": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "output": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

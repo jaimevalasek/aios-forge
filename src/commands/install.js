@@ -49,6 +49,9 @@ async function runInstall({ args, options, logger, t }) {
   logger.log(t('install.step_agent_prompt', { tool: promptTool }));
 
   return {
+    ok: true,
+    targetDir,
+    detection,
     ...result,
     localeApply
   };

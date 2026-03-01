@@ -87,6 +87,16 @@ All notable changes to this project will be documented in this file.
 - `update` now supports `--lang=en|pt-BR|es|fr` (and `--language`) to force localized agent-pack sync during update, including dry-run planning.
 - `--json` output mode now supports `init`, `install`, and `update` with clean machine-readable payloads (no mixed human logs).
 - `--json` output mode now also supports `agents`, `agent:prompt`, `locale:apply`, `setup:context`, and `i18n:add`.
+- JSON payloads for `init/install/update/agents/agent:prompt/locale:apply/setup:context/i18n:add` now include stable `ok` and command context fields.
+- JSON schema catalog expanded with formal contracts for:
+  - `init`
+  - `install`
+  - `update`
+  - `agents`
+  - `agent:prompt`
+  - `locale:apply`
+  - `setup:context`
+  - `i18n:add`
 - `init` and `install` now support `--lang=en|pt-BR|es|fr` to auto-apply localized agent packs during bootstrap.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
@@ -98,6 +108,7 @@ All notable changes to this project will be documented in this file.
   - `tests/update.test.js` now covers `--lang` override and dry-run locale sync planning
   - `tests/json-output.test.js` now covers `init/install/update --json`
   - `tests/json-output.test.js` now covers `agents/agent:prompt/locale:apply/setup:context/i18n:add --json`
+  - `tests/json-schema-files.test.js` now validates expanded schema catalog
   - `tests/locales.test.js`
   - `tests/agent-contracts.test.js`
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`

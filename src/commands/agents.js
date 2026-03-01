@@ -45,7 +45,7 @@ async function runAgentsList({ args, options, logger, t }) {
     logger.log(t('agents.output_line', { value: agent.output }));
   }
 
-  return { count: agents.length, agents, locale };
+  return { ok: true, targetDir, count: agents.length, agents, locale };
 }
 
 async function runAgentPrompt({ args, options, logger, t }) {
@@ -68,7 +68,7 @@ async function runAgentPrompt({ args, options, logger, t }) {
   logger.log(t('agents.prompt_title', { agent: agent.id, tool, locale }));
   logger.log(prompt);
 
-  return { agent: agent.id, tool, locale, prompt };
+  return { ok: true, targetDir, agent: agent.id, tool, locale, instructionPath, prompt };
 }
 
 module.exports = {

@@ -8,9 +8,49 @@
   },
   "schemas": [
     {
+      "id": "init",
+      "command": "aios-lite init <project-name> --json",
+      "file": "init.schema.json"
+    },
+    {
+      "id": "install",
+      "command": "aios-lite install [path] --json",
+      "file": "install.schema.json"
+    },
+    {
+      "id": "update",
+      "command": "aios-lite update [path] --json",
+      "file": "update.schema.json"
+    },
+    {
       "id": "info",
       "command": "aios-lite info --json",
       "file": "info.schema.json"
+    },
+    {
+      "id": "agents",
+      "command": "aios-lite agents [path] --json",
+      "file": "agents.schema.json"
+    },
+    {
+      "id": "agent_prompt",
+      "command": "aios-lite agent:prompt <agent> [path] --json",
+      "file": "agent-prompt.schema.json"
+    },
+    {
+      "id": "locale_apply",
+      "command": "aios-lite locale:apply [path] --json",
+      "file": "locale-apply.schema.json"
+    },
+    {
+      "id": "setup_context",
+      "command": "aios-lite setup:context [path] --defaults --json",
+      "file": "setup-context.schema.json"
+    },
+    {
+      "id": "i18n_add",
+      "command": "aios-lite i18n:add <locale> --dry-run --json",
+      "file": "i18n-add.schema.json"
     },
     {
       "id": "doctor",

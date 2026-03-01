@@ -45,7 +45,10 @@ async function runI18nAdd({ args, options, logger, t }) {
   logger.log(t('i18n_add.step_translate'));
   logger.log(t('i18n_add.step_try', { locale: result.locale }));
 
-  return result;
+  return {
+    ok: true,
+    ...result
+  };
 }
 
 module.exports = {

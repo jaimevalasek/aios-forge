@@ -604,6 +604,8 @@ async function runSetupContext({ args, options, logger, t }) {
   );
 
   return {
+    ok: true,
+    targetDir,
     filePath,
     data,
     classificationScore: classificationResult.score,

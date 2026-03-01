@@ -44,6 +44,7 @@ async function runUpdate({ args, options, logger, t }) {
   }
 
   return {
+    targetDir,
     ...result,
     localeSync
   };
