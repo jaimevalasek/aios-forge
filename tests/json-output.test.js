@@ -95,6 +95,17 @@ test('test:package --dry-run --json returns plan payload', async () => {
   assert.equal(Array.isArray(parsed.steps), true);
 });
 
+test('workflow:plan --json returns workflow payload', async () => {
+  const cli = await runCli(['workflow:plan', '--classification=SMALL', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.classification, 'SMALL');
+  assert.equal(Array.isArray(parsed.commands), true);
+  assert.equal(parsed.commands.includes('@architect'), true);
+});
+
 test('unknown command with --json returns structured error', async () => {
   const cli = await runCli(['unknown', '--json']);
   assert.equal(cli.code, 1);

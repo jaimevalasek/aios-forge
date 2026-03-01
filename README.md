@@ -24,6 +24,7 @@ npx aios-lite install
 - `aios-lite locale:apply [path] [--lang=en|pt-BR]`
 - `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep] [--json]`
 - `aios-lite test:package [source-path] [--keep] [--dry-run] [--json]`
+- `aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
 - `aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
 
 ## Agent usage helper
@@ -37,6 +38,7 @@ aios-lite doctor --fix
 aios-lite test:smoke --lang=pt-BR
 aios-lite test:smoke --web3=ethereum
 aios-lite test:package --dry-run
+aios-lite workflow:plan --classification=SMALL
 aios-lite mcp:init --dry-run
 ```
 

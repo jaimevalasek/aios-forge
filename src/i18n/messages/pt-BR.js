@@ -21,6 +21,8 @@ module.exports = {
       'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep] [--json] [--locale=pt-BR]',
     help_test_package:
       'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=pt-BR]',
+    help_workflow_plan:
+      'aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=pt-BR]',
     help_mcp_init:
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
@@ -216,6 +218,12 @@ module.exports = {
     pack_done: 'Tarball do pacote criado: {tarball}',
     completed: 'Teste de pacote concluido com {count} etapas validadas.',
     workspace: 'Workspace do teste de pacote: {path}'
+  },
+  workflow_plan: {
+    context_missing:
+      'Arquivo de contexto nao encontrado. Usando workflow de fallback com base na classificacao informada/padrao.',
+    title: 'Workflow recomendado para classificacao {classification}:',
+    notes: 'Notas:'
   },
   mcp_init: {
     context_missing:

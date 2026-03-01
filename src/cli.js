@@ -16,6 +16,7 @@ const { runLocaleApply } = require('./commands/locale-apply');
 const { runSmokeTest } = require('./commands/smoke');
 const { runMcpInit } = require('./commands/mcp-init');
 const { runPackageTest } = require('./commands/package-e2e');
+const { runWorkflowPlan } = require('./commands/workflow-plan');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'info',
@@ -26,6 +27,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'test-smoke',
   'test:package',
   'test-package',
+  'workflow:plan',
+  'workflow-plan',
   'mcp:init',
   'mcp-init',
   'version',
@@ -65,6 +68,7 @@ function printHelp(t, logger) {
   logger.log(`  ${t('cli.help_locale_apply')}`);
   logger.log(`  ${t('cli.help_test_smoke')}`);
   logger.log(`  ${t('cli.help_test_package')}`);
+  logger.log(`  ${t('cli.help_workflow_plan')}`);
   logger.log(`  ${t('cli.help_mcp_init')}`);
 }
 
@@ -126,6 +130,8 @@ async function main() {
       result = await runSmokeTest({ args, options, logger, t });
     } else if (command === 'test:package' || command === 'test-package') {
       result = await runPackageTest({ args, options, logger, t });
+    } else if (command === 'workflow:plan' || command === 'workflow-plan') {
+      result = await runWorkflowPlan({ args, options, logger, t });
     } else if (command === 'mcp:init' || command === 'mcp-init') {
       result = await runMcpInit({ args, options, logger, t });
     } else {
