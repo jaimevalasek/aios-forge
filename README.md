@@ -62,6 +62,11 @@ Use `--json` on selected commands:
 - `aios-lite init <project-name> --json`
 - `aios-lite install [path] --json`
 - `aios-lite update [path] --json`
+- `aios-lite agents [path] --json`
+- `aios-lite agent:prompt <agent> [path] --json`
+- `aios-lite locale:apply [path] --json`
+- `aios-lite setup:context [path] --defaults --json`
+- `aios-lite i18n:add <locale> --dry-run --json`
 - `aios-lite info --json`
 - `aios-lite doctor --json`
 - `aios-lite context:validate --json`

@@ -75,6 +75,65 @@ test('update --json returns structured payload without human logs', async () => 
   assert.equal(typeof parsed.existingInstall, 'boolean');
 });
 
+test('agents --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const cli = await runCli(['agents', dir, '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(typeof parsed.count, 'number');
+  assert.equal(Array.isArray(parsed.agents), true);
+  assert.equal(typeof parsed.locale, 'string');
+});
+
+test('agent:prompt --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const cli = await runCli(['agent:prompt', 'setup', dir, '--tool=codex', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.agent, 'setup');
+  assert.equal(parsed.tool, 'codex');
+  assert.equal(typeof parsed.locale, 'string');
+  assert.equal(typeof parsed.prompt, 'string');
+});
+
+test('locale:apply --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const install = await runCli(['install', dir, '--json']);
+  assert.equal(install.code, 0);
+
+  const cli = await runCli(['locale:apply', dir, '--dry-run', '--lang=fr', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.locale, 'fr');
+  assert.equal(parsed.dryRun, true);
+  assert.equal(Array.isArray(parsed.copied), true);
+});
+
+test('setup:context --defaults --json returns structured payload', async () => {
+  const dir = await makeTempDir();
+  const cli = await runCli(['setup:context', dir, '--defaults', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(typeof parsed.filePath, 'string');
+  assert.equal(typeof parsed.classificationScore, 'number');
+  assert.equal(typeof parsed.data, 'object');
+  assert.equal(typeof parsed.data.projectName, 'string');
+});
+
+test('i18n:add --dry-run --json returns scaffold plan payload', async () => {
+  const cli = await runCli(['i18n:add', 'zz', '--dry-run', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.locale, 'zz');
+  assert.equal(parsed.dryRun, true);
+  assert.equal(typeof parsed.filePath, 'string');
+});
+
 test('context:validate --json returns non-zero and reason for missing file', async () => {
   const dir = await makeTempDir();
   const cli = await runCli(['context:validate', dir, '--json']);
