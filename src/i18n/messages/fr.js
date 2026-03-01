@@ -241,7 +241,13 @@ module.exports = {
     context_missing:
       'Fichier contexte introuvable. Utilisation du workflow de secours selon la classification fournie/par defaut.',
     title: 'Workflow recommande pour la classification {classification} :',
-    notes: 'Notes :'
+    notes: 'Notes :',
+    note_framework_not_installed:
+      'Le framework n est pas encore installe ; terminez l installation du stack avant @dev.',
+    note_dapp_context:
+      'Contexte dApp detecte ; incluez les skills Web3 pendant @architect et @dev.',
+    note_micro_scope:
+      'Gardez un scope d implementation minimal et evitez les agents optionnels.'
   },
   parallel_init: {
     context_missing:
@@ -303,11 +309,62 @@ module.exports = {
   mcp_init: {
     context_missing:
       'Fichier contexte introuvable. Generation d un plan MCP de base avec hypotheses generiques.',
+    invalid_tool: 'Valeur --tool invalide : {tool}. Utilisez une de ces valeurs : {expected}.',
     generated: 'Plan MCP ecrit : {path}',
     dry_run_generated: '[dry-run] Le plan MCP serait ecrit : {path}',
     server_count: 'Serveurs MCP dans le plan : {count}',
     preset_count: 'Presets outils generes : {count}',
     preset_written: 'Preset ecrit ({tool}) : {path}',
     preset_dry_run: '[dry-run] Le preset serait ecrit ({tool}) : {path}'
+  },
+  mcp_doctor: {
+    context_missing: 'project.context.md introuvable.',
+    context_missing_hint: 'Executez setup d abord pour une validation MCP basee sur le contexte.',
+    context_parse_invalid: 'project.context.md n a pas pu etre parse ({reason}).',
+    context_parse_invalid_hint:
+      'Corrigez le format du contexte pour activer la validation MCP selon le stack.',
+    context_ok: 'project.context.md est disponible et parseable.',
+    plan_missing: 'Fichier de plan MCP introuvable (.aios-lite/mcp/servers.local.json).',
+    plan_missing_hint: 'Executez : aios-lite mcp:init',
+    plan_invalid: 'JSON du plan MCP invalide : {error}',
+    plan_invalid_hint: 'Regenerez le plan avec : aios-lite mcp:init',
+    plan_ok: 'Le fichier de plan MCP est present et JSON valide.',
+    plan_servers_ok: 'Le plan MCP declare {count} definition(s) de serveur.',
+    plan_servers_missing: 'Le plan MCP ne contient aucune definition de serveur.',
+    plan_servers_hint: 'Regenerez avec : aios-lite mcp:init',
+    core_enabled: 'Le serveur MCP core "{server}" est active.',
+    core_missing: 'Le serveur MCP core "{server}" est absent ou desactive.',
+    core_missing_hint: 'Regenerez et gardez les serveurs core de base actives.',
+    presets_any_ok: '{count} fichier(s) de preset MCP trouve(s).',
+    presets_any_missing: 'Aucun fichier de preset MCP trouve.',
+    presets_any_hint: 'Executez : aios-lite mcp:init',
+    presets_coverage_partial:
+      'Seulement {existing}/{total} presets outils sont presents.',
+    presets_coverage_partial_hint:
+      'Executez : aios-lite mcp:init (sans --tool) pour generer tous les presets.',
+    presets_coverage_full:
+      'Tous les presets outils sont presents (claude, codex, gemini, opencode).',
+    env_none_required:
+      'Aucune variable d environnement requise dans les serveurs MCP actives.',
+    env_missing:
+      '{missing}/{total} variable(s) d environnement requise(s) manquante(s) : {vars}',
+    env_missing_hint_strict: 'Definissez les variables manquantes avant execution.',
+    env_missing_hint_relaxed:
+      'Definissez les variables pour une disponibilite runtime complete. Utilisez --strict-env pour echouer sur ce controle.',
+    env_all_present: 'Toutes les variables requises sont disponibles ({count}).',
+    compat_database_ok:
+      'Database MCP correspond au moteur de stack du contexte ({engine}).',
+    compat_database_mismatch:
+      'Database MCP ne correspond pas completement au stack du contexte ({engine}).',
+    compat_database_hint:
+      'Regenerez avec : aios-lite mcp:init, ou ajustez manuellement le serveur database.',
+    compat_web3_ok: 'MCP chain-rpc est active pour le contexte Web3.',
+    compat_web3_missing:
+      'Contexte Web3 detecte, mais chain-rpc MCP est absent ou desactive.',
+    compat_web3_missing_hint: 'Regenerez avec : aios-lite mcp:init',
+    compat_web3_unneeded: 'chain-rpc MCP est active, mais le contexte n est pas Web3.',
+    compat_web3_unneeded_hint: 'Desactivez chain-rpc si non necessaire.',
+    report_title: 'Rapport MCP doctor : {path}',
+    summary: 'Resume : {passed} valides, {failed} echecs, {warnings} avertissements.'
   }
 };

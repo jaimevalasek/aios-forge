@@ -235,20 +235,28 @@ function normalizeTool(tool) {
   return value;
 }
 
-function resolveToolDefinitions(tool) {
+function resolveToolDefinitions(tool, t) {
   const normalized = normalizeTool(tool);
   if (!normalized) return TOOL_PRESET_DEFINITIONS;
 
   const found = TOOL_PRESET_DEFINITIONS.find((item) => item.id === normalized);
   if (!found) {
     const expected = TOOL_PRESET_DEFINITIONS.map((item) => item.id).join(', ');
+    if (typeof t === 'function') {
+      throw new Error(
+        t('mcp_init.invalid_tool', {
+          tool: String(tool || ''),
+          expected
+        })
+      );
+    }
     throw new Error(`Invalid --tool value: ${tool}. Use one of: ${expected}.`);
   }
   return [found];
 }
 
 function buildToolPresets(plan, options = {}) {
-  const selectedTools = resolveToolDefinitions(options.tool);
+  const selectedTools = resolveToolDefinitions(options.tool, options.t);
   const enabledServers = plan.servers.filter((server) => server.enabled);
 
   return selectedTools.map((tool) => {
@@ -293,7 +301,7 @@ async function runMcpInit({ args, options = {}, logger, t }) {
 
   const plan = buildMcpPlan(targetDir, contextData, contextMarkdown || '');
   const filePath = path.join(targetDir, '.aios-lite/mcp/servers.local.json');
-  const presets = buildToolPresets(plan, { tool: requestedTool });
+  const presets = buildToolPresets(plan, { tool: requestedTool, t });
   const presetDir = path.join(targetDir, '.aios-lite/mcp/presets');
   const presetFiles = presets.map((preset) => ({
     tool: preset.tool,

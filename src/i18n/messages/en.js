@@ -236,7 +236,12 @@ module.exports = {
     context_missing:
       'Context file not found. Using fallback workflow based on provided/default classification.',
     title: 'Recommended workflow for classification {classification}:',
-    notes: 'Notes:'
+    notes: 'Notes:',
+    note_framework_not_installed:
+      'Framework is not installed yet; complete stack installation before @dev.',
+    note_dapp_context:
+      'dApp context detected; include Web3 skills during @architect and @dev.',
+    note_micro_scope: 'Keep implementation scope minimal and avoid optional agents.'
   },
   parallel_init: {
     context_missing: 'Context file not found: {path}. Run setup:context first.',
@@ -291,11 +296,53 @@ module.exports = {
   mcp_init: {
     context_missing:
       'Context file not found. Generating baseline MCP plan with generic assumptions.',
+    invalid_tool: 'Invalid --tool value: {tool}. Use one of: {expected}.',
     generated: 'MCP plan written: {path}',
     dry_run_generated: '[dry-run] MCP plan would be written: {path}',
     server_count: 'MCP servers in plan: {count}',
     preset_count: 'Tool presets generated: {count}',
     preset_written: 'Preset written ({tool}): {path}',
     preset_dry_run: '[dry-run] Preset would be written ({tool}): {path}'
+  },
+  mcp_doctor: {
+    context_missing: 'project.context.md was not found.',
+    context_missing_hint: 'Run setup first for context-aware MCP validation.',
+    context_parse_invalid: 'project.context.md could not be parsed ({reason}).',
+    context_parse_invalid_hint: 'Fix context formatting to enable stack-aware MCP validation.',
+    context_ok: 'project.context.md is available and parseable.',
+    plan_missing: 'MCP plan file was not found (.aios-lite/mcp/servers.local.json).',
+    plan_missing_hint: 'Run: aios-lite mcp:init',
+    plan_invalid: 'MCP plan JSON is invalid: {error}',
+    plan_invalid_hint: 'Regenerate the plan with: aios-lite mcp:init',
+    plan_ok: 'MCP plan file is present and valid JSON.',
+    plan_servers_ok: 'MCP plan declares {count} server definition(s).',
+    plan_servers_missing: 'MCP plan has no server definitions.',
+    plan_servers_hint: 'Regenerate with: aios-lite mcp:init',
+    core_enabled: 'Core MCP server "{server}" is enabled.',
+    core_missing: 'Core MCP server "{server}" is missing or disabled.',
+    core_missing_hint: 'Regenerate and keep baseline core servers enabled.',
+    presets_any_ok: '{count} MCP preset file(s) found.',
+    presets_any_missing: 'No MCP preset files were found.',
+    presets_any_hint: 'Run: aios-lite mcp:init',
+    presets_coverage_partial: 'Only {existing}/{total} tool presets are present.',
+    presets_coverage_partial_hint:
+      'Run: aios-lite mcp:init (without --tool) to generate all presets.',
+    presets_coverage_full: 'All tool presets are present (claude, codex, gemini, opencode).',
+    env_none_required: 'No required environment variables in enabled MCP servers.',
+    env_missing: '{missing}/{total} required env var(s) are missing: {vars}',
+    env_missing_hint_strict: 'Set the missing variables before execution.',
+    env_missing_hint_relaxed:
+      'Set variables for full runtime readiness. Use --strict-env to fail on this check.',
+    env_all_present: 'All required env vars are available ({count}).',
+    compat_database_ok: 'Database MCP matches context stack engine ({engine}).',
+    compat_database_mismatch: 'Database MCP does not fully match context stack ({engine}).',
+    compat_database_hint: 'Regenerate with: aios-lite mcp:init, or adjust database server manually.',
+    compat_web3_ok: 'chain-rpc MCP is enabled for Web3 context.',
+    compat_web3_missing: 'Web3 context detected, but chain-rpc MCP is missing or disabled.',
+    compat_web3_missing_hint: 'Regenerate with: aios-lite mcp:init',
+    compat_web3_unneeded: 'chain-rpc MCP is enabled, but context is not Web3.',
+    compat_web3_unneeded_hint: 'Disable chain-rpc if not needed.',
+    report_title: 'MCP doctor report: {path}',
+    summary: 'Summary: {passed} passed, {failed} failed, {warnings} warnings.'
   }
 };

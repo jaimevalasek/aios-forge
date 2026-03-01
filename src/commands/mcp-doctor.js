@@ -94,7 +94,7 @@ function formatCheckPrefix(check) {
   return 'FAIL';
 }
 
-async function runMcpDoctor({ args, options = {}, logger }) {
+async function runMcpDoctor({ args, options = {}, logger, t }) {
   const targetDir = path.resolve(process.cwd(), args[0] || '.');
   const strictEnv = normalizeBoolean(options['strict-env'], false);
   const planPath = path.join(targetDir, '.aios-lite/mcp/servers.local.json');
@@ -113,8 +113,8 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'context.exists',
         false,
         'warn',
-        'project.context.md was not found.',
-        'Run setup first for context-aware MCP validation.'
+        t('mcp_doctor.context_missing'),
+        t('mcp_doctor.context_missing_hint')
       )
     );
   } else if (!contextResult.parsed) {
@@ -123,8 +123,10 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'context.parsed',
         false,
         'warn',
-        `project.context.md could not be parsed (${contextResult.parseError || 'invalid_frontmatter'}).`,
-        'Fix context formatting to enable stack-aware MCP validation.'
+        t('mcp_doctor.context_parse_invalid', {
+          reason: contextResult.parseError || 'invalid_frontmatter'
+        }),
+        t('mcp_doctor.context_parse_invalid_hint')
       )
     );
   } else {
@@ -133,7 +135,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'context.parsed',
         true,
         'info',
-        'project.context.md is available and parseable.'
+        t('mcp_doctor.context_ok')
       )
     );
   }
@@ -145,8 +147,8 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'plan.exists',
         false,
         'error',
-        'MCP plan file was not found (.aios-lite/mcp/servers.local.json).',
-        'Run: aios-lite mcp:init'
+        t('mcp_doctor.plan_missing'),
+        t('mcp_doctor.plan_missing_hint')
       )
     );
   } else if (!planFile.parsed) {
@@ -155,8 +157,8 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'plan.parsed',
         false,
         'error',
-        `MCP plan JSON is invalid: ${planFile.error}`,
-        'Regenerate the plan with: aios-lite mcp:init'
+        t('mcp_doctor.plan_invalid', { error: planFile.error }),
+        t('mcp_doctor.plan_invalid_hint')
       )
     );
   } else {
@@ -165,7 +167,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'plan.parsed',
         true,
         'info',
-        'MCP plan file is present and valid JSON.'
+        t('mcp_doctor.plan_ok')
       )
     );
   }
@@ -181,9 +183,9 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         serverMap.size > 0,
         'error',
         serverMap.size > 0
-          ? `MCP plan declares ${serverMap.size} server definition(s).`
-          : 'MCP plan has no server definitions.',
-        serverMap.size > 0 ? '' : 'Regenerate with: aios-lite mcp:init'
+          ? t('mcp_doctor.plan_servers_ok', { count: serverMap.size })
+          : t('mcp_doctor.plan_servers_missing'),
+        serverMap.size > 0 ? '' : t('mcp_doctor.plan_servers_hint')
       )
     );
 
@@ -196,9 +198,9 @@ async function runMcpDoctor({ args, options = {}, logger }) {
           ok,
           'error',
           ok
-            ? `Core MCP server "${serverId}" is enabled.`
-            : `Core MCP server "${serverId}" is missing or disabled.`,
-          ok ? '' : 'Regenerate and keep baseline core servers enabled.'
+            ? t('mcp_doctor.core_enabled', { server: serverId })
+            : t('mcp_doctor.core_missing', { server: serverId }),
+          ok ? '' : t('mcp_doctor.core_missing_hint')
         )
       );
     }
@@ -222,9 +224,9 @@ async function runMcpDoctor({ args, options = {}, logger }) {
       existingPresetCount > 0,
       'error',
       existingPresetCount > 0
-        ? `${existingPresetCount} MCP preset file(s) found.`
-        : 'No MCP preset files were found.',
-      existingPresetCount > 0 ? '' : 'Run: aios-lite mcp:init'
+        ? t('mcp_doctor.presets_any_ok', { count: existingPresetCount })
+        : t('mcp_doctor.presets_any_missing'),
+      existingPresetCount > 0 ? '' : t('mcp_doctor.presets_any_hint')
     )
   );
 
@@ -234,8 +236,11 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'presets.coverage',
         false,
         'warn',
-        `Only ${existingPresetCount}/${TOOL_PRESETS.length} tool presets are present.`,
-        'Run: aios-lite mcp:init (without --tool) to generate all presets.'
+        t('mcp_doctor.presets_coverage_partial', {
+          existing: existingPresetCount,
+          total: TOOL_PRESETS.length
+        }),
+        t('mcp_doctor.presets_coverage_partial_hint')
       )
     );
   } else if (existingPresetCount === TOOL_PRESETS.length) {
@@ -244,7 +249,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'presets.coverage',
         true,
         'info',
-        'All tool presets are present (claude, codex, gemini, opencode).'
+        t('mcp_doctor.presets_coverage_full')
       )
     );
   }
@@ -258,7 +263,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'env.required',
         true,
         'info',
-        'No required environment variables in enabled MCP servers.'
+        t('mcp_doctor.env_none_required')
       )
     );
   } else if (missingEnv.length > 0) {
@@ -267,10 +272,14 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'env.required',
         false,
         envSeverity,
-        `${missingEnv.length}/${requiredEnv.length} required env var(s) are missing: ${missingEnv.join(', ')}`,
+        t('mcp_doctor.env_missing', {
+          missing: missingEnv.length,
+          total: requiredEnv.length,
+          vars: missingEnv.join(', ')
+        }),
         strictEnv
-          ? 'Set the missing variables before execution.'
-          : 'Set variables for full runtime readiness. Use --strict-env to fail on this check.'
+          ? t('mcp_doctor.env_missing_hint_strict')
+          : t('mcp_doctor.env_missing_hint_relaxed')
       )
     );
   } else {
@@ -279,7 +288,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
         'env.required',
         true,
         'info',
-        `All required env vars are available (${requiredEnv.length}).`
+        t('mcp_doctor.env_all_present', { count: requiredEnv.length })
       )
     );
   }
@@ -296,11 +305,11 @@ async function runMcpDoctor({ args, options = {}, logger }) {
           matches,
           matches ? 'info' : 'warn',
           matches
-            ? `Database MCP matches context stack engine (${stackDatabase}).`
-            : `Database MCP does not fully match context stack (${stackDatabase}).`,
+            ? t('mcp_doctor.compat_database_ok', { engine: stackDatabase })
+            : t('mcp_doctor.compat_database_mismatch', { engine: stackDatabase }),
           matches
             ? ''
-            : 'Regenerate with: aios-lite mcp:init, or adjust database server manually.'
+            : t('mcp_doctor.compat_database_hint')
         )
       );
     }
@@ -315,9 +324,9 @@ async function runMcpDoctor({ args, options = {}, logger }) {
           chainOk,
           'error',
           chainOk
-            ? 'chain-rpc MCP is enabled for Web3 context.'
-            : 'Web3 context detected, but chain-rpc MCP is missing or disabled.',
-          chainOk ? '' : 'Regenerate with: aios-lite mcp:init'
+            ? t('mcp_doctor.compat_web3_ok')
+            : t('mcp_doctor.compat_web3_missing'),
+          chainOk ? '' : t('mcp_doctor.compat_web3_missing_hint')
         )
       );
     } else if (chainRpcServer && chainRpcServer.enabled) {
@@ -326,8 +335,8 @@ async function runMcpDoctor({ args, options = {}, logger }) {
           'compat.web3',
           false,
           'warn',
-          'chain-rpc MCP is enabled, but context is not Web3.',
-          'Disable chain-rpc if not needed.'
+          t('mcp_doctor.compat_web3_unneeded'),
+          t('mcp_doctor.compat_web3_unneeded_hint')
         )
       );
     }
@@ -366,7 +375,7 @@ async function runMcpDoctor({ args, options = {}, logger }) {
     return output;
   }
 
-  logger.log(`MCP doctor report: ${targetDir}`);
+  logger.log(t('mcp_doctor.report_title', { path: targetDir }));
   for (const check of checks) {
     logger.log(`[${formatCheckPrefix(check)}] ${check.id} - ${check.message}`);
     if (check.hint) {
@@ -374,7 +383,11 @@ async function runMcpDoctor({ args, options = {}, logger }) {
     }
   }
   logger.log(
-    `Summary: ${summary.passed} passed, ${summary.failed} failed, ${summary.warnings} warnings.`
+    t('mcp_doctor.summary', {
+      passed: summary.passed,
+      failed: summary.failed,
+      warnings: summary.warnings
+    })
   );
 
   return output;

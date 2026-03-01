@@ -143,3 +143,18 @@ test('mcp:init supports --tool filter for a single preset', async () => {
   assert.equal(codexPreset.mcpServers.context7.args.includes('$CONTEXT7_MCP_URL'), true);
   assert.equal(codexPreset.mcpServers.database.args.includes('$DATABASE_MCP_URL'), true);
 });
+
+test('mcp:init rejects invalid --tool value', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('en');
+
+  await assert.rejects(
+    runMcpInit({
+      args: [dir],
+      options: { tool: 'invalid-tool' },
+      logger: createQuietLogger(),
+      t
+    }),
+    /Invalid --tool value/
+  );
+});

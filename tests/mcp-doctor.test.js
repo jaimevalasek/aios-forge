@@ -78,10 +78,12 @@ function withTempEnv(values, fn) {
 
 test('mcp:doctor fails when MCP plan file is missing', async () => {
   const dir = await makeTempDir();
+  const { t } = createTranslator('en');
   const result = await runMcpDoctor({
     args: [dir],
     options: {},
-    logger: createQuietLogger()
+    logger: createQuietLogger(),
+    t
   });
 
   assert.equal(result.ok, false);
@@ -104,7 +106,8 @@ test('mcp:doctor strict env mode fails when required variables are missing', asy
   const result = await runMcpDoctor({
     args: [dir],
     options: { 'strict-env': true },
-    logger: createQuietLogger()
+    logger: createQuietLogger(),
+    t
   });
 
   assert.equal(result.ok, false);
@@ -139,7 +142,8 @@ test('mcp:doctor strict env mode passes when required variables exist', async ()
       const result = await runMcpDoctor({
         args: [dir],
         options: { 'strict-env': true },
-        logger: createQuietLogger()
+        logger: createQuietLogger(),
+        t
       });
 
       assert.equal(result.ok, true);

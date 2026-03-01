@@ -24,23 +24,23 @@ function buildWorkflowPlan(input = {}) {
   const projectType = String(input.projectType || 'web_app');
   const frameworkInstalled = Boolean(input.frameworkInstalled);
   const sequence = WORKFLOW_BY_CLASSIFICATION[classification] || WORKFLOW_BY_CLASSIFICATION.MICRO;
-  const notes = [];
+  const noteKeys = [];
 
   if (!frameworkInstalled) {
-    notes.push('Framework is not installed yet; complete stack installation before @dev.');
+    noteKeys.push('framework_not_installed');
   }
   if (projectType === 'dapp' || Boolean(input.web3Enabled)) {
-    notes.push('dApp context detected; include Web3 skills during @architect and @dev.');
+    noteKeys.push('dapp_context');
   }
   if (classification === 'MICRO') {
-    notes.push('Keep implementation scope minimal and avoid optional agents.');
+    noteKeys.push('micro_scope');
   }
 
   return {
     classification,
     sequence,
     commands: withAgentPrefix(sequence),
-    notes
+    noteKeys
   };
 }
 
@@ -71,7 +71,8 @@ async function runWorkflowPlan({ args, options = {}, logger, t }) {
     classification: plan.classification,
     sequence: plan.sequence,
     commands: plan.commands,
-    notes: plan.notes
+    notes: plan.noteKeys.map((key) => t(`workflow_plan.note_${key}`)),
+    noteKeys: plan.noteKeys
   };
 
   if (jsonMode) {
@@ -85,9 +86,9 @@ async function runWorkflowPlan({ args, options = {}, logger, t }) {
   for (const command of plan.commands) {
     logger.log(`- ${command}`);
   }
-  if (plan.notes.length > 0) {
+  if (output.notes.length > 0) {
     logger.log(t('workflow_plan.notes'));
-    for (const note of plan.notes) {
+    for (const note of output.notes) {
       logger.log(`- ${note}`);
     }
   }

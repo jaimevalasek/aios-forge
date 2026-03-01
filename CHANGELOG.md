@@ -57,6 +57,9 @@ All notable changes to this project will be documented in this file.
 - `update` now reapplies active agent prompts from `conversation_language` in context, preventing locale reset after template refresh.
 - `mcp:init` now writes both shared plan and tool-specific preset templates.
 - `mcp:init` Context7/Database presets now default to remote-endpoint bridge templates (`mcp-remote`) with URL env vars instead of generic command placeholders.
+- `mcp:init` invalid `--tool` errors are now localized via i18n dictionaries.
+- `mcp:doctor` human-readable check messages and summary are now fully localized.
+- `workflow:plan` advisory notes are now localized from i18n keys instead of hardcoded English.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`
@@ -64,6 +67,7 @@ All notable changes to this project will be documented in this file.
   - `tests/agent-contracts.test.js`
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`
   - `tests/mcp-doctor.test.js`
+  - `tests/mcp-init.test.js` now covers invalid `--tool` handling
   - `tests/parallel-init.test.js`
   - `tests/parallel-doctor.test.js`
   - `tests/parallel-assign.test.js`
