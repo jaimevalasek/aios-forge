@@ -3,7 +3,9 @@
 module.exports = {
   cli: {
     title: 'AIOS Lite CLI',
+    title_line: '{title}\n',
     usage: 'Utilisation :',
+    help_item_line: '  {text}',
     help_init: 'aios-lite init <project-name> [--force] [--dry-run] [--locale=fr]',
     help_install: 'aios-lite install [path] [--force] [--dry-run] [--locale=fr]',
     help_update: 'aios-lite update [path] [--dry-run] [--locale=fr]',
@@ -36,6 +38,7 @@ module.exports = {
     help_mcp_doctor:
       'aios-lite mcp:doctor [path] [--strict-env] [--json] [--locale=fr]',
     unknown_command: 'Commande inconnue : {command}',
+    unknown_command_line: '{message}\n',
     error_prefix: 'Erreur : {message}'
   },
   init: {

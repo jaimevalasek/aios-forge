@@ -103,3 +103,20 @@ test('translator exposes localized doctor command wrapper keys', () => {
   assert.equal(es.t('doctor.fix_action_line', { action: 'x' }), '- Accion: x');
   assert.equal(fr.t('doctor.fix_action_line', { action: 'x' }), '- Action : x');
 });
+
+test('translator exposes localized cli line wrapper keys', () => {
+  const en = createTranslator('en');
+  const pt = createTranslator('pt-BR');
+  const es = createTranslator('es');
+  const fr = createTranslator('fr');
+
+  assert.equal(en.t('cli.help_item_line', { text: 'x' }), '  x');
+  assert.equal(pt.t('cli.help_item_line', { text: 'x' }), '  x');
+  assert.equal(es.t('cli.help_item_line', { text: 'x' }), '  x');
+  assert.equal(fr.t('cli.help_item_line', { text: 'x' }), '  x');
+
+  assert.equal(en.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
+  assert.equal(pt.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
+  assert.equal(es.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
+  assert.equal(fr.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
+});

@@ -77,6 +77,7 @@ All notable changes to this project will be documented in this file.
 - Standardized localized line formatting for `agents`, `locale:apply`, `workflow:plan`, and `parallel:init` human-readable listings.
 - Localized diagnostic line wrappers for `mcp:doctor` and `parallel:doctor` checks/hints, plus `context:validate` issue list rows.
 - Localized diagnostic/action wrapper lines in `doctor` command output (checks, hints, fix actions, and detail lines).
+- `cli` help and unknown-command wrapper lines are now localized via i18n keys instead of inline formatting.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`

@@ -75,29 +75,33 @@ function createLogger() {
   };
 }
 
+function logHelpLine(t, logger, key) {
+  logger.log(t('cli.help_item_line', { text: t(key) }));
+}
+
 function printHelp(t, logger) {
-  logger.log(`${t('cli.title')}\n`);
+  logger.log(t('cli.title_line', { title: t('cli.title') }));
   logger.log(t('cli.usage'));
-  logger.log(`  ${t('cli.help_init')}`);
-  logger.log(`  ${t('cli.help_install')}`);
-  logger.log(`  ${t('cli.help_update')}`);
-  logger.log(`  ${t('cli.help_info')}`);
-  logger.log(`  ${t('cli.help_doctor')}`);
-  logger.log(`  ${t('cli.help_i18n_add')}`);
-  logger.log(`  ${t('cli.help_agents')}`);
-  logger.log(`  ${t('cli.help_agent_prompt')}`);
-  logger.log(`  ${t('cli.help_context_validate')}`);
-  logger.log(`  ${t('cli.help_setup_context')}`);
-  logger.log(`  ${t('cli.help_locale_apply')}`);
-  logger.log(`  ${t('cli.help_test_smoke')}`);
-  logger.log(`  ${t('cli.help_test_package')}`);
-  logger.log(`  ${t('cli.help_workflow_plan')}`);
-  logger.log(`  ${t('cli.help_parallel_init')}`);
-  logger.log(`  ${t('cli.help_parallel_doctor')}`);
-  logger.log(`  ${t('cli.help_parallel_assign')}`);
-  logger.log(`  ${t('cli.help_parallel_status')}`);
-  logger.log(`  ${t('cli.help_mcp_init')}`);
-  logger.log(`  ${t('cli.help_mcp_doctor')}`);
+  logHelpLine(t, logger, 'cli.help_init');
+  logHelpLine(t, logger, 'cli.help_install');
+  logHelpLine(t, logger, 'cli.help_update');
+  logHelpLine(t, logger, 'cli.help_info');
+  logHelpLine(t, logger, 'cli.help_doctor');
+  logHelpLine(t, logger, 'cli.help_i18n_add');
+  logHelpLine(t, logger, 'cli.help_agents');
+  logHelpLine(t, logger, 'cli.help_agent_prompt');
+  logHelpLine(t, logger, 'cli.help_context_validate');
+  logHelpLine(t, logger, 'cli.help_setup_context');
+  logHelpLine(t, logger, 'cli.help_locale_apply');
+  logHelpLine(t, logger, 'cli.help_test_smoke');
+  logHelpLine(t, logger, 'cli.help_test_package');
+  logHelpLine(t, logger, 'cli.help_workflow_plan');
+  logHelpLine(t, logger, 'cli.help_parallel_init');
+  logHelpLine(t, logger, 'cli.help_parallel_doctor');
+  logHelpLine(t, logger, 'cli.help_parallel_assign');
+  logHelpLine(t, logger, 'cli.help_parallel_status');
+  logHelpLine(t, logger, 'cli.help_mcp_init');
+  logHelpLine(t, logger, 'cli.help_mcp_doctor');
 }
 
 function commandSupportsJson(command) {
@@ -204,7 +208,7 @@ async function main() {
           }
         });
       } else {
-        logger.error(`${message}\n`);
+        logger.error(t('cli.unknown_command_line', { message }));
         printHelp(t, logger);
       }
       process.exitCode = 1;
