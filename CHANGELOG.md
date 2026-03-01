@@ -84,6 +84,7 @@ All notable changes to this project will be documented in this file.
 - `doctor` now enforces multi-IDE gateway contracts (Claude/Codex/Gemini/OpenCode) and validates required Gemini/OpenCode files.
 - `doctor` now also validates each Gemini command file (`.gemini/commands/aios-*.toml`) maps to the expected shared agent instruction file.
 - `doctor --fix` now restores broken gateway contract files (Claude/Codex/Gemini/OpenCode + Gemini command mappings) from template in safe mode.
+- `update` now supports `--lang=en|pt-BR|es|fr` (and `--language`) to force localized agent-pack sync during update, including dry-run planning.
 - `init` and `install` now support `--lang=en|pt-BR|es|fr` to auto-apply localized agent packs during bootstrap.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
@@ -92,6 +93,7 @@ All notable changes to this project will be documented in this file.
   - `tests/prompt-tool.test.js`
   - `tests/init-install-guidance.test.js` now validates locale pack auto-apply on `init/install --lang`
   - `tests/version.test.js`
+  - `tests/update.test.js` now covers `--lang` override and dry-run locale sync planning
   - `tests/locales.test.js`
   - `tests/agent-contracts.test.js`
   - `tests/smoke.test.js` now verifies active agent prompt locale application for `--lang=es` and `--lang=fr`

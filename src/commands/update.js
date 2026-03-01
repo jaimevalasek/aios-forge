@@ -9,6 +9,7 @@ const { applyAgentLocale } = require('../locales');
 async function runUpdate({ args, options, logger, t }) {
   const targetDir = path.resolve(process.cwd(), args[0] || '.');
   const dryRun = Boolean(options['dry-run']);
+  const requestedLanguage = options.lang || options.language;
 
   const detection = await detectFramework(targetDir);
   const result = await updateInstallation(targetDir, {
@@ -21,18 +22,26 @@ async function runUpdate({ args, options, logger, t }) {
   }
 
   let localeSync = null;
-  if (!dryRun) {
+  if (!dryRun || requestedLanguage) {
     const context = await validateProjectContextFile(targetDir);
     const language =
-      context.parsed && context.data && context.data.conversation_language
+      requestedLanguage ||
+      (context.parsed && context.data && context.data.conversation_language
         ? context.data.conversation_language
-        : 'en';
-    localeSync = await applyAgentLocale(targetDir, language, { dryRun: false });
+        : 'en');
+    localeSync = await applyAgentLocale(targetDir, language, { dryRun });
   }
 
   logger.log(t('update.done_at', { targetDir }));
   logger.log(t('update.files_updated', { count: result.copied.length }));
   logger.log(t('update.backups_created', { count: result.backedUp.length }));
+  if (localeSync) {
+    if (dryRun) {
+      logger.log(t('locale_apply.dry_run_applied', { locale: localeSync.locale }));
+    } else {
+      logger.log(t('locale_apply.applied', { locale: localeSync.locale }));
+    }
+  }
 
   return {
     ...result,

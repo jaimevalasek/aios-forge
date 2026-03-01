@@ -10,7 +10,8 @@ module.exports = {
       'aios-lite init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
     help_install:
       'aios-lite install [path] [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=fr]',
-    help_update: 'aios-lite update [path] [--dry-run] [--locale=fr]',
+    help_update:
+      'aios-lite update [path] [--dry-run] [--lang=en|pt-BR|es|fr] [--locale=fr]',
     help_info: 'aios-lite info [path] [--json] [--locale=fr]',
     help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--json] [--locale=fr]',
     help_i18n_add: 'aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=fr]',
