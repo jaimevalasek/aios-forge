@@ -83,6 +83,16 @@ test('mcp:init --json returns structured plan payload', async () => {
   assert.equal(Array.isArray(parsed.plan.servers), true);
 });
 
+test('test:package --dry-run --json returns plan payload', async () => {
+  const cli = await runCli(['test:package', '--dry-run', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.dryRun, true);
+  assert.equal(Array.isArray(parsed.steps), true);
+});
+
 test('unknown command with --json returns structured error', async () => {
   const cli = await runCli(['unknown', '--json']);
   assert.equal(cli.code, 1);

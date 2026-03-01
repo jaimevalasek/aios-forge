@@ -19,6 +19,8 @@ module.exports = {
     help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run] [--locale=pt-BR]',
     help_test_smoke:
       'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep] [--json] [--locale=pt-BR]',
+    help_test_package:
+      'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=pt-BR]',
     help_mcp_init: 'aios-lite mcp:init [path] [--dry-run] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
     error_prefix: 'Erro: {message}'
@@ -207,6 +209,12 @@ module.exports = {
     steps_count: 'Etapas validadas: {count}',
     workspace_kept: 'Workspace mantido: {path}',
     workspace_removed: 'Workspace removido: {path}'
+  },
+  package_test: {
+    start: 'Executando teste de pacote a partir da origem: {sourceDir}',
+    pack_done: 'Tarball do pacote criado: {tarball}',
+    completed: 'Teste de pacote concluido com {count} etapas validadas.',
+    workspace: 'Workspace do teste de pacote: {path}'
   },
   mcp_init: {
     context_missing:
