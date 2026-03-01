@@ -69,6 +69,7 @@ function renderProjectContext(data) {
   const walletProvider = data.walletProvider || '';
   const indexer = data.indexer || '';
   const rpcProvider = data.rpcProvider || '';
+  const notes = Array.isArray(data.notes) ? data.notes.filter(Boolean) : [];
 
   return `---
 project_name: "${data.projectName}"
@@ -100,8 +101,11 @@ generated_at: "${generatedAt}"
 ## Services
 - Queues: ${data.queues || ''}
 - Storage: ${data.storage || ''}
+- WebSockets: ${data.websockets || ''}
 - Email: ${data.email || ''}
 - Payments: ${data.payments || ''}
+- Cache: ${data.cache || ''}
+- Search: ${data.search || ''}
 
 ## Web3
 - Enabled: ${web3Enabled ? 'yes' : 'no'}
@@ -113,6 +117,9 @@ generated_at: "${generatedAt}"
 
 ## Installation commands
 ${data.installCommands || (data.frameworkInstalled ? '[already installed]' : '[add commands here]')}
+
+## Notes
+${notes.length > 0 ? notes.map((note) => `- ${note}`).join('\n') : '- [none]'}
 
 ## Conventions
 - Language: ${language}

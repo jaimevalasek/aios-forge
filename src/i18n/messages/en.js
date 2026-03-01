@@ -131,16 +131,49 @@ module.exports = {
     detected: 'Detected framework: {framework} (installed={installed})',
     q_project_name: 'Project name',
     q_project_type: 'Project type (web_app|api|site|script|dapp)',
-    q_profile: 'Profile (developer|beginner|team)',
+    q_profile: 'Profile: [1] developer [2] beginner [3] team',
+    q_use_detected_framework: 'Use detected framework? (true/false)',
     q_framework: 'Framework',
     q_framework_installed: 'Framework installed? (true/false)',
     q_language: 'Conversation language (for example en or pt-BR)',
+    q_backend_menu:
+      'Backend: [1] Laravel [2] Rails [3] Django [4] Node/Express [5] Next.js [6] Nuxt [7] Hardhat [8] Foundry [9] Truffle [10] Anchor [11] Solana Web3 [12] Cardano [13] Other',
+    q_backend_text: 'Backend (free text)',
+    q_laravel_version: 'Laravel version (for example 11, 10)',
+    q_frontend_menu:
+      'Frontend: [1] TALL Stack [2] VILT Stack [3] Blade [4] Next.js [5] Nuxt [6] React [7] Vue [8] Other',
+    q_frontend_text: 'Frontend (free text)',
+    q_auth_menu:
+      'Auth (Laravel): [1] Breeze [2] Jetstream + Livewire [3] Filament Shield [4] Custom',
     q_web3_enabled: 'Web3 enabled? (true/false)',
     q_web3_networks: 'Web3 networks (for example ethereum, solana, cardano)',
     q_contract_framework: 'Contract framework (for example Hardhat, Foundry, Anchor, Aiken)',
     q_wallet_provider: 'Wallet provider (for example wagmi, RainbowKit, Phantom, Lace)',
     q_indexer: 'Indexer (for example The Graph, Helius, Blockfrost)',
     q_rpc_provider: 'RPC provider (for example Alchemy, Infura, QuickNode)',
+    q_jetstream_teams: 'Jetstream teams enabled? (true/false)',
+    q_jetstream_existing_action:
+      'Existing Laravel project without Jetstream detected. Action: [1] continue without Jetstream [2] recreate with Jetstream (recommended) [3] manual install (risk)',
+    q_auth_text: 'Authentication approach (free text)',
+    q_uiux_menu: 'UI/UX: [1] Tailwind [2] Flux UI [3] shadcn/ui [4] Filament',
+    q_uiux_text: 'UI/UX approach (free text)',
+    q_database_menu:
+      'Database: [1] MySQL [2] PostgreSQL [3] SQLite [4] MongoDB [5] Supabase [6] PlanetScale',
+    q_database_text: 'Database (free text)',
+    q_services_list:
+      'Additional services (comma list): queues, storage, websockets, payments, email, cache, search',
+    q_rails_options:
+      'Rails options used (comma list, e.g. --database=postgresql,--css=tailwind,--api)',
+    q_next_options:
+      'Next.js create-next-app options (comma list, e.g. TypeScript,ESLint,Tailwind CSS,App Router,src/ directory)',
+    q_beginner_summary: 'Describe your project in one sentence',
+    q_beginner_users:
+      'Expected users: [1] personal/small up to 10 [2] small team up to 100 [3] external customers',
+    q_beginner_mobile: 'Mobile requirement: [1] mobile app [2] responsive web [3] desktop only',
+    q_beginner_hosting: 'Hosting preference: [1] simple managed [2] VPS [3] cloud provider',
+    q_beginner_accept_recommendation: 'Accept starter recommendation? (true/false)',
+    beginner_recommendation:
+      'Starter recommendation -> framework: {framework}, frontend: {frontend}, database: {database}, auth: {auth}',
     q_user_types: 'How many user types?',
     q_integrations: 'How many external integrations?',
     q_rules_complexity: 'Rules complexity (none|some|complex)',

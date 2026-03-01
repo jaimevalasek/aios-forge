@@ -56,6 +56,10 @@ test('renderProjectContext writes required frontmatter fields', () => {
     walletProvider: 'wagmi',
     indexer: 'The Graph',
     rpcProvider: 'Alchemy',
+    websockets: 'Reverb/Pusher',
+    cache: 'Redis',
+    search: 'Meilisearch',
+    notes: ['Example note'],
     aiosLiteVersion: '0.1.5'
   });
 
@@ -64,6 +68,10 @@ test('renderProjectContext writes required frontmatter fields', () => {
   assert.equal(markdown.includes('web3_enabled: true'), true);
   assert.equal(markdown.includes('contract_framework: "Hardhat"'), true);
   assert.equal(markdown.includes('RPC provider: Alchemy'), true);
+  assert.equal(markdown.includes('WebSockets: Reverb/Pusher'), true);
+  assert.equal(markdown.includes('Cache: Redis'), true);
+  assert.equal(markdown.includes('Search: Meilisearch'), true);
+  assert.equal(markdown.includes('- Example note'), true);
   assert.equal(markdown.includes('classification: "MICRO"'), true);
 });
 

@@ -2,6 +2,7 @@
 
 const path = require('node:path');
 const readline = require('node:readline/promises');
+const packageJson = require('../../package.json');
 const { detectFramework } = require('../detector');
 const {
   calculateClassification,
@@ -10,30 +11,188 @@ const {
   writeProjectContext
 } = require('../context-writer');
 const { applyAgentLocale } = require('../locales');
+const {
+  BACKEND_CHOICES,
+  AUTH_CHOICES,
+  normalizeChoice,
+  normalizeProfile,
+  inferProjectTypeFromFramework,
+  inferWeb3NetworkFromFramework,
+  buildDeveloperProfile,
+  recommendBeginnerProfile,
+  buildTeamProfile
+} = require('../onboarding');
 
-const WEB3_FRAMEWORK_TO_NETWORK = {
-  Hardhat: 'ethereum',
-  Foundry: 'ethereum',
-  Truffle: 'ethereum',
-  Anchor: 'solana',
-  'Solana Web3': 'solana',
-  Cardano: 'cardano'
+const JETSTREAM_ACTION_CHOICES = {
+  '1': 'continue_without_jetstream',
+  '2': 'recreate_with_jetstream',
+  '3': 'manual_install_risk'
 };
 
+const SERVICE_PATTERNS = [
+  { pattern: /queue|horizon/i, field: 'queues', value: 'Redis/Horizon' },
+  { pattern: /storage|s3|r2/i, field: 'storage', value: 'S3-compatible' },
+  { pattern: /websocket|reverb|pusher/i, field: 'websockets', value: 'Reverb/Pusher' },
+  { pattern: /payment|stripe|mercadopago|pagseguro/i, field: 'payments', value: 'Payments provider' },
+  { pattern: /email|mailgun|resend|ses/i, field: 'email', value: 'Transactional provider' },
+  { pattern: /cache|redis/i, field: 'cache', value: 'Redis' },
+  { pattern: /search|meilisearch|algolia/i, field: 'search', value: 'Meilisearch/Algolia' }
+];
+
+function hasOption(options, name) {
+  return Object.prototype.hasOwnProperty.call(options, name);
+}
+
 function resolveOption(options, name, fallback = '') {
-  return options[name] !== undefined ? String(options[name]) : fallback;
+  return hasOption(options, name) ? String(options[name]) : fallback;
 }
 
 function isWeb3Framework(framework) {
-  return Object.prototype.hasOwnProperty.call(WEB3_FRAMEWORK_TO_NETWORK, String(framework || ''));
-}
-
-function inferProjectTypeFromFramework(framework) {
-  return isWeb3Framework(framework) ? 'dapp' : 'web_app';
+  return inferProjectTypeFromFramework(framework) === 'dapp';
 }
 
 function inferWeb3Network(framework) {
-  return WEB3_FRAMEWORK_TO_NETWORK[String(framework || '')] || 'ethereum';
+  return inferWeb3NetworkFromFramework(framework) || 'ethereum';
+}
+
+function uniqueStrings(values) {
+  return values.filter((value, index, arr) => value && arr.indexOf(value) === index);
+}
+
+function servicesToContextFields(services, fallback = {}) {
+  const output = {
+    queues: fallback.queues || '',
+    storage: fallback.storage || '',
+    websockets: fallback.websockets || '',
+    payments: fallback.payments || '',
+    email: fallback.email || '',
+    cache: fallback.cache || '',
+    search: fallback.search || ''
+  };
+
+  for (const raw of services || []) {
+    const item = String(raw || '').trim();
+    if (!item) continue;
+    for (const rule of SERVICE_PATTERNS) {
+      if (rule.pattern.test(item)) {
+        output[rule.field] = output[rule.field] || rule.value;
+      }
+    }
+  }
+
+  return output;
+}
+
+function mergeProfileData(data, profileData) {
+  if (!profileData) return data;
+
+  const merged = {
+    ...data,
+    profile: profileData.profile || data.profile,
+    projectType: profileData.projectType || data.projectType,
+    framework: profileData.framework || data.framework,
+    backend: profileData.backend || data.backend,
+    frontend: profileData.frontend || data.frontend,
+    database: profileData.database || data.database,
+    auth: profileData.auth || data.auth,
+    uiux: profileData.uiux || data.uiux,
+    web3Enabled: profileData.web3Enabled !== undefined ? Boolean(profileData.web3Enabled) : data.web3Enabled,
+    web3Networks: profileData.web3Networks || data.web3Networks,
+    contractFramework: profileData.contractFramework || data.contractFramework,
+    notes: uniqueStrings([...(data.notes || []), ...(profileData.notes || [])])
+  };
+
+  return {
+    ...merged,
+    ...servicesToContextFields(profileData.services, merged)
+  };
+}
+
+function applyExplicitOverrides(data, options, detectedInstalled) {
+  const output = { ...data };
+
+  if (hasOption(options, 'project-name')) output.projectName = String(options['project-name']);
+  if (hasOption(options, 'project-type')) output.projectType = String(options['project-type']);
+  if (hasOption(options, 'profile')) output.profile = normalizeProfile(options.profile, output.profile);
+  if (hasOption(options, 'framework')) output.framework = String(options.framework);
+  if (hasOption(options, 'framework-installed')) {
+    output.frameworkInstalled = normalizeBoolean(options['framework-installed'], detectedInstalled);
+  }
+  if (hasOption(options, 'language')) output.conversationLanguage = String(options.language);
+  if (hasOption(options, 'web3-enabled')) {
+    output.web3Enabled = normalizeBoolean(options['web3-enabled'], output.web3Enabled);
+  }
+  if (hasOption(options, 'web3-networks')) output.web3Networks = String(options['web3-networks']);
+  if (hasOption(options, 'contract-framework')) output.contractFramework = String(options['contract-framework']);
+  if (hasOption(options, 'wallet-provider')) output.walletProvider = String(options['wallet-provider']);
+  if (hasOption(options, 'indexer')) output.indexer = String(options.indexer);
+  if (hasOption(options, 'rpc-provider')) output.rpcProvider = String(options['rpc-provider']);
+  if (hasOption(options, 'backend')) output.backend = String(options.backend);
+  if (hasOption(options, 'frontend')) output.frontend = String(options.frontend);
+  if (hasOption(options, 'database')) output.database = String(options.database);
+  if (hasOption(options, 'auth')) output.auth = String(options.auth);
+  if (hasOption(options, 'uiux')) output.uiux = String(options.uiux);
+  if (hasOption(options, 'queues')) output.queues = String(options.queues);
+  if (hasOption(options, 'storage')) output.storage = String(options.storage);
+  if (hasOption(options, 'websockets')) output.websockets = String(options.websockets);
+  if (hasOption(options, 'payments')) output.payments = String(options.payments);
+  if (hasOption(options, 'email')) output.email = String(options.email);
+  if (hasOption(options, 'cache')) output.cache = String(options.cache);
+  if (hasOption(options, 'search')) output.search = String(options.search);
+  if (hasOption(options, 'install-commands')) output.installCommands = String(options['install-commands']);
+  if (hasOption(options, 'aios-lite-version')) output.aiosLiteVersion = String(options['aios-lite-version']);
+
+  return output;
+}
+
+function buildDeveloperProfileFromOptions(options, defaults) {
+  const output = buildDeveloperProfile({
+    backendChoice: resolveOption(options, 'backend-choice', defaults.framework),
+    backend: resolveOption(options, 'backend', defaults.backend),
+    framework: resolveOption(options, 'framework', defaults.framework),
+    frontendChoice: resolveOption(options, 'frontend-choice', defaults.frontend),
+    authChoice: resolveOption(options, 'auth-choice', defaults.auth),
+    uiuxChoice: resolveOption(options, 'uiux-choice', defaults.uiux),
+    databaseChoice: resolveOption(options, 'database-choice', defaults.database),
+    servicesChoice: resolveOption(options, 'services', ''),
+    laravelVersion: resolveOption(options, 'laravel-version', ''),
+    teamsEnabled: normalizeBoolean(options['teams-enabled'], false)
+  });
+
+  const railsFlags = resolveOption(options, 'rails-options', '');
+  if (railsFlags) {
+    output.notes.push(`Rails setup flags: ${railsFlags}`);
+  }
+  const nextFlags = resolveOption(options, 'next-options', '');
+  if (nextFlags) {
+    output.notes.push(`Next.js setup flags: ${nextFlags}`);
+  }
+  return output;
+}
+
+function buildBeginnerProfileFromOptions(options) {
+  return recommendBeginnerProfile({
+    projectSummary: resolveOption(options, 'project-summary', ''),
+    expectedUsers: resolveOption(options, 'expected-users', ''),
+    mobileRequirement: resolveOption(options, 'mobile-requirement', ''),
+    hostingPreference: resolveOption(options, 'hosting-preference', '')
+  });
+}
+
+function buildTeamProfileFromOptions(options, defaults) {
+  return buildTeamProfile({
+    projectType: resolveOption(options, 'project-type', defaults.projectType),
+    framework: resolveOption(options, 'framework', defaults.framework),
+    backend: resolveOption(options, 'backend', defaults.backend),
+    frontend: resolveOption(options, 'frontend', defaults.frontend),
+    database: resolveOption(options, 'database', defaults.database),
+    auth: resolveOption(options, 'auth', defaults.auth),
+    uiux: resolveOption(options, 'uiux', defaults.uiux),
+    services: resolveOption(options, 'services', ''),
+    web3Enabled: resolveOption(options, 'web3-enabled', String(defaults.web3Enabled)),
+    web3Networks: resolveOption(options, 'web3-networks', defaults.web3Networks),
+    contractFramework: resolveOption(options, 'contract-framework', defaults.contractFramework)
+  });
 }
 
 async function ask(rl, question, fallback = '') {
@@ -42,6 +201,120 @@ async function ask(rl, question, fallback = '') {
   const cleaned = String(value || '').trim();
   if (!cleaned) return fallback;
   return cleaned;
+}
+
+async function askDeveloperProfile(rl, data, t) {
+  const developerInput = {
+    framework: data.framework,
+    backendChoice: await ask(rl, t('setup_context.q_backend_menu'), data.framework)
+  };
+  const backend = normalizeChoice(developerInput.backendChoice, BACKEND_CHOICES, data.framework);
+
+  if (String(backend).toLowerCase() === 'laravel') {
+    developerInput.laravelVersion = await ask(rl, t('setup_context.q_laravel_version'), '11');
+    developerInput.frontendChoice = await ask(rl, t('setup_context.q_frontend_menu'), '1');
+    developerInput.authChoice = await ask(rl, t('setup_context.q_auth_menu'), '2');
+    developerInput.uiuxChoice = await ask(rl, t('setup_context.q_uiux_menu'), '2');
+    const auth = normalizeChoice(developerInput.authChoice, AUTH_CHOICES, '');
+    if (auth === 'Jetstream + Livewire') {
+      developerInput.teamsEnabled = normalizeBoolean(
+        await ask(rl, t('setup_context.q_jetstream_teams'), 'true'),
+        true
+      );
+    }
+  } else {
+    developerInput.frontendChoice = await ask(rl, t('setup_context.q_frontend_menu'), data.frontend || '6');
+    developerInput.auth = await ask(rl, t('setup_context.q_auth_text'), data.auth || 'Custom');
+    developerInput.uiuxChoice = await ask(rl, t('setup_context.q_uiux_menu'), data.uiux || '1');
+
+    if (backend === 'Rails') {
+      developerInput.railsOptions = await ask(rl, t('setup_context.q_rails_options'), '');
+    }
+    if (backend === 'Next.js') {
+      developerInput.nextOptions = await ask(rl, t('setup_context.q_next_options'), '');
+    }
+  }
+
+  developerInput.databaseChoice = await ask(rl, t('setup_context.q_database_menu'), data.database || '3');
+  developerInput.servicesChoice = await ask(rl, t('setup_context.q_services_list'), '');
+
+  const profileData = buildDeveloperProfile(developerInput);
+
+  if (backend === 'Laravel' && profileData.auth === 'Jetstream + Livewire' && data.frameworkInstalled) {
+    const action = await ask(rl, t('setup_context.q_jetstream_existing_action'), '2');
+    const resolvedAction = normalizeChoice(action, JETSTREAM_ACTION_CHOICES, 'recreate_with_jetstream');
+    profileData.notes.push(`Jetstream existing-project action: ${resolvedAction}`);
+  }
+  if (developerInput.railsOptions) {
+    profileData.notes.push(`Rails setup flags: ${developerInput.railsOptions}`);
+  }
+  if (developerInput.nextOptions) {
+    profileData.notes.push(`Next.js create flags: ${developerInput.nextOptions}`);
+  }
+
+  return profileData;
+}
+
+async function askBeginnerProfile(rl, data, logger, t) {
+  const projectSummary = await ask(rl, t('setup_context.q_beginner_summary'), '');
+  const expectedUsers = await ask(rl, t('setup_context.q_beginner_users'), '1');
+  const mobileRequirement = await ask(rl, t('setup_context.q_beginner_mobile'), '2');
+  const hostingPreference = await ask(rl, t('setup_context.q_beginner_hosting'), '1');
+
+  const recommendation = recommendBeginnerProfile({
+    projectSummary,
+    expectedUsers,
+    mobileRequirement,
+    hostingPreference
+  });
+
+  logger.log(
+    t('setup_context.beginner_recommendation', {
+      framework: recommendation.framework,
+      frontend: recommendation.frontend || 'n/a',
+      database: recommendation.database || 'n/a',
+      auth: recommendation.auth || 'n/a'
+    })
+  );
+
+  const useRecommendation = normalizeBoolean(
+    await ask(rl, t('setup_context.q_beginner_accept_recommendation'), 'true'),
+    true
+  );
+  if (useRecommendation) return recommendation;
+
+  const custom = buildTeamProfile({
+    projectType: await ask(rl, t('setup_context.q_project_type'), data.projectType),
+    framework: await ask(rl, t('setup_context.q_framework'), recommendation.framework),
+    backend: await ask(rl, t('setup_context.q_backend_text'), recommendation.backend),
+    frontend: await ask(rl, t('setup_context.q_frontend_text'), recommendation.frontend),
+    database: await ask(rl, t('setup_context.q_database_text'), recommendation.database),
+    auth: await ask(rl, t('setup_context.q_auth_text'), recommendation.auth),
+    uiux: await ask(rl, t('setup_context.q_uiux_text'), recommendation.uiux),
+    services: await ask(rl, t('setup_context.q_services_list'), '')
+  });
+
+  return {
+    ...custom,
+    profile: 'beginner',
+    notes: uniqueStrings([
+      ...recommendation.notes,
+      'Starter recommendation declined; using custom stack from onboarding.'
+    ])
+  };
+}
+
+async function askTeamProfile(rl, data, t) {
+  return buildTeamProfile({
+    projectType: await ask(rl, t('setup_context.q_project_type'), data.projectType),
+    framework: await ask(rl, t('setup_context.q_framework'), data.framework),
+    backend: await ask(rl, t('setup_context.q_backend_text'), data.backend || data.framework),
+    frontend: await ask(rl, t('setup_context.q_frontend_text'), data.frontend),
+    database: await ask(rl, t('setup_context.q_database_text'), data.database),
+    auth: await ask(rl, t('setup_context.q_auth_text'), data.auth),
+    uiux: await ask(rl, t('setup_context.q_uiux_text'), data.uiux),
+    services: await ask(rl, t('setup_context.q_services_list'), '')
+  });
 }
 
 async function runSetupContext({ args, options, logger, t }) {
@@ -53,47 +326,36 @@ async function runSetupContext({ args, options, logger, t }) {
   const detectedInstalled = detection.installed;
   const inferredProjectType = inferProjectTypeFromFramework(detectedFramework);
   const inferredWeb3Enabled = inferredProjectType === 'dapp';
-
   const baseName = path.basename(targetDir) || 'my-project';
 
   let data = {
-    projectName: resolveOption(options, 'project-name', baseName),
-    projectType: resolveOption(options, 'project-type', inferredProjectType),
-    profile: resolveOption(options, 'profile', 'developer'),
-    framework: resolveOption(options, 'framework', detectedFramework),
-    frameworkInstalled:
-      options['framework-installed'] !== undefined
-        ? normalizeBoolean(options['framework-installed'], detectedInstalled)
-        : detectedInstalled,
-    conversationLanguage: resolveOption(options, 'language', 'en'),
-    web3Enabled:
-      options['web3-enabled'] !== undefined
-        ? normalizeBoolean(options['web3-enabled'], inferredWeb3Enabled)
-        : inferredWeb3Enabled,
-    web3Networks: resolveOption(
-      options,
-      'web3-networks',
-      inferredWeb3Enabled ? inferWeb3Network(detectedFramework) : ''
-    ),
-    contractFramework: resolveOption(
-      options,
-      'contract-framework',
-      inferredWeb3Enabled ? detectedFramework : ''
-    ),
-    walletProvider: resolveOption(options, 'wallet-provider', ''),
-    indexer: resolveOption(options, 'indexer', ''),
-    rpcProvider: resolveOption(options, 'rpc-provider', ''),
-    backend: resolveOption(options, 'backend', ''),
-    frontend: resolveOption(options, 'frontend', ''),
-    database: resolveOption(options, 'database', ''),
-    auth: resolveOption(options, 'auth', ''),
-    uiux: resolveOption(options, 'uiux', ''),
-    queues: resolveOption(options, 'queues', ''),
-    storage: resolveOption(options, 'storage', ''),
-    email: resolveOption(options, 'email', ''),
-    payments: resolveOption(options, 'payments', ''),
-    installCommands: resolveOption(options, 'install-commands', ''),
-    aiosLiteVersion: resolveOption(options, 'aios-lite-version', '0.1.7')
+    projectName: baseName,
+    projectType: inferredProjectType,
+    profile: 'developer',
+    framework: detectedFramework,
+    frameworkInstalled: detectedInstalled,
+    conversationLanguage: 'en',
+    web3Enabled: inferredWeb3Enabled,
+    web3Networks: inferredWeb3Enabled ? inferWeb3Network(detectedFramework) : '',
+    contractFramework: inferredWeb3Enabled ? detectedFramework : '',
+    walletProvider: '',
+    indexer: '',
+    rpcProvider: '',
+    backend: '',
+    frontend: '',
+    database: '',
+    auth: '',
+    uiux: '',
+    queues: '',
+    storage: '',
+    websockets: '',
+    payments: '',
+    email: '',
+    cache: '',
+    search: '',
+    installCommands: '',
+    notes: [],
+    aiosLiteVersion: packageJson.version || '0.1.7'
   };
 
   let userTypesCount = Number(options['user-types'] || 1);
@@ -107,21 +369,46 @@ async function runSetupContext({ args, options, logger, t }) {
     });
 
     try {
-      logger.log(t('setup_context.detected', { framework: detectedFramework, installed: String(detectedInstalled) }));
+      logger.log(
+        t('setup_context.detected', { framework: detectedFramework, installed: String(detectedInstalled) })
+      );
 
       data.projectName = await ask(rl, t('setup_context.q_project_name'), data.projectName);
+
+      if (detection.framework) {
+        const useDetection = normalizeBoolean(
+          await ask(rl, t('setup_context.q_use_detected_framework'), 'true'),
+          true
+        );
+        if (!useDetection) {
+          data.framework = await ask(rl, t('setup_context.q_framework'), data.framework);
+          data.frameworkInstalled = normalizeBoolean(
+            await ask(rl, t('setup_context.q_framework_installed'), String(data.frameworkInstalled)),
+            data.frameworkInstalled
+          );
+        }
+      } else {
+        data.framework = await ask(rl, t('setup_context.q_framework'), data.framework);
+        data.frameworkInstalled = normalizeBoolean(
+          await ask(rl, t('setup_context.q_framework_installed'), String(data.frameworkInstalled)),
+          data.frameworkInstalled
+        );
+      }
+
+      data.profile = normalizeProfile(await ask(rl, t('setup_context.q_profile'), data.profile), data.profile);
+      data.conversationLanguage = await ask(rl, t('setup_context.q_language'), data.conversationLanguage);
+
+      let profileData = null;
+      if (data.profile === 'developer') {
+        profileData = await askDeveloperProfile(rl, data, t);
+      } else if (data.profile === 'beginner') {
+        profileData = await askBeginnerProfile(rl, data, logger, t);
+      } else {
+        profileData = await askTeamProfile(rl, data, t);
+      }
+      data = mergeProfileData(data, profileData);
+
       data.projectType = await ask(rl, t('setup_context.q_project_type'), data.projectType);
-      data.profile = await ask(rl, t('setup_context.q_profile'), data.profile);
-      data.framework = await ask(rl, t('setup_context.q_framework'), data.framework);
-      data.frameworkInstalled = normalizeBoolean(
-        await ask(rl, t('setup_context.q_framework_installed'), String(data.frameworkInstalled)),
-        data.frameworkInstalled
-      );
-      data.conversationLanguage = await ask(
-        rl,
-        t('setup_context.q_language'),
-        data.conversationLanguage
-      );
       data.web3Enabled = normalizeBoolean(
         await ask(rl, t('setup_context.q_web3_enabled'), String(data.web3Enabled)),
         data.web3Enabled
@@ -131,7 +418,7 @@ async function runSetupContext({ args, options, logger, t }) {
         data.contractFramework = await ask(
           rl,
           t('setup_context.q_contract_framework'),
-          data.contractFramework
+          data.contractFramework || data.framework
         );
         data.walletProvider = await ask(rl, t('setup_context.q_wallet_provider'), data.walletProvider);
         data.indexer = await ask(rl, t('setup_context.q_indexer'), data.indexer);
@@ -145,14 +432,25 @@ async function runSetupContext({ args, options, logger, t }) {
       }
 
       userTypesCount = Number(await ask(rl, t('setup_context.q_user_types'), String(userTypesCount)));
-      integrationsCount = Number(
-        await ask(rl, t('setup_context.q_integrations'), String(integrationsCount))
-      );
+      integrationsCount = Number(await ask(rl, t('setup_context.q_integrations'), String(integrationsCount)));
       rulesComplexity = await ask(rl, t('setup_context.q_rules_complexity'), rulesComplexity);
     } finally {
       rl.close();
     }
+  } else {
+    const profile = normalizeProfile(resolveOption(options, 'profile', data.profile), data.profile);
+    let profileData = null;
+    if (profile === 'developer') {
+      profileData = buildDeveloperProfileFromOptions(options, data);
+    } else if (profile === 'beginner') {
+      profileData = buildBeginnerProfileFromOptions(options);
+    } else {
+      profileData = buildTeamProfileFromOptions(options, data);
+    }
+    data = mergeProfileData(data, profileData);
   }
+
+  data = applyExplicitOverrides(data, options, detectedInstalled);
 
   const classificationResult = calculateClassification({
     userTypesCount,
@@ -160,10 +458,7 @@ async function runSetupContext({ args, options, logger, t }) {
     rulesComplexity
   });
 
-  data = {
-    ...data,
-    classification: options.classification || classificationResult.classification
-  };
+  data.classification = resolveOption(options, 'classification', classificationResult.classification);
   if (data.projectType === 'dapp') {
     data.web3Enabled = true;
   }
@@ -210,5 +505,8 @@ async function runSetupContext({ args, options, logger, t }) {
 }
 
 module.exports = {
-  runSetupContext
+  runSetupContext,
+  servicesToContextFields,
+  mergeProfileData,
+  applyExplicitOverrides
 };
