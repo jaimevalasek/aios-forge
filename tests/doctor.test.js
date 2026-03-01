@@ -107,3 +107,19 @@ test('doctor validates Codex gateway contract markers', async () => {
   assert.equal(report.ok, false);
   assert.equal(report.checks.some((c) => c.id === 'gateway:codex:contract' && !c.ok), true);
 });
+
+test('doctor validates Gemini command instruction mappings', async () => {
+  const dir = await makeTempDir();
+  await installTemplate(dir, { mode: 'install' });
+  await writeValidContext(dir, 'en');
+
+  await fs.writeFile(
+    path.join(dir, '.gemini/commands/aios-dev.toml'),
+    'name = "aios-dev"\ninstruction_file = ".aios-lite/agents/setup.md"\n',
+    'utf8'
+  );
+
+  const report = await runDoctor(dir);
+  assert.equal(report.ok, false);
+  assert.equal(report.checks.some((c) => c.id === 'gateway:gemini:command:dev' && !c.ok), true);
+});

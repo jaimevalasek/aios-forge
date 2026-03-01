@@ -82,6 +82,7 @@ All notable changes to this project will be documented in this file.
 - `cli` help and unknown-command wrapper lines are now localized via i18n keys instead of inline formatting.
 - `init` and `install` now print explicit multi-IDE onboarding hints (`agents` + `agent:prompt setup`) with optional `--tool=codex|claude|gemini|opencode` guidance.
 - `doctor` now enforces multi-IDE gateway contracts (Claude/Codex/Gemini/OpenCode) and validates required Gemini/OpenCode files.
+- `doctor` now also validates each Gemini command file (`.gemini/commands/aios-*.toml`) maps to the expected shared agent instruction file.
 - `init` and `install` now support `--lang=en|pt-BR|es|fr` to auto-apply localized agent packs during bootstrap.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:

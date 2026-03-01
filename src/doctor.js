@@ -23,6 +23,16 @@ async function fileContainsAll(filePath, patterns) {
   }
 }
 
+const GEMINI_COMMAND_EXPECTATIONS = [
+  { file: '.gemini/commands/aios-setup.toml', agent: 'setup' },
+  { file: '.gemini/commands/aios-analyst.toml', agent: 'analyst' },
+  { file: '.gemini/commands/aios-architect.toml', agent: 'architect' },
+  { file: '.gemini/commands/aios-pm.toml', agent: 'pm' },
+  { file: '.gemini/commands/aios-dev.toml', agent: 'dev' },
+  { file: '.gemini/commands/aios-qa.toml', agent: 'qa' },
+  { file: '.gemini/commands/aios-orchestrator.toml', agent: 'orchestrator' }
+];
+
 async function runDoctor(targetDir) {
   const checks = [];
 
@@ -79,6 +89,24 @@ async function runDoctor(targetDir) {
     });
   }
 
+  for (const expectation of GEMINI_COMMAND_EXPECTATIONS) {
+    const commandPath = path.join(targetDir, expectation.file);
+    if (!(await exists(commandPath))) continue;
+    checks.push({
+      id: `gateway:gemini:command:${expectation.agent}`,
+      key: 'doctor.gateway_gemini_command_pointer',
+      params: { file: expectation.file },
+      ok: await fileContainsAll(commandPath, [
+        `instruction_file = ".aios-lite/agents/${expectation.agent}.md"`
+      ]),
+      hintKey: 'doctor.gateway_gemini_command_pointer_hint',
+      hintParams: {
+        file: expectation.file,
+        agent: expectation.agent
+      }
+    });
+  }
+
   const contextPath = path.join(targetDir, '.aios-lite/context/project.context.md');
   checks.push({
     id: 'context:project',
@@ -104,7 +132,8 @@ async function runDoctor(targetDir) {
         key: issue.key,
         params: issue.params || {},
         ok: false,
-        hintKey: issue.hintKey
+        hintKey: issue.hintKey,
+        hintParams: issue.hintParams || undefined
       });
     }
   }

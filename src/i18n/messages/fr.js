@@ -128,6 +128,10 @@ module.exports = {
     gateway_gemini_pointer: 'La passerelle Gemini reference les chemins partages commandes et agents',
     gateway_gemini_pointer_hint:
       'Assurez-vous que .gemini/GEMINI.md reference .gemini/commands/ et .aios-lite/agents/.',
+    gateway_gemini_command_pointer:
+      'Le fichier de commande Gemini pointe vers l agent partage : {file}',
+    gateway_gemini_command_pointer_hint:
+      'Assurez-vous que {file} inclut instruction_file = ".aios-lite/agents/{agent}.md".',
     gateway_opencode_pointer: 'La passerelle OpenCode reference les fichiers partages AIOS Lite',
     gateway_opencode_pointer_hint:
       'Assurez-vous que OPENCODE.md reference .aios-lite/config.md et .aios-lite/agents/.',

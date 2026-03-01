@@ -114,6 +114,12 @@ test('translator exposes localized doctor gateway contract keys', () => {
   assert.equal(pt.t('doctor.gateway_codex_pointer').includes('Gateway do Codex'), true);
   assert.equal(es.t('doctor.gateway_codex_pointer').includes('gateway de Codex'), true);
   assert.equal(fr.t('doctor.gateway_codex_pointer').includes('passerelle Codex'), true);
+  assert.equal(
+    en.t('doctor.gateway_gemini_command_pointer', { file: '.gemini/commands/aios-dev.toml' }).includes(
+      '.gemini/commands/aios-dev.toml'
+    ),
+    true
+  );
 });
 
 test('translator exposes localized cli line wrapper keys', () => {

@@ -15,7 +15,7 @@ function printDoctorChecks(report, logger, t) {
     if (!check.ok && check.hintKey) {
       logger.log(
         t('doctor.hint_line', {
-          hint: t(check.hintKey)
+          hint: t(check.hintKey, check.hintParams || check.params)
         })
       );
     }
