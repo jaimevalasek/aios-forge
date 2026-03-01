@@ -1,0 +1,48 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+
+function runCli(args, options = {}) {
+  const cwd = options.cwd || process.cwd();
+  const env = { ...process.env, ...(options.env || {}) };
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-lite.js'), ...args], {
+      cwd,
+      env
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+    child.on('close', (code) => {
+      resolve({ code, stdout, stderr });
+    });
+  });
+}
+
+test('help output is localized with --locale=pt-BR', async () => {
+  const cli = await runCli(['help', '--locale=pt-BR']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stdout.includes('CLI do AIOS Lite'), true);
+  assert.equal(cli.stdout.includes('Uso:'), true);
+});
+
+test('unknown command error is localized in pt-BR', async () => {
+  const cli = await runCli(['comando-inexistente', '--locale=pt-BR']);
+  assert.equal(cli.code, 1);
+  assert.equal(cli.stderr.includes('Comando desconhecido'), true);
+});
+
+test('env locale pt resolves to pt-BR dictionary', async () => {
+  const cli = await runCli(['help'], { env: { AIOS_LITE_LOCALE: 'pt' } });
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stdout.includes('Uso:'), true);
+  assert.equal(cli.stdout.includes('CLI do AIOS Lite'), true);
+});

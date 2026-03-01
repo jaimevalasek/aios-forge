@@ -58,11 +58,18 @@ function normalizeLocale(raw, messages = loadMessages()) {
 
   if (!raw) return supported.includes('en') ? 'en' : supported[0];
 
-  const clean = String(raw).toLowerCase();
-  if (supported.includes(clean)) return clean;
+  const clean = String(raw).trim().toLowerCase();
+  const canonical = clean.replace(/_/g, '-');
+  if (supported.includes(canonical)) return canonical;
 
-  const base = clean.split(/[-_]/)[0];
+  const base = canonical.split('-')[0];
   if (supported.includes(base)) return base;
+
+  const regionalMatch = supported
+    .slice()
+    .sort()
+    .find((locale) => locale.startsWith(`${base}-`));
+  if (regionalMatch) return regionalMatch;
 
   if (supported.includes('en')) return 'en';
   return supported[0];
