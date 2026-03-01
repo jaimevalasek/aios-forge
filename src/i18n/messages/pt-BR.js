@@ -201,6 +201,27 @@ module.exports = {
     q_user_types: 'Quantos tipos de usuario?',
     q_integrations: 'Quantas integracoes externas?',
     q_rules_complexity: 'Complexidade de regras (none|some|complex)',
+    note_status_enabled: 'habilitado',
+    note_status_disabled: 'desabilitado',
+    note_jetstream_teams: 'Jetstream teams: {status}',
+    note_selected_services: 'Servicos selecionados: {services}',
+    note_rails_setup_flags: 'Flags de setup do Rails: {flags}',
+    note_next_setup_flags: 'Flags de setup do Next.js: {flags}',
+    note_next_create_flags: 'Flags do create-next-app: {flags}',
+    note_jetstream_existing_action: 'Acao para projeto existente com Jetstream: {action}',
+    note_mobile_first:
+      'Requisito mobile-first detectado; considere React Native/Expo como proximo passo.',
+    note_vps_preference:
+      'Preferencia por VPS detectada; mantenha scripts de deploy simples e reproduziveis.',
+    note_cloud_profile:
+      'Perfil cloud detectado; use banco gerenciado e object storage desde o inicio.',
+    note_web3_terms: 'Termos Web3 detectados; recomendacao inicial de dApp aplicada.',
+    note_starter_profile:
+      'Esta recomendacao e um perfil inicial; ajuste quando os requisitos ficarem mais claros.',
+    note_team_profile:
+      'Perfil de time selecionado; preserve convencoes explicitas de equipe e regras de CI.',
+    note_beginner_declined:
+      'Recomendacao inicial recusada; usando stack customizada do onboarding.',
     written: 'Arquivo de contexto escrito: {path}',
     classification_result: 'Classificacao: {classification} (score={score}/6)',
     locale_applied: 'Pacote de agentes localizado aplicado: {locale} ({count} arquivos)'
@@ -236,7 +257,15 @@ module.exports = {
     start: 'Executando teste de pacote a partir da origem: {sourceDir}',
     pack_done: 'Tarball do pacote criado: {tarball}',
     completed: 'Teste de pacote concluido com {count} etapas validadas.',
-    workspace: 'Workspace do teste de pacote: {path}'
+    workspace: 'Workspace do teste de pacote: {path}',
+    error_npm_pack: 'Falha no npm pack: {detail}',
+    error_tarball_missing: 'npm pack nao retornou o nome do tarball',
+    error_npx_init: 'Falha no npx init: {detail}',
+    error_npx_setup_context: 'Falha no npx setup:context: {detail}',
+    error_npx_doctor: 'Falha no npx doctor: {detail}',
+    error_doctor_not_ok: 'doctor retornou ok=false durante o teste de pacote',
+    error_npx_mcp_init: 'Falha no npx mcp:init: {detail}',
+    error_mcp_not_ok: 'mcp:init retornou ok=false durante o teste de pacote'
   },
   workflow_plan: {
     context_missing:

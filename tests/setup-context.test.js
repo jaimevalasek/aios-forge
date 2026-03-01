@@ -84,6 +84,30 @@ test('setup:context beginner recommendation can produce dapp defaults', async ()
   assert.equal(result.data.contractFramework, 'Hardhat');
 });
 
+test('setup:context localizes onboarding notes with pt-BR locale', async () => {
+  const projectDir = await makeTempDir();
+  const logger = createQuietLogger();
+  const { t } = createTranslator('pt-BR');
+
+  const result = await runSetupContext({
+    args: [projectDir],
+    options: {
+      defaults: true,
+      profile: 'beginner',
+      'project-summary': 'Web3 wallet and token dashboard',
+      'expected-users': '3',
+      'mobile-requirement': '1',
+      'hosting-preference': '3'
+    },
+    logger,
+    t
+  });
+
+  const notes = Array.isArray(result.data.notes) ? result.data.notes.join('\n') : '';
+  assert.equal(notes.includes('This recommendation is a starter profile'), false);
+  assert.equal(notes.includes('recomendacao') || notes.includes('Recomendacao'), true);
+});
+
 test('setup:context team profile preserves explicit web3 values', async () => {
   const projectDir = await makeTempDir();
   const logger = createQuietLogger();

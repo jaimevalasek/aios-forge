@@ -10,6 +10,12 @@ function toArg(value) {
   return typeof value === 'string' ? value : String(value);
 }
 
+function commandFailureDetail(result) {
+  const stderr = String((result && result.stderr) || '').trim();
+  const stdout = String((result && result.stdout) || '').trim();
+  return stderr || stdout || 'unknown error';
+}
+
 async function runCommand(cmd, args, options = {}) {
   const cwd = options.cwd || process.cwd();
   const env = { ...process.env, ...(options.env || {}) };
@@ -107,14 +113,18 @@ async function runPackageTest({ args, options = {}, logger, t }) {
       }
     });
     if (pack.code !== 0) {
-      throw new Error(`npm pack failed: ${pack.stderr || pack.stdout || 'unknown error'}`);
+      throw new Error(
+        t('package_test.error_npm_pack', {
+          detail: commandFailureDetail(pack)
+        })
+      );
     }
     tarballName = parsePackResult(pack.stdout);
     if (!tarballName) {
       tarballName = await resolveTarballFromDir(packDir);
     }
     if (!tarballName) {
-      throw new Error('npm pack did not return tarball name');
+      throw new Error(t('package_test.error_tarball_missing'));
     }
     tarballPath = path.join(packDir, tarballName);
     steps.push('pack');
@@ -131,7 +141,11 @@ async function runPackageTest({ args, options = {}, logger, t }) {
       }
     );
     if (init.code !== 0) {
-      throw new Error(`npx init failed: ${init.stderr || init.stdout || 'unknown error'}`);
+      throw new Error(
+        t('package_test.error_npx_init', {
+          detail: commandFailureDetail(init)
+        })
+      );
     }
     steps.push('npx:init');
 
@@ -163,7 +177,11 @@ async function runPackageTest({ args, options = {}, logger, t }) {
       }
     );
     if (setup.code !== 0) {
-      throw new Error(`npx setup:context failed: ${setup.stderr || setup.stdout || 'unknown error'}`);
+      throw new Error(
+        t('package_test.error_npx_setup_context', {
+          detail: commandFailureDetail(setup)
+        })
+      );
     }
     steps.push('npx:setup-context');
 
@@ -179,11 +197,15 @@ async function runPackageTest({ args, options = {}, logger, t }) {
       }
     );
     if (doctor.code !== 0) {
-      throw new Error(`npx doctor failed: ${doctor.stderr || doctor.stdout || 'unknown error'}`);
+      throw new Error(
+        t('package_test.error_npx_doctor', {
+          detail: commandFailureDetail(doctor)
+        })
+      );
     }
     doctorResult = JSON.parse(doctor.stdout);
     if (!doctorResult.ok) {
-      throw new Error('doctor returned ok=false during package test');
+      throw new Error(t('package_test.error_doctor_not_ok'));
     }
     steps.push('npx:doctor');
 
@@ -199,11 +221,15 @@ async function runPackageTest({ args, options = {}, logger, t }) {
       }
     );
     if (mcp.code !== 0) {
-      throw new Error(`npx mcp:init failed: ${mcp.stderr || mcp.stdout || 'unknown error'}`);
+      throw new Error(
+        t('package_test.error_npx_mcp_init', {
+          detail: commandFailureDetail(mcp)
+        })
+      );
     }
     mcpResult = JSON.parse(mcp.stdout);
     if (!mcpResult.ok) {
-      throw new Error('mcp:init returned ok=false during package test');
+      throw new Error(t('package_test.error_mcp_not_ok'));
     }
     steps.push('npx:mcp-init');
 

@@ -59,6 +59,88 @@ function uniqueStrings(values) {
   return values.filter((value, index, arr) => value && arr.indexOf(value) === index);
 }
 
+function localizeSetupNote(note, t) {
+  const raw = String(note || '').trim();
+  if (!raw) return '';
+
+  const jetstreamTeams = raw.match(/^Jetstream teams:\s*(enabled|disabled)$/i);
+  if (jetstreamTeams) {
+    return t('setup_context.note_jetstream_teams', {
+      status:
+        jetstreamTeams[1].toLowerCase() === 'enabled'
+          ? t('setup_context.note_status_enabled')
+          : t('setup_context.note_status_disabled')
+    });
+  }
+
+  const selectedServices = raw.match(/^Selected services:\s*(.+)$/i);
+  if (selectedServices) {
+    return t('setup_context.note_selected_services', {
+      services: selectedServices[1]
+    });
+  }
+
+  const railsFlags = raw.match(/^Rails setup flags:\s*(.+)$/i);
+  if (railsFlags) {
+    return t('setup_context.note_rails_setup_flags', {
+      flags: railsFlags[1]
+    });
+  }
+
+  const nextSetupFlags = raw.match(/^Next\.js setup flags:\s*(.+)$/i);
+  if (nextSetupFlags) {
+    return t('setup_context.note_next_setup_flags', {
+      flags: nextSetupFlags[1]
+    });
+  }
+
+  const nextCreateFlags = raw.match(/^Next\.js create flags:\s*(.+)$/i);
+  if (nextCreateFlags) {
+    return t('setup_context.note_next_create_flags', {
+      flags: nextCreateFlags[1]
+    });
+  }
+
+  const jetstreamAction = raw.match(/^Jetstream existing-project action:\s*(.+)$/i);
+  if (jetstreamAction) {
+    return t('setup_context.note_jetstream_existing_action', {
+      action: jetstreamAction[1]
+    });
+  }
+
+  if (raw === 'Mobile-first requirement detected; consider React Native/Expo as follow-up.') {
+    return t('setup_context.note_mobile_first');
+  }
+  if (raw === 'VPS preference detected; keep deployment scripts simple and reproducible.') {
+    return t('setup_context.note_vps_preference');
+  }
+  if (raw === 'Cloud profile detected; use managed DB and object storage from day one.') {
+    return t('setup_context.note_cloud_profile');
+  }
+  if (raw === 'Web3 terms detected; dApp starter recommendation applied.') {
+    return t('setup_context.note_web3_terms');
+  }
+  if (raw === 'This recommendation is a starter profile; adjust once requirements are clearer.') {
+    return t('setup_context.note_starter_profile');
+  }
+  if (raw === 'Team profile selected; preserve explicit team conventions and CI rules.') {
+    return t('setup_context.note_team_profile');
+  }
+  if (raw === 'Starter recommendation declined; using custom stack from onboarding.') {
+    return t('setup_context.note_beginner_declined');
+  }
+
+  return raw;
+}
+
+function localizeProfileNotes(profileData, t) {
+  if (!profileData || !Array.isArray(profileData.notes)) return profileData;
+  return {
+    ...profileData,
+    notes: uniqueStrings(profileData.notes.map((note) => localizeSetupNote(note, t)))
+  };
+}
+
 function servicesToContextFields(services, fallback = {}) {
   const output = {
     queues: fallback.queues || '',
@@ -145,7 +227,7 @@ function applyExplicitOverrides(data, options, detectedInstalled) {
   return output;
 }
 
-function buildDeveloperProfileFromOptions(options, defaults) {
+function buildDeveloperProfileFromOptions(options, defaults, t) {
   const output = buildDeveloperProfile({
     backendChoice: resolveOption(options, 'backend-choice', defaults.framework),
     backend: resolveOption(options, 'backend', defaults.backend),
@@ -161,22 +243,31 @@ function buildDeveloperProfileFromOptions(options, defaults) {
 
   const railsFlags = resolveOption(options, 'rails-options', '');
   if (railsFlags) {
-    output.notes.push(`Rails setup flags: ${railsFlags}`);
+    output.notes.push(
+      t('setup_context.note_rails_setup_flags', {
+        flags: railsFlags
+      })
+    );
   }
   const nextFlags = resolveOption(options, 'next-options', '');
   if (nextFlags) {
-    output.notes.push(`Next.js setup flags: ${nextFlags}`);
+    output.notes.push(
+      t('setup_context.note_next_setup_flags', {
+        flags: nextFlags
+      })
+    );
   }
   return output;
 }
 
-function buildBeginnerProfileFromOptions(options) {
-  return recommendBeginnerProfile({
+function buildBeginnerProfileFromOptions(options, t) {
+  const profile = recommendBeginnerProfile({
     projectSummary: resolveOption(options, 'project-summary', ''),
     expectedUsers: resolveOption(options, 'expected-users', ''),
     mobileRequirement: resolveOption(options, 'mobile-requirement', ''),
     hostingPreference: resolveOption(options, 'hosting-preference', '')
   });
+  return localizeProfileNotes(profile, t);
 }
 
 function buildTeamProfileFromOptions(options, defaults) {
@@ -243,16 +334,28 @@ async function askDeveloperProfile(rl, data, t) {
   if (backend === 'Laravel' && profileData.auth === 'Jetstream + Livewire' && data.frameworkInstalled) {
     const action = await ask(rl, t('setup_context.q_jetstream_existing_action'), '2');
     const resolvedAction = normalizeChoice(action, JETSTREAM_ACTION_CHOICES, 'recreate_with_jetstream');
-    profileData.notes.push(`Jetstream existing-project action: ${resolvedAction}`);
+    profileData.notes.push(
+      t('setup_context.note_jetstream_existing_action', {
+        action: resolvedAction
+      })
+    );
   }
   if (developerInput.railsOptions) {
-    profileData.notes.push(`Rails setup flags: ${developerInput.railsOptions}`);
+    profileData.notes.push(
+      t('setup_context.note_rails_setup_flags', {
+        flags: developerInput.railsOptions
+      })
+    );
   }
   if (developerInput.nextOptions) {
-    profileData.notes.push(`Next.js create flags: ${developerInput.nextOptions}`);
+    profileData.notes.push(
+      t('setup_context.note_next_create_flags', {
+        flags: developerInput.nextOptions
+      })
+    );
   }
 
-  return profileData;
+  return localizeProfileNotes(profileData, t);
 }
 
 async function askBeginnerProfile(rl, data, logger, t) {
@@ -281,7 +384,7 @@ async function askBeginnerProfile(rl, data, logger, t) {
     await ask(rl, t('setup_context.q_beginner_accept_recommendation'), 'true'),
     true
   );
-  if (useRecommendation) return recommendation;
+  if (useRecommendation) return localizeProfileNotes(recommendation, t);
 
   const custom = buildTeamProfile({
     projectType: await ask(rl, t('setup_context.q_project_type'), data.projectType),
@@ -298,14 +401,15 @@ async function askBeginnerProfile(rl, data, logger, t) {
     ...custom,
     profile: 'beginner',
     notes: uniqueStrings([
-      ...recommendation.notes,
-      'Starter recommendation declined; using custom stack from onboarding.'
+      ...localizeProfileNotes(recommendation, t).notes,
+      t('setup_context.note_beginner_declined')
     ])
   };
 }
 
 async function askTeamProfile(rl, data, t) {
-  return buildTeamProfile({
+  return localizeProfileNotes(
+    buildTeamProfile({
     projectType: await ask(rl, t('setup_context.q_project_type'), data.projectType),
     framework: await ask(rl, t('setup_context.q_framework'), data.framework),
     backend: await ask(rl, t('setup_context.q_backend_text'), data.backend || data.framework),
@@ -314,7 +418,9 @@ async function askTeamProfile(rl, data, t) {
     auth: await ask(rl, t('setup_context.q_auth_text'), data.auth),
     uiux: await ask(rl, t('setup_context.q_uiux_text'), data.uiux),
     services: await ask(rl, t('setup_context.q_services_list'), '')
-  });
+    }),
+    t
+  );
 }
 
 async function runSetupContext({ args, options, logger, t }) {
@@ -441,12 +547,13 @@ async function runSetupContext({ args, options, logger, t }) {
     const profile = normalizeProfile(resolveOption(options, 'profile', data.profile), data.profile);
     let profileData = null;
     if (profile === 'developer') {
-      profileData = buildDeveloperProfileFromOptions(options, data);
+      profileData = buildDeveloperProfileFromOptions(options, data, t);
     } else if (profile === 'beginner') {
-      profileData = buildBeginnerProfileFromOptions(options);
+      profileData = buildBeginnerProfileFromOptions(options, t);
     } else {
-      profileData = buildTeamProfileFromOptions(options, data);
+      profileData = localizeProfileNotes(buildTeamProfileFromOptions(options, data), t);
     }
+    profileData = localizeProfileNotes(profileData, t);
     data = mergeProfileData(data, profileData);
   }
 

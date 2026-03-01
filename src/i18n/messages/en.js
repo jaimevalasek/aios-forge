@@ -195,6 +195,27 @@ module.exports = {
     q_user_types: 'How many user types?',
     q_integrations: 'How many external integrations?',
     q_rules_complexity: 'Rules complexity (none|some|complex)',
+    note_status_enabled: 'enabled',
+    note_status_disabled: 'disabled',
+    note_jetstream_teams: 'Jetstream teams: {status}',
+    note_selected_services: 'Selected services: {services}',
+    note_rails_setup_flags: 'Rails setup flags: {flags}',
+    note_next_setup_flags: 'Next.js setup flags: {flags}',
+    note_next_create_flags: 'Next.js create flags: {flags}',
+    note_jetstream_existing_action: 'Jetstream existing-project action: {action}',
+    note_mobile_first:
+      'Mobile-first requirement detected; consider React Native/Expo as follow-up.',
+    note_vps_preference:
+      'VPS preference detected; keep deployment scripts simple and reproducible.',
+    note_cloud_profile:
+      'Cloud profile detected; use managed DB and object storage from day one.',
+    note_web3_terms: 'Web3 terms detected; dApp starter recommendation applied.',
+    note_starter_profile:
+      'This recommendation is a starter profile; adjust once requirements are clearer.',
+    note_team_profile:
+      'Team profile selected; preserve explicit team conventions and CI rules.',
+    note_beginner_declined:
+      'Starter recommendation declined; using custom stack from onboarding.',
     written: 'Context file written: {path}',
     classification_result: 'Classification: {classification} (score={score}/6)',
     locale_applied: 'Localized agent pack applied: {locale} ({count} files)'
@@ -230,7 +251,15 @@ module.exports = {
     start: 'Running package test from source: {sourceDir}',
     pack_done: 'Package tarball created: {tarball}',
     completed: 'Package test completed with {count} validated steps.',
-    workspace: 'Package test workspace: {path}'
+    workspace: 'Package test workspace: {path}',
+    error_npm_pack: 'npm pack failed: {detail}',
+    error_tarball_missing: 'npm pack did not return tarball name',
+    error_npx_init: 'npx init failed: {detail}',
+    error_npx_setup_context: 'npx setup:context failed: {detail}',
+    error_npx_doctor: 'npx doctor failed: {detail}',
+    error_doctor_not_ok: 'doctor returned ok=false during package test',
+    error_npx_mcp_init: 'npx mcp:init failed: {detail}',
+    error_mcp_not_ok: 'mcp:init returned ok=false during package test'
   },
   workflow_plan: {
     context_missing:
