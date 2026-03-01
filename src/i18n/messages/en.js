@@ -16,7 +16,8 @@ module.exports = {
     help_setup_context:
       'aios-lite setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--language=en] [--web3-enabled=true|false] [--locale=en]',
     help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR] [--dry-run] [--locale=en]',
-    help_test_smoke: 'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--keep] [--locale=en]',
+    help_test_smoke:
+      'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     error_prefix: 'Error: {message}'
   },
@@ -155,7 +156,12 @@ module.exports = {
   },
   smoke: {
     start: 'Running smoke test in: {projectDir}',
+    using_web3_profile: 'Using Web3 smoke profile: {target}',
+    seeded_web3_workspace: 'Seeded workspace for Web3 target: {target}',
     step_ok: 'OK: {step}',
+    web3_detected: 'Web3 framework detected: {framework} ({network})',
+    web3_context_verified: 'Web3 context verified for network: {network}',
+    invalid_web3_target: 'Invalid --web3 target: {target}. Use ethereum, solana, or cardano.',
     completed: 'Smoke test completed successfully.',
     steps_count: 'Validated steps: {count}',
     workspace_kept: 'Workspace kept: {path}',

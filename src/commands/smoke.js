@@ -11,6 +11,39 @@ const { runAgentsList, runAgentPrompt } = require('./agents');
 const { runContextValidate } = require('./context-validate');
 const { runDoctor } = require('../doctor');
 const { runUpdate } = require('./update');
+const { detectFramework } = require('../detector');
+const { validateProjectContextFile } = require('../context');
+
+const WEB3_SMOKE_TARGETS = ['ethereum', 'solana', 'cardano'];
+const WEB3_PROFILE_BY_TARGET = {
+  ethereum: {
+    framework: 'Hardhat',
+    network: 'ethereum',
+    seedPackage: {
+      name: 'demo-dapp',
+      devDependencies: { hardhat: '^2.24.0' }
+    },
+    files: [{ path: 'hardhat.config.ts', content: 'export default {};\n' }]
+  },
+  solana: {
+    framework: 'Anchor',
+    network: 'solana',
+    seedPackage: {
+      name: 'demo-dapp',
+      dependencies: { '@coral-xyz/anchor': '^0.30.1' }
+    },
+    files: [{ path: 'Anchor.toml', content: '[provider]\ncluster="devnet"\n' }]
+  },
+  cardano: {
+    framework: 'Cardano',
+    network: 'cardano',
+    seedPackage: {
+      name: 'demo-dapp',
+      dependencies: { 'lucid-cardano': '^0.10.11' }
+    },
+    files: [{ path: 'aiken.toml', content: 'name = "demo"\nversion = "0.1.0"\n' }]
+  }
+};
 
 function createQuietLogger() {
   return {
@@ -25,9 +58,38 @@ function assertStep(condition, message) {
   }
 }
 
+function normalizeWeb3Target(raw) {
+  const value = String(raw || '').trim().toLowerCase();
+  if (!value) return '';
+  return value;
+}
+
+function resolveWeb3Profile(rawTarget) {
+  const target = normalizeWeb3Target(rawTarget);
+  if (!target) return null;
+  if (!WEB3_SMOKE_TARGETS.includes(target)) return { invalid: true, target };
+  return {
+    target,
+    ...WEB3_PROFILE_BY_TARGET[target]
+  };
+}
+
+async function seedWeb3Workspace(projectDir, profile) {
+  const pkgPath = path.join(projectDir, 'package.json');
+  await fs.writeFile(pkgPath, `${JSON.stringify(profile.seedPackage, null, 2)}\n`, 'utf8');
+  for (const file of profile.files) {
+    await fs.writeFile(path.join(projectDir, file.path), file.content, 'utf8');
+  }
+}
+
 async function runSmokeTest({ args, options, logger, t }) {
   const language = String(options.language || options.lang || 'en');
   const keep = Boolean(options.keep);
+  const web3Profile = resolveWeb3Profile(options.web3);
+  if (web3Profile && web3Profile.invalid) {
+    throw new Error(t('smoke.invalid_web3_target', { target: web3Profile.target }));
+  }
+
   const baseDir = path.resolve(process.cwd(), args[0] || os.tmpdir());
   await ensureDir(baseDir);
 
@@ -40,6 +102,12 @@ async function runSmokeTest({ args, options, logger, t }) {
 
   try {
     logger.log(t('smoke.start', { projectDir }));
+    if (web3Profile) {
+      logger.log(t('smoke.using_web3_profile', { target: web3Profile.target }));
+      await seedWeb3Workspace(projectDir, web3Profile);
+      steps.push(`seed:web3:${web3Profile.target}`);
+      logger.log(t('smoke.seeded_web3_workspace', { target: web3Profile.target }));
+    }
 
     const installResult = await runInstall({
       args: [projectDir],
@@ -51,21 +119,51 @@ async function runSmokeTest({ args, options, logger, t }) {
     steps.push('install');
     logger.log(t('smoke.step_ok', { step: 'install' }));
 
+    if (web3Profile) {
+      const detection = await detectFramework(projectDir);
+      assertStep(
+        detection.framework === web3Profile.framework,
+        `unexpected web3 framework detection: ${detection.framework}`
+      );
+      steps.push(`detect:web3:${web3Profile.target}`);
+      logger.log(
+        t('smoke.web3_detected', {
+          framework: detection.framework,
+          network: web3Profile.network
+        })
+      );
+    }
+
     const setupResult = await runSetupContext({
       args: [projectDir],
       options: {
         defaults: true,
         'project-name': 'demo',
-        'project-type': 'web_app',
-        profile: 'developer',
-        framework: 'Node',
-        'framework-installed': true,
-        language
+        language,
+        ...(web3Profile
+          ? {}
+          : {
+              'project-type': 'web_app',
+              profile: 'developer',
+              framework: 'Node',
+              'framework-installed': true
+            })
       },
       logger: quietLogger,
       t
     });
     assertStep(Boolean(setupResult.filePath), 'setup:context did not write context file');
+    if (web3Profile) {
+      assertStep(setupResult.data.projectType === 'dapp', 'setup did not infer project_type=dapp');
+      assertStep(
+        String(setupResult.data.web3Networks || '').includes(web3Profile.network),
+        'setup did not infer expected web3 network'
+      );
+      assertStep(
+        setupResult.data.framework === web3Profile.framework,
+        'setup did not keep expected web3 framework'
+      );
+    }
     steps.push('setup:context');
     logger.log(t('smoke.step_ok', { step: 'setup:context' }));
 
@@ -112,6 +210,19 @@ async function runSmokeTest({ args, options, logger, t }) {
     steps.push('context:validate');
     logger.log(t('smoke.step_ok', { step: 'context:validate' }));
 
+    if (web3Profile) {
+      const parsedContext = await validateProjectContextFile(projectDir);
+      assertStep(parsedContext.valid, 'web3 context parse failed');
+      assertStep(parsedContext.data.project_type === 'dapp', 'context project_type is not dapp');
+      assertStep(parsedContext.data.web3_enabled === true, 'context web3_enabled is not true');
+      assertStep(
+        String(parsedContext.data.web3_networks || '').includes(web3Profile.network),
+        'context web3_networks does not include expected target'
+      );
+      steps.push(`verify:web3-context:${web3Profile.target}`);
+      logger.log(t('smoke.web3_context_verified', { network: web3Profile.network }));
+    }
+
     const doctorResult = await runDoctor(projectDir);
     assertStep(doctorResult.ok, 'doctor check failed');
     steps.push('doctor');
@@ -134,7 +245,8 @@ async function runSmokeTest({ args, options, logger, t }) {
       steps,
       workspaceRoot,
       projectDir,
-      kept: keep
+      kept: keep,
+      web3Target: web3Profile ? web3Profile.target : null
     };
   } finally {
     if (!keep) {

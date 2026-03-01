@@ -69,3 +69,7 @@
 ### D017 - Conservative Web3 scope in MVP+
 - Decision: include Web3 framework detection + context + skills/templates, but avoid automatic chain operations or deployment commands.
 - Why: keep AIOS Lite lightweight and safe while enabling clear guidance for developer-driven implementation.
+
+### D018 - Chain-specific smoke profiles
+- Decision: extend `test:smoke` with `--web3=ethereum|solana|cardano` profiles that seed representative project files and validate dApp context output.
+- Why: ensure Web3 support remains regression-safe across releases with one deterministic CLI check.

@@ -29,3 +29,8 @@
 - Severity: Medium
 - Probability: Medium
 - Mitigation: keep explicit `--framework` and `--project-type` overrides in `setup:context`; document manual override flow in `docs/en/web3.md`.
+
+## R007 - Web3 smoke profile drift from real-world stacks
+- Severity: Medium
+- Probability: Medium
+- Mitigation: maintain per-chain smoke seeds and update profile fixtures when major tooling conventions change.

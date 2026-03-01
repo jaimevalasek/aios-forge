@@ -34,6 +34,13 @@ aios-lite setup:context . \
   --rpc-provider=Alchemy
 ```
 
+## Web3 smoke checks
+```bash
+aios-lite test:smoke --web3=ethereum
+aios-lite test:smoke --web3=solana
+aios-lite test:smoke --web3=cardano
+```
+
 ## Skills bundled in templates
 - Static:
   - `web3-ethereum-patterns.md`

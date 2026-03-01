@@ -7,6 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { createTranslator } = require('../src/i18n');
 const { runSmokeTest } = require('../src/commands/smoke');
+const { validateProjectContextFile } = require('../src/context');
 
 async function makeTempDir() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-smoke-test-'));
@@ -38,4 +39,46 @@ test('test:smoke runs end-to-end and keeps workspace when requested', async () =
   assert.equal(await fileExists(path.join(result.projectDir, '.aios-lite/context/project.context.md')), true);
 
   await fs.rm(result.workspaceRoot, { recursive: true, force: true });
+});
+
+test('test:smoke supports web3 profiles for ethereum, solana, and cardano', async () => {
+  const baseDir = await makeTempDir();
+  const { t } = createTranslator('en');
+  const logger = { log() {}, error() {} };
+
+  for (const target of ['ethereum', 'solana', 'cardano']) {
+    const result = await runSmokeTest({
+      args: [baseDir],
+      options: { web3: target, keep: true },
+      logger,
+      t
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.web3Target, target);
+
+    const context = await validateProjectContextFile(result.projectDir);
+    assert.equal(context.valid, true);
+    assert.equal(context.data.project_type, 'dapp');
+    assert.equal(context.data.web3_enabled, true);
+    assert.equal(String(context.data.web3_networks).includes(target), true);
+
+    await fs.rm(result.workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test('test:smoke rejects invalid web3 target', async () => {
+  const baseDir = await makeTempDir();
+  const { t } = createTranslator('en');
+  const logger = { log() {}, error() {} };
+
+  await assert.rejects(
+    runSmokeTest({
+      args: [baseDir],
+      options: { web3: 'bitcoin' },
+      logger,
+      t
+    }),
+    /Invalid --web3 target/
+  );
 });

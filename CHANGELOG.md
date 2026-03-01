@@ -2,7 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.5] - Unreleased
+## [0.1.6] - Unreleased
+### Added
+- `test:smoke` now supports chain-specific Web3 profiles:
+  - `--web3=ethereum`
+  - `--web3=solana`
+  - `--web3=cardano`
+- Web3 smoke workflow now verifies:
+  - framework detection per chain profile
+  - `project.context.md` dApp/Web3 frontmatter consistency.
+
+### Changed
+- CLI help and docs updated for `test:smoke --web3`.
+- `setup:context` and setup templates now default `aios_lite_version` to `0.1.6`.
+
+## [0.1.5] - 2026-03-01
 ### Added
 - Web3 framework detection:
   - Ethereum: `Hardhat`, `Foundry`, `Truffle`

@@ -49,3 +49,8 @@
 - [x] Web3 static and dynamic skill templates (Ethereum, Solana, Cardano, security checklist).
 - [x] Web3 documentation (`docs/en/web3.md`) and README updates.
 - [x] Detector/context test coverage for Web3 paths.
+
+## Sprint 8 - Web3 reliability
+- [x] `test:smoke --web3=ethereum|solana|cardano` profiles.
+- [x] Smoke assertions for chain-specific framework detection.
+- [x] Smoke assertions for dApp/Web3 context frontmatter integrity.

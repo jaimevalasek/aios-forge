@@ -39,6 +39,7 @@
 ### smoke
 - `test:smoke` runs install -> setup context -> locale apply -> agents -> prompt -> context validate -> doctor -> update.
 - Smoke command supports `--keep` to inspect generated workspace.
+- Smoke command supports `--web3=ethereum|solana|cardano` with chain-specific seeded workspace checks.
 
 ## Manual
 - Empty folder: `npx aios-lite init demo`.
@@ -52,6 +53,10 @@
   - create `hardhat.config.ts` + `package.json` with `hardhat`
   - run `aios-lite install` and `aios-lite setup:context --defaults`
   - verify `project_type: "dapp"` and Web3 frontmatter fields in `project.context.md`
+- Web3 smoke:
+  - `aios-lite test:smoke --web3=ethereum`
+  - `aios-lite test:smoke --web3=solana`
+  - `aios-lite test:smoke --web3=cardano`
 - Recovery flow:
   - `aios-lite doctor --fix --dry-run`
   - `aios-lite doctor --fix`

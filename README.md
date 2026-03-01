@@ -22,7 +22,7 @@ npx aios-lite install
 - `aios-lite agent:prompt <agent> [--tool=codex|claude|gemini|opencode]`
 - `aios-lite context:validate [path]`
 - `aios-lite locale:apply [path] [--lang=en|pt-BR]`
-- `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--keep]`
+- `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR] [--web3=ethereum|solana|cardano] [--keep]`
 
 ## Agent usage helper
 If your AI CLI does not show a visual agent picker, use:
@@ -33,6 +33,7 @@ aios-lite agent:prompt setup --tool=codex
 aios-lite locale:apply --lang=pt-BR
 aios-lite doctor --fix
 aios-lite test:smoke --lang=pt-BR
+aios-lite test:smoke --web3=ethereum
 ```
 
 ## i18n
