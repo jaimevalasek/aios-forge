@@ -113,6 +113,9 @@ aios-lite mcp:doctor --strict-env
 `mcp:init` generates:
 - `.aios-lite/mcp/servers.local.json` (project MCP plan)
 - `.aios-lite/mcp/presets/<tool>.json` (tool-specific preset templates)
+- Context7/Database presets in remote-endpoint mode (`mcp-remote`) using:
+  - `CONTEXT7_MCP_URL`
+  - `DATABASE_MCP_URL` (when database MCP is enabled)
 
 `mcp:doctor` validates:
 - core MCP servers (`filesystem`, `context7`)

@@ -130,6 +130,7 @@ test('mcp:doctor strict env mode passes when required variables exist', async ()
 
   await withTempEnv(
     {
+      CONTEXT7_MCP_URL: 'https://example.invalid/context7',
       RPC_URL: 'https://example.invalid/rpc',
       CHAIN_ID: '1',
       PRIVATE_KEY: '0xabc123'

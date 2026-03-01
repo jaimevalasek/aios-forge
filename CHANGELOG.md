@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
   - `fr-*` -> `fr`
 - `update` now reapplies active agent prompts from `conversation_language` in context, preventing locale reset after template refresh.
 - `mcp:init` now writes both shared plan and tool-specific preset templates.
+- `mcp:init` Context7/Database presets now default to remote-endpoint bridge templates (`mcp-remote`) with URL env vars instead of generic command placeholders.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`

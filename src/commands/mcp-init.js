@@ -46,6 +46,11 @@ function extractStackValue(markdown, fieldLabel) {
 function normalizeDatabaseEngine(input) {
   const value = String(input || '').trim().toLowerCase();
   if (!value) return '';
+  if (
+    ['n/a', 'na', 'none', '-', '[not applicable]', 'not applicable'].includes(value)
+  ) {
+    return '';
+  }
   if (value.includes('postgres') || value.includes('supabase')) return 'postgresql';
   if (value.includes('mysql') || value.includes('planetscale')) return 'mysql';
   if (value.includes('sqlite')) return 'sqlite';
@@ -76,20 +81,13 @@ function buildDatabaseServer(databaseEngine) {
     };
   }
 
-  const envByEngine = {
-    postgresql: ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_SSL'],
-    mysql: ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'],
-    sqlite: ['DB_FILE'],
-    mongodb: ['MONGODB_URI']
-  };
-
   return {
     id: 'database',
     enabled: true,
     recommended: true,
-    reason: 'Context indicates database-backed features.',
+    reason: 'Context indicates database-backed features (remote MCP endpoint recommended).',
     engine: databaseEngine,
-    env: envByEngine[databaseEngine] || []
+    env: ['DATABASE_MCP_URL']
   };
 }
 
@@ -134,7 +132,8 @@ function buildMcpPlan(targetDir, contextData, contextMarkdown) {
       enabled: true,
       recommended: true,
       reason: 'Use up-to-date official documentation at implementation time.',
-      env: []
+      env: ['CONTEXT7_MCP_URL'],
+      optional_env: ['CONTEXT7_API_KEY']
     },
     buildDatabaseServer(databaseEngine),
     {
@@ -177,6 +176,12 @@ function envTemplate(keys) {
   return output;
 }
 
+function mergeEnvKeys(server) {
+  const required = Array.isArray(server && server.env) ? server.env : [];
+  const optional = Array.isArray(server && server.optional_env) ? server.optional_env : [];
+  return Array.from(new Set([...required, ...optional]));
+}
+
 function serverTemplate(server) {
   if (server.id === 'filesystem') {
     return {
@@ -187,12 +192,23 @@ function serverTemplate(server) {
     };
   }
 
-  if (server.id === 'database') {
+  if (server.id === 'context7') {
     return {
       transport: 'stdio',
-      command: '<database-mcp-command>',
-      args: [server.engine || '<engine>'],
-      env: envTemplate(server.env)
+      command: 'npx',
+      args: ['-y', 'mcp-remote', '$CONTEXT7_MCP_URL'],
+      env: envTemplate(mergeEnvKeys(server))
+    };
+  }
+
+  if (server.id === 'database') {
+    const env = envTemplate(mergeEnvKeys(server));
+    env.DATABASE_ENGINE = server.engine || '<engine>';
+    return {
+      transport: 'stdio',
+      command: 'npx',
+      args: ['-y', 'mcp-remote', '$DATABASE_MCP_URL'],
+      env
     };
   }
 

@@ -34,6 +34,7 @@ test('normalizeDatabaseEngine maps common providers', () => {
   assert.equal(normalizeDatabaseEngine('PlanetScale'), 'mysql');
   assert.equal(normalizeDatabaseEngine('SQLite'), 'sqlite');
   assert.equal(normalizeDatabaseEngine('MongoDB'), 'mongodb');
+  assert.equal(normalizeDatabaseEngine('[not applicable]'), '');
 });
 
 test('mcp:init writes plan from existing context', async () => {
@@ -71,11 +72,17 @@ test('mcp:init writes plan from existing context', async () => {
   assert.equal(chainRpc.enabled, true);
   assert.equal(chainRpc.networks.includes('solana'), true);
 
+  const context7 = result.plan.servers.find((server) => server.id === 'context7');
+  assert.equal(context7.enabled, true);
+  assert.equal(context7.env.includes('CONTEXT7_MCP_URL'), true);
+
   const codexPreset = JSON.parse(
     await fs.readFile(path.join(dir, '.aios-lite/mcp/presets/codex.json'), 'utf8')
   );
   assert.equal(codexPreset.tool, 'codex');
   assert.equal(Boolean(codexPreset.mcpServers.filesystem), true);
+  assert.equal(codexPreset.mcpServers.context7.command, 'npx');
+  assert.equal(codexPreset.mcpServers.context7.args.includes('mcp-remote'), true);
 });
 
 test('mcp:init dry-run does not write file and handles missing context', async () => {
@@ -129,4 +136,10 @@ test('mcp:init supports --tool filter for a single preset', async () => {
     await fileExists(path.join(dir, '.aios-lite/mcp/presets/claude.json')),
     false
   );
+
+  const codexPreset = JSON.parse(
+    await fs.readFile(path.join(dir, '.aios-lite/mcp/presets/codex.json'), 'utf8')
+  );
+  assert.equal(codexPreset.mcpServers.context7.args.includes('$CONTEXT7_MCP_URL'), true);
+  assert.equal(codexPreset.mcpServers.database.args.includes('$DATABASE_MCP_URL'), true);
 });
