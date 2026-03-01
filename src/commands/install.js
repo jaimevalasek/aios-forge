@@ -3,11 +3,13 @@
 const path = require('node:path');
 const { detectFramework } = require('../detector');
 const { installTemplate } = require('../installer');
+const { resolvePromptTool } = require('../prompt-tool');
 
 async function runInstall({ args, options, logger, t }) {
   const targetDir = path.resolve(process.cwd(), args[0] || '.');
   const force = Boolean(options.force);
   const dryRun = Boolean(options['dry-run']);
+  const promptTool = resolvePromptTool(options.tool);
 
   const detection = await detectFramework(targetDir);
   if (detection.installed) {
@@ -29,6 +31,10 @@ async function runInstall({ args, options, logger, t }) {
   logger.log(t('install.done_at', { targetDir }));
   logger.log(t('install.files_copied', { count: result.copied.length }));
   logger.log(t('install.files_skipped', { count: result.skipped.length }));
+  logger.log(t('install.next_steps'));
+  logger.log(t('install.step_setup_context'));
+  logger.log(t('install.step_agents'));
+  logger.log(t('install.step_agent_prompt', { tool: promptTool }));
 
   return result;
 }

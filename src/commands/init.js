@@ -3,6 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { installTemplate } = require('../installer');
+const { resolvePromptTool } = require('../prompt-tool');
 
 async function directoryIsEmpty(dirPath) {
   try {
@@ -23,6 +24,7 @@ async function runInit({ args, options, logger, t }) {
   const targetDir = path.resolve(process.cwd(), projectName);
   const force = Boolean(options.force);
   const dryRun = Boolean(options['dry-run']);
+  const promptTool = resolvePromptTool(options.tool);
 
   await fs.mkdir(targetDir, { recursive: true });
 
@@ -44,6 +46,8 @@ async function runInit({ args, options, logger, t }) {
   logger.log(t('init.next_steps'));
   logger.log(t('init.step_cd', { projectName }));
   logger.log(t('init.step_setup'));
+  logger.log(t('init.step_agents'));
+  logger.log(t('init.step_agent_prompt', { tool: promptTool }));
 
   return result;
 }

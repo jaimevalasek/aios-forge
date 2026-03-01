@@ -6,8 +6,10 @@ module.exports = {
     title_line: '{title}\n',
     usage: 'Uso:',
     help_item_line: '  {text}',
-    help_init: 'aios-lite init <project-name> [--force] [--dry-run] [--locale=es]',
-    help_install: 'aios-lite install [path] [--force] [--dry-run] [--locale=es]',
+    help_init:
+      'aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=es]',
+    help_install:
+      'aios-lite install [path] [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=es]',
     help_update: 'aios-lite update [path] [--dry-run] [--locale=es]',
     help_info: 'aios-lite info [path] [--json] [--locale=es]',
     help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--json] [--locale=es]',
@@ -42,21 +44,31 @@ module.exports = {
     error_prefix: 'Error: {message}'
   },
   init: {
-    usage_error: 'Uso: aios-lite init <project-name> [--force] [--dry-run] [--locale=es]',
+    usage_error:
+      'Uso: aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=es]',
     non_empty_dir: 'El directorio no esta vacio: {targetDir}. Usa --force para continuar.',
     created_at: 'Proyecto creado en: {targetDir}',
     files_copied: 'Archivos copiados: {count}',
     files_skipped: 'Archivos omitidos: {count}',
     next_steps: 'Siguientes pasos:',
     step_cd: '1. cd {projectName}',
-    step_setup: '2. Abre en tu AI CLI y ejecuta @setup'
+    step_setup: '2. Abre en tu AI CLI y ejecuta @setup',
+    step_agents: '3. Si no aparece selector visual, ejecuta: aios-lite agents',
+    step_agent_prompt:
+      '4. Genera el prompt de setup para tu herramienta: aios-lite agent:prompt setup --tool={tool}'
   },
   install: {
     framework_detected: 'Framework detectado: {framework} ({evidence})',
     framework_not_detected: 'No se detecto framework. Instalando en modo generico.',
     done_at: 'Instalacion completada en: {targetDir}',
     files_copied: 'Archivos copiados: {count}',
-    files_skipped: 'Archivos omitidos: {count}'
+    files_skipped: 'Archivos omitidos: {count}',
+    next_steps: 'Siguientes pasos:',
+    step_setup_context:
+      '1. Genera/actualiza el contexto del proyecto: aios-lite setup:context --defaults',
+    step_agents: '2. Si no aparece selector visual, ejecuta: aios-lite agents',
+    step_agent_prompt:
+      '3. Genera el prompt de setup para tu herramienta: aios-lite agent:prompt setup --tool={tool}'
   },
   update: {
     not_installed: 'No se encontro instalacion de AIOS Lite en {targetDir}.',

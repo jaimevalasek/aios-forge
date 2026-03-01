@@ -6,8 +6,10 @@ module.exports = {
     title_line: '{title}\n',
     usage: 'Usage:',
     help_item_line: '  {text}',
-    help_init: 'aios-lite init <project-name> [--force] [--dry-run] [--locale=en]',
-    help_install: 'aios-lite install [path] [--force] [--dry-run] [--locale=en]',
+    help_init:
+      'aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=en]',
+    help_install:
+      'aios-lite install [path] [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=en]',
     help_update: 'aios-lite update [path] [--dry-run] [--locale=en]',
     help_info: 'aios-lite info [path] [--json] [--locale=en]',
     help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--json] [--locale=en]',
@@ -42,21 +44,28 @@ module.exports = {
     error_prefix: 'Error: {message}'
   },
   init: {
-    usage_error: 'Usage: aios-lite init <project-name> [--force] [--dry-run] [--locale=en]',
+    usage_error:
+      'Usage: aios-lite init <project-name> [--force] [--dry-run] [--tool=codex|claude|gemini|opencode] [--locale=en]',
     non_empty_dir: 'Directory is not empty: {targetDir}. Use --force to continue.',
     created_at: 'Project created at: {targetDir}',
     files_copied: 'Files copied: {count}',
     files_skipped: 'Files skipped: {count}',
     next_steps: 'Next steps:',
     step_cd: '1. cd {projectName}',
-    step_setup: '2. Open in your AI CLI and run @setup'
+    step_setup: '2. Open in your AI CLI and run @setup',
+    step_agents: '3. If no visual picker appears, run: aios-lite agents',
+    step_agent_prompt: '4. Generate setup prompt for your tool: aios-lite agent:prompt setup --tool={tool}'
   },
   install: {
     framework_detected: 'Framework detected: {framework} ({evidence})',
     framework_not_detected: 'No framework detected. Installing in generic mode.',
     done_at: 'Installation completed at: {targetDir}',
     files_copied: 'Files copied: {count}',
-    files_skipped: 'Files skipped: {count}'
+    files_skipped: 'Files skipped: {count}',
+    next_steps: 'Next steps:',
+    step_setup_context: '1. Generate/refresh project context: aios-lite setup:context --defaults',
+    step_agents: '2. If no visual picker appears, run: aios-lite agents',
+    step_agent_prompt: '3. Generate setup prompt for your tool: aios-lite agent:prompt setup --tool={tool}'
   },
   update: {
     not_installed: 'No AIOS Lite installation found in {targetDir}.',

@@ -11,8 +11,8 @@ npx aios-lite install
 ```
 
 ## Commands
-- `aios-lite init <project-name>`
-- `aios-lite install [path]`
+- `aios-lite init <project-name> [--tool=codex|claude|gemini|opencode]`
+- `aios-lite install [path] [--tool=codex|claude|gemini|opencode]`
 - `aios-lite update [path]`
 - `aios-lite info [path] [--json]`
 - `aios-lite doctor [path] [--fix] [--dry-run] [--json]`

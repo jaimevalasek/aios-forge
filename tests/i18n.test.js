@@ -120,3 +120,21 @@ test('translator exposes localized cli line wrapper keys', () => {
   assert.equal(es.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
   assert.equal(fr.t('cli.unknown_command_line', { message: 'x' }), 'x\n');
 });
+
+test('translator exposes localized init/install onboarding guidance keys', () => {
+  const en = createTranslator('en');
+  const pt = createTranslator('pt-BR');
+  const es = createTranslator('es');
+  const fr = createTranslator('fr');
+
+  assert.equal(
+    en.t('init.step_agent_prompt', { tool: 'codex' }).includes('--tool=codex'),
+    true
+  );
+  assert.equal(
+    pt.t('install.step_setup_context').includes('aios-lite setup:context --defaults'),
+    true
+  );
+  assert.equal(es.t('init.step_agents').includes('aios-lite agents'), true);
+  assert.equal(fr.t('install.step_agent_prompt', { tool: 'gemini' }).includes('--tool=gemini'), true);
+});
