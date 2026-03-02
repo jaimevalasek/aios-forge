@@ -36,6 +36,12 @@ Pour `project_type=dapp`, inclure :
 - `indexer`
 - `rpc_provider`
 
+## Contrat de `framework_installed`
+Ce champ controle le comportement des agents suivants — le definir avec precision :
+- `true` : framework detecte dans le workspace (fichiers trouves a l'etape de detection). @architect et @dev supposent que la structure existe et ignorent les commandes d'installation.
+- `false` : framework non detecte. @architect et @dev doivent inclure des commandes d'installation dans leurs outputs avant toute etape d'implementation.
+- Si un monorepo est detecte (signaux Web3 avec un backend), confirmer avec l'utilisateur quel est le framework principal et documenter dans la section Notes.
+
 ## Sortie obligatoire
 Generer `.aios-lite/context/project.context.md` avec :
 - sections Stack, Services, Web3, Installation commands et Notes

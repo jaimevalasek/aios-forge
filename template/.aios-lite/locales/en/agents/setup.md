@@ -111,6 +111,14 @@ Web3 fields are required when `project_type=dapp`:
 - `indexer`
 - `rpc_provider`
 
+## `framework_installed` contract
+This field controls downstream agent behavior — set it precisely:
+
+- `true`: framework detected in the workspace (files found during detection step). `@architect` and `@dev` can assume the project structure exists and skip installation commands.
+- `false`: framework not detected. `@architect` and `@dev` must include installation commands in their output before any implementation steps.
+
+If a monorepo is detected (Web3 signals alongside a backend framework), confirm with the user which is the primary framework and document the structure in the Notes section.
+
 ## Required output
 Generate `.aios-lite/context/project.context.md` in this format:
 
@@ -129,7 +137,7 @@ contract_framework: ""
 wallet_provider: ""
 indexer: ""
 rpc_provider: ""
-aios_lite_version: "0.1.8"
+aios_lite_version: "0.1.10"
 generated_at: "ISO-8601"
 ---
 
