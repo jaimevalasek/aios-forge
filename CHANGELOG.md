@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
   - `.aios-lite/agents/ux-ui.md`
   - `.aios-lite/locales/{en,pt-BR,es,fr}/agents/ux-ui.md`
   - `.gemini/commands/aios-ux-ui.toml`
+- Legacy framework detection support:
+  - `CodeIgniter 3`
+  - `CodeIgniter 4`
 - New package installation validation command:
   - `aios-lite test:package [source-path] [--keep] [--dry-run] [--json]`
 - New workflow planning command:
@@ -108,6 +111,7 @@ All notable changes to this project will be documented in this file.
 - `init` and `install` now support `--lang=en|pt-BR|es|fr` to auto-apply localized agent packs during bootstrap.
 - Setup templates now default `aios_lite_version` to `0.1.8`.
 - `ui-ux-modern` static skill was expanded to a production-ready checklist with token, state, accessibility, responsive, and handoff guidance.
+- Developer onboarding now handles `Other` backend/frontend choices as true free-text custom values (legacy/custom stacks).
 - Expanded automated coverage:
   - `tests/i18n-cli.test.js`
   - `tests/init-install-guidance.test.js`

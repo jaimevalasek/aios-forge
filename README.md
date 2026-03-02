@@ -10,6 +10,17 @@ npx aios-lite init my-project
 npx aios-lite install
 ```
 
+## Legacy projects and custom stacks
+You can run AIOS Lite on existing/legacy projects (not only new projects).
+
+```bash
+# inside an existing project
+npx aios-lite install .
+aios-lite setup:context . --defaults --framework="CodeIgniter 3" --backend="CodeIgniter 3" --database="MySQL"
+```
+
+If your stack is not listed in menus, use free-text values via `--framework`, `--backend`, `--frontend`, `--database`, `--auth`, and `--uiux`.
+
 ## Commands
 - `aios-lite init <project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
 - `aios-lite install [path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`

@@ -62,6 +62,25 @@ test('detects Cardano by aiken.toml', async () => {
   assert.equal(out.framework, 'Cardano');
 });
 
+test('detects CodeIgniter 3 by legacy core file', async () => {
+  const dir = await makeTempDir();
+  await fs.mkdir(path.join(dir, 'system/core'), { recursive: true });
+  await fs.writeFile(path.join(dir, 'system/core/CodeIgniter.php'), '<?php', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'CodeIgniter 3');
+  assert.equal(out.evidence, 'system/core/CodeIgniter.php');
+});
+
+test('detects CodeIgniter 4 by spark file', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'spark'), '#!/usr/bin/env php', 'utf8');
+
+  const out = await detectFramework(dir);
+  assert.equal(out.framework, 'CodeIgniter 4');
+  assert.equal(out.evidence, 'spark');
+});
+
 test('falls back to Node with generic package.json', async () => {
   const dir = await makeTempDir();
   await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ name: 'x' }), 'utf8');

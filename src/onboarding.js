@@ -154,7 +154,14 @@ function buildDeveloperProfile(input) {
   const laravelVersion = normalizeText(input.laravelVersion);
   const teamsEnabled = input.teamsEnabled === true;
 
-  const backendValue = backend === 'Other' ? normalizeText(input.framework || input.backend) : backend;
+  const backendValue =
+    backend === 'Other'
+      ? normalizeText(input.backend || input.framework) || 'Custom backend'
+      : backend;
+  const frontendValue =
+    frontend === 'Other'
+      ? normalizeText(input.frontendText || input.frontend) || 'Custom frontend'
+      : frontend;
   const framework = backendValue === 'Laravel' && laravelVersion ? `Laravel ${laravelVersion}` : backendValue;
   const projectType = inferProjectTypeFromFramework(backendValue);
   const web3Network = inferWeb3NetworkFromFramework(backendValue);
@@ -172,7 +179,7 @@ function buildDeveloperProfile(input) {
     projectType,
     framework,
     backend: backendValue,
-    frontend,
+    frontend: frontendValue,
     auth,
     uiux,
     database,

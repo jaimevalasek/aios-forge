@@ -20,7 +20,7 @@ module.exports = {
       'aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=es]',
     help_context_validate: 'aios-lite context:validate [path] [--json] [--locale=es]',
     help_setup_context:
-      'aios-lite setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--language=es] [--web3-enabled=true|false] [--locale=es]',
+      'aios-lite setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--framework=<name>] [--backend=<name>] [--frontend=<name>] [--database=<name>] [--auth=<name>] [--uiux=<name>] [--language=es] [--web3-enabled=true|false] [--locale=es]',
     help_locale_apply: 'aios-lite locale:apply [path] [--lang=en|pt-BR|es|fr] [--dry-run] [--locale=es]',
     help_test_smoke:
       'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json] [--locale=es]',

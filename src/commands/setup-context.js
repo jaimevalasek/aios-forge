@@ -13,6 +13,7 @@ const {
 const { applyAgentLocale } = require('../locales');
 const {
   BACKEND_CHOICES,
+  FRONTEND_CHOICES,
   AUTH_CHOICES,
   normalizeChoice,
   normalizeProfile,
@@ -300,6 +301,13 @@ async function askDeveloperProfile(rl, data, t) {
     backendChoice: await ask(rl, t('setup_context.q_backend_menu'), data.framework)
   };
   const backend = normalizeChoice(developerInput.backendChoice, BACKEND_CHOICES, data.framework);
+  if (backend === 'Other') {
+    developerInput.backend = await ask(
+      rl,
+      t('setup_context.q_backend_text'),
+      data.backend || data.framework
+    );
+  }
 
   if (String(backend).toLowerCase() === 'laravel') {
     developerInput.laravelVersion = await ask(rl, t('setup_context.q_laravel_version'), '11');
@@ -315,6 +323,18 @@ async function askDeveloperProfile(rl, data, t) {
     }
   } else {
     developerInput.frontendChoice = await ask(rl, t('setup_context.q_frontend_menu'), data.frontend || '6');
+    const frontend = normalizeChoice(
+      developerInput.frontendChoice,
+      FRONTEND_CHOICES,
+      data.frontend || ''
+    );
+    if (frontend === 'Other') {
+      developerInput.frontendText = await ask(
+        rl,
+        t('setup_context.q_frontend_text'),
+        data.frontend || ''
+      );
+    }
     developerInput.auth = await ask(rl, t('setup_context.q_auth_text'), data.auth || 'Custom');
     developerInput.uiuxChoice = await ask(rl, t('setup_context.q_uiux_menu'), data.uiux || '1');
 

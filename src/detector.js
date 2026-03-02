@@ -58,6 +58,33 @@ async function detectFramework(projectDir) {
     checks.push({ framework: 'Laravel', installed: true, evidence: hasArtisan ? 'artisan' : 'composer.json:laravel/framework', confidence: 'high' });
   }
 
+  const hasCodeIgniter4Spark = await exists(path.join(projectDir, 'spark'));
+  const hasCodeIgniter4AppConfig = await exists(path.join(projectDir, 'app/Config/App.php'));
+  const hasCodeIgniter4Composer = dependencyExists(composerJson, ['codeigniter4/framework']);
+  if (hasCodeIgniter4Spark || hasCodeIgniter4AppConfig || hasCodeIgniter4Composer) {
+    checks.push({
+      framework: 'CodeIgniter 4',
+      installed: true,
+      evidence: hasCodeIgniter4Spark
+        ? 'spark'
+        : hasCodeIgniter4AppConfig
+          ? 'app/Config/App.php'
+          : 'composer.json:codeigniter4/framework',
+      confidence: hasCodeIgniter4Spark || hasCodeIgniter4AppConfig ? 'high' : 'medium'
+    });
+  }
+
+  const hasCodeIgniter3Core = await exists(path.join(projectDir, 'system/core/CodeIgniter.php'));
+  const hasCodeIgniter3Config = await exists(path.join(projectDir, 'application/config/config.php'));
+  if (hasCodeIgniter3Core || hasCodeIgniter3Config) {
+    checks.push({
+      framework: 'CodeIgniter 3',
+      installed: true,
+      evidence: hasCodeIgniter3Core ? 'system/core/CodeIgniter.php' : 'application/config/config.php',
+      confidence: 'high'
+    });
+  }
+
   const hasSymfonyConsole = await exists(path.join(projectDir, 'bin/console'));
   const hasSymfonyComposer = dependencyExists(composerJson, ['symfony/framework-bundle']);
   if (hasSymfonyConsole || hasSymfonyComposer) {

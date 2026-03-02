@@ -143,3 +143,31 @@ test('setup:context team profile preserves explicit web3 values', async () => {
   assert.equal(result.data.payments, 'Payments provider');
   assert.equal(result.data.cache, 'Redis');
 });
+
+test('setup:context defaults supports legacy custom stack values', async () => {
+  const projectDir = await makeTempDir();
+  const logger = createQuietLogger();
+  const { t } = createTranslator('en');
+
+  const result = await runSetupContext({
+    args: [projectDir],
+    options: {
+      defaults: true,
+      profile: 'developer',
+      framework: 'CodeIgniter 3',
+      'backend-choice': '13',
+      backend: 'CodeIgniter 3',
+      'frontend-choice': '8',
+      frontend: 'Bootstrap + jQuery',
+      'database-choice': '1',
+      auth: 'Legacy session auth'
+    },
+    logger,
+    t
+  });
+
+  assert.equal(result.data.framework, 'CodeIgniter 3');
+  assert.equal(result.data.backend, 'CodeIgniter 3');
+  assert.equal(result.data.frontend, 'Bootstrap + jQuery');
+  assert.equal(result.data.database, 'MySQL');
+});

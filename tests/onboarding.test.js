@@ -77,3 +77,22 @@ test('buildTeamProfile preserves explicit web3 stack and infers network', () => 
   assert.equal(profile.web3Networks, 'solana');
   assert.equal(profile.services.includes('Payments'), true);
 });
+
+test('buildDeveloperProfile supports custom legacy stack via Other choices', () => {
+  const profile = buildDeveloperProfile({
+    backendChoice: '13',
+    backend: 'CodeIgniter 3',
+    framework: 'CodeIgniter 3',
+    frontendChoice: '8',
+    frontendText: 'Bootstrap + jQuery',
+    auth: 'Legacy session auth',
+    uiuxChoice: '1',
+    databaseChoice: '1'
+  });
+
+  assert.equal(profile.projectType, 'web_app');
+  assert.equal(profile.framework, 'CodeIgniter 3');
+  assert.equal(profile.backend, 'CodeIgniter 3');
+  assert.equal(profile.frontend, 'Bootstrap + jQuery');
+  assert.equal(profile.database, 'MySQL');
+});
