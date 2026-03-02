@@ -1,0 +1,36 @@
+# Documentação AIOS Lite (Português)
+
+Bem-vindo à documentação em português do AIOS Lite — um framework leve de agentes de IA para projetos de software.
+
+## Guias
+
+| Documento | Descrição |
+|---|---|
+| [Início Rápido](./inicio-rapido.md) | Instale, configure e comece em menos de 10 minutos |
+| [Cenários de Uso](./cenarios.md) | Exemplos completos e práticos para projetos MICRO, SMALL e MEDIUM |
+| [Guia de Agentes](./agentes.md) | Quando usar cada agente e o que ele entrega |
+| [Suporte Web3](./web3.md) | Guia para projetos dApp (Ethereum, Solana, Cardano) |
+
+## Documentação em inglês
+
+Para referências técnicas completas, consulte `docs/en/`:
+- [i18n](../en/i18n.md) — Localização e packs de idioma
+- [Orquestração paralela](../en/parallel.md) — Para projetos MEDIUM com múltiplas lanes
+- [Integração MCP](../en/mcp.md) — Model Context Protocol
+- [Schemas JSON](../en/json-schemas.md) — Contratos de saída machine-readable
+- [Web3 (EN)](../en/web3.md) — Referência técnica de suporte Web3
+
+## Início rápido em 3 comandos
+
+```bash
+# 1. Instalar em um projeto existente
+npx aios-lite install
+
+# 2. Configurar contexto do projeto
+npx aios-lite setup:context
+
+# 3. Verificar saúde
+npx aios-lite doctor
+```
+
+Depois, abra seu AI IDE e digite `/setup` para começar.
