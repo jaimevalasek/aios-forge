@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [0.1.11] - 2026-03-02
+### Added
+- Agent prompt enrichment across all 8 agents:
+  - `@analyst`: 6 concrete Phase 1 discovery questions, entity deep-dive example (scheduling system), field-level table format for Phase 3, `Visual references` and `Risks identified` output sections, responsibility boundary note.
+  - `@architect`: concrete folder/module structure trees for MICRO/SMALL/MEDIUM across Laravel (TALL), Node/Express, Next.js (App Router), and dApp (Hardhat/Foundry/Anchor) stacks.
+  - `@pm`: explicit 2-page golden rule with cut-ruthlessly instruction, when-to-use guidance (SMALL/MEDIUM only, skip MICRO), exact `prd.md` section template.
+  - `@dev`: Laravel ALWAYS/NEVER convention list (Form Requests, Actions, Policies, Events+Listeners, Jobs, Resources, N+1 prevention), UI/UX conventions, Web3 guards for dApp projects, semantic commit format with examples, responsibility boundary note.
+  - `@orchestrator`: MEDIUM-only activation condition with early exit, 4-step orchestration process, dependency graph example, parallel vs sequential classification rules, `agent-N.status.md` and `shared-decisions.md` status file protocol.
+  - `@setup`: explicit `framework_installed` contract semantics (true/false downstream behavior), monorepo detection guidance for mixed Web3 + backend repos.
+  - `@ux-ui` and `@qa`: no structural changes (already complete).
+- All 8 locale packs (`en`, `pt-BR`, `es`, `fr`) synchronized with enriched agent content.
+- `isMonorepoDetection()` in `src/detector.js`: returns `true` when a Web3 framework and a backend or frontend framework coexist in the same directory.
+- Monorepo detection note propagated to `setup:context` output (localized via `note_monorepo` key in all 4 i18n message files).
+- `note_monorepo` i18n key added to `en`, `pt-BR`, `es`, and `fr` message dictionaries.
+- 4 new tests for `isMonorepoDetection` in `tests/detector.test.js`.
+
+### Changed
+- `setup:context` now prepends a localized monorepo warning note when Web3 and application framework signals coexist in the project directory.
+- `template/.aios-lite/config.md` context contract updated with explicit `framework_installed` semantics.
+- `aios_lite_version` example in `@setup` output template corrected from `0.1.8` to `0.1.10`.
+- `tests/agent-contracts.test.js` updated to reflect new `@dev` section names (`Laravel conventions`, `Responsibility boundary`).
+
 ### Added
 - Full `pt-BR` CLI dictionary at `src/i18n/messages/pt-BR.js`.
 - Localized agent prompt packs for:
