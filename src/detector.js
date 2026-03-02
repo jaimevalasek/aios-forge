@@ -235,8 +235,27 @@ async function detectFramework(projectDir) {
   };
 }
 
+const WEB3_FRAMEWORKS = new Set(['Hardhat', 'Foundry', 'Truffle', 'Anchor', 'Solana Web3', 'Cardano']);
+const BACKEND_FRAMEWORKS = new Set(['Laravel', 'Rails', 'Django', 'Symfony', 'AdonisJS', 'CodeIgniter 4', 'CodeIgniter 3']);
+const FRONTEND_FRAMEWORKS = new Set(['Next.js', 'Nuxt', 'SvelteKit', 'Remix']);
+
+/**
+ * Returns true when detection found both a Web3 framework and a backend or
+ * frontend framework in the same directory — typical of monorepos that bundle
+ * smart contracts alongside a web application.
+ */
+function isMonorepoDetection(detection) {
+  if (!detection || !Array.isArray(detection.matches) || detection.matches.length < 2) return false;
+  const names = detection.matches.map((m) => m.framework);
+  const hasWeb3 = names.some((n) => WEB3_FRAMEWORKS.has(n));
+  const hasBackend = names.some((n) => BACKEND_FRAMEWORKS.has(n));
+  const hasFrontend = names.some((n) => FRONTEND_FRAMEWORKS.has(n));
+  return hasWeb3 && (hasBackend || hasFrontend);
+}
+
 module.exports = {
   detectFramework,
+  isMonorepoDetection,
   safeJsonParse,
   dependencyExists
 };

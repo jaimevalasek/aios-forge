@@ -2,7 +2,7 @@
 
 const path = require('node:path');
 const readline = require('node:readline/promises');
-const { detectFramework } = require('../detector');
+const { detectFramework, isMonorepoDetection } = require('../detector');
 const { getCliVersionSync } = require('../version');
 const {
   calculateClassification,
@@ -453,6 +453,7 @@ async function runSetupContext({ args, options, logger, t }) {
   const inferredProjectType = inferProjectTypeFromFramework(detectedFramework);
   const inferredWeb3Enabled = inferredProjectType === 'dapp';
   const baseName = path.basename(targetDir) || 'my-project';
+  const monorepoDetected = isMonorepoDetection(detection);
 
   let data = {
     projectName: baseName,
@@ -480,7 +481,9 @@ async function runSetupContext({ args, options, logger, t }) {
     cache: '',
     search: '',
     installCommands: '',
-    notes: [],
+    notes: monorepoDetected
+      ? ['Monorepo detected: Web3 and application framework coexist. Confirm primary framework with user and document structure in Notes.']
+      : [],
     aiosLiteVersion: getCliVersionSync()
   };
 

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { detectFramework } = require('../src/detector');
+const { detectFramework, isMonorepoDetection } = require('../src/detector');
 
 async function makeTempDir() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-detector-'));
@@ -95,4 +95,33 @@ test('returns not installed for empty directory', async () => {
   const out = await detectFramework(dir);
   assert.equal(out.installed, false);
   assert.equal(out.framework, null);
+});
+
+test('isMonorepoDetection returns false for single framework', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'artisan'), '', 'utf8');
+  const out = await detectFramework(dir);
+  assert.equal(isMonorepoDetection(out), false);
+});
+
+test('isMonorepoDetection returns true when Web3 and backend coexist', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'artisan'), '', 'utf8');
+  await fs.writeFile(path.join(dir, 'hardhat.config.js'), 'module.exports = {};', 'utf8');
+  const out = await detectFramework(dir);
+  assert.equal(isMonorepoDetection(out), true);
+});
+
+test('isMonorepoDetection returns true when Web3 and frontend coexist', async () => {
+  const dir = await makeTempDir();
+  await fs.writeFile(path.join(dir, 'next.config.js'), 'module.exports = {};', 'utf8');
+  await fs.writeFile(path.join(dir, 'hardhat.config.js'), 'module.exports = {};', 'utf8');
+  const out = await detectFramework(dir);
+  assert.equal(isMonorepoDetection(out), true);
+});
+
+test('isMonorepoDetection returns false for null or missing detection', () => {
+  assert.equal(isMonorepoDetection(null), false);
+  assert.equal(isMonorepoDetection({}), false);
+  assert.equal(isMonorepoDetection({ matches: [] }), false);
 });

@@ -70,7 +70,7 @@ test('core agent contracts include actionable sections', async () => {
     },
     {
       file: 'dev.md',
-      tokens: ['Working rules', 'Implementation strategy', 'Output expectations']
+      tokens: ['Working rules', 'Implementation strategy', 'Laravel conventions', 'Responsibility boundary']
     },
     {
       file: 'ux-ui.md',
