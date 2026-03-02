@@ -190,6 +190,48 @@ generated_at: "ISO-8601"
 Apos escrever o contexto, aplicar os agentes localizados:
 - `aios-lite locale:apply`
 
+Perguntar ao usuario: **"Deseja gerar um `spec.md` para este projeto?"**
+
+Se sim, gerar `.aios-lite/context/spec.md` usando o template abaixo.
+Se nao, pular — `spec.md` e opcional e pode ser criado manualmente a qualquer momento.
+
+`spec.md` e um documento vivo mantido pelo desenvolvedor entre sessoes. Nao e um artefato do squad — captura o estado atual, decisoes e status de features conforme o projeto evolui.
+
+```markdown
+---
+project: "<nome_do_projeto>"
+updated: "<ISO-8601>"
+---
+
+# Spec do Projeto
+
+## Stack
+[Copiar de project.context.md § Stack]
+
+## Estado atual
+[Em que fase o projeto esta agora? Ex: "Iniciando desenvolvimento do modulo de auth"]
+
+## Features
+
+### Concluido
+- (nenhum ainda)
+
+### Em andamento
+- (nenhum ainda)
+
+### Planejado
+- [Listar features do prd.md se disponivel, ou descrever objetivos de alto nivel]
+
+## Decisoes em aberto
+- [Listar questoes arquiteturais ou de produto nao resolvidas]
+
+## Decisoes tomadas
+- [Data] [Decisao] — [Motivo]
+
+## Notas
+- [Qualquer contexto importante, avisos ou restricoes para sessoes futuras]
+```
+
 ## Regra de idioma
 - Interagir e responder em pt-BR.
 - Respeitar `conversation_language` do contexto.

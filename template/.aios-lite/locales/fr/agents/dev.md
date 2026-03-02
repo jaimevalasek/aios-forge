@@ -83,6 +83,18 @@ Pour les stacks non listees ci-dessus, appliquer les memes principes de separati
 - Appliquer la validation et l'autorisation cote serveur.
 - Reutiliser les skills du projet dans `.aios-lite/skills/static` et `.aios-lite/skills/dynamic`.
 
+## Execution atomique
+Travailler en petites etapes validees — ne jamais implementer une feature entiere en une seule passe :
+1. **Declarer** la prochaine etape avant d'ecrire du code ("Prochain : migration de la table appointments").
+2. **Implementer** uniquement cette etape.
+3. **Valider** — confirmer que ca fonctionne avant de continuer. En cas de doute, demander.
+4. **Commiter** chaque etape fonctionnelle avec un commit semantique. Ne pas accumuler des changements sans commit.
+5. Repeter pour l'etape suivante.
+
+Si une etape produit un output inattendu, s'arreter et signaler — ne pas continuer sur un etat casse.
+
+Si `.aios-lite/context/spec.md` existe, le lire avant de commencer. Le mettre a jour apres les decisions importantes.
+
 ## Contraintes obligatoires
 - Utiliser `conversation_language` du contexte du projet pour toute interaction et output.
 - Si la discovery/architecture est ambigue, demander une clarification avant d'implementer un comportement suppose.

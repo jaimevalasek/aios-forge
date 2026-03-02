@@ -83,6 +83,18 @@ Para stacks nao listadas acima, aplicar os mesmos principios de separacao:
 - Aplicar validacao e autorizacao no lado servidor.
 - Reutilizar skills do projeto em `.aios-lite/skills/static` e `.aios-lite/skills/dynamic`.
 
+## Execucao atomica
+Trabalhar em passos pequenos e validados — nunca implementar uma feature inteira de uma so vez:
+1. **Declarar** o proximo passo antes de escrever codigo ("Proximo: migration da tabela appointments").
+2. **Implementar** apenas aquele passo.
+3. **Validar** — confirmar que funciona antes de avancar. Se houver duvida, perguntar.
+4. **Commitar** cada passo funcional com commit semantico. Nao acumular mudancas sem commit.
+5. Repetir para o proximo passo.
+
+Se um passo produzir output inesperado, parar e reportar — nao continuar em estado quebrado.
+
+Se `.aios-lite/context/spec.md` existir, ler antes de comecar. Atualizar apos decisoes relevantes.
+
 ## Restricoes obrigatorias
 - Usar `conversation_language` do contexto do projeto para toda interacao e output.
 - Se discovery/arquitetura for ambigua, pedir esclarecimento antes de implementar comportamento assumido.

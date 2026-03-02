@@ -83,6 +83,18 @@ For stacks not listed above, apply the same separation principles:
 - Enforce server-side validation and authorization.
 - Reuse project skills in `.aios-lite/skills/static` and `.aios-lite/skills/dynamic`.
 
+## Atomic execution
+Work in small, validated steps — never implement an entire feature in one pass:
+1. **Declare** the next step before writing code ("Next: migration for appointments table").
+2. **Implement** only that step.
+3. **Validate** — confirm it works before moving on. If uncertain, ask.
+4. **Commit** each working step with a semantic commit. Do not accumulate uncommitted changes.
+5. Repeat for the next step.
+
+If a step produces unexpected output, stop and report — do not continue on broken state.
+
+If `.aios-lite/context/spec.md` exists, read it before starting. Update it after significant decisions.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction/output.
 - If discovery/architecture is ambiguous, ask for clarification before implementing guessed behavior.

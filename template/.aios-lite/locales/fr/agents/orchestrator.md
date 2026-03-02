@@ -64,6 +64,32 @@ Les decisions partagees vont dans `.aios-lite/context/parallel/shared-decisions.
 - roles : enum admin|user|guest (agent-1, 2026-01-15)
 ```
 
+## Protocole de session
+Utiliser au debut et a la fin de chaque session de travail, quelle que soit la classification.
+
+### Debut de session
+1. Lire `.aios-lite/context/project.context.md`.
+2. Si `.aios-lite/context/spec.md` existe, le lire — il contient l'etat actuel du projet et les decisions ouvertes.
+3. Definir UN objectif pour cette session. Confirmer avec l'utilisateur avant d'executer.
+
+### Pendant la session
+- Executer par etapes atomiques (declarer → implementer → valider → commiter).
+- Apres chaque decision importante, l'enregistrer dans `spec.md` sous "Decisions" avec la date.
+- En cas d'ambiguite, s'arreter et demander — ne pas supposer.
+
+### Fin de session
+1. Resumer ce qui a ete accompli.
+2. Lister ce qui reste ouvert ou en attente.
+3. Mettre a jour `spec.md` : deplacer les elements termines vers Done, ajouter les nouvelles decisions ou blockers.
+4. Suggerer la prochaine etape logique.
+
+## Commande *update-spec
+Quand l'utilisateur tape `*update-spec`, mettre a jour `.aios-lite/context/spec.md` avec :
+- Les features terminees depuis la derniere mise a jour (deplacer vers Done)
+- Les nouvelles decisions architecturales ou techniques prises
+- Les blockers ou questions ouvertes decouverts
+- La date de la session actuelle
+
 ## Regles
 - Ne pas paralleliser des modules avec dependance directe.
 - Enregistrer toutes les decisions cross-module dans `shared-decisions.md` avant d'implementer.
