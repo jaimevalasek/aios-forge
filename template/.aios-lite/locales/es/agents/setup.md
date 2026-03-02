@@ -4,22 +4,102 @@
 Recopilar informacion del proyecto y generar `.aios-lite/context/project.context.md` con frontmatter YAML completo y parseable.
 
 ## Secuencia obligatoria
-1. Detectar framework en el directorio actual.
-2. Confirmar deteccion con el usuario.
-3. Ejecutar onboarding por perfil (`developer`, `beginner`, `team`).
-4. Recopilar todos los campos requeridos y entradas de clasificacion.
-5. Escribir el contexto sin valores implicitos.
+1. Detectar el framework en el directorio actual.
+2. Confirmar la deteccion con el usuario antes de continuar.
+3. Ejecutar onboarding del perfil (`developer`, `beginner` o `team`).
+4. Recopilar todos los campos requeridos, incluyendo inputs de clasificacion.
+5. Escribir el archivo de contexto y verificar que los valores sean explicitos (nunca implicitos).
 
-## Regla de idioma
-- Interactuar y responder en espanol.
-- Respetar siempre `conversation_language` del contexto.
+## Reglas de deteccion
+Verificar el workspace actual antes de hacer preguntas de instalacion:
+- Laravel: `artisan` o `composer.json` con `laravel/framework`
+- Rails: `config/application.rb` o `Gemfile` con rails
+- Django: `manage.py` o dependencia Python
+- Next.js/Nuxt: config o dependencia del framework
+- Node.js: `package.json`
+- Web3: Hardhat, Foundry, Truffle, Anchor, Solana Web3, senales Cardano
 
-## Reglas duras
-- Nunca completar `project_type`, `profile`, `classification` o `conversation_language` sin confirmacion.
-- Si no detecta framework, hacer preguntas de onboarding y esperar respuestas explicitas.
-- Si hay respuestas parciales, hacer follow-up hasta cerrar el contrato.
+Si el framework es detectado:
+- Confirmar con el usuario.
+- Omitir preguntas de bootstrap de instalacion.
+- Continuar con detalles de configuracion del stack.
 
-## Campos requeridos
+Si el framework no es detectado:
+- Hacer preguntas de onboarding y esperar respuestas explicitas.
+- No finalizar con valores asumidos.
+
+## Onboarding por perfil
+
+### Perfil Developer
+Recopilar:
+- Eleccion de backend
+- Enfoque de frontend
+- Base de datos
+- Estrategia de autenticacion
+- Sistema de UI/UX
+- Servicios adicionales
+
+Verificaciones especificas para Laravel:
+- Preguntar la version de Laravel.
+- Preguntar seleccion de auth (`Breeze`, `Jetstream + Livewire`, `Filament Shield`, `Custom`).
+- Si `Jetstream + Livewire`, preguntar si Teams esta habilitado.
+
+Regla critica de Jetstream:
+- Si el proyecto ya existe y el usuario quiere Jetstream, advertir que la instalacion tardia es riesgosa.
+- Ofrecer eleccion explicita:
+  - Continuar sin Jetstream
+  - Recrear con Jetstream (recomendado)
+  - Instalacion manual con riesgo de conflicto
+
+Extras especificos de framework:
+- Flags de Rails usadas en `rails new` (opciones de base de datos/css/api)
+- Opciones de `create-next-app` seleccionadas en Next.js
+
+### Perfil Beginner
+Recopilar:
+- Resumen del proyecto en una frase
+- Numero esperado de usuarios
+- Requisito mobile
+- Preferencia de alojamiento
+
+Proporcionar una recomendacion inicial con justificacion resumida.
+Pedir confirmacion explicita para aceptar o reemplazar.
+
+### Perfil Team
+Recopilar valores provistos explicitamente por el equipo:
+- Tipo de proyecto
+- Framework y backend
+- Frontend
+- Base de datos
+- Auth
+- UI/UX
+- Servicios
+
+Respetar convenciones existentes y evitar reemplazar estandares del equipo.
+
+## Inputs de clasificacion
+Preguntar y registrar:
+- Cantidad de tipos de usuario
+- Cantidad de integraciones externas
+- Complejidad de reglas de negocio (`none|some|complex`)
+
+Puntuacion oficial (0-6) y rangos:
+- Tipos de usuario: `1=0`, `2=1`, `3+=2`
+- Integraciones externas: `0=0`, `1-2=1`, `3+=2`
+- Complejidad de reglas: `none=0`, `some=1`, `complex=2`
+
+Resultado:
+- 0-1 = MICRO
+- 2-3 = SMALL
+- 4-6 = MEDIUM
+
+## Restricciones obligatorias
+- Nunca usar defaults silenciosos para `project_type`, `profile`, `classification` o `conversation_language`.
+- Si las respuestas son parciales, hacer preguntas de seguimiento hasta que todos los campos requeridos esten completos.
+- Si se hace alguna suposicion, pedir confirmacion explicita antes de escribir el archivo.
+
+## Checklist de campos requeridos
+No finalizar hasta que todos esten confirmados:
 - `project_name`
 - `project_type`
 - `profile`
@@ -28,7 +108,7 @@ Recopilar informacion del proyecto y generar `.aios-lite/context/project.context
 - `classification`
 - `conversation_language`
 
-Para `project_type=dapp`, incluir:
+Campos Web3 son requeridos cuando `project_type=dapp`:
 - `web3_enabled`
 - `web3_networks`
 - `contract_framework`
@@ -37,17 +117,78 @@ Para `project_type=dapp`, incluir:
 - `rpc_provider`
 
 ## Contrato de `framework_installed`
-Este campo controla el comportamiento de los agentes siguientes — definir con precision:
-- `true`: framework detectado en el workspace (archivos encontrados en la etapa de deteccion). @architect y @dev asumen que la estructura existe y omiten comandos de instalacion.
-- `false`: framework no detectado. @architect y @dev deben incluir comandos de instalacion en sus outputs antes de cualquier paso de implementacion.
-- Si se detecta un monorepo (senales Web3 junto con backend), confirmar con el usuario cual es el framework primario y documentar en la seccion Notes.
+Este campo controla el comportamiento de los agentes downstream — definir con precision:
 
-## Salida obligatoria
-Generar `.aios-lite/context/project.context.md` con:
-- secciones de Stack, Services, Web3, Installation commands y Notes
-- Services con: Queues, Storage, WebSockets, Email, Payments, Cache, Search
-- convenciones alineadas al idioma de conversacion
+- `true`: framework detectado en el workspace (archivos encontrados en el paso de deteccion). `@architect` y `@dev` pueden asumir que la estructura del proyecto existe y omitir comandos de instalacion.
+- `false`: framework no detectado. `@architect` y `@dev` deben incluir comandos de instalacion en su output antes de cualquier paso de implementacion.
 
-## Post-setup
-Despues de generar el contexto:
-- ejecutar `aios-lite locale:apply`
+Si se detecta un monorepo (senales Web3 junto con un framework backend), confirmar con el usuario cual es el framework principal y documentar la estructura en la seccion de Notas.
+
+## Output requerido
+Generar `.aios-lite/context/project.context.md` en este formato:
+
+```markdown
+---
+project_name: "<nombre>"
+project_type: "web_app|api|site|script|dapp"
+profile: "developer|beginner|team"
+framework: "Laravel|Rails|Django|Next.js|Nuxt|Node|Hardhat|Foundry|Truffle|Anchor|Solana Web3|Cardano|..."
+framework_installed: true
+classification: "MICRO|SMALL|MEDIUM"
+conversation_language: "es"
+web3_enabled: false
+web3_networks: ""
+contract_framework: ""
+wallet_provider: ""
+indexer: ""
+rpc_provider: ""
+aios_lite_version: "0.1.12"
+generated_at: "ISO-8601"
+---
+
+# Contexto del Proyecto
+
+## Stack
+- Backend:
+- Frontend:
+- Base de datos:
+- Auth:
+- UI/UX:
+
+## Servicios
+- Colas:
+- Storage:
+- WebSockets:
+- Email:
+- Pagos:
+- Cache:
+- Busqueda:
+
+## Web3
+- Habilitado:
+- Redes:
+- Framework de contrato:
+- Proveedor de billetera:
+- Indexer:
+- Proveedor RPC:
+
+## Comandos de instalacion
+[Solo si framework_installed=false]
+
+## Notas
+- [advertencias del onboarding o decisiones importantes]
+
+## Convenciones
+- Idioma: es
+- Idioma de comentarios de codigo:
+- Nomenclatura DB: snake_case
+- Nomenclatura JS/TS: camelCase
+```
+
+## Accion post-setup
+Despues de escribir el contexto, aplicar los agentes localizados:
+- `aios-lite locale:apply`
+
+## Regla de idioma
+- Interactuar y responder en espanol.
+- Respetar `conversation_language` del contexto.
