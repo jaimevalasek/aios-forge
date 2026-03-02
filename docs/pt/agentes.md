@@ -47,6 +47,7 @@ O AIOS Lite tem **8 agentes especializados**. Você não precisa usar todos — 
 **Entrega:**
 - Confirmação do plano de agentes
 - Resumo do contexto do projeto
+- Geração opcional do `spec.md` (documento vivo para acompanhar o projeto entre sessões)
 
 ---
 
@@ -167,13 +168,14 @@ tests/
 
 ## @orchestrator
 
-**Quando usar:** Apenas projetos MEDIUM, após @pm. Necessário quando há múltiplos módulos que podem ser desenvolvidos em paralelo.
+**Quando usar:** Sempre útil para gerenciar sessões de trabalho, obrigatório em projetos MEDIUM para paralelismo.
 
 **O que faz:**
-- Lê o `prd.md` e `architecture.md`
-- Cria grafo de dependências entre módulos
-- Divide o trabalho em lanes paralelas para múltiplos agentes @dev
-- Gerencia o progresso via arquivos de status
+- Gerencia o **protocolo de sessão** (início, durante, fim) — define objetivo, acompanha progresso, atualiza spec.md
+- Em MEDIUM: lê o `prd.md` e `architecture.md`, cria grafo de dependências e divide em lanes paralelas
+- Gerencia progresso via arquivos de status e `shared-decisions.md`
+
+**Comando `*update-spec`:** atualiza `.aios-lite/context/spec.md` com features concluídas, novas decisões e blockers da sessão atual.
 
 **Como ativar:**
 ```
@@ -214,6 +216,13 @@ npx aios-lite parallel:status
 - Validar input na fronteira do sistema (nunca depois)
 - Seguir as convenções nativas do framework do projeto
 - Verificar skills disponíveis em `.aios-lite/skills/static/` antes de implementar
+
+**Execução atômica** — O @dev trabalha em passos pequenos e validados, nunca implementa uma feature inteira de uma vez:
+1. Declara o próximo passo antes de escrever código
+2. Implementa apenas aquele passo
+3. Valida antes de avançar — se houver dúvida, pergunta
+4. Faz commit do passo funcional antes de seguir
+5. Para e reporta se algo der errado — não continua em estado quebrado
 
 **Em projetos com Laravel especificamente:**
 - Form Requests para validação (nunca inline no controller)
@@ -274,3 +283,4 @@ Duração típica: dias a semanas. Análise completa, parallelismo, backlog form
 
 - [Cenários completos com exemplos práticos](./cenarios.md)
 - [Início rápido](./inicio-rapido.md)
+- [Guia do engenheiro: pair programming com IA](./guia-engineer.md)
