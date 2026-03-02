@@ -625,6 +625,513 @@ Escreva testes Hardhat cobrindo todos os cenários críticos.
 
 ---
 
+## Cenário 5 — API Node.js com Fastify (SMALL)
+
+**Projeto:** API de gerenciamento de pedidos para restaurante.
+**Stack:** Node.js + Fastify + PostgreSQL + Prisma + JWT.
+**Classificação:** SMALL (2 tipos de usuário=1pt, 2 integrações=1pt, algumas regras=1pt → 3 pontos)
+
+### Passo 1: Instalar
+
+```bash
+mkdir restaurante-api && cd restaurante-api
+npm init -y
+npm install fastify @prisma/client
+npm install -D prisma
+npx aios-lite install
+npx aios-lite setup:context . --defaults \
+  --project-name="Restaurante API" \
+  --project-type=api \
+  --framework="Node" \
+  --framework-installed=true \
+  --classification=SMALL \
+  --lang=pt-BR
+```
+
+### Passo 2: @setup
+
+```
+/setup
+```
+
+**O agente confirma:**
+```
+Framework detectado: Node.js (package.json ✓)
+Projeto: Restaurante API (SMALL)
+
+Plano: @setup → @analyst → @architect → @dev → @qa
+Próximo: /analyst
+```
+
+### Passo 3: @analyst
+
+```
+/analyst
+```
+
+*Você responde às perguntas:*
+
+- **Usuários:** Garçom (cria pedidos), Cozinha (atualiza status)
+- **Fluxo principal:** Garçom abre mesa → adiciona itens → cozinha vê e prepara → garçom fecha conta
+- **Regras críticas:**
+  - Pedido não pode ser fechado com itens pendentes
+  - Item cancelado não volta ao estoque (soft delete no pedido)
+  - Mesa só pode ter 1 pedido aberto por vez
+- **Integrações:** WhatsApp (aviso ao garçom quando prato fica pronto), impressora fiscal
+
+**O @analyst entrega** `.aios-lite/context/discovery.md`:
+
+```markdown
+## Entidades principais
+
+| Entidade    | Atributos                               | Restrições                      |
+|-------------|------------------------------------------|----------------------------------|
+| Table       | id, number, status (free/occupied)       | 1 pedido aberto por vez         |
+| Order       | id, table_id, status, opened_at          | closed só se itens = ready      |
+| OrderItem   | id, order_id, menu_item_id, qty, status  | status: pending/ready/cancelled |
+| MenuItem    | id, name, price, category, available     | —                               |
+| User        | id, name, role (waiter/kitchen)          | JWT auth por role               |
+
+## Regras de negócio
+- RN01: Mesa não pode ter 2 pedidos abertos simultaneamente
+- RN02: Pedido só fecha se todos os itens estiverem ready ou cancelled
+- RN03: Garçom só vê suas próprias mesas; cozinha vê tudo
+
+## Integrações
+- WhatsApp API (Evolution API) — notificação quando item fica pronto
+- Impressora fiscal — payload no fechamento do pedido
+```
+
+### Passo 4: @architect
+
+```
+/architect
+```
+
+**O @architect entrega** `.aios-lite/context/architecture.md`:
+
+```
+Classificação: SMALL → estrutura Fastify por domínio
+
+src/
+  plugins/
+    prisma.js        ← decorador global do cliente Prisma
+    auth.js          ← fastify-jwt plugin
+  routes/
+    orders/
+      index.js       ← GET /orders, POST /orders
+      [id].js        ← GET, PATCH, DELETE /orders/:id
+    items/
+      index.js
+    tables/
+      index.js
+  services/
+    order.service.js        ← regras de negócio (RN01, RN02)
+    notification.service.js ← WhatsApp integration
+  schemas/
+    order.schema.js  ← Fastify JSON Schema para validação
+  app.js
+
+prisma/
+  schema.prisma
+  migrations/
+
+test/
+  orders.test.js
+```
+
+**Decisões técnicas:**
+- Auth: `fastify-jwt` com roles no payload (`{ id, role }`)
+- Validação: Fastify JSON Schema (não Zod — evitar overhead)
+- ORM: Prisma (type-safe, migrations automáticas)
+
+### Passo 5: @dev
+
+```
+/dev
+
+Implemente a rota POST /orders e o OrderService.
+Inclua a validação RN01 (mesa com pedido aberto).
+```
+
+**O @dev implementa:**
+
+```javascript
+// src/services/order.service.js
+class OrderService {
+  constructor(prisma) {
+    this.prisma = prisma;
+  }
+
+  async create({ tableId, waiterId }) {
+    // RN01: verificar mesa livre
+    const open = await this.prisma.order.findFirst({
+      where: { tableId, status: { in: ['open', 'in_progress'] } },
+    });
+    if (open) {
+      throw new Error('Table already has an open order');
+    }
+
+    return this.prisma.order.create({
+      data: { tableId, waiterId, status: 'open' },
+    });
+  }
+
+  async close(orderId) {
+    // RN02: verificar itens pendentes
+    const pending = await this.prisma.orderItem.count({
+      where: { orderId, status: 'pending' },
+    });
+    if (pending > 0) {
+      throw new Error('Cannot close order with pending items');
+    }
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'closed', closedAt: new Date() },
+    });
+  }
+}
+
+module.exports = { OrderService };
+```
+
+```javascript
+// src/routes/orders/index.js
+module.exports = async function orderRoutes(fastify) {
+  const service = new OrderService(fastify.prisma);
+
+  fastify.post('/', {
+    preHandler: [fastify.authenticate, fastify.requireRole('waiter')],
+    schema: {
+      body: { type: 'object', required: ['tableId'], properties: {
+        tableId: { type: 'integer' }
+      }},
+    },
+  }, async (request, reply) => {
+    const order = await service.create({
+      tableId: request.body.tableId,
+      waiterId: request.user.id,
+    });
+    return reply.code(201).send(order);
+  });
+};
+```
+
+### Passo 6: @qa
+
+```
+/qa
+
+Escreva testes para o OrderService:
+- criação com sucesso
+- RN01: mesa com pedido aberto (deve lançar erro)
+- RN02: fechamento com itens pendentes (deve lançar erro)
+- fechamento com sucesso
+```
+
+---
+
+## Cenário 6 — Aplicação Rails + Hotwire (SMALL)
+
+**Projeto:** Plataforma colaborativa de gerenciamento de tarefas.
+**Stack:** Rails 7 + PostgreSQL + Hotwire (Turbo + Stimulus) + Tailwind CSS.
+**Classificação:** SMALL (2 tipos de usuário=1pt, 1 integração=1pt, algumas regras=1pt → 3 pontos)
+
+### Passo 1: Instalar
+
+```bash
+rails new task-app --database=postgresql --css=tailwind
+cd task-app
+npx aios-lite install
+npx aios-lite setup:context . --defaults \
+  --project-name="Task App" \
+  --project-type=web_app \
+  --framework="Rails" \
+  --framework-installed=true \
+  --classification=SMALL \
+  --lang=pt-BR
+```
+
+### Passo 2: @setup
+
+```
+/setup
+```
+
+**O agente confirma:**
+```
+Framework detectado: Rails (config/application.rb ✓)
+Versão: Rails 7.x
+
+Plano: @setup → @analyst → @architect → @dev → @qa
+Próximo: /analyst
+```
+
+### Passo 3: @analyst
+
+*Você responde às perguntas:*
+
+- **Usuários:** Admin (cria projetos e convida membros), Membro (cria e move tarefas)
+- **Fluxo:** Admin cria projeto → convida membros → membros criam e movem tarefas entre colunas (To Do / In Progress / Done)
+- **Regras:**
+  - Tarefa só pode ser atribuída a membros do mesmo projeto
+  - Admin pode arquivar projeto (tarefas ficam read-only)
+  - Membros recebem e-mail ao serem atribuídos a uma tarefa
+- **Integrações:** ActionMailer (e-mails de notificação)
+
+**O @analyst entrega** `.aios-lite/context/discovery.md`:
+
+```markdown
+## Entidades
+| Entidade    | Atributos                                    | Restrições                         |
+|-------------|----------------------------------------------|-------------------------------------|
+| User        | id, name, email, password_digest             | Devise ou has_secure_password       |
+| Project     | id, name, archived, owner_id                 | owner deve ser admin                |
+| Membership  | id, project_id, user_id, role                | role: admin/member                  |
+| Task        | id, project_id, assignee_id, title, status   | assignee deve ser membro do projeto |
+| Column      | status enum: todo/in_progress/done           | —                                   |
+
+## Regras
+- RN01: Atribuição restrita a membros do projeto (validação no model)
+- RN02: Projeto arquivado → tarefas readonly
+- RN03: E-mail via ActionMailer ao atribuir tarefa
+```
+
+### Passo 4: @architect
+
+**O @architect entrega:**
+
+```
+Classificação: SMALL → estrutura Rails padrão com concerns
+
+app/
+  models/
+    user.rb, project.rb, membership.rb, task.rb
+    concerns/
+      archivable.rb      ← módulo para lógica de arquivamento
+  controllers/
+    projects_controller.rb
+    tasks_controller.rb
+    memberships_controller.rb
+  views/
+    projects/
+      index.html.erb
+      show.html.erb      ← board Kanban
+    tasks/
+      _task.html.erb     ← Turbo Frame por tarefa
+      _form.html.erb
+    layouts/
+      application.html.erb
+  mailers/
+    task_mailer.rb
+  javascript/
+    controllers/
+      kanban_controller.js  ← Stimulus: drag-and-drop colunas
+
+config/routes.rb
+db/schema.rb
+test/models/, test/controllers/
+```
+
+**Decisões técnicas:**
+- Realtime: Turbo Streams via ActionCable (move de tarefa sem refresh)
+- Auth: `has_secure_password` + `before_action :require_login`
+- Drag-and-drop: Stimulus + Sortable.js (sem React)
+
+### Passo 5: @dev
+
+```
+/dev
+
+Implemente a move de tarefa via Turbo Stream.
+Quando o usuário arrasta uma tarefa para outra coluna,
+o status deve ser atualizado sem reload de página.
+```
+
+**O @dev implementa:**
+
+```ruby
+# app/controllers/tasks_controller.rb
+def update
+  @task = current_user.accessible_tasks.find(params[:id])
+
+  if @task.update(task_params)
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.remove("task_#{@task.id}"),
+          turbo_stream.append("column_#{@task.status}", partial: "tasks/task", locals: { task: @task })
+        ]
+      end
+      format.html { redirect_to project_path(@task.project) }
+    end
+  end
+end
+```
+
+```javascript
+// app/javascript/controllers/kanban_controller.js
+import { Controller } from "@hotwired/stimulus"
+import Sortable from "sortablejs"
+
+export default class extends Controller {
+  static targets = ["column"]
+
+  connect() {
+    this.columnTargets.forEach(column => {
+      new Sortable(column, {
+        group: "tasks",
+        animation: 150,
+        onEnd: (event) => this.#moved(event),
+      })
+    })
+  }
+
+  #moved(event) {
+    const taskId = event.item.dataset.taskId
+    const newStatus = event.to.dataset.status
+    fetch(`/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "X-CSRF-Token": this.#csrfToken() },
+      body: JSON.stringify({ task: { status: newStatus } }),
+    })
+  }
+
+  #csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').content
+  }
+}
+```
+
+### Passo 6: @qa
+
+```
+/qa
+
+Escreva testes para:
+- RN01: atribuição de tarefa a não-membro (deve falhar)
+- RN02: projeto arquivado — atualização de tarefa deve ser bloqueada
+- Turbo Stream: resposta correta ao mover tarefa
+```
+
+---
+
+## Cenário 7 — API Python com FastAPI (MICRO)
+
+**Projeto:** API de controle de estoque pessoal.
+**Stack:** Python + FastAPI + SQLite + SQLAlchemy + Pydantic.
+**Classificação:** MICRO (1 tipo de usuário=0pt, 0 integrações=0pt, sem regras complexas=0pt → 0 pontos)
+
+> **Django:** Para projetos Python SMALL ou MEDIUM (múltiplos usuários, banco relacional maior, admin panel), prefira Django + DRF. O FastAPI brilha em APIs simples, serviços assíncronos e microsserviços.
+
+### Passo 1: Instalar
+
+```bash
+mkdir estoque-api && cd estoque-api
+pip install fastapi uvicorn sqlalchemy pydantic
+npx aios-lite install
+npx aios-lite setup:context . --defaults \
+  --project-name="Estoque API" \
+  --project-type=api \
+  --framework="FastAPI" \
+  --framework-installed=true \
+  --classification=MICRO \
+  --lang=pt-BR
+```
+
+### Passo 2: @setup (detectando FastAPI)
+
+```
+/setup
+```
+
+**O agente confirma:**
+```
+Framework detectado: FastAPI (dependência em requirements.txt ✓)
+Classificação: MICRO
+
+Nota: FastAPI não está na lista padrão de detecção automática.
+      O framework foi registrado a partir da sua descrição.
+
+Plano simplificado (MICRO): @setup → @dev
+Próximo passo: ative /dev e descreva o que precisa.
+```
+
+> O @setup registra `framework: "FastAPI"` no context.md e segue normalmente.
+> Não existe stack "errada" — qualquer framework que você descrever é aceito.
+
+### Passo 3: @dev direto
+
+```
+/dev
+
+Crie uma API FastAPI para controle de estoque com:
+- CRUD de produtos (nome, quantidade, preço, categoria)
+- Endpoint de busca por categoria
+- SQLAlchemy com SQLite
+- Validação via Pydantic
+```
+
+**O @dev implementa:**
+
+```python
+# main.py
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from . import models, schemas, crud
+from .database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
+app = FastAPI(title="Estoque API")
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.post("/products/", response_model=schemas.Product, status_code=201)
+def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    return crud.create_product(db, product)
+
+@app.get("/products/", response_model=list[schemas.Product])
+def list_products(category: str | None = None, db: Session = Depends(get_db)):
+    return crud.get_products(db, category=category)
+
+@app.put("/products/{product_id}", response_model=schemas.Product)
+def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    db_product = crud.update_product(db, product_id, product)
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+```
+
+```python
+# schemas.py
+from pydantic import BaseModel, Field
+
+class ProductBase(BaseModel):
+    name: str
+    quantity: int = Field(ge=0)
+    price: float = Field(ge=0)
+    category: str
+
+class ProductCreate(ProductBase):
+    pass
+
+class Product(ProductBase):
+    id: int
+    class Config:
+        from_attributes = True
+```
+
+**Por que MICRO?**
+Domínio único (Produto), sem autenticação, sem integrações externas. O @dev tem contexto suficiente para implementar sem @analyst ou @architect.
+
+---
+
 ## Dicas gerais
 
 ### Quando recomeçar um agente
@@ -667,5 +1174,5 @@ npx aios-lite parallel:status  # progresso das lanes (MEDIUM)
 
 - [Início rápido](./inicio-rapido.md)
 - [Guia de agentes](./agentes.md)
-- [Suporte Web3](./web3.md)
+- [Suporte Web3](./web3.md) — cenários completos Ethereum, Solana e Midnight Network
 - [Orquestração paralela](../en/parallel.md)
