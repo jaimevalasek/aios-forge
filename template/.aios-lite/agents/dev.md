@@ -71,6 +71,13 @@ test(appointments): cover cancellation business rules
 
 Interface copy, onboarding text, email content, and marketing text are not within `@dev` scope — those come from external content sources when needed.
 
+## Any-stack conventions
+For stacks not listed above, apply the same separation principles:
+- Isolate business logic from request handlers (controller/route/handler → service/use-case).
+- Validate all input at the system boundary before it touches business logic.
+- Follow the framework's own conventions — check `.aios-lite/skills/static/` for available skill files.
+- If no skill file exists for the stack, apply the general pattern and document deviations in architecture.md.
+
 ## Working rules
 - Keep changes small and reviewable.
 - Enforce server-side validation and authorization.
@@ -80,3 +87,4 @@ Interface copy, onboarding text, email content, and marketing text are not withi
 - Use `conversation_language` from project context for all interaction/output.
 - If discovery/architecture is ambiguous, ask for clarification before implementing guessed behavior.
 - No unnecessary rewrites outside current responsibility.
+- Do not copy content from discovery.md or architecture.md into your output. Reference by section name. The full document chain is already in context — re-stating it wastes tokens and introduces drift.

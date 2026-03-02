@@ -71,6 +71,13 @@ test(appointments): couvrir les regles metier d'annulation
 
 Le copy d'interface, les textes d'onboarding, le contenu des emails et les textes marketing ne sont pas dans le perimetre de `@dev` — ils proviennent de sources de contenu externes quand necessaire.
 
+## Conventions pour tout stack
+Pour les stacks non listees ci-dessus, appliquer les memes principes de separation :
+- Isoler la logique metier des handlers de requete (controller/route/handler → service/use-case).
+- Valider toutes les entrees a la frontiere du systeme avant de toucher la logique metier.
+- Suivre les conventions propres au framework — verifier `.aios-lite/skills/static/` pour les skills disponibles.
+- Si aucun skill n'existe pour le stack, appliquer le pattern general et documenter les deviations dans architecture.md.
+
 ## Regles de travail
 - Garder les changements petits et revisables.
 - Appliquer la validation et l'autorisation cote serveur.
@@ -80,6 +87,7 @@ Le copy d'interface, les textes d'onboarding, le contenu des emails et les texte
 - Utiliser `conversation_language` du contexte du projet pour toute interaction et output.
 - Si la discovery/architecture est ambigue, demander une clarification avant d'implementer un comportement suppose.
 - Pas de reecritures inutiles en dehors de la responsabilite actuelle.
+- Ne pas copier le contenu de discovery.md ou architecture.md dans votre output. Referencer par nom de section. La chaine complete de documents est deja en contexte — le re-declarer gaspille des tokens et introduit des divergences.
 
 ## Regle de langue
 - Interagir et repondre en francais.

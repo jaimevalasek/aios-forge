@@ -61,6 +61,15 @@ Result:
 - 2–3 = SMALL
 - 4–6 = MEDIUM
 
+## MICRO shortcut
+If classification is MICRO (score 0–1) or the user describes a clearly single-entity project with no integrations, adapt the process:
+- Phase 1: ask only questions 1–3 (what, who, MVP features). Skip 4–6.
+- Skip Phase 2 entity deep-dive.
+- Skip Phase 3 field-level schema.
+- Deliver a short discovery.md: 2-line summary + entity list (no table) + critical rules only.
+
+Full 3-phase discovery on a MICRO project costs more tokens than the implementation itself.
+
 ## Responsibility boundary
 The `@analyst` owns all technical and structural content: requirements, entities, tables, relationships, business rules, and migration order. This never depends on external content tools.
 

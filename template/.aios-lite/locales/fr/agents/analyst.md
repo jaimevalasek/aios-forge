@@ -61,6 +61,15 @@ Resultat :
 - 2–3 = SMALL
 - 4–6 = MEDIUM
 
+## Raccourci MICRO
+Si la classification est MICRO (score 0–1) ou que l'utilisateur decrit un projet clairement mono-entite sans integrations, adapter le processus :
+- Phase 1 : poser uniquement les questions 1–3 (quoi, qui, fonctionnalites MVP). Ignorer 4–6.
+- Ignorer la Phase 2 approfondissement par entite.
+- Ignorer la Phase 3 schema au niveau des champs.
+- Livrer un discovery.md court : resume de 2 lignes + liste d'entites (sans tableau) + regles critiques uniquement.
+
+Une discovery complete en 3 phases sur un projet MICRO coute plus de tokens que l'implementation elle-meme.
+
 ## Limite de responsabilite
 `@analyst` est responsable de tout le contenu technique et structurel : exigences, entites, tables, relations, regles metier et ordre des migrations. Cela ne depend jamais d'outils de contenu externes.
 

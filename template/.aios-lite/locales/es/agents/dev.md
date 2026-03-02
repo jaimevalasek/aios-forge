@@ -71,6 +71,13 @@ test(citas): cubrir reglas de negocio de cancelacion
 
 Copy de interfaz, textos de onboarding, contenido de email y textos de marketing no estan en el alcance de `@dev` — esos provienen de fuentes de contenido externas cuando se necesitan.
 
+## Convenciones para cualquier stack
+Para stacks no listadas arriba, aplicar los mismos principios de separacion:
+- Aislar logica de negocio de los handlers de peticion (controller/route/handler → service/use-case).
+- Validar todo input en la frontera del sistema antes de tocar la logica de negocio.
+- Seguir las convenciones propias del framework — verificar `.aios-lite/skills/static/` para skills disponibles.
+- Si no existe skill para el stack, aplicar el patron general y documentar desviaciones en architecture.md.
+
 ## Reglas de trabajo
 - Mantener cambios pequenos y revisables.
 - Aplicar validacion y autorizacion del lado servidor.
@@ -80,6 +87,7 @@ Copy de interfaz, textos de onboarding, contenido de email y textos de marketing
 - Usar `conversation_language` del contexto del proyecto para toda interaccion y output.
 - Si discovery/arquitectura es ambigua, pedir aclaracion antes de implementar comportamiento asumido.
 - Sin reescrituras innecesarias fuera de la responsabilidad actual.
+- No copiar contenido de discovery.md o architecture.md en tu output. Referenciar por nombre de seccion. La cadena completa de documentos ya esta en contexto — repetirlo desperdicia tokens e introduce divergencia.
 
 ## Regla de idioma
 - Interactuar y responder en espanol.

@@ -189,10 +189,17 @@ Cuando la calidad del frontend sea importante, agregar una seccion de handoff pa
 - Restricciones de la libreria de componentes
 - Riesgos de UX a mitigar
 
+## Objetivos de output por clasificacion
+Mantener architecture.md proporcional — el output verboso cuesta tokens sin agregar valor:
+- **MICRO**: <= 40 lineas. Estructura de carpetas + secuencia de implementacion solo. Omitir arquitectura de integracion y preocupaciones transversales a menos que auth sea explicitamente requerida.
+- **SMALL**: <= 80 lineas. Estructura completa + decisiones clave. Mantener cada seccion en 2–4 lineas.
+- **MEDIUM**: sin limite de lineas. La complejidad justifica el detalle.
+
 ## Restricciones obligatorias
 - Usar `conversation_language` del contexto del proyecto para toda interaccion y output.
 - Asegurar que el output pueda ser ejecutado directamente por `@dev` sin ambiguedad.
 - No introducir patrones que no existan en las convenciones del stack elegido.
+- No copiar contenido de discovery.md en architecture.md. Referenciar secciones por nombre: "ver discovery.md § Entidades". La cadena de documentos ya esta en contexto.
 
 ## Regla de idioma
 - Interactuar y responder en espanol.

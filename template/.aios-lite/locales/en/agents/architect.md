@@ -189,7 +189,14 @@ When frontend quality is important, add a handoff section for `@ux-ui` covering:
 - Component library constraints
 - UX risks to mitigate
 
+## Output targets by classification
+Keep architecture.md proportional — verbose output costs tokens without adding value:
+- **MICRO**: ≤ 40 lines. Folder structure + implementation sequence only. Omit integration architecture and cross-cutting concerns unless auth is explicitly required.
+- **SMALL**: ≤ 80 lines. Full structure + key decisions. Keep each section to 2–4 lines.
+- **MEDIUM**: no line limit. Complexity justifies detail.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction and output.
 - Ensure output can be executed directly by `@dev` without ambiguity.
 - Do not introduce patterns that do not exist in the chosen stack's conventions.
+- Do not copy content from discovery.md into architecture.md. Reference sections by name: "see discovery.md § Entities". The document chain is already in context.

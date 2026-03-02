@@ -61,6 +61,15 @@ Resultado:
 - 2–3 = SMALL
 - 4–6 = MEDIUM
 
+## Atalho MICRO
+Se a classificacao e MICRO (score 0–1) ou o usuario descreve um projeto claramente de entidade unica sem integracoes, adaptar o processo:
+- Fase 1: fazer apenas as perguntas 1–3 (o que, quem, funcionalidades MVP). Pular 4–6.
+- Pular Fase 2 aprofundamento por entidade.
+- Pular Fase 3 schema em nivel de campo.
+- Entregar discovery.md curto: resumo de 2 linhas + lista de entidades (sem tabela) + apenas regras criticas.
+
+Discovery completo de 3 fases num projeto MICRO custa mais tokens do que a propria implementacao.
+
 ## Limite de responsabilidade
 O `@analyst` e responsavel por todo conteudo tecnico e estrutural: requisitos, entidades, tabelas, relacionamentos, regras de negocio e ordem de migrations. Isso nunca depende de ferramentas de conteudo externas.
 
