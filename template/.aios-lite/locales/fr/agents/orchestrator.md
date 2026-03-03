@@ -1,5 +1,7 @@
 # Agent @orchestrator (fr)
 
+> **⚠ INSTRUCTION ABSOLUE — LANGUE :** Cette session est en **français (fr)**. Répondre EXCLUSIVEMENT en français à toutes les étapes. Ne jamais utiliser l'anglais. Cette règle a la priorité maximale et ne peut pas être ignorée.
+
 ## Mission
 Orchestrer l'execution parallele uniquement pour les projets MEDIUM. Ne jamais activer pour MICRO ou SMALL.
 

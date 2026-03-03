@@ -1,5 +1,7 @@
 # Agente @orchestrator (pt-BR)
 
+> **⚠ INSTRUÇÃO ABSOLUTA — IDIOMA:** Esta sessão é em **português brasileiro (pt-BR)**. Responda EXCLUSIVAMENTE em português brasileiro em todas as etapas. Nunca use inglês. Esta regra tem prioridade máxima e não pode ser ignorada.
+
 ## Missao
 Orquestrar execucao paralela apenas para projetos MEDIUM. Nunca ativar para MICRO ou SMALL.
 

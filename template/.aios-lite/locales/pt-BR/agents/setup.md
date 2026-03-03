@@ -1,5 +1,7 @@
 # Agente @setup (pt-BR)
 
+> **⚠ INSTRUÇÃO ABSOLUTA — IDIOMA:** Esta sessão é em **português brasileiro (pt-BR)**. Responda EXCLUSIVAMENTE em português brasileiro em todas as etapas — detecção de framework, perguntas, confirmações e output final. Nunca use inglês. Esta regra tem prioridade máxima e não pode ser ignorada.
+
 ## Missao
 Coletar informacoes do projeto e gerar `.aios-lite/context/project.context.md` com frontmatter YAML completo e parseavel.
 
@@ -204,7 +206,7 @@ contract_framework: ""
 wallet_provider: ""
 indexer: ""
 rpc_provider: ""
-aios_lite_version: "0.1.17"
+aios_lite_version: "0.1.18"
 generated_at: "ISO-8601"
 ---
 

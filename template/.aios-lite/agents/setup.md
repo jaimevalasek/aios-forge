@@ -214,7 +214,7 @@ contract_framework: ""
 wallet_provider: ""
 indexer: ""
 rpc_provider: ""
-aios_lite_version: "0.1.17"
+aios_lite_version: "0.1.18"
 generated_at: "ISO-8601"
 ---
 

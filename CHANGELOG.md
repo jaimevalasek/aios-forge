@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.18] - 2026-03-03
+### Fixed
+- Language bug: locale agent files (pt-BR, es, fr) were responding in English even after `aios-lite install --lang=<locale>` because the language rule was at the bottom of each file. LLMs process top-to-bottom and would default to English before reading the rule.
+- Added `> **⚠ ABSOLUTE INSTRUCTION — LANGUAGE**` blockquote as the **first content after the title** in all 8 agents across all 3 locales (pt-BR, es, fr) + en locale (24 files total). Instruction explicitly forbids English and names the target language before any mission, sequence, or detection logic runs.
+
 ## [0.1.17] - 2026-03-03
 ### Added
 - `static-html-patterns.md` Section 0 — **Hero Law**: explicit rule that the hero MUST be full-viewport animated background + ONE headline + TWO buttons. Cards in the hero are forbidden.
