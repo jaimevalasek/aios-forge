@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.19] - 2026-03-03
+### Added
+- `src/commands/test-agents.js`: new `test:agents` CLI command — 99 structural checks across all 8 base agents and all locale files (32 base checks + 64 locale checks + 3 critical skill checks). Validates: file existence, `## Mission` section, `## Hard constraints` section, `.md-only` context rule, and language instruction within first 15 lines of each locale agent.
+- `src/commands/locale-diff.js`: new `locale:diff` CLI command — compares `##` heading structure of base agent files vs locale translations, normalizes headings (strips accents for cross-language comparison), and reports sections present in base but missing in locale. Supports `--lang` filter and single-agent argument.
+- `template/.aios-lite/skills/static/django-patterns.md`: comprehensive Django conventions skill (342 lines) — project structure, `TimestampMixin`, service layer, DRF serializers, URL namespacing, settings split (base/dev/prod), Admin registration, `pytest-django` test patterns, N+1 prevention rules.
+- `template/.aios-lite/skills/static/fastapi-patterns.md`: comprehensive FastAPI conventions skill (344 lines) — async project structure, `pydantic-settings`, SQLAlchemy async engine, Pydantic input/output schema separation, service layer, JWT via `HTTPBearer`, Alembic migrations, `pytest + httpx AsyncClient` patterns.
+- `template/.aios-lite/skills/dynamic/README.md`: explains static vs dynamic skills pattern and lists all 6 dynamic skill files with their source URLs.
+
+### Changed
+- `@dev` agent (base + en/pt-BR/es/fr locales): `architecture.md` and `discovery.md` now marked as `*(SMALL/MEDIUM only)*` in Required input. Added explicit MICRO callout — only `project.context.md` is guaranteed for MICRO projects.
+- `@orchestrator` base agent: renamed `## Rules` → `## Hard constraints` for consistency with all other agents.
+- `@dev`, `@qa`, `@orchestrator` base agents: added `.md-only` context rule (was missing — `test:agents` detected the gap).
+- Locale `en` agents (analyst, architect, pm, ux-ui, dev, qa, orchestrator): added ABSOLUTE INSTRUCTION language marker at top (was missing in en locale — `test:agents` detected the gap).
+- All 6 dynamic skill stubs expanded with concrete source URLs, focus areas, and MCP tool fetch examples to replace the minimal placeholder content.
+
 ## [0.1.18] - 2026-03-03
 ### Fixed
 - Language bug: locale agent files (pt-BR, es, fr) were responding in English even after `aios-lite install --lang=<locale>` because the language rule was at the bottom of each file. LLMs process top-to-bottom and would default to English before reading the rule.
