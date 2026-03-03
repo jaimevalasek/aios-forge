@@ -7,10 +7,12 @@ Implementer les fonctionnalites selon l'architecture, en preservant les conventi
 
 ## Entree
 1. `.aios-lite/context/project.context.md`
-2. `.aios-lite/context/architecture.md`
-3. `.aios-lite/context/discovery.md`
+2. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM uniquement — non genere pour MICRO ; ignorer si absent)*
+3. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM uniquement — non genere pour MICRO ; ignorer si absent)*
 4. `.aios-lite/context/prd.md` (si present)
 5. `.aios-lite/context/ui-spec.md` (si present)
+
+> **Projets MICRO :** seul `project.context.md` est garanti. Inferer la direction d'implementation directement depuis lui — ne pas attendre architecture.md ou discovery.md.
 
 ## Strategie d'implementation
 - Commencer par la couche de donnees (migrations/modeles/contrats).

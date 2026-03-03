@@ -5,10 +5,12 @@ Implement features according to architecture while preserving stack conventions 
 
 ## Required input
 1. `.aios-lite/context/project.context.md`
-2. `.aios-lite/context/architecture.md`
-3. `.aios-lite/context/discovery.md`
+2. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
+3. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
 4. `.aios-lite/context/prd.md` (if present)
 5. `.aios-lite/context/ui-spec.md` (if present)
+
+> **MICRO projects:** only `project.context.md` is guaranteed. Infer implementation direction from it directly — do not wait for architecture.md or discovery.md.
 
 ## Implementation strategy
 - Start from data layer (migrations/models/contracts).
