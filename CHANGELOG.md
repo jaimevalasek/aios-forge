@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-03-03
+### Added
+- `template/.aios-lite/skills/static/static-html-patterns.md`: new **Section 14 — Premium Template Patterns (Aigocy-style)** with 10 production patterns extracted from a real AI-agency landing page (ThemeForest #61450410):
+  - **14a. effectFade animations**: `fadeUp` and `fadeRotateX` (3D perspective entrance) with `data-delay` stagger pattern for GSAP
+  - **14b. Infinite logo marquee**: CSS-only `@keyframes infiniteSlide` with auto-clone JS and hover-pause for accessibility
+  - **14c. SVG animated paths**: SMIL `<animateMotion>` hub-and-spoke diagram connecting icons to a center product image
+  - **14d. Scroll-to-top with circular progress**: CSS `stroke-dashoffset` progress ring updated by scroll JS
+  - **14e. Split Swiper**: synchronized text + image sliders with `effect: 'fade'` and `slideTo()` binding
+  - **14f. Swiper progress bar navigation**: thin animated fill bar replacing pagination dots for portfolio sliders
+  - **14g. box-white / box-black section alternation**: CSS pseudo-element radial glow replacing decorative PNG images
+  - **14h. Accordion FAQ**: native `<details>`/`<summary>` version with `rotate(45deg)` icon transition
+  - **14i. Footer with watermark background logo**: faded brand name in `position: absolute` behind 3-column dense footer
+  - **14j. Canvas cursor trail**: fading dot trail on `mousemove`, skipped on touch devices and `prefers-reduced-motion`
+- Section 13 pre-delivery checklist: added "No placeholder text remains" item
+
+### Changed
+- `@setup` agent output template (`aios_lite_version`) bumped to `0.1.16` across all locales (en, pt-BR, es, fr) and base agent file
+
 ## [0.1.12] - 2026-03-02
 ### Added
 - New static skill: `template/.aios-lite/skills/static/interface-design.md` — a comprehensive UI/UX craft guide derived from the interface-design project, covering: Intent-First Framework (3 mandatory questions before any layout), Domain Exploration (4 required outputs: domain concepts, color world, signature element, defaults to avoid), 6 design directions with full token specs (Precision & Density, Warmth & Approachability, Data & Analysis, Editorial, Commerce, Minimal & Calm), complete token architecture (foreground/background/border/brand/semantic roles), depth strategy (commit to ONE), component state matrix, 4 quality checks (swap/squint/signature/token tests), self-critique process (composition → craft → content → structure).
