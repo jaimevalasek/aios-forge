@@ -23,6 +23,7 @@ const { runParallelDoctor } = require('./commands/parallel-doctor');
 const { runParallelAssign } = require('./commands/parallel-assign');
 const { runParallelStatus } = require('./commands/parallel-status');
 const { runTestAgents } = require('./commands/test-agents');
+const { runLocaleDiff } = require('./commands/locale-diff');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'init',
@@ -45,6 +46,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'test-smoke',
   'test:agents',
   'test-agents',
+  'locale:diff',
+  'locale-diff',
   'test:package',
   'test-package',
   'workflow:plan',
@@ -115,6 +118,7 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_context_validate');
   logHelpLine(t, logger, 'cli.help_setup_context');
   logHelpLine(t, logger, 'cli.help_locale_apply');
+  logHelpLine(t, logger, 'cli.help_locale_diff');
   logHelpLine(t, logger, 'cli.help_test_agents');
   logHelpLine(t, logger, 'cli.help_test_smoke');
   logHelpLine(t, logger, 'cli.help_test_package');
@@ -184,6 +188,8 @@ async function main() {
       result = await runSetupContext({ args, options, logger: commandLogger, t });
     } else if (command === 'locale:apply' || command === 'locale-apply') {
       result = await runLocaleApply({ args, options, logger: commandLogger, t });
+    } else if (command === 'locale:diff' || command === 'locale-diff') {
+      result = await runLocaleDiff({ args, options, logger: commandLogger, t });
     } else if (command === 'test:agents' || command === 'test-agents') {
       result = await runTestAgents({ args, options, logger: commandLogger, t });
     } else if (command === 'test:smoke' || command === 'test-smoke') {
