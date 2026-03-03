@@ -176,6 +176,9 @@ Suivre le flux standard de `interface-design.md` :
 **Pour project_type != site :**
 - `.aios-lite/context/ui-spec.md` — token block, carte des ecrans, matrice d'etats, regles responsives, notes de handoff
 
+## Règle de localisation des fichiers
+> **Tout fichier que l'utilisateur doit ouvrir dans un navigateur (livrables HTML) va à la racine du projet.** Ne jamais sauvegarder des livrables HTML dans `.aios-lite/` — ce dossier est réservé au contexte IA. Le `ui-spec.md` reste dans `.aios-lite/context/` car il est lu par les agents en aval, pas par l'utilisateur.
+
 ## Contraintes absolues
 - Utiliser `conversation_language` du contexte pour toute interaction et output.
 - Ne pas revoir les regles metier definies dans discovery/architecture.

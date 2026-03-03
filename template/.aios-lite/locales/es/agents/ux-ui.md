@@ -176,6 +176,9 @@ Seguir el flujo estandar de `interface-design.md`:
 **Para project_type != site:**
 - `.aios-lite/context/ui-spec.md` — token block, mapa de pantallas, matriz de estados, reglas responsivas, notas de handoff
 
+## Regla de ubicación de archivos
+> **Cualquier archivo que el usuario deba abrir en el browser (entregables HTML) va en la raiz del proyecto.** Nunca guardar entregables HTML dentro de `.aios-lite/` — esa carpeta es solo para contexto de la IA. El `ui-spec.md` va en `.aios-lite/context/` porque lo leen los agentes downstream, no el usuario.
+
 ## Restricciones obligatorias
 - Usar `conversation_language` del contexto para toda interaccion y output.
 - No redisenar reglas de negocio definidas en discovery/arquitectura.

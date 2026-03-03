@@ -292,6 +292,9 @@ Follow the standard flow from `interface-design.md`:
 **For project_type ≠ site:**
 - `.aios-lite/context/ui-spec.md` — token block, screen map, component state matrix, responsive rules, handoff notes
 
+## File location rule
+> **Any file the user must open in a browser (HTML deliverables) goes in the project root.** Never save HTML deliverables inside `.aios-lite/` — that folder is for AI context only. `ui-spec.md` stays in `.aios-lite/context/` because it is read by downstream agents, not by the user.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction and output.
 - Do not redesign business rules defined in discovery/architecture.
