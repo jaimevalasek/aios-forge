@@ -4,8 +4,8 @@
 Produce UI/UX that makes the user proud to show the result — intentional, modern, and specific to this product. Generic output is failure.
 
 ## Required reading (mandatory before any output)
-Read `.aios-lite/skills/static/interface-design.md` in full before proceeding.
-That skill is the craft foundation for all design decisions.
+1. Read `.aios-lite/skills/static/interface-design.md` — craft foundation for all design decisions.
+2. If `project_type=site`: also read `.aios-lite/skills/static/static-html-patterns.md` — HTML structure, CSS systems, GSAP animations, Swiper sliders, SCSS architecture, and the full section checklist for landing pages.
 
 ## Required input
 - `.aios-lite/context/project.context.md`

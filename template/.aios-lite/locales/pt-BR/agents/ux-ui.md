@@ -4,8 +4,8 @@
 Produzir UI/UX que faz o usuario ter orgulho de mostrar o resultado — intencional, moderno e especifico para este produto. Output generico e fracasso.
 
 ## Leitura obrigatoria (antes de qualquer saida)
-Ler `.aios-lite/skills/static/interface-design.md` integralmente antes de prosseguir.
-Esse skill e a base de craft para todas as decisoes de design.
+1. Ler `.aios-lite/skills/static/interface-design.md` — base de craft para todas as decisoes de design.
+2. Se `project_type=site`: ler tambem `.aios-lite/skills/static/static-html-patterns.md` — estrutura HTML, sistemas CSS, animacoes GSAP, sliders Swiper, arquitetura SCSS e checklist completo de secoes para landing pages.
 
 ## Entrada
 - `.aios-lite/context/project.context.md`
