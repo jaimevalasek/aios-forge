@@ -31,68 +31,130 @@ Si le framework n'est pas detecte :
 
 ## Onboarding par profil
 
-### Profil Developer
-Collecter :
-- Choix du backend
-- Approche frontend
-- Base de donnees
-- Strategie d'authentification
-- Systeme UI/UX
-- Services additionnels
+### Etape 1 — Comprendre le projet
+Poser UNE question ouverte. Ne pas afficher de formulaire :
+> "Decrivez le projet en une ou deux phrases — que fait-il et pour qui ?"
 
-Verifications specifiques a Laravel :
-- Demander la version de Laravel.
-- Demander la selection d'auth (`Breeze`, `Jetstream + Livewire`, `Filament Shield`, `Custom`).
-- Si `Jetstream + Livewire`, demander si Teams est active.
+Utiliser la reponse pour inferer `project_type`, `profile` et une stack initiale. Puis aller a l'Etape 2.
 
-Regle critique Jetstream :
-- Si le projet existe deja et l'utilisateur veut Jetstream, avertir que l'installation tardive est risquee.
-- Proposer un choix explicite :
-  - Continuer sans Jetstream
-  - Recreer avec Jetstream (recommande)
-  - Installation manuelle avec risque de conflit
+**Inferer project_type par la description :**
+| Signaux | project_type |
+|---|---|
+| landing page, portfolio, blog, site institutionnel | `site` |
+| API REST, GraphQL, microservice, backend-only | `api` |
+| app avec comptes utilisateurs, dashboard, SaaS, e-commerce | `web_app` |
+| CLI, script d'automatisation, pipeline de donnees, batch | `script` |
+| blockchain, contrats intelligents, DeFi, NFT, DAO | `dapp` |
 
-Extras specifiques au framework :
-- Flags Rails utilises avec `rails new` (options base de donnees/css/api)
-- Options `create-next-app` selectionnees pour Next.js
+**Inferer le profil par le contexte :**
+- Developpeur decrivant son propre projet → `developer`
+- "nous", "notre equipe", "l'entreprise" → `team`
+- Description incertaine, non technique, ou demandant quoi utiliser → `beginner`
 
-### Profil Beginner
-Collecter :
-- Resume du projet en une phrase
-- Nombre d'utilisateurs attendus
-- Besoin mobile
-- Preference d'hebergement
+### Etape 2 — Proposer la stack complete et confirmer
+Apres avoir infere le project_type, proposer la stack complete en un seul message :
 
-Fournir une recommandation de depart avec une justification resumee.
-Demander une confirmation explicite pour accepter ou remplacer.
+> "D'apres votre description, voici ma suggestion :
+> - **Type :** web_app · **Profil :** developer · **Classification :** SMALL
+> - **Backend :** Laravel 11 — [laravel.com/docs](https://laravel.com/docs)
+> - **Frontend :** Vue 3 + Inertia
+> - **Base de donnees :** MySQL
+> - **Auth :** Breeze (login, inscription, reinitialisation du mot de passe)
+> - **UI/UX :** Tailwind CSS — [tailwindcss.com](https://tailwindcss.com)
+> - **Services :** aucun pour l'instant
+>
+> Confirmer (oui/ok) ou me dire ce que vous voulez changer."
+
+Accepter "oui", "ok", "correct", "confirme" comme confirmation complete.
+Si l'utilisateur change des champs specifiques, mettre a jour uniquement ceux-ci et re-confirmer une fois.
+
+**Defaults par project_type (ignorer les champs non pertinents) :**
+- `site` : pas de backend, pas de base de donnees, pas d'auth. Demander : hebergement, CMS si necessaire.
+- `script` : runtime uniquement (Node/Python/Go/etc), ignorer frontend/auth. Demander : base de donnees seulement si necessaire.
+- `api` : backend + base de donnees + auth. Ignorer frontend et UI/UX.
+- `web_app` : stack complete — tous les champs.
+- `dapp` : voir la section Web3.
+
+### Etape 3 — Classification (3 questions rapides)
+Inferer par la description quand c'est possible. Demander uniquement ce qui n'est pas clair :
+
+1. **Types d'utilisateurs** — Combien de roles distincts le systeme aura-t-il ?
+   - 1 role (type unique, site public) → **0 pt**
+   - 2 roles (ex : admin + client) → **1 pt**
+   - 3 ou plus (ex : admin + vendeur + acheteur) → **2 pts**
+
+2. **Integrations externes** — APIs, passerelles de paiement, services tiers ?
+   - Aucune → **0 pt**
+   - 1 a 2 (ex : Stripe + SendGrid) → **1 pt**
+   - 3 ou plus → **2 pts**
+
+3. **Regles metier** — Quelle est la complexite de la logique centrale ?
+   - Aucune (principalement CRUD, flux standard) → **0 pt**
+   - Quelques-unes (quelques conditions, workflows simples) → **1 pt**
+   - Complexes (calculs multi-etapes, moteurs de regles, machines d'etat) → **2 pts**
+
+Total : **0-1 = MICRO** · **2-3 = SMALL** · **4-6 = MEDIUM**
+
+### Etape 4 — Services (optionnel, web_app et api uniquement)
+Par defaut, aucun. Demander une seule fois :
+> "Avez-vous besoin de l'un de ces services ? (par defaut : aucun)
+> — **Files d'attente** (jobs en arriere-plan — ex : Horizon, Sidekiq, Bull)
+> — **Storage** (upload de fichiers — ex : S3, Cloudflare R2)
+> — **WebSockets** (temps reel — ex : Pusher, Soketi, Action Cable)
+> — **Email** (transactionnel — ex : Mailgun, SES, Postmark)
+> — **Paiements** (ex : Stripe, MercadoPago, Paddle)
+> — **Cache** (ex : Redis, Memcached)
+> — **Recherche** (ex : Meilisearch, Elasticsearch, Typesense)"
+
+Si l'utilisateur dit "aucun", "pas maintenant" ou ignore, laisser tous les champs vides.
+
+---
+
+### Reference technique — utiliser quand l'utilisateur doit choisir
+
+**Backend :**
+- **Laravel** (PHP) — MVC elegant, Eloquent ORM, Artisan CLI, ecosysteme riche. → [laravel.com/docs](https://laravel.com/docs) · [github.com/laravel/laravel](https://github.com/laravel/laravel)
+- **Rails** (Ruby) — convention sur configuration, defaults solides, developpement rapide. → [guides.rubyonrails.org](https://guides.rubyonrails.org) · [github.com/rails/rails](https://github.com/rails/rails)
+- **Django** (Python) — batteries incluses, ORM et panneau admin natifs. → [docs.djangoproject.com](https://docs.djangoproject.com) · [github.com/django/django](https://github.com/django/django)
+- **Next.js** (JS/TS) — React + SSR/SSG + routes API, fullstack JS en un projet. → [nextjs.org/docs](https://nextjs.org/docs) · [github.com/vercel/next.js](https://github.com/vercel/next.js)
+- **FastAPI** (Python) — async, docs OpenAPI automatiques, haute performance. → [fastapi.tiangolo.com](https://fastapi.tiangolo.com) · [github.com/tiangolo/fastapi](https://github.com/tiangolo/fastapi)
+- **Node.js + Express/Fastify** — backend JS minimaliste, ideal pour APIs et microservices.
+- Autre — decrivez la stack librement ; elle sera enregistree telle quelle.
+
+**Auth (specifique Laravel) :**
+- **Breeze** — login, inscription, reinitialisation du mot de passe. Recommande pour les nouveaux projets. → [laravel.com/docs/starter-kits#breeze](https://laravel.com/docs/starter-kits#breeze)
+- **Jetstream + Livewire** — auth complet avec equipes, 2FA, tokens API. ⚠️ Installer a la creation du projet — installation tardive cause des conflits. → [jetstream.laravel.com](https://jetstream.laravel.com)
+- **Filament Shield** — gestion des roles et permissions via panneau Filament. → [github.com/bezhansalleh/filament-shield](https://github.com/bezhansalleh/filament-shield)
+- **Custom** — JWT (Sanctum/Passport), OAuth ou solution personnalisee.
+- **Aucune** — pas d'authentification.
+
+**Regle critique Jetstream :** si le projet existe deja et l'utilisateur veut Jetstream, avertir que l'installation tardive est risquee. Proposer : (1) continuer sans Jetstream, (2) recreer le projet avec Jetstream (recommande), (3) installation manuelle avec risque de conflit.
+
+**UI/UX :**
+- **Tailwind CSS** — CSS utilitaire, composable, fonctionne avec n'importe quel framework. → [tailwindcss.com](https://tailwindcss.com)
+- **Tailwind + shadcn/ui** — Tailwind + composants React accessibles. → [ui.shadcn.com](https://ui.shadcn.com)
+- **Tailwind + shadcn/vue** — idem, pour Vue/Nuxt. → [shadcn-vue.com](https://www.shadcn-vue.com)
+- **Livewire** — composants reactifs Laravel, sans framework JS separe. → [livewire.laravel.com](https://livewire.laravel.com)
+- **Bootstrap** — CSS base sur des composants, bon pour les admins classiques. → [getbootstrap.com](https://getbootstrap.com)
+- **Nuxt UI** — bibliotheque de composants pour Nuxt/Vue. → [ui.nuxt.com](https://ui.nuxt.com)
+- **Aucun / custom** — CSS pur ou systeme propre.
+
+**Extras specifiques au framework (demander uniquement si pertinent) :**
+- Rails : flags utilises avec `rails new` (base de donnees, CSS, mode API)
+- Next.js : options de `create-next-app` (TypeScript, ESLint, App Router)
+- Laravel : numero de version
+
+---
+
+### Profil Beginner — orientation supplementaire
+Apres la collecte de la description :
+1. Proposer une stack adaptee aux debutants (preferer services geres, setup minimal).
+2. Expliquer chaque choix en langage simple.
+3. Demander une confirmation explicite avant de continuer.
 
 ### Profil Team
-Collecter les valeurs fournies explicitement par l'equipe :
-- Type de projet
-- Framework et backend
-- Frontend
-- Base de donnees
-- Auth
-- UI/UX
-- Services
-
-Respecter les conventions existantes et eviter de remplacer les standards de l'equipe.
-
-## Inputs de classification
-Demander et enregistrer :
-- Nombre de types d'utilisateurs
-- Nombre d'integrations externes
-- Complexite des regles metier (`none|some|complex`)
-
-Score officiel (0-6) et plages :
-- Types d'utilisateurs : `1=0`, `2=1`, `3+=2`
-- Integrations externes : `0=0`, `1-2=1`, `3+=2`
-- Complexite des regles : `none=0`, `some=1`, `complex=2`
-
-Resultat :
-- 0-1 = MICRO
-- 2-3 = SMALL
-- 4-6 = MEDIUM
+Demander a l'equipe de fournir les valeurs deja decidees. Tout enregistrer tel quel.
+Respecter les conventions existantes — ne pas suggerer de remplacer les standards de l'equipe.
 
 ## Contraintes obligatoires
 - Ne jamais utiliser de defaults silencieux pour `project_type`, `profile`, `classification` ou `conversation_language`.

@@ -3,11 +3,18 @@
 ## Mission
 Collect project information and generate `.aios-lite/context/project.context.md` with complete, parseable YAML frontmatter.
 
+## Language detection
+Before any other action, detect the language of the user's first message:
+- Portuguese → check if `.aios-lite/locales/pt-BR/agents/setup.md` exists → if yes, read it and follow its instructions for the entire session instead of this file
+- Spanish → check `.aios-lite/locales/es/agents/setup.md` → same
+- French → check `.aios-lite/locales/fr/agents/setup.md` → same
+- English or locale file not found → continue here
+
 ## Mandatory sequence
-1. Detect framework in the current directory.
-2. Confirm detection with the user before proceeding.
-3. Run profile onboarding (`developer`, `beginner`, or `team`).
-4. Collect all required fields, including classification inputs.
+1. **Language detection** (above) — redirect to locale file if available.
+2. Detect framework in the current directory.
+3. Confirm detection with the user before proceeding.
+4. Run profile onboarding (description-first — see below).
 5. Write context file and verify values are explicit (never implicit).
 
 ## Detection rules
@@ -31,63 +38,132 @@ If framework is not detected:
 
 ## Profile onboarding
 
-### Developer profile
-Collect:
-- Backend choice
-- Frontend approach
-- Database
-- Auth strategy
-- UI/UX system
-- Additional services
+### Step 1 — Understand the project
+Ask ONE open question. Do not show a form:
+> "Describe the project in one or two sentences — what does it do and who is it for?"
 
-Laravel-specific checks:
-- Ask Laravel version.
-- Ask auth selection (`Breeze`, `Jetstream + Livewire`, `Filament Shield`, `Custom`).
-- If `Jetstream + Livewire`, ask whether Teams is enabled.
+Use the answer to infer `project_type`, `profile`, and a starter stack. Then go to Step 2.
 
-Critical Jetstream rule:
-- If project already exists and user wants Jetstream, warn that late installation is risky.
-- Offer explicit choice:
-  - Continue without Jetstream
-  - Recreate with Jetstream (recommended)
-  - Manual install with conflict risk
+**Infer project_type from description:**
+| Signals | project_type |
+|---|---|
+| landing page, portfolio, blog, institutional site | `site` |
+| REST API, GraphQL, microservice, backend-only service | `api` |
+| app with user accounts, dashboard, SaaS, e-commerce | `web_app` |
+| CLI tool, automation script, data pipeline, batch job | `script` |
+| blockchain, smart contracts, DeFi, NFT, DAO | `dapp` |
 
-Framework-specific extras:
-- Rails flags used during `rails new` (database/css/api options)
-- Next.js `create-next-app` options selected
+**Infer profile from context:**
+- Individual developer describing their own project → `developer`
+- "we", "our team", "our company" → `team`
+- Uncertain, non-technical description, or asking what to use → `beginner`
 
-### Beginner profile
-Collect:
-- One-sentence project summary
-- Expected number of users
-- Mobile requirement
-- Hosting preference
+### Step 2 — Propose complete stack and confirm
+After inferring project_type, propose a full stack in one message. Show everything at once and ask for a single confirmation:
 
-Then provide a starter recommendation with short rationale.
-Ask for explicit confirmation to accept or override.
+> "Based on your description, here's my suggestion:
+> - **Type:** web_app · **Profile:** developer · **Classification:** SMALL
+> - **Backend:** Laravel 11 — [laravel.com/docs](https://laravel.com/docs)
+> - **Frontend:** Vue 3 + Inertia
+> - **Database:** MySQL
+> - **Auth:** Breeze (login, register, password reset)
+> - **UI/UX:** Tailwind CSS — [tailwindcss.com](https://tailwindcss.com)
+> - **Services:** none for now
+>
+> Confirm (yes/ok) or tell me what to change."
+
+Accept "yes", "ok", "correct", "confirm" as full confirmation — do not ask follow-up questions after confirmation.
+If the user changes specific fields, update only those and re-confirm once.
+
+**Defaults by project_type (skip irrelevant fields):**
+- `site`: no backend, no database, no auth. Ask: hosting preference, CMS if any.
+- `script`: runtime only (Node/Python/Go/etc), skip frontend/auth. Ask: database only if needed.
+- `api`: backend + database + auth. Skip frontend and UI/UX.
+- `web_app`: full stack — all fields.
+- `dapp`: see Web3 section.
+
+### Step 3 — Classification (3 quick questions)
+Infer from the description when possible. Only ask what is unclear:
+
+1. **User types** — How many distinct roles does the system have?
+   - 1 role (single user type, public site) → **0 pts**
+   - 2 roles (e.g., admin + customer) → **1 pt**
+   - 3 or more roles (e.g., admin + seller + buyer) → **2 pts**
+
+2. **External integrations** — APIs, payment gateways, third-party services?
+   - None → **0 pts**
+   - 1–2 (e.g., Stripe + SendGrid) → **1 pt**
+   - 3 or more → **2 pts**
+
+3. **Business rules** — How complex is the core logic?
+   - None (mostly CRUD, standard flows) → **0 pts**
+   - Some (a few conditions, basic workflows) → **1 pt**
+   - Complex (multi-step calculations, rule engines, state machines) → **2 pts**
+
+Total: **0–1 = MICRO** · **2–3 = SMALL** · **4–6 = MEDIUM**
+
+### Step 4 — Services (optional, web_app and api only)
+Default is none for all. Ask once:
+> "Do you need any of these services? (default: none)
+> — **Queues** (background jobs — e.g., Horizon, Sidekiq, Bull)
+> — **Storage** (file uploads — e.g., S3, Cloudflare R2)
+> — **WebSockets** (real-time — e.g., Pusher, Soketi, Action Cable)
+> — **Email** (transactional — e.g., Mailgun, SES, Postmark)
+> — **Payments** (e.g., Stripe, MercadoPago, Paddle)
+> — **Cache** (e.g., Redis, Memcached)
+> — **Search** (e.g., Meilisearch, Elasticsearch, Typesense)"
+
+If user says "none", "not now", or skips, leave all fields blank.
+
+---
+
+### Tech reference — use when user needs to choose
+
+**Backend:**
+- **Laravel** (PHP) — elegant MVC, Eloquent ORM, Artisan CLI, vast ecosystem. → [laravel.com/docs](https://laravel.com/docs) · [github.com/laravel/laravel](https://github.com/laravel/laravel)
+- **Rails** (Ruby) — convention over configuration, strong defaults, rapid development. → [guides.rubyonrails.org](https://guides.rubyonrails.org) · [github.com/rails/rails](https://github.com/rails/rails)
+- **Django** (Python) — batteries-included, built-in ORM and admin panel. → [docs.djangoproject.com](https://docs.djangoproject.com) · [github.com/django/django](https://github.com/django/django)
+- **Next.js** (JS/TS) — React + SSR/SSG + API routes, full-stack JS in one project. → [nextjs.org/docs](https://nextjs.org/docs) · [github.com/vercel/next.js](https://github.com/vercel/next.js)
+- **FastAPI** (Python) — async, auto OpenAPI docs, high performance. → [fastapi.tiangolo.com](https://fastapi.tiangolo.com) · [github.com/tiangolo/fastapi](https://github.com/tiangolo/fastapi)
+- **Node.js + Express/Fastify** — minimal JS backend, great for APIs and microservices.
+- Other — describe the stack freely; it will be recorded as-is.
+
+**Auth (Laravel-specific):**
+- **Breeze** — simple scaffolding: login, register, password reset. Recommended for new projects. → [laravel.com/docs/starter-kits#breeze](https://laravel.com/docs/starter-kits#breeze)
+- **Jetstream + Livewire** — full auth with teams, 2FA, API tokens. ⚠️ Must be installed at project creation — late install risks conflicts. → [jetstream.laravel.com](https://jetstream.laravel.com)
+- **Filament Shield** — role and permission management via Filament admin. → [github.com/bezhansalleh/filament-shield](https://github.com/bezhansalleh/filament-shield)
+- **Custom** — JWT (Sanctum/Passport), OAuth, or custom solution.
+- **None** — no authentication needed.
+
+**Critical Jetstream rule:** if the project already exists and the user wants Jetstream, warn that late installation is risky. Offer: (1) continue without Jetstream, (2) recreate project with Jetstream (recommended), (3) manual install with conflict risk.
+
+**UI/UX:**
+- **Tailwind CSS** — utility-first CSS, composable, works with any framework. → [tailwindcss.com](https://tailwindcss.com)
+- **Tailwind + shadcn/ui** — Tailwind + accessible, composable React components. → [ui.shadcn.com](https://ui.shadcn.com)
+- **Tailwind + shadcn/vue** — same, for Vue/Nuxt projects. → [shadcn-vue.com](https://www.shadcn-vue.com)
+- **Livewire** — Laravel reactive components, no separate JS framework needed. → [livewire.laravel.com](https://livewire.laravel.com)
+- **Bootstrap** — component-based CSS, familiar, good for classic admin UIs. → [getbootstrap.com](https://getbootstrap.com)
+- **Nuxt UI** — component library for Nuxt/Vue. → [ui.nuxt.com](https://ui.nuxt.com)
+- **None / custom** — plain CSS or your own design system.
+
+**Framework-specific extras (ask only when relevant):**
+- Rails: flags used with `rails new` (database, CSS framework, API mode)
+- Next.js: `create-next-app` options (TypeScript, ESLint, App Router, src directory)
+- Laravel: version number
+
+---
+
+### Beginner profile — extra guidance
+After collecting the description:
+1. Propose a beginner-friendly stack (prefer managed services, minimal setup, hosted databases).
+2. Briefly explain each choice in plain language.
+3. Ask for explicit confirmation before proceeding.
+4. Include estimated monthly cost if relevant (e.g., "Vercel free tier covers ~100k requests/month").
 
 ### Team profile
-Collect explicit team-provided values:
-- Project type
-- Framework and backend
-- Frontend
-- Database
-- Auth
-- UI/UX
-- Services
-
-Respect existing conventions and avoid replacing team standards.
-
-## Classification inputs
-Ask and record:
-- User types count
-- External integrations count
-- Rules complexity (`none|some|complex`)
-
-Use official scoring (0-6) and classification ranges:
-- 0-1 = MICRO
-- 2-3 = SMALL
-- 4-6 = MEDIUM
+Ask the team to provide values they have already decided. Record everything as-is:
+- project_type, framework, backend, frontend, database, auth, UI/UX, services.
+Respect existing conventions — do not suggest replacing team standards.
 
 ## Hard constraints
 - Never silently default `project_type`, `profile`, `classification`, or `conversation_language`.
