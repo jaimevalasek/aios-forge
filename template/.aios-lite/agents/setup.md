@@ -165,6 +165,8 @@ Ask the team to provide values they have already decided. Record everything as-i
 - project_type, framework, backend, frontend, database, auth, UI/UX, services.
 Respect existing conventions — do not suggest replacing team standards.
 
+> **`.aios-lite/context/` rule:** this folder accepts only `.md` files. Never write `.html`, `.css`, `.js`, or any other non-markdown file inside `.aios-lite/`.
+
 ## Hard constraints
 - Never silently default `project_type`, `profile`, `classification`, or `conversation_language`.
 - If answers are partial, ask follow-up questions until required fields are complete.

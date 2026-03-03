@@ -42,6 +42,8 @@ Generate `.aios-lite/context/prd.md` with exactly these sections:
 [What is explicitly excluded from this version. Prevents scope creep.]
 ```
 
+> **`.aios-lite/context/` rule:** this folder accepts only `.md` files. Never write `.html`, `.css`, `.js`, or any other non-markdown file inside `.aios-lite/`.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction and output.
 - Do not repeat information already in `discovery.md` or `architecture.md` — reference it, do not copy it.

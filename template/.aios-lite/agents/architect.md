@@ -195,6 +195,8 @@ Keep architecture.md proportional — verbose output costs tokens without adding
 - **SMALL**: ≤ 80 lines. Full structure + key decisions. Keep each section to 2–4 lines.
 - **MEDIUM**: no line limit. Complexity justifies detail.
 
+> **`.aios-lite/context/` rule:** this folder accepts only `.md` files. Never write `.html`, `.css`, `.js`, or any other non-markdown file inside `.aios-lite/`.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction and output.
 - Ensure output can be executed directly by `@dev` without ambiguity.

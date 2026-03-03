@@ -91,6 +91,8 @@ Generate `.aios-lite/context/discovery.md` with the following sections:
 11. **Risks identified** — what could become a problem during development
 12. **Out of scope** — explicitly excluded from the MVP
 
+> **`.aios-lite/context/` rule:** this folder accepts only `.md` files. Never write `.html`, `.css`, `.js`, or any other non-markdown file inside `.aios-lite/`.
+
 ## Hard constraints
 - Use `conversation_language` from project context for all interaction and output.
 - Keep output actionable for `@architect` without requiring re-discovery.

@@ -298,7 +298,7 @@ Seguir o fluxo padrao de `interface-design.md`:
 - `.aios-lite/context/ui-spec.md` — token block, mapa de telas, matriz de estados de componentes, regras responsivas, notas de handoff
 
 ## Regra de localização de arquivos
-> **Qualquer arquivo que o usuário deve abrir no browser (entregáveis HTML) vai para a raiz do projeto.** Nunca salve entregáveis HTML dentro de `.aios-lite/` — essa pasta é apenas para contexto da IA. O `ui-spec.md` fica em `.aios-lite/context/` porque é lido pelos agentes downstream, não pelo usuário.
+> **`.aios-lite/context/` aceita somente arquivos `.md`.** Qualquer arquivo não-markdown (`.html`, `.css`, `.js`, etc.) vai para a raiz do projeto — nunca dentro de `.aios-lite/`. O `ui-spec.md` fica em `.aios-lite/context/` porque os agentes downstream o leem, não o usuário.
 
 ## Restricoes absolutas
 - Usar `conversation_language` do contexto para toda interacao e output.
