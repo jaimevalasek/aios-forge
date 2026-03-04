@@ -7,10 +7,11 @@ Implementar funcionalidades conforme a arquitetura, preservando as convencoes da
 
 ## Entrada
 1. `.aios-lite/context/project.context.md`
-2. `.aios-lite/context/architecture.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
-3. `.aios-lite/context/discovery.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
-4. `.aios-lite/context/prd.md` (se existir)
-5. `.aios-lite/context/ui-spec.md` (se existir)
+2. `.aios-lite/context/skeleton-system.md` *(se existir — ler primeiro para orientacao rapida da estrutura)*
+3. `.aios-lite/context/architecture.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
+4. `.aios-lite/context/discovery.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
+5. `.aios-lite/context/prd.md` (se existir)
+6. `.aios-lite/context/ui-spec.md` (se existir)
 
 > **Projetos MICRO:** apenas `project.context.md` é garantido. Inferir a direção de implementação a partir dele diretamente — não esperar por architecture.md ou discovery.md.
 
@@ -21,7 +22,7 @@ Se `framework_installed=true` em `project.context.md`:
 - **Se ausente:** ⚠ Alertar o usuario antes de prosseguir:
   > Projeto existente detectado mas sem discovery.md. Rode o scanner primeiro para economizar tokens:
   > `python aios-lite-scan.py`
-- **Se presente:** ler `discovery.md` E `spec.md` juntos — sao duas metades da memoria do projeto. Nunca ler um sem o outro.
+- **Se presente:** ler `skeleton-system.md` primeiro (indice leve), depois `discovery.md` E `spec.md` juntos — sao duas metades da memoria do projeto. Nunca ler um sem o outro.
 
 ## Estrategia de implementacao
 - Comecar pela camada de dados (migrations/models/contratos).
@@ -137,6 +138,15 @@ Trabalhar em passos pequenos e validados — nunca implementar uma feature intei
 Se um passo produzir output inesperado, parar e reportar — nao continuar em estado quebrado.
 
 Se `.aios-lite/context/spec.md` existir, ler antes de comecar. Atualizar apos decisoes relevantes.
+
+Ao criar, deletar ou modificar um arquivo significativamente, atualizar a entrada correspondente em `skeleton-system.md` (mapa de arquivos + status do modulo). Manter o skeleton atualizado — e o indice vivo que outros agentes consultam.
+
+## Comando *update-skeleton
+Quando o usuario digitar `*update-skeleton`, reescrever `.aios-lite/context/skeleton-system.md` para refletir o estado atual do projeto:
+- Atualizar entradas do mapa de arquivos (✓ / ◑ / ○) com base no que foi implementado
+- Atualizar a tabela de status dos modulos
+- Atualizar as rotas principais se novos endpoints foram adicionados
+- Adicionar a data da atualizacao no topo
 
 ## Restricoes obrigatorias
 - Usar `conversation_language` do contexto do projeto para toda interacao e output.

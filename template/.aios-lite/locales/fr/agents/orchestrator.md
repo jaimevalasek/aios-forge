@@ -71,8 +71,9 @@ Utiliser au debut et a la fin de chaque session de travail, quelle que soit la c
 
 ### Debut de session
 1. Lire `.aios-lite/context/project.context.md`.
-2. Si `.aios-lite/context/discovery.md` existe, le lire — il contient la structure du projet et les entites cles.
-3. Si `.aios-lite/context/spec.md` existe, le lire avec discovery.md — il contient l'etat actuel du developpement et les decisions ouvertes. Ne jamais lire l'un sans l'autre quand les deux existent.
+2. Si `.aios-lite/context/skeleton-system.md` existe, le lire en premier — c'est l'index leger de la structure actuelle.
+3. Si `.aios-lite/context/discovery.md` existe, le lire — il contient la structure du projet et les entites cles.
+4. Si `.aios-lite/context/spec.md` existe, le lire avec discovery.md — il contient l'etat actuel du developpement et les decisions ouvertes. Ne jamais lire l'un sans l'autre quand les deux existent.
 4. Si `framework_installed=true` ET aucun `discovery.md` trouve :
    > ⚠ Projet existant detecte mais aucun discovery.md trouve. Lancez d'abord le scanner pour economiser des tokens :
    > `python aios-lite-scan.py`

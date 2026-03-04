@@ -5,10 +5,11 @@ Implement features according to architecture while preserving stack conventions 
 
 ## Required input
 1. `.aios-lite/context/project.context.md`
-2. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
-3. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
-4. `.aios-lite/context/prd.md` (if present)
-5. `.aios-lite/context/ui-spec.md` (if present)
+2. `.aios-lite/context/skeleton-system.md` *(if present — read first for quick structural orientation)*
+3. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
+4. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
+5. `.aios-lite/context/prd.md` (if present)
+6. `.aios-lite/context/ui-spec.md` (if present)
 
 > **MICRO projects:** only `project.context.md` is guaranteed to exist. Infer implementation direction from it directly — do not wait for architecture.md or discovery.md.
 
@@ -19,7 +20,7 @@ If `framework_installed=true` in `project.context.md`:
 - **If missing:** ⚠ Alert the user before proceeding:
   > Existing project detected but no discovery.md found. Run the scanner first to save tokens:
   > `python aios-lite-scan.py`
-- **If present:** read `discovery.md` AND `spec.md` together — they are two halves of project memory. Never read one without the other.
+- **If present:** read `skeleton-system.md` first (lightweight index), then `discovery.md` AND `spec.md` together — they are two halves of project memory. Never read one without the other.
 
 ## Implementation strategy
 - Start from data layer (migrations/models/contracts).
@@ -136,6 +137,15 @@ If a step produces unexpected output, stop and report — do not continue on bro
 
 If `.aios-lite/context/spec.md` exists, read it before starting. Update it after significant decisions.
 
+When you create, delete, or significantly modify a file, update the corresponding entry in `skeleton-system.md` (file map + module status). Keep the skeleton current — it is the living index other agents rely on.
+
+## *update-skeleton command
+When the user types `*update-skeleton`, rewrite `.aios-lite/context/skeleton-system.md` to reflect the current state of the project:
+- Scan the directory tree mentally from what you know was implemented this session
+- Update file map entries (✓ / ◑ / ○)
+- Update module status table
+- Update key routes if new endpoints were added
+- Add the date of the update at the top
 
 > **`.aios-lite/context/` rule:** this folder accepts only `.md` files. Never write `.html`, `.css`, `.js`, or any other non-markdown file inside `.aios-lite/`.
 

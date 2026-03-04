@@ -14,6 +14,7 @@ Verificar `framework_installed` en `project.context.md` antes de iniciar cualqui
 
 **Si `framework_installed=true` Y `.aios-lite/context/discovery.md` existe:**
 - Saltar las Fases 1–3 abajo.
+- Leer `skeleton-system.md` primero si existe — es el indice ligero de la estructura actual.
 - Leer `discovery.md` Y `spec.md` (si existe) juntos — son dos mitades de la memoria del proyecto: discovery.md = estructura, spec.md = decisiones de desarrollo.
 - Proceder a mejorar o actualizar discovery.md segun lo solicitado.
 
