@@ -5,8 +5,8 @@ const { validateProjectContextFile } = require('../context');
 
 const WORKFLOW_BY_CLASSIFICATION = {
   MICRO: ['setup', 'dev'],
-  SMALL: ['setup', 'analyst', 'architect', 'ux-ui', 'dev', 'qa'],
-  MEDIUM: ['setup', 'analyst', 'architect', 'ux-ui', 'pm', 'orchestrator', 'dev', 'qa']
+  SMALL: ['setup', 'product', 'analyst', 'architect', 'dev', 'qa'],
+  MEDIUM: ['setup', 'product', 'analyst', 'architect', 'ux-ui', 'pm', 'orchestrator', 'dev', 'qa']
 };
 
 function normalizeClassification(value, fallback = 'MICRO') {
@@ -34,6 +34,7 @@ function buildWorkflowPlan(input = {}) {
   }
   if (classification === 'MICRO') {
     noteKeys.push('micro_scope');
+    noteKeys.push('product_optional');
   }
 
   return {

@@ -361,7 +361,9 @@ module.exports = {
     note_dapp_context:
       'Contexto dApp detectado; incluye skills Web3 durante @architect y @dev.',
     note_micro_scope:
-      'Mantén el alcance de implementacion minimo y evita agentes opcionales.'
+      'Mantén el alcance de implementacion minimo y evita agentes opcionales.',
+    note_product_optional:
+      '@product es opcional para MICRO — omitelo y ve directo a @dev si la idea ya esta clara.'
   },
   parallel_init: {
     context_missing:

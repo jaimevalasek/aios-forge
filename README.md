@@ -22,57 +22,77 @@ aios-lite setup:context . --defaults --framework="CodeIgniter 3" --backend="Code
 If your stack is not listed in menus, use free-text values via `--framework`, `--backend`, `--frontend`, `--database`, `--auth`, and `--uiux`.
 
 ## Commands
-- `aios-lite init <project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
-- `aios-lite install [path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
-- `aios-lite update [path] [--lang=en|pt-BR|es|fr]`
-- `aios-lite info [path] [--json]`
-- `aios-lite doctor [path] [--fix] [--dry-run] [--json]`
-- `aios-lite i18n:add <locale>`
-- `aios-lite setup:context [path]`
-- `aios-lite agents`
-- `aios-lite agent:prompt <agent> [--tool=codex|claude|gemini|opencode]`
-- `aios-lite context:validate [path] [--json]`
-- `aios-lite locale:apply [path] [--lang=en|pt-BR|es|fr]`
-- `aios-lite test:smoke [workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
-- `aios-lite test:package [source-path] [--keep] [--dry-run] [--json]`
-- `aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
-- `aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]`
-- `aios-lite parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json]`
-- `aios-lite parallel:status [path] [--json]`
-- `aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
-- `aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
-- `aios-lite mcp:doctor [path] [--strict-env] [--json]`
+
+**Setup and install**
+- [`aios-lite init`](docs/en/cli-reference.md#init) `<project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
+- [`aios-lite install`](docs/en/cli-reference.md#install) `[path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
+- [`aios-lite update`](docs/en/cli-reference.md#update) `[path] [--lang=en|pt-BR|es|fr]`
+- [`aios-lite info`](docs/en/cli-reference.md#info) `[path] [--json]`
+- [`aios-lite doctor`](docs/en/cli-reference.md#doctor) `[path] [--fix] [--dry-run] [--json]`
+- [`aios-lite setup:context`](docs/en/cli-reference.md#setupcontext) `[path] [--defaults] [--framework=<name>] [--lang=en|pt-BR|es|fr]`
+- [`aios-lite context:validate`](docs/en/cli-reference.md#contextvalidate) `[path] [--json]`
+
+**Agents**
+- [`aios-lite agents`](docs/en/cli-reference.md#agents)
+- [`aios-lite agent:prompt`](docs/en/cli-reference.md#agentprompt) `<agent> [--tool=codex|claude|gemini|opencode]`
+- [`aios-lite workflow:plan`](docs/en/cli-reference.md#workflowplan) `[path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
+
+**Locale**
+- [`aios-lite i18n:add`](docs/en/i18n.md#create-a-locale-scaffold) `<locale>`
+- [`aios-lite locale:apply`](docs/en/i18n.md#apply-localized-agent-prompts) `[path] [--lang=en|pt-BR|es|fr]`
+
+**Parallel orchestration**
+- [`aios-lite parallel:init`](docs/en/parallel.md) `[path] [--workers=2..6] [--force] [--dry-run] [--json]`
+- [`aios-lite parallel:assign`](docs/en/parallel.md#scope-assignment) `[path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json]`
+- [`aios-lite parallel:status`](docs/en/parallel.md#status-overview) `[path] [--json]`
+- [`aios-lite parallel:doctor`](docs/en/parallel.md#diagnose-and-repair) `[path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
+
+**MCP**
+- [`aios-lite mcp:init`](docs/en/mcp.md#mcpinit) `[path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
+- [`aios-lite mcp:doctor`](docs/en/mcp.md#mcpdoctor) `[path] [--strict-env] [--json]`
+
+**Testing and validation (CI / contributors)**
+- [`aios-lite test:smoke`](docs/en/cli-reference.md#testsmoke) `[workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
+- [`aios-lite test:package`](docs/en/cli-reference.md#testpackage) `[source-path] [--keep] [--dry-run] [--json]`
 
 ## Agent usage helper
-If your AI CLI does not show a visual agent picker, use:
 
-```bash
-aios-lite agents
-aios-lite agent:prompt setup --tool=codex
-aios-lite agent:prompt ux-ui --tool=codex
-aios-lite init my-project --lang=pt-BR --tool=codex
-aios-lite install --lang=es --tool=claude
-aios-lite update --lang=fr
-aios-lite locale:apply --lang=pt-BR
-aios-lite doctor --fix
-aios-lite test:smoke --lang=pt-BR
-aios-lite test:smoke --web3=ethereum
-aios-lite test:smoke --profile=mixed
-aios-lite test:smoke --profile=parallel
-aios-lite test:package --dry-run
-aios-lite workflow:plan --classification=SMALL
-aios-lite parallel:init --workers=3
-aios-lite parallel:assign --source=architecture --workers=3
-aios-lite parallel:status
-aios-lite parallel:doctor --fix --dry-run
-aios-lite mcp:init --dry-run
-aios-lite mcp:doctor --strict-env
-```
+If your AI CLI does not show a visual agent picker, these commands let you interact with agents directly from the terminal. See the [CLI reference](docs/en/cli-reference.md) for full docs on each.
 
-Default planning includes `@ux-ui` for SMALL/MEDIUM projects (and optional use for MICRO when frontend quality is a priority).
+**Discover agents**
+- [`aios-lite agents`](docs/en/cli-reference.md#agents) — list all agents and their paths
+- [`aios-lite agent:prompt setup --tool=codex`](docs/en/cli-reference.md#agentprompt) — get activation prompt for any agent
+- [`aios-lite workflow:plan --classification=SMALL`](docs/en/cli-reference.md#workflowplan) — see the recommended agent sequence
+
+**Setup and locale**
+- [`aios-lite init my-project --lang=pt-BR --tool=codex`](docs/en/cli-reference.md#init)
+- [`aios-lite install --lang=es --tool=claude`](docs/en/cli-reference.md#install)
+- [`aios-lite update --lang=fr`](docs/en/cli-reference.md#update)
+- [`aios-lite locale:apply --lang=pt-BR`](docs/en/i18n.md#apply-localized-agent-prompts)
+
+**Maintenance**
+- [`aios-lite doctor --fix`](docs/en/cli-reference.md#doctor) — restore any missing managed files
+
+**Parallel orchestration**
+- [`aios-lite parallel:init --workers=3`](docs/en/parallel.md)
+- [`aios-lite parallel:assign --source=architecture --workers=3`](docs/en/parallel.md#scope-assignment)
+- [`aios-lite parallel:status`](docs/en/parallel.md#status-overview)
+- [`aios-lite parallel:doctor --fix --dry-run`](docs/en/parallel.md#diagnose-and-repair)
+
+**MCP**
+- [`aios-lite mcp:init --dry-run`](docs/en/mcp.md#mcpinit)
+- [`aios-lite mcp:doctor --strict-env`](docs/en/mcp.md#mcpdoctor)
+
+**Integration tests (CI)**
+- [`aios-lite test:smoke --lang=pt-BR`](docs/en/cli-reference.md#testsmoke)
+- [`aios-lite test:smoke --web3=ethereum`](docs/en/cli-reference.md#testsmoke)
+- [`aios-lite test:smoke --profile=parallel`](docs/en/cli-reference.md#testsmoke)
+- [`aios-lite test:package --dry-run`](docs/en/cli-reference.md#testpackage)
+
+Default planning includes `@product` → `@ux-ui` for SMALL/MEDIUM projects.
 
 ## JSON output for CI
-Use `--json` on selected commands:
+Use `--json` on selected commands. See [JSON schemas](docs/en/json-schemas.md) for output contracts.
 - `aios-lite init <project-name> --json`
 - `aios-lite install [path] --json`
 - `aios-lite update [path] --json`
@@ -115,6 +135,7 @@ aios-lite i18n:add fr
 - OpenCode (`OPENCODE.md`)
 
 ## Web3 support
+See the [Web3 guide](docs/en/web3.md) for the full reference.
 - `project_type=dapp` is supported in context validation and setup.
 - Framework detection now includes:
   - Ethereum: `Hardhat`, `Foundry`, `Truffle`
@@ -129,14 +150,28 @@ aios-lite i18n:add fr
   - `--rpc-provider=Alchemy`
 
 ## Docs
-- i18n guide: `docs/en/i18n.md`
-- JSON schemas: `docs/en/json-schemas.md`
-- parallel guide: `docs/en/parallel.md`
-- MCP guide: `docs/en/mcp.md`
-- web3 guide: `docs/en/web3.md`
-- release guide: `docs/en/release.md`
-- release flow: `docs/en/release-flow.md`
-- release notes template: `docs/en/release-notes-template.md`
+
+**CLI reference**
+- [CLI reference](docs/en/cli-reference.md) — `init`, `install`, `update`, `info`, `doctor`, `setup:context`, `context:validate`, `agents`, `agent:prompt`, `workflow:plan`, `test:smoke`, `test:package`
+
+**Feature guides**
+- [i18n guide](docs/en/i18n.md) — `i18n:add`, `locale:apply`, locale resolution
+- [Parallel orchestration](docs/en/parallel.md) — `parallel:init`, `parallel:assign`, `parallel:status`, `parallel:doctor`
+- [MCP guide](docs/en/mcp.md) — `mcp:init`, `mcp:doctor`
+- [Web3 guide](docs/en/web3.md) — `project_type=dapp`, framework detection, Web3 context fields
+- [JSON schemas](docs/en/json-schemas.md) — `--json` output contracts for all commands
+
+**Release (internal)**
+- [Release guide](docs/en/release.md)
+- [Release flow](docs/en/release-flow.md)
+- [Release notes template](docs/en/release-notes-template.md)
+
+**Portuguese guides**
+- [Início rápido](docs/pt/inicio-rapido.md)
+- [Guia de agentes](docs/pt/agentes.md)
+- [Cenários de uso](docs/pt/cenarios.md)
+- [Clientes AI](docs/pt/clientes-ai.md)
+- [Guia do engenheiro](docs/pt/guia-engineer.md)
 
 ## MCP bootstrap
 Generate a local MCP server recommendation file from `project.context.md`:

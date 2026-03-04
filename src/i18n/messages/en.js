@@ -348,7 +348,8 @@ module.exports = {
       'Framework is not installed yet; complete stack installation before @dev.',
     note_dapp_context:
       'dApp context detected; include Web3 skills during @architect and @dev.',
-    note_micro_scope: 'Keep implementation scope minimal and avoid optional agents.'
+    note_micro_scope: 'Keep implementation scope minimal and avoid optional agents.',
+    note_product_optional: '@product is optional for MICRO — skip it and go straight to @dev if the idea is already clear.'
   },
   parallel_init: {
     context_missing: 'Context file not found: {path}. Run setup:context first.',
