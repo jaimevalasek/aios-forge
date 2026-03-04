@@ -63,6 +63,16 @@ resources/views/<resource>/   ← plural folder (users/, orders/)
 - Always implement: loading states, empty states, and error states
 - Always provide visual feedback for user actions
 
+## Motion and animation (React / Next.js)
+
+When `framework=React` or `framework=Next.js` and the project has visual/marketing pages or the user requests animations:
+
+1. Read `.aios-lite/skills/static/react-motion-patterns.md` before implementing any animation
+2. Available patterns: animated mesh background, gradient text, scroll reveal, 3D card tilt, hero staggered entrance, infinite marquee, scroll progress bar, glassmorphism card, floating orbs, page transition
+3. Use **Framer Motion** as the primary library; plain CSS `@keyframes` as fallback when Framer Motion is not installed
+4. Always include `prefers-reduced-motion` fallback for every animation
+5. Never apply heavy motion to pure admin/CRUD interfaces — motion serves the user, not the data
+
 ## Web3 conventions (when `project_type=dapp`)
 - Validate inputs on-chain and off-chain
 - Never trust client-provided values for sensitive contract calls

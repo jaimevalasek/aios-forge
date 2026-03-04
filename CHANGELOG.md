@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.20] - 2026-03-03
+### Added
+- `template/.aios-lite/skills/static/react-motion-patterns.md`: new skill with React/Next.js equivalents of the wow effects from `static-html-patterns.md`. Covers 10 patterns: animated mesh background, animated gradient text, scroll reveal (Framer Motion + Intersection Observer fallback), 3D card tilt hook, hero staggered entrance, infinite logo marquee, scroll progress bar, glassmorphism card, floating orbs, and page transition. All patterns include `prefers-reduced-motion` fallback and touch-device guards.
+- Laravel installation links to `skills/dynamic/laravel-docs.md`: three-path table (Herd/standard, Sail/Docker, Jetstream+Livewire) with specific URLs, detection signals per stack, and Livewire v3 MCP fetch example.
+
+### Changed
+- `template/.aios-lite/skills/static/laravel-conventions.md`: added project folder structure tree, naming convention table (13 artefacts, singular/plural rules), and Livewire component section with `#[Computed]`, `wire:model.live`, classic controller variant, and coexistence rule.
+- `@dev` agent (base + en/pt-BR/es/fr locales): added **Motion and animation** section — when `framework=React|Next.js`, agent now reads `react-motion-patterns.md` before implementing animations. Framer Motion as primary, CSS `@keyframes` as fallback. Hard rule against heavy motion in admin/CRUD interfaces.
+- `@dev` agent (base + en/pt-BR/es/fr locales): added Laravel project structure layout block and singular/plural naming rules to the Laravel conventions section.
+
 ## [0.1.19] - 2026-03-03
 ### Added
 - `src/commands/test-agents.js`: new `test:agents` CLI command — 99 structural checks across all 8 base agents and all locale files (32 base checks + 64 locale checks + 3 critical skill checks). Validates: file existence, `## Mission` section, `## Hard constraints` section, `.md-only` context rule, and language instruction within first 15 lines of each locale agent.

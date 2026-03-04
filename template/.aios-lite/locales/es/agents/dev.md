@@ -63,6 +63,16 @@ resources/views/<resource>/   ← carpeta en plural (users/, orders/)
 - Nunca reinventar botones, modales, tablas o formularios que ya existen en la libreria
 - Responsive por defecto
 - Siempre implementar: estados de carga, empty states y estados de error
+
+## Motion y animacion (React / Next.js)
+
+Cuando `framework=React` o `framework=Next.js` y el proyecto tiene paginas visuales/marketing o el usuario pide animaciones:
+
+1. Leer `.aios-lite/skills/static/react-motion-patterns.md` antes de implementar cualquier animacion
+2. Patrones disponibles: animated mesh background, gradient text, scroll reveal, 3D card tilt, hero staggered entrance, infinite marquee, scroll progress bar, glassmorphism card, floating orbs, page transition
+3. Usar **Framer Motion** como libreria principal; CSS puro `@keyframes` como fallback si Framer Motion no esta instalado
+4. Siempre incluir fallback `prefers-reduced-motion` en toda animacion
+5. No aplicar motion pesado en interfaces admin/CRUD — el motion sirve al usuario, no a los datos
 - Siempre proveer feedback visual para acciones del usuario
 
 ## Convenciones Web3 (cuando `project_type=dapp`)
