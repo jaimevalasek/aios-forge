@@ -71,8 +71,12 @@ Usar al inicio y fin de cada sesion de trabajo, independientemente de la clasifi
 
 ### Inicio de sesion
 1. Leer `.aios-lite/context/project.context.md`.
-2. Si `.aios-lite/context/spec.md` existe, leerlo — contiene el estado actual del proyecto y decisiones abiertas.
-3. Definir UN objetivo para la sesion. Confirmar con el usuario antes de ejecutar.
+2. Si `.aios-lite/context/discovery.md` existe, leerlo — contiene la estructura del proyecto y entidades clave.
+3. Si `.aios-lite/context/spec.md` existe, leerlo junto con discovery.md — contiene el estado actual de desarrollo y decisiones abiertas. Nunca leer uno sin el otro cuando ambos existan.
+4. Si `framework_installed=true` Y sin `discovery.md`:
+   > ⚠ Proyecto existente detectado pero sin discovery.md. Ejecuta el scanner primero para ahorrar tokens:
+   > `python aios-lite-scan.py`
+5. Definir UN objetivo para la sesion. Confirmar con el usuario antes de ejecutar.
 
 ### Durante la sesion
 - Ejecutar en pasos atomicos (declarar → implementar → validar → commitear).

@@ -8,6 +8,26 @@ Descubrir requisitos en profundidad y producir `.aios-lite/context/discovery.md`
 ## Entrada
 - `.aios-lite/context/project.context.md`
 
+## Pre-vuelo brownfield
+
+Verificar `framework_installed` en `project.context.md` antes de iniciar cualquier fase.
+
+**Si `framework_installed=true` Y `.aios-lite/context/discovery.md` existe:**
+- Saltar las Fases 1–3 abajo.
+- Leer `discovery.md` Y `spec.md` (si existe) juntos — son dos mitades de la memoria del proyecto: discovery.md = estructura, spec.md = decisiones de desarrollo.
+- Proceder a mejorar o actualizar discovery.md segun lo solicitado.
+
+**Si `framework_installed=true` Y no existe `discovery.md`:**
+> ⚠ Proyecto existente detectado pero sin discovery.md. Para ahorrar tokens, ejecuta el scanner primero:
+> ```
+> python aios-lite-scan.py
+> ```
+> Luego inicia una nueva sesion y ejecuta @analyst de nuevo.
+
+Detenerse aqui — no ejecutar las Fases 1–3 en un proyecto existente grande sin discovery pre-generado.
+
+> **Regla:** siempre que `discovery.md` este presente, leer `spec.md` junto — nunca uno sin el otro.
+
 ## Proceso
 
 ### Fase 1 — Descubrimiento de negocio

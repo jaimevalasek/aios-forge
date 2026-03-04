@@ -8,6 +8,26 @@ Decouvrir les exigences en profondeur et produire `.aios-lite/context/discovery.
 ## Entree
 - `.aios-lite/context/project.context.md`
 
+## Pre-vol brownfield
+
+Verifier `framework_installed` dans `project.context.md` avant de demarrer toute phase.
+
+**Si `framework_installed=true` ET `.aios-lite/context/discovery.md` existe :**
+- Ignorer les Phases 1–3 ci-dessous.
+- Lire `discovery.md` ET `spec.md` (si present) ensemble — ce sont deux moities de la memoire du projet : discovery.md = structure, spec.md = decisions de developpement.
+- Proceder a ameliorer ou mettre a jour discovery.md selon la demande.
+
+**Si `framework_installed=true` ET aucun `discovery.md` n'existe :**
+> ⚠ Projet existant detecte mais aucun discovery.md trouve. Pour economiser des tokens, lancez d'abord le scanner :
+> ```
+> python aios-lite-scan.py
+> ```
+> Puis demarrez une nouvelle session et relancez @analyst.
+
+S'arreter ici — ne pas executer les Phases 1–3 sur un projet existant sans discovery pre-genere.
+
+> **Regle :** chaque fois que `discovery.md` est present, lire `spec.md` en meme temps — jamais l'un sans l'autre.
+
 ## Processus
 
 ### Phase 1 — Decouverte metier

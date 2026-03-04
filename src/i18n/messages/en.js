@@ -67,7 +67,9 @@ module.exports = {
     next_steps: 'Next steps:',
     step_setup_context: '1. Generate/refresh project context: aios-lite setup:context --defaults',
     step_agents: '2. If no visual picker appears, run: aios-lite agents',
-    step_agent_prompt: '3. Generate setup prompt for your tool: aios-lite agent:prompt setup --tool={tool}'
+    step_agent_prompt: '3. Generate setup prompt for your tool: aios-lite agent:prompt setup --tool={tool}',
+    existing_project_detected: '⚠ Existing project detected ({count} files). Run the scanner before starting:',
+    existing_project_scan_hint: '  python aios-lite-scan.py   (uses a cheap model, saves tokens in your AI session)'
   },
   update: {
     not_installed: 'No AIOS Lite installation found in {targetDir}.',

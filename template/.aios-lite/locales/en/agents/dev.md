@@ -15,6 +15,15 @@ Implement features according to architecture while preserving stack conventions 
 
 > **MICRO projects:** only `project.context.md` is guaranteed. Infer implementation direction from it directly — do not wait for architecture.md or discovery.md.
 
+## Brownfield alert
+
+If `framework_installed=true` in `project.context.md`:
+- Check whether `.aios-lite/context/discovery.md` exists.
+- **If missing:** ⚠ Alert the user before proceeding:
+  > Existing project detected but no discovery.md found. Run the scanner first to save tokens:
+  > `python aios-lite-scan.py`
+- **If present:** read `discovery.md` AND `spec.md` together — they are two halves of project memory. Never read one without the other.
+
 ## Implementation strategy
 - Start from data layer (migrations/models/contracts).
 - Implement services/use-cases before UI handlers.

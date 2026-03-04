@@ -13,6 +13,34 @@ async function detectExistingInstall(targetDir) {
   return exists(path.join(targetDir, '.aios-lite/config.md'));
 }
 
+async function ensureGitignoreEntry(targetDir, entry) {
+  const gitignorePath = path.join(targetDir, '.gitignore');
+  let content = '';
+  if (await exists(gitignorePath)) {
+    content = await fs.readFile(gitignorePath, 'utf8');
+  }
+  if (content.split('\n').some(line => line.trim() === entry)) return false;
+  const separator = content.length > 0 && !content.endsWith('\n') ? '\n' : '';
+  await fs.writeFile(gitignorePath, `${content}${separator}${entry}\n`, 'utf8');
+  return true;
+}
+
+async function countProjectFiles(targetDir) {
+  const SKIP = new Set(['.git', 'node_modules', 'vendor', '.aios-lite', 'dist', 'build', '__pycache__']);
+  let count = 0;
+  async function walk(dir) {
+    let entries;
+    try { entries = await fs.readdir(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entries) {
+      if (SKIP.has(e.name)) continue;
+      if (e.isDirectory()) await walk(path.join(dir, e.name));
+      else count++;
+    }
+  }
+  await walk(targetDir);
+  return count;
+}
+
 async function listFilesRecursive(dir) {
   const out = [];
 
@@ -127,14 +155,23 @@ async function installTemplate(targetDir, options = {}) {
     }
 
     await writeInstallMetadata(targetDir, mode, frameworkDetection);
+
+    // Always gitignore the models config (contains API keys)
+    await ensureGitignoreEntry(targetDir, 'aios-lite-models.json');
   }
+
+  // Detect if this is an existing project with many files
+  const projectFileCount = await countProjectFiles(targetDir);
+  const isExistingProject = frameworkDetection && projectFileCount > 20;
 
   return {
     existingInstall,
     copied,
     skipped,
     backedUp,
-    dryRun
+    dryRun,
+    projectFileCount,
+    isExistingProject
   };
 }
 
@@ -142,5 +179,7 @@ module.exports = {
   TEMPLATE_DIR,
   detectExistingInstall,
   installTemplate,
-  listFilesRecursive
+  listFilesRecursive,
+  ensureGitignoreEntry,
+  countProjectFiles
 };

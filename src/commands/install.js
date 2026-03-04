@@ -48,6 +48,12 @@ async function runInstall({ args, options, logger, t }) {
   logger.log(t('install.step_agents'));
   logger.log(t('install.step_agent_prompt', { tool: promptTool }));
 
+  if (result.isExistingProject) {
+    logger.log('');
+    logger.log(t('install.existing_project_detected', { count: result.projectFileCount }));
+    logger.log(t('install.existing_project_scan_hint'));
+  }
+
   return {
     ok: true,
     targetDir,

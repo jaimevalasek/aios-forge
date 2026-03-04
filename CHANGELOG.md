@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.23] - 2026-03-04
+### Added
+- `template/aios-lite-scan.py`: standalone Python scanner (zero external dependencies, stdlib only). Walks the project tree, reads up to 12 key files (package.json, composer.json, schema.prisma, routes/web.php, etc.), reads `project.context.md` and `spec.md` if present, then calls a cheap LLM API (DeepSeek, Gemini, OpenAI, Anthropic, Groq, Together, or Mistral) to generate `.aios-lite/context/discovery.md` with 9 structured sections. Saves main-session tokens on brownfield projects.
+- `template/aios-lite-models.json`: API key config template for 7 providers. Auto-added to `.gitignore` on install to prevent key commits.
+- Brownfield project detection in installer: when `framework_installed` is detected and the project has >20 files, `install` and `update` now emit an alert with instructions to run `aios-lite-scan.py` first.
+- `@analyst` (base + en/pt-BR/es/fr): **Brownfield pre-flight** section — checks `framework_installed`, skips Phases 1–3 if `discovery.md` already exists, alerts the user to run the scanner if it is missing. Rule enforced: always read `spec.md` alongside `discovery.md`.
+- `@dev` (base + en/pt-BR/es/fr): **Brownfield alert** section — if `framework_installed=true` and `discovery.md` is missing, alerts the user to run `aios-lite-scan.py` before proceeding.
+- `@orchestrator` (base + en/pt-BR/es/fr): session start now reads `discovery.md` AND `spec.md` together at session open, with brownfield alert when `discovery.md` is absent.
+
 ## [0.1.22] - 2026-03-04
 ### Fixed
 - `setup:context` command: `--lang=pt-BR` (and any `--lang` alias) was silently ignored — `applyExplicitOverrides` only read `options.language` but the parser stores the flag as `options.lang`. Fixed by reading `options.language ?? options.lang`, consistent with all other commands (`install`, `update`, `init`, `locale-apply`, etc.). Running `npx aios-lite setup:context . --defaults --lang=pt-BR` now correctly installs the pt-BR locale agents.

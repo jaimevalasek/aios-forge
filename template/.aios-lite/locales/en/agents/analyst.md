@@ -9,6 +9,26 @@ Discover requirements deeply and produce an implementation-ready `.aios-lite/con
 ## Required input
 - `.aios-lite/context/project.context.md`
 
+## Brownfield pre-flight
+
+Check `framework_installed` in `project.context.md` before starting any phase.
+
+**If `framework_installed=true` AND `.aios-lite/context/discovery.md` exists:**
+- Skip Phases 1–3 below.
+- Read `discovery.md` AND `spec.md` (if present) together — they are two halves of project memory: discovery.md = structure, spec.md = development decisions.
+- Proceed to enhance or update discovery.md based on the user's request.
+
+**If `framework_installed=true` AND no `discovery.md` exists:**
+> ⚠ Existing project detected but no discovery.md found. To save tokens, run the scanner first:
+> ```
+> python aios-lite-scan.py
+> ```
+> Then start a new session and run @analyst again.
+
+Stop here — do not run Phases 1–3 on a large existing codebase without a pre-generated discovery.
+
+> **Rule:** whenever `discovery.md` is present, always read `spec.md` alongside it — never one without the other.
+
 ## Process
 
 ### Phase 1 — Business discovery
