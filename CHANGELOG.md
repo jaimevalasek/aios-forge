@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.26] - 2026-03-04
+### Added
+- **Browser QA engine** (`qa:init`, `qa:doctor`, `qa:run`, `qa:scan`, `qa:report`): full Playwright-powered browser testing built into aios-lite. No LLM required. No separate tool. Playwright is an optional runtime dependency — zero impact on users who don't need browser testing.
+- `qa:init`: generates `aios-qa.config.json` by reading `prd.md` (acceptance criteria → test scenarios) and `discovery.md` (business rules). URL auto-resolved from `project.context.md`.
+- `qa:doctor`: validates all prerequisites (Playwright installed, Chromium binary, config valid, URL reachable, context and prd.md present).
+- `qa:run`: full QA session with 4 personas: **naive** (empty forms, 10K strings, ghost clickables), **hacker** (8 secret patterns against window globals and HTML source, 10 sensitive file paths, XSS, open redirect, SQL injection, IDOR ±1, debug routes), **power** (keyboard navigation focus visibility, boundary values on numeric/date inputs), **mobile** (375px viewport, horizontal overflow, touch targets < 44px, fonts < 12px). Post-persona: network-level probes (console stack traces, sensitive GET params, mixed content). Accessibility audit (5 WCAG checks). Performance capture (TTFB, load time, request count, transfer size). AC coverage from `prd.md` with screenshots. Output: `aios-qa-report.md` + `aios-qa-report.json` + `aios-qa-screenshots/`.
+- `qa:scan`: autonomous crawler — maps all routes via BFS (configurable depth and max pages), probes each route for exposed secrets, console leaks, accessibility issues, and horizontal overflow. Sensitive files probed once per domain.
+- `qa:report`: displays last generated report; `--json` returns parsed `aios-qa-report.json`.
+- `@qa` agent (base + all 4 locales) updated with browser report integration rules: if `aios-qa-report.md` exists, merge findings, promote severity when both static review and browser test flag the same issue, tag ACs as `[browser-validated]`.
+- i18n keys added for `qa_doctor`, `qa_init`, `qa_run`, `qa_scan`, `qa_report` sections across all 4 locales (en, pt-BR, es, fr).
+- `docs/en/qa-browser.md`: full reference for all 5 qa: commands with examples, persona descriptions, probe list, performance thresholds, CI integration patterns.
+- README updated: Browser QA section in Commands, Agent usage helper, JSON output, and Docs feature guides — all with links to `docs/en/qa-browser.md`.
+
 ## [0.1.25] - 2026-03-04
 ### Added
 - `@product` agent: conversational product wizard that runs between `@setup` and `@analyst`. Starts from a raw idea and leads a natural back-and-forth conversation (8 strict conversation rules: one question at a time, no filler words, reflect before advancing, surface forgotten requirements, challenge assumptions gently, prioritize ruthlessly, draft early after 5–7 exchanges). Supports two modes: creation (no prd.md) and enrichment (prd.md exists). Produces `.aios-lite/context/prd.md` with 8 sections: vision, problem, users, MVP scope (🔴 must-have / 🟡 should-have), out-of-scope, user flows, success metrics, open questions.

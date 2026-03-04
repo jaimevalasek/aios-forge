@@ -51,6 +51,13 @@ If your stack is not listed in menus, use free-text values via `--framework`, `-
 - [`aios-lite mcp:init`](docs/en/mcp.md#mcpinit) `[path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
 - [`aios-lite mcp:doctor`](docs/en/mcp.md#mcpdoctor) `[path] [--strict-env] [--json]`
 
+**Browser QA (Playwright)**
+- [`aios-lite qa:init`](docs/en/qa-browser.md#qainit) `[path] [--url=<app-url>] [--dry-run] [--json]`
+- [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor) `[path] [--json]`
+- [`aios-lite qa:run`](docs/en/qa-browser.md#qarun) `[path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--json]`
+- [`aios-lite qa:scan`](docs/en/qa-browser.md#qascan) `[path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--json]`
+- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport) `[path] [--json]`
+
 **Testing and validation (CI / contributors)**
 - [`aios-lite test:smoke`](docs/en/cli-reference.md#testsmoke) `[workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
 - [`aios-lite test:package`](docs/en/cli-reference.md#testpackage) `[source-path] [--keep] [--dry-run] [--json]`
@@ -83,6 +90,13 @@ If your AI CLI does not show a visual agent picker, these commands let you inter
 - [`aios-lite mcp:init --dry-run`](docs/en/mcp.md#mcpinit)
 - [`aios-lite mcp:doctor --strict-env`](docs/en/mcp.md#mcpdoctor)
 
+**Browser QA**
+- [`aios-lite qa:init --url=http://localhost:3000`](docs/en/qa-browser.md#qainit)
+- [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor)
+- [`aios-lite qa:run --persona=hacker`](docs/en/qa-browser.md#qarun)
+- [`aios-lite qa:scan --depth=2 --max-pages=30`](docs/en/qa-browser.md#qascan)
+- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport)
+
 **Integration tests (CI)**
 - [`aios-lite test:smoke --lang=pt-BR`](docs/en/cli-reference.md#testsmoke)
 - [`aios-lite test:smoke --web3=ethereum`](docs/en/cli-reference.md#testsmoke)
@@ -110,6 +124,10 @@ Use `--json` on selected commands. See [JSON schemas](docs/en/json-schemas.md) f
 - `aios-lite parallel:status --json`
 - `aios-lite parallel:doctor --json`
 - `aios-lite mcp:doctor --json`
+- `aios-lite qa:run --json`
+- `aios-lite qa:scan --json`
+- `aios-lite qa:doctor --json`
+- `aios-lite qa:report --json`
 
 ## i18n
 CLI localization is supported with:
@@ -158,6 +176,7 @@ See the [Web3 guide](docs/en/web3.md) for the full reference.
 - [i18n guide](docs/en/i18n.md) — `i18n:add`, `locale:apply`, locale resolution
 - [Parallel orchestration](docs/en/parallel.md) — `parallel:init`, `parallel:assign`, `parallel:status`, `parallel:doctor`
 - [MCP guide](docs/en/mcp.md) — `mcp:init`, `mcp:doctor`
+- [Browser QA guide](docs/en/qa-browser.md) — `qa:init`, `qa:doctor`, `qa:run`, `qa:scan`, `qa:report`
 - [Web3 guide](docs/en/web3.md) — `project_type=dapp`, framework detection, Web3 context fields
 - [JSON schemas](docs/en/json-schemas.md) — `--json` output contracts for all commands
 
