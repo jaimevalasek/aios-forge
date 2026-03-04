@@ -2,6 +2,24 @@
 
 Lightweight AI agent framework for software projects.
 
+## Requirements
+
+**Core**
+
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| Node.js | ≥ 18.0.0 | Required by the CLI itself |
+| An AI CLI tool | — | At least one: [Claude Code](https://claude.ai/code), [Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), or [OpenCode](https://opencode.ai) |
+
+**Optional — by feature**
+
+| Feature | Extra requirement |
+|---------|-------------------|
+| `scan:project` (brownfield scanner) | `aios-lite-models.json` with a cheap LLM API key (DeepSeek, OpenAI, Gemini, Groq, Together, Mistral, or Anthropic) |
+| `qa:run` / `qa:scan` (browser QA) | Playwright + Chromium: `npm install -g playwright && npx playwright install chromium` |
+| `mcp:init` / `mcp:doctor` | MCP-compatible tool (Claude Code, Gemini CLI, OpenCode, or Codex CLI with MCP support) |
+| Web3 support | Project must use a supported chain toolchain (Hardhat, Foundry, Anchor, etc.) |
+
 ## Install
 
 ```bash
