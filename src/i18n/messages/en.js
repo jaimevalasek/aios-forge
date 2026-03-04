@@ -41,6 +41,16 @@ module.exports = {
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=en]',
     help_mcp_doctor:
       'aios-lite mcp:doctor [path] [--strict-env] [--json] [--locale=en]',
+    help_qa_doctor:
+      'aios-lite qa:doctor [path] [--json] [--locale=en]',
+    help_qa_init:
+      'aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=en]',
+    help_qa_run:
+      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--json] [--locale=en]',
+    help_qa_scan:
+      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--json] [--locale=en]',
+    help_qa_report:
+      'aios-lite qa:report [path] [--json] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Error: {message}'
@@ -512,5 +522,77 @@ module.exports = {
     compat_web3_unneeded_hint: 'Disable chain-rpc if not needed.',
     report_title: 'MCP doctor report: {path}',
     summary: 'Summary: {passed} passed, {failed} failed, {warnings} warnings.'
+  },
+  qa_doctor: {
+    prefix_ok: 'OK',
+    prefix_warn: 'WARN',
+    prefix_fail: 'FAIL',
+    check_line: '[{prefix}] {id} - {message}',
+    hint_line: '  Hint: {hint}',
+    report_title: 'QA doctor report: {path}',
+    summary: 'Summary: {passed} passed, {failed} failed, {warnings} warnings.',
+    playwright_ok: 'Playwright is installed.',
+    playwright_missing: 'Playwright package not found.',
+    playwright_missing_hint: 'Run: npm install -g playwright && npx playwright install chromium',
+    chromium_ok: 'Chromium browser binary found.',
+    chromium_missing: 'Chromium binary not found.',
+    chromium_missing_hint: 'Run: npx playwright install chromium',
+    config_ok: 'aios-qa.config.json found and valid.',
+    config_missing: 'aios-qa.config.json not found.',
+    config_missing_hint: 'Run: aios-lite qa:init --url=<your-app-url>',
+    config_invalid: 'aios-qa.config.json is not valid JSON: {error}',
+    url_ok: 'Target URL is reachable ({url}).',
+    url_missing: 'No target URL configured in aios-qa.config.json.',
+    url_missing_hint: 'Run: aios-lite qa:init --url=<your-app-url>',
+    url_unreachable: 'Target URL is not reachable ({url}): {error}',
+    url_unreachable_hint: 'Start your application before running qa:run or qa:scan.',
+    context_ok: 'project.context.md found — tests will be enriched with project context.',
+    context_missing: 'project.context.md not found — running in generic mode.',
+    prd_ok: 'prd.md found — {count} acceptance criteria mapped to test scenarios.',
+    prd_missing: 'prd.md not found — AC coverage mapping will be skipped.'
+  },
+  qa_init: {
+    context_found: 'Context found: project={name}, url={url}',
+    prd_found: 'prd.md found — extracted {count} acceptance criteria as test scenarios.',
+    prd_missing: 'prd.md not found — no AC scenarios generated. Add prd.md to enrich tests.',
+    generated: 'QA config written: {path}',
+    dry_run_generated: '[dry-run] QA config would be written: {path}',
+    scenarios_count: 'Test scenarios from prd.md: {count}',
+    personas_count: 'Personas enabled: {count} (naive, hacker, power, mobile)',
+    probes_count: 'Security probes enabled: {count}',
+    next_steps: 'Next steps:',
+    step_doctor: '1. Verify prerequisites: aios-lite qa:doctor',
+    step_run: '2. Run browser tests: aios-lite qa:run'
+  },
+  qa_run: {
+    playwright_missing: 'Playwright is not installed. Run: npm install -g playwright && npx playwright install chromium',
+    config_missing: 'aios-qa.config.json not found. Run: aios-lite qa:init --url=<your-app-url>',
+    url_missing: 'No URL configured. Add url to aios-qa.config.json or use --url=<app-url>.',
+    starting: 'Starting browser QA session: {url}',
+    persona_start: 'Running persona: {persona}',
+    persona_done: 'Persona "{persona}" complete — {count} finding(s)',
+    accessibility: 'Running accessibility audit...',
+    performance: 'Capturing performance metrics...',
+    ac_scenarios: 'Documenting AC coverage...',
+    done: 'QA session complete.',
+    report_written: 'Report written: {path}',
+    json_written: 'JSON report written: {path}',
+    screenshots_dir: 'Screenshots saved to: {path}',
+    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low'
+  },
+  qa_scan: {
+    playwright_missing: 'Playwright is not installed. Run: npm install -g playwright && npx playwright install chromium',
+    config_missing: 'aios-qa.config.json not found. Run: aios-lite qa:init --url=<your-app-url>',
+    url_missing: 'No URL configured. Add url to aios-qa.config.json or use --url=<app-url>.',
+    starting: 'Starting autonomous scan: {url}',
+    crawling: 'Crawling routes (max depth {depth}, max pages {pages})...',
+    routes_found: 'Routes discovered: {count}',
+    scanning_route: 'Scanning: {route}',
+    done: 'Autonomous scan complete.',
+    report_written: 'Report written: {path}',
+    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low'
+  },
+  qa_report: {
+    not_found: 'No QA report found. Run: aios-lite qa:run or aios-lite qa:scan'
   }
 };

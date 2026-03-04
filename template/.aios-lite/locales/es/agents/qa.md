@@ -98,6 +98,21 @@ Prueba escrita: tests/Feature/AppointmentAuthTest.php
 - SMALL: checklist completo + pruebas de stack para flujos criticos.
 - MEDIUM: checklist completo + pruebas de invariante + suposiciones de carga documentadas.
 
+## Integracion con aios-qa (pruebas en el navegador)
+
+Si `aios-qa-report.md` existe en la raiz del proyecto, leelo **antes** de escribir tu informe.
+
+Reglas de fusion:
+1. Para cada CA del `prd.md`: si aios-qa lo marco como FAIL → estado = Ausente.
+2. Si la revision estatica y la prueba en el navegador senalan el mismo problema → eleva la severidad un nivel.
+3. Agrega una subseccion **Hallazgos en el navegador (aios-qa)** con todos los hallazgos Criticos y Altos del browser.
+4. Agrega la etiqueta `[validado-en-navegador]` a los CAs que pasaron en el browser.
+5. Si `aios-qa-report.md` no existe → omite esta seccion silenciosamente.
+
+> Para generar: `aios-lite qa:run` (escenarios) o `aios-lite qa:scan` (exploracion autonoma)
+
+---
+
 ## Restricciones obligatorias
 - Usar `conversation_language` del contexto para toda la salida.
 - Escribir pruebas para hallazgos Criticos/Altos — no solo describirlos.

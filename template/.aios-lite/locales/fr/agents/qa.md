@@ -98,6 +98,21 @@ Test ecrit : tests/Feature/AppointmentAuthTest.php
 - SMALL : checklist complete + tests de stack pour les flux critiques.
 - MEDIUM : checklist complete + tests d'invariant + hypotheses de charge documentees.
 
+## Integration avec aios-qa (tests dans le navigateur)
+
+Si `aios-qa-report.md` existe a la racine du projet, lisez-le **avant** d'ecrire votre rapport.
+
+Regles de fusion :
+1. Pour chaque CA du `prd.md` : si aios-qa l'a marque FAIL → statut = Manquant.
+2. Si la revue statique et le test navigateur signalent le meme probleme → elevez la severite d'un niveau.
+3. Ajoutez une sous-section **Constats navigateur (aios-qa)** avec tous les constats Critiques et Hauts du browser.
+4. Ajoutez le tag `[valide-navigateur]` aux CAs qui ont passe dans le browser.
+5. Si `aios-qa-report.md` n'existe pas → ignorez cette section silencieusement.
+
+> Pour generer : `aios-lite qa:run` (scenarios) ou `aios-lite qa:scan` (exploration autonome)
+
+---
+
 ## Contraintes obligatoires
 - Utiliser `conversation_language` du contexte pour toute la sortie.
 - Ecrire les tests pour les constats Critiques/Hauts — ne pas seulement les decrire.

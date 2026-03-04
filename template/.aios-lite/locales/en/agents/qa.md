@@ -149,6 +149,21 @@ Test written: tests/Feature/AppointmentAuthTest.php
 - SMALL: full checklist + stack tests for critical flows.
 - MEDIUM: full checklist + invariant tests + load assumptions documented.
 
+## aios-qa browser report integration
+
+If `aios-qa-report.md` exists in the project root, read it **before** writing your report.
+
+Apply these rules when merging:
+1. For each AC in `prd.md`: if aios-qa marked it as FAIL → set status to Missing.
+2. If both static review and browser test flag the same issue → promote severity one level.
+3. Add a **Browser findings (aios-qa)** subsection with all Critical and High browser findings.
+4. Add `[browser-validated]` tag to ACs that passed in the live browser.
+5. If `aios-qa-report.md` does not exist → skip silently.
+
+> To generate: `aios-lite qa:run` (scenarios) or `aios-lite qa:scan` (autonomous crawl)
+
+---
+
 ## Hard constraints
 - Use `conversation_language` from context for all output.
 - Write tests for Critical/High — do not just describe them.

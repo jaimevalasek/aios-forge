@@ -24,6 +24,11 @@ const { runParallelAssign } = require('./commands/parallel-assign');
 const { runParallelStatus } = require('./commands/parallel-status');
 const { runTestAgents } = require('./commands/test-agents');
 const { runLocaleDiff } = require('./commands/locale-diff');
+const { runQaDoctor } = require('./commands/qa-doctor');
+const { runQaInit } = require('./commands/qa-init');
+const { runQaRun } = require('./commands/qa-run');
+const { runQaScan } = require('./commands/qa-scan');
+const { runQaReport } = require('./commands/qa-report');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'init',
@@ -72,6 +77,16 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'mcp-init',
   'mcp:doctor',
   'mcp-doctor',
+  'qa:doctor',
+  'qa-doctor',
+  'qa:init',
+  'qa-init',
+  'qa:run',
+  'qa-run',
+  'qa:scan',
+  'qa-scan',
+  'qa:report',
+  'qa-report',
   'version',
   '--version',
   '-v'
@@ -129,6 +144,11 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_parallel_status');
   logHelpLine(t, logger, 'cli.help_mcp_init');
   logHelpLine(t, logger, 'cli.help_mcp_doctor');
+  logHelpLine(t, logger, 'cli.help_qa_doctor');
+  logHelpLine(t, logger, 'cli.help_qa_init');
+  logHelpLine(t, logger, 'cli.help_qa_run');
+  logHelpLine(t, logger, 'cli.help_qa_scan');
+  logHelpLine(t, logger, 'cli.help_qa_report');
 }
 
 function commandSupportsJson(command) {
@@ -230,6 +250,16 @@ async function main() {
       result = await runMcpInit({ args, options, logger: commandLogger, t });
     } else if (command === 'mcp:doctor' || command === 'mcp-doctor') {
       result = await runMcpDoctor({ args, options, logger: commandLogger, t });
+    } else if (command === 'qa:doctor' || command === 'qa-doctor') {
+      result = await runQaDoctor({ args, options, logger: commandLogger, t });
+    } else if (command === 'qa:init' || command === 'qa-init') {
+      result = await runQaInit({ args, options, logger: commandLogger, t });
+    } else if (command === 'qa:run' || command === 'qa-run') {
+      result = await runQaRun({ args, options, logger: commandLogger, t });
+    } else if (command === 'qa:scan' || command === 'qa-scan') {
+      result = await runQaScan({ args, options, logger: commandLogger, t });
+    } else if (command === 'qa:report' || command === 'qa-report') {
+      result = await runQaReport({ args, options, logger: commandLogger, t });
     } else {
       const message = t('cli.unknown_command', { command });
       if (jsonMode) {
