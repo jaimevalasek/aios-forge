@@ -611,7 +611,8 @@ module.exports = {
     report_written: 'Rapport ecrit : {path}',
     json_written: 'Rapport JSON ecrit : {path}',
     screenshots_dir: 'Captures sauvegardees dans : {path}',
-    findings_summary: 'Findings : {critical} critique(s), {high} eleve(s), {medium} moyen(s), {low} faible(s)'
+    findings_summary: 'Findings : {critical} critique(s), {high} eleve(s), {medium} moyen(s), {low} faible(s)',
+    html_report_written: 'Rapport HTML ecrit : {path}'
   },
   qa_scan: {
     playwright_missing: 'Playwright non installe. Executez : npm install -g playwright && npx playwright install chromium',
@@ -623,9 +624,11 @@ module.exports = {
     scanning_route: 'Scan en cours : {route}',
     done: 'Scan autonome termine.',
     report_written: 'Rapport ecrit : {path}',
-    findings_summary: 'Findings : {critical} critique(s), {high} eleve(s), {medium} moyen(s), {low} faible(s)'
+    findings_summary: 'Findings : {critical} critique(s), {high} eleve(s), {medium} moyen(s), {low} faible(s)',
+    html_report_written: 'Rapport HTML ecrit : {path}'
   },
   qa_report: {
-    not_found: 'Aucun rapport QA trouve. Executez : aios-lite qa:run ou aios-lite qa:scan'
+    not_found: 'Aucun rapport QA trouve. Executez : aios-lite qa:run ou aios-lite qa:scan',
+    html_report_written: 'Rapport HTML ecrit : {path}'
   }
 };

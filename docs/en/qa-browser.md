@@ -127,7 +127,7 @@ Summary: 5 passed, 0 failed, 1 warnings.
 Runs a full browser QA session: 4 personas, security probes, accessibility audit, performance capture, and AC coverage.
 
 ```bash
-aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--json]
+aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]
 ```
 
 **Flags:**
@@ -137,6 +137,7 @@ aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] 
 | `--url=<url>` | Override URL from config |
 | `--persona=<name>` | Run only one persona |
 | `--headed` | Show browser window (useful for debugging) |
+| `--html` | Also generate an HTML report in `reports/<run-id>/index.html` |
 | `--json` | Output result as JSON |
 
 #### Personas
@@ -198,7 +199,7 @@ If `prd.md` exists, acceptance criteria are extracted from the table and 🔴 mu
 Autonomous crawl mode. No pre-defined scenarios needed — the tool discovers all routes and probes each one.
 
 ```bash
-aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--json]
+aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]
 ```
 
 **Flags:**
@@ -209,6 +210,7 @@ aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--heade
 | `--depth=<n>` | `3` | Max crawl depth from base URL |
 | `--max-pages=<n>` | `50` | Max pages to visit |
 | `--headed` | false | Show browser window |
+| `--html` | false | Also generate an HTML report in `reports/<run-id>/index.html` |
 | `--json` | false | Output result as JSON |
 
 **What it does on each route:**
@@ -226,10 +228,15 @@ Sensitive files (`/.env`, `/.git/config`, etc.) are probed once per domain at th
 Displays the last generated report.
 
 ```bash
-aios-lite qa:report [path] [--json]
+aios-lite qa:report [path] [--html] [--json]
 ```
 
-In JSON mode, returns the parsed `aios-qa-report.json` content.
+| Flag | Description |
+|------|-------------|
+| `--html` | Regenerate an HTML report from the existing `aios-qa-report.json` |
+| `--json` | Return the parsed `aios-qa-report.json` as JSON |
+
+In default mode, prints `aios-qa-report.md` to the terminal.
 
 ---
 
@@ -261,6 +268,48 @@ aios-lite qa:run
 # Terminal 1 — continues with merged findings
 @qa   # reads aios-qa-report.md automatically
 ```
+
+---
+
+## HTML reports
+
+Add `--html` to `qa:run` or `qa:scan` to generate a self-contained visual report alongside the default MD/JSON outputs.
+
+```bash
+aios-lite qa:run --html
+aios-lite qa:scan --html
+```
+
+Or generate HTML retroactively from an existing run:
+
+```bash
+aios-lite qa:report --html
+```
+
+**Output structure:**
+
+```
+reports/
+  index.html                    ← historical index of all runs
+  2026-03-04_15-30-00_run/
+    index.html                  ← full report (self-contained)
+    meta.json                   ← run metadata for the index
+  2026-03-04_14-00-00_scan/
+    index.html
+    meta.json
+```
+
+**Features:**
+- Screenshots embedded as base64 — no external file references, fully portable for sharing
+- Severity filter buttons (All / Critical / High / Medium / Low)
+- Collapsible finding cards with location, risk, fix, and screenshot
+- Performance cards with colour-coded thresholds
+- AC coverage table (when `prd.md` was used)
+- Routes discovered list (scan mode)
+- Click-to-zoom screenshot lightbox
+- `reports/index.html` auto-updated after each run with a sortable history table
+
+The MD and JSON outputs are never modified — `--html` is purely additive.
 
 ---
 

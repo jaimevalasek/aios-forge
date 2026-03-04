@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.27] - 2026-03-04
+### Added
+- **HTML reports** for browser QA: `--html` flag added to `qa:run`, `qa:scan`, and `qa:report`. Generates a self-contained visual report in `reports/<date>_<time>_<mode>/index.html`. Screenshots embedded as base64 — fully portable for sharing. Existing `aios-qa-report.md` and `aios-qa-report.json` outputs are never modified; HTML is purely additive.
+- `reports/index.html`: historical index auto-updated after each HTML run, listing all runs with date, mode, URL, and severity badges. Sorted newest first.
+- `qa:report --html`: retroactively generates HTML from the existing `aios-qa-report.json` without re-running Playwright.
+- HTML report features: severity filter buttons, collapsible finding cards (location + risk + fix + screenshot), performance cards with colour-coded thresholds, AC coverage table, routes list (scan mode), click-to-zoom screenshot lightbox, vanilla JS (no framework).
+- `src/qa-html-report.js`: self-contained HTML generator module with embedded CSS and JS, `writeHtmlReport()` and `updateReportsIndex()` exports.
+- i18n key `html_report_written` added to `qa_run`, `qa_scan`, `qa_report` sections in all 4 locales (en, pt-BR, es, fr).
+- Missing `help_qa_*` i18n keys added to pt-BR locale (were absent; es/fr fall back to en).
+- `docs/en/qa-browser.md`: `--html` flag documented for all three commands, plus a new **HTML reports** section describing folder structure, features, and `qa:report --html` retroactive mode.
+- README: `--html` flag added to Browser QA command signatures and Agent usage helper examples.
+
 ## [0.1.26] - 2026-03-04
 ### Added
 - **Browser QA engine** (`qa:init`, `qa:doctor`, `qa:run`, `qa:scan`, `qa:report`): full Playwright-powered browser testing built into aios-lite. No LLM required. No separate tool. Playwright is an optional runtime dependency — zero impact on users who don't need browser testing.

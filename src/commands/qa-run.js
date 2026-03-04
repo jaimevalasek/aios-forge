@@ -852,7 +852,17 @@ async function runQaRun({ args, options = {}, logger, t }) {
     const summary = { critical: bySev('critical'), high: bySev('high'), medium: bySev('medium'), low: bySev('low') };
     logger.log(t('qa_run.findings_summary', summary));
 
-    const output = { ok: true, targetDir, url, summary, mdPath, jsonPath, screenshotsDir, findings, acCoverage };
+    // HTML report (optional, additive — does not replace MD/JSON)
+    let htmlPath, htmlDir;
+    if (options.html) {
+      const { writeHtmlReport } = require('../qa-html-report');
+      const result = await writeHtmlReport(targetDir, projectName, url, findings, acCoverage, perf, 'run', screenshotsDir, { thresholds });
+      htmlPath = result.htmlPath;
+      htmlDir = result.runDir;
+      logger.log(t('qa_run.html_report_written', { path: htmlPath }));
+    }
+
+    const output = { ok: true, targetDir, url, summary, mdPath, jsonPath, screenshotsDir, findings, acCoverage, ...(htmlPath ? { htmlPath, htmlDir } : {}) };
     if (options.json) return output;
     return output;
   } finally {

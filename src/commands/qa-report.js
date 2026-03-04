@@ -21,6 +21,29 @@ async function runQaReport({ args, options = {}, logger, t }) {
     }
   }
 
+  if (options.html) {
+    if (!(await exists(jsonPath))) {
+      logger.error(t('qa_report.not_found'));
+      process.exitCode = 1;
+      return { ok: false, error: 'report_not_found' };
+    }
+    try {
+      const raw = await fs.readFile(jsonPath, 'utf8');
+      const data = JSON.parse(raw);
+      const { writeHtmlReport } = require('../qa-html-report');
+      const screenshotsDir = path.join(targetDir, 'aios-qa-screenshots');
+      const result = await writeHtmlReport(
+        targetDir, data.project || 'Project', data.url || '',
+        data.findings || [], data.ac_coverage || [], data.performance || null,
+        data.mode || 'run', screenshotsDir, { routes: data.routes_scanned }
+      );
+      logger.log(t('qa_report.html_report_written', { path: result.htmlPath }));
+      return { ok: true, htmlPath: result.htmlPath };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  }
+
   const content = await readTextIfExists(mdPath);
   if (!content) {
     logger.error(t('qa_report.not_found'));

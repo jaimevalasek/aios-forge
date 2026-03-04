@@ -43,6 +43,16 @@ module.exports = {
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=pt-BR]',
     help_mcp_doctor:
       'aios-lite mcp:doctor [path] [--strict-env] [--json] [--locale=pt-BR]',
+    help_qa_doctor:
+      'aios-lite qa:doctor [path] [--json] [--locale=pt-BR]',
+    help_qa_init:
+      'aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=pt-BR]',
+    help_qa_run:
+      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json] [--locale=pt-BR]',
+    help_qa_scan:
+      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=pt-BR]',
+    help_qa_report:
+      'aios-lite qa:report [path] [--html] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erro: {message}'
@@ -601,7 +611,8 @@ module.exports = {
     report_written: 'Relatorio escrito: {path}',
     json_written: 'Relatorio JSON escrito: {path}',
     screenshots_dir: 'Screenshots salvos em: {path}',
-    findings_summary: 'Findings: {critical} critico(s), {high} alto(s), {medium} medio(s), {low} baixo(s)'
+    findings_summary: 'Findings: {critical} critico(s), {high} alto(s), {medium} medio(s), {low} baixo(s)',
+    html_report_written: 'Relatorio HTML escrito: {path}'
   },
   qa_scan: {
     playwright_missing: 'Playwright nao instalado. Execute: npm install -g playwright && npx playwright install chromium',
@@ -613,9 +624,11 @@ module.exports = {
     scanning_route: 'Escaneando: {route}',
     done: 'Scan autonomo concluido.',
     report_written: 'Relatorio escrito: {path}',
-    findings_summary: 'Findings: {critical} critico(s), {high} alto(s), {medium} medio(s), {low} baixo(s)'
+    findings_summary: 'Findings: {critical} critico(s), {high} alto(s), {medium} medio(s), {low} baixo(s)',
+    html_report_written: 'Relatorio HTML escrito: {path}'
   },
   qa_report: {
-    not_found: 'Nenhum relatorio QA encontrado. Execute: aios-lite qa:run ou aios-lite qa:scan'
+    not_found: 'Nenhum relatorio QA encontrado. Execute: aios-lite qa:run ou aios-lite qa:scan',
+    html_report_written: 'Relatorio HTML escrito: {path}'
   }
 };

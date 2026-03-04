@@ -46,11 +46,11 @@ module.exports = {
     help_qa_init:
       'aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=en]',
     help_qa_run:
-      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--json] [--locale=en]',
+      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json] [--locale=en]',
     help_qa_scan:
-      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--json] [--locale=en]',
+      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=en]',
     help_qa_report:
-      'aios-lite qa:report [path] [--json] [--locale=en]',
+      'aios-lite qa:report [path] [--html] [--json] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Error: {message}'
@@ -578,7 +578,8 @@ module.exports = {
     report_written: 'Report written: {path}',
     json_written: 'JSON report written: {path}',
     screenshots_dir: 'Screenshots saved to: {path}',
-    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low'
+    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low',
+    html_report_written: 'HTML report written: {path}'
   },
   qa_scan: {
     playwright_missing: 'Playwright is not installed. Run: npm install -g playwright && npx playwright install chromium',
@@ -590,9 +591,11 @@ module.exports = {
     scanning_route: 'Scanning: {route}',
     done: 'Autonomous scan complete.',
     report_written: 'Report written: {path}',
-    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low'
+    findings_summary: 'Findings: {critical} critical, {high} high, {medium} medium, {low} low',
+    html_report_written: 'HTML report written: {path}'
   },
   qa_report: {
-    not_found: 'No QA report found. Run: aios-lite qa:run or aios-lite qa:scan'
+    not_found: 'No QA report found. Run: aios-lite qa:run or aios-lite qa:scan',
+    html_report_written: 'HTML report written: {path}'
   }
 };

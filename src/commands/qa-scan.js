@@ -317,7 +317,16 @@ async function runQaScan({ args, options = {}, logger, t }) {
     const summary = jsonReport.summary;
     logger.log(t('qa_scan.findings_summary', summary));
 
-    const output = { ok: true, targetDir, url, routesScanned: routes.length, summary, mdPath, jsonPath, findings };
+    // HTML report (optional, additive — does not replace MD/JSON)
+    let htmlPath;
+    if (options.html) {
+      const { writeHtmlReport } = require('../qa-html-report');
+      const result = await writeHtmlReport(targetDir, projectName, url, findings, [], null, 'scan', screenshotsDir, { routes });
+      htmlPath = result.htmlPath;
+      logger.log(t('qa_scan.html_report_written', { path: htmlPath }));
+    }
+
+    const output = { ok: true, targetDir, url, routesScanned: routes.length, summary, mdPath, jsonPath, findings, ...(htmlPath ? { htmlPath } : {}) };
     if (options.json) return output;
     return output;
   } finally {

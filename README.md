@@ -54,9 +54,9 @@ If your stack is not listed in menus, use free-text values via `--framework`, `-
 **Browser QA (Playwright)**
 - [`aios-lite qa:init`](docs/en/qa-browser.md#qainit) `[path] [--url=<app-url>] [--dry-run] [--json]`
 - [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor) `[path] [--json]`
-- [`aios-lite qa:run`](docs/en/qa-browser.md#qarun) `[path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--json]`
-- [`aios-lite qa:scan`](docs/en/qa-browser.md#qascan) `[path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--json]`
-- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport) `[path] [--json]`
+- [`aios-lite qa:run`](docs/en/qa-browser.md#qarun) `[path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]`
+- [`aios-lite qa:scan`](docs/en/qa-browser.md#qascan) `[path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]`
+- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport) `[path] [--html] [--json]`
 
 **Testing and validation (CI / contributors)**
 - [`aios-lite test:smoke`](docs/en/cli-reference.md#testsmoke) `[workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
@@ -94,7 +94,9 @@ If your AI CLI does not show a visual agent picker, these commands let you inter
 - [`aios-lite qa:init --url=http://localhost:3000`](docs/en/qa-browser.md#qainit)
 - [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor)
 - [`aios-lite qa:run --persona=hacker`](docs/en/qa-browser.md#qarun)
+- [`aios-lite qa:run --html`](docs/en/qa-browser.md#html-reports) — visual HTML report in `reports/`
 - [`aios-lite qa:scan --depth=2 --max-pages=30`](docs/en/qa-browser.md#qascan)
+- [`aios-lite qa:report --html`](docs/en/qa-browser.md#html-reports) — retroactive HTML from last run
 - [`aios-lite qa:report`](docs/en/qa-browser.md#qareport)
 
 **Integration tests (CI)**
