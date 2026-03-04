@@ -207,7 +207,7 @@ contract_framework: ""
 wallet_provider: ""
 indexer: ""
 rpc_provider: ""
-aios_lite_version: "0.1.24"
+aios_lite_version: "0.1.25"
 generated_at: "ISO-8601"
 ---
 
@@ -309,10 +309,10 @@ Apres le setup, toujours conclure avec l'etape suivante recommandee. Utiliser le
 | project_type | classification | Agent suivant |
 |---|---|---|
 | `site` | tout | **@ux-ui** |
-| `web_app` / `api` / `script` | MICRO | **@dev** |
-| `web_app` / `api` | SMALL | **@analyst** |
-| `web_app` / `api` | MEDIUM | **@analyst** (puis @architect → @ux-ui → @orchestrator) |
-| `dapp` | tout | **@analyst** |
+| `web_app` / `api` / `script` | MICRO | **@product** (optionnel) ou **@dev** |
+| `web_app` / `api` | SMALL | **@product** → puis @analyst |
+| `web_app` / `api` | MEDIUM | **@product** → puis @analyst → @architect |
+| `dapp` | tout | **@product** (optionnel) → puis @analyst |
 
 Exemple de message de cloture :
 > "Setup termine. Prochaine etape : activez **@ux-ui** pour concevoir votre landing page."

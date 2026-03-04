@@ -18,6 +18,7 @@ There are no slash commands in Codex. Invoke agents by describing your intent:
 | @analyst | "analyze the requirements", "use the analyst agent" |
 | @architect | "design the architecture", "use the architect agent" |
 | @ux-ui | "design the UI", "use the ux-ui agent" |
+| @product | "define the product vision", "use the product agent", "start the product wizard" |
 | @pm | "create the user stories", "use the pm agent" |
 | @dev | "implement the feature", "use the dev agent" |
 | @qa | "write the tests", "use the qa agent" |
@@ -30,6 +31,7 @@ When invoked, read the corresponding agent file listed below and follow its inst
 - @analyst → `.aios-lite/agents/analyst.md`
 - @architect → `.aios-lite/agents/architect.md`
 - @ux-ui → `.aios-lite/agents/ux-ui.md`
+- @product → `.aios-lite/agents/product.md`
 - @pm → `.aios-lite/agents/pm.md`
 - @dev → `.aios-lite/agents/dev.md`
 - @qa → `.aios-lite/agents/qa.md`

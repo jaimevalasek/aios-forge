@@ -207,7 +207,7 @@ contract_framework: ""
 wallet_provider: ""
 indexer: ""
 rpc_provider: ""
-aios_lite_version: "0.1.24"
+aios_lite_version: "0.1.25"
 generated_at: "ISO-8601"
 ---
 
@@ -309,10 +309,10 @@ Tras completar el setup, siempre cerrar con el proximo paso recomendado. Usar el
 | project_type | classification | Proximo agente |
 |---|---|---|
 | `site` | cualquiera | **@ux-ui** |
-| `web_app` / `api` / `script` | MICRO | **@dev** |
-| `web_app` / `api` | SMALL | **@analyst** |
-| `web_app` / `api` | MEDIUM | **@analyst** (luego @architect → @ux-ui → @orchestrator) |
-| `dapp` | cualquiera | **@analyst** |
+| `web_app` / `api` / `script` | MICRO | **@product** (opcional) o **@dev** |
+| `web_app` / `api` | SMALL | **@product** → luego @analyst |
+| `web_app` / `api` | MEDIUM | **@product** → luego @analyst → @architect |
+| `dapp` | cualquiera | **@product** (opcional) → luego @analyst |
 
 Ejemplo de cierre:
 > "Setup completado. Proximo paso: activa **@ux-ui** para disenar tu landing page."

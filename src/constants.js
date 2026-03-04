@@ -18,6 +18,7 @@ const MANAGED_FILES = [
   '.aios-lite/agents/analyst.md',
   '.aios-lite/agents/architect.md',
   '.aios-lite/agents/ux-ui.md',
+  '.aios-lite/agents/product.md',
   '.aios-lite/agents/pm.md',
   '.aios-lite/agents/dev.md',
   '.aios-lite/agents/qa.md',
@@ -26,6 +27,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/en/agents/analyst.md',
   '.aios-lite/locales/en/agents/architect.md',
   '.aios-lite/locales/en/agents/ux-ui.md',
+  '.aios-lite/locales/en/agents/product.md',
   '.aios-lite/locales/en/agents/pm.md',
   '.aios-lite/locales/en/agents/dev.md',
   '.aios-lite/locales/en/agents/qa.md',
@@ -34,6 +36,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/pt-BR/agents/analyst.md',
   '.aios-lite/locales/pt-BR/agents/architect.md',
   '.aios-lite/locales/pt-BR/agents/ux-ui.md',
+  '.aios-lite/locales/pt-BR/agents/product.md',
   '.aios-lite/locales/pt-BR/agents/pm.md',
   '.aios-lite/locales/pt-BR/agents/dev.md',
   '.aios-lite/locales/pt-BR/agents/qa.md',
@@ -42,6 +45,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/es/agents/analyst.md',
   '.aios-lite/locales/es/agents/architect.md',
   '.aios-lite/locales/es/agents/ux-ui.md',
+  '.aios-lite/locales/es/agents/product.md',
   '.aios-lite/locales/es/agents/pm.md',
   '.aios-lite/locales/es/agents/dev.md',
   '.aios-lite/locales/es/agents/qa.md',
@@ -50,6 +54,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/fr/agents/analyst.md',
   '.aios-lite/locales/fr/agents/architect.md',
   '.aios-lite/locales/fr/agents/ux-ui.md',
+  '.aios-lite/locales/fr/agents/product.md',
   '.aios-lite/locales/fr/agents/pm.md',
   '.aios-lite/locales/fr/agents/dev.md',
   '.aios-lite/locales/fr/agents/qa.md',
@@ -119,6 +124,13 @@ const AGENT_DEFINITIONS = [
     path: '.aios-lite/agents/setup.md',
     dependsOn: [],
     output: '.aios-lite/context/project.context.md'
+  },
+  {
+    id: 'product',
+    command: '@product',
+    path: '.aios-lite/agents/product.md',
+    dependsOn: [],
+    output: '.aios-lite/context/prd.md'
   },
   {
     id: 'analyst',
