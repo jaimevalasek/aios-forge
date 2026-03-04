@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.22] - 2026-03-04
+### Fixed
+- `setup:context` command: `--lang=pt-BR` (and any `--lang` alias) was silently ignored — `applyExplicitOverrides` only read `options.language` but the parser stores the flag as `options.lang`. Fixed by reading `options.language ?? options.lang`, consistent with all other commands (`install`, `update`, `init`, `locale-apply`, etc.). Running `npx aios-lite setup:context . --defaults --lang=pt-BR` now correctly installs the pt-BR locale agents.
+
 ## [0.1.21] - 2026-03-03
 ### Changed
 - `@ux-ui` Step 0 (base + en/pt-BR/es/fr locales): added **Option C — Default / Skip** to the visual style question. When chosen, the agent skips style confirmation and goes directly to Step 1 using `interface-design.md` as the sole design authority, letting domain exploration drive the visual direction organically. Accepted inputs: C / skip / pular / saltar / passer / padrão / default.

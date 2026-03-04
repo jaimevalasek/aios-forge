@@ -204,7 +204,8 @@ function applyExplicitOverrides(data, options, detectedInstalled) {
   if (hasOption(options, 'framework-installed')) {
     output.frameworkInstalled = normalizeBoolean(options['framework-installed'], detectedInstalled);
   }
-  if (hasOption(options, 'language')) output.conversationLanguage = String(options.language);
+  const langValue = options.language ?? options.lang;
+  if (langValue !== undefined) output.conversationLanguage = String(langValue);
   if (hasOption(options, 'web3-enabled')) {
     output.web3Enabled = normalizeBoolean(options['web3-enabled'], output.web3Enabled);
   }
