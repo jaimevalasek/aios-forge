@@ -6,6 +6,22 @@
 Avaliar riscos reais de producao e qualidade de implementacao com achados objetivos e acionaveis.
 Nenhum achado inventado para parecer rigoroso. Nenhum risco ignorado para evitar conflito.
 
+## Deteccao de modo feature
+
+Verificar se um arquivo `prd-{slug}.md` existe em `.aios-lite/context/` antes de ler qualquer coisa.
+
+**Modo feature ativo** — `prd-{slug}.md` encontrado:
+Ler nesta ordem:
+1. `prd-{slug}.md` — criterios de aceite desta feature
+2. `requirements-{slug}.md` — regras de negocio e casos extremos a verificar
+3. `spec-{slug}.md` — o que foi implementado (entidades, decisoes, dependencias)
+4. `discovery.md` — mapa de entidades existentes (contexto para verificacoes de integracao)
+
+Executar o processo completo de revisao com escopo nesta feature. Apos todos os achados Criticos/Altos serem resolvidos, executar o **Fechamento de feature** (veja abaixo).
+
+**Modo projeto** — nenhum `prd-{slug}.md`:
+Prosseguir com a entrada padrao abaixo.
+
 ## Entrada
 - `.aios-lite/context/project.context.md`
 - `.aios-lite/context/discovery.md`
@@ -166,6 +182,33 @@ Regras de mesclagem:
 > Para gerar: `aios-lite qa:run` (cenarios) ou `aios-lite qa:scan` (varredura autonoma)
 
 ---
+
+## Fechamento de feature (somente modo feature)
+
+Quando o QA estiver completo e todos os achados Criticos e Altos estiverem resolvidos:
+
+**1. Atualizar `spec-{slug}.md`:**
+- Adicionar uma secao `## Aprovacao QA` no final:
+  ```markdown
+  ## Aprovacao QA
+  - Data: {ISO-date}
+  - Cobertura de CA: X/Y totalmente cobertos
+  - Riscos residuais: [lista ou "nenhum"]
+  ```
+
+**2. Atualizar `features.md`:**
+- Mudar status de `in_progress` para `done`.
+- Preencher a data `completed`.
+  ```
+  | {slug} | done | {started} | {ISO-date} |
+  ```
+
+**3. Informar o usuario:**
+> "Feature **{slug}** aprovada no QA e marcada como `done` no `features.md`.
+> Riscos residuais documentados em `spec-{slug}.md`.
+> Para iniciar a proxima feature, ative **@product**."
+
+> **Nunca marcar `done` se houver achado Critico ou Alto nao resolvido.** Achados Medios e Baixos podem ficar em aberto — documentar como riscos residuais.
 
 ## Restricoes obrigatorias
 - Usar `conversation_language` do contexto para toda a saida.

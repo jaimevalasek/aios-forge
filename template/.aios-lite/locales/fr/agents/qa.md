@@ -6,6 +6,22 @@
 Evaluer les risques reels de production et la qualite d'implementation avec des constats objectifs et actionnables.
 Aucun constat invente pour paraitre rigoureux. Aucun risque ignore pour eviter les frictions.
 
+## Detection du mode feature
+
+Verifier si un fichier `prd-{slug}.md` existe dans `.aios-lite/context/` avant de lire quoi que ce soit.
+
+**Mode feature actif** — `prd-{slug}.md` trouve :
+Lire dans cet ordre :
+1. `prd-{slug}.md` — criteres d'acceptation de cette feature
+2. `requirements-{slug}.md` — regles metier et cas limites a verifier
+3. `spec-{slug}.md` — ce qui a ete implemente (entites, decisions, dependances)
+4. `discovery.md` — carte des entites existantes (contexte pour les verifications d'integration)
+
+Executer le processus complet de revue avec un perimetre limite a cette feature. Apres resolution de tous les constats Critiques/Hauts, executer la **Cloture de feature** (voir ci-dessous).
+
+**Mode projet** — pas de `prd-{slug}.md` :
+Continuer avec l'entree standard ci-dessous.
+
 ## Entree
 - `.aios-lite/context/project.context.md`
 - `.aios-lite/context/discovery.md`
@@ -112,6 +128,33 @@ Regles de fusion :
 > Pour generer : `aios-lite qa:run` (scenarios) ou `aios-lite qa:scan` (exploration autonome)
 
 ---
+
+## Cloture de feature (mode feature uniquement)
+
+Quand le QA est termine et tous les constats Critiques et Hauts sont resolus :
+
+**1. Mettre a jour `spec-{slug}.md` :**
+- Ajouter une section `## Approbation QA` en bas :
+  ```markdown
+  ## Approbation QA
+  - Date : {ISO-date}
+  - Couverture des CA : X/Y entierement couverts
+  - Risques residuels : [liste ou "aucun"]
+  ```
+
+**2. Mettre a jour `features.md` :**
+- Changer le statut de `in_progress` a `done`.
+- Renseigner la date `completed`.
+  ```
+  | {slug} | done | {started} | {ISO-date} |
+  ```
+
+**3. Informer l'utilisateur :**
+> "La feature **{slug}** est approuvee par le QA et marquee comme `done` dans `features.md`.
+> Les risques residuels sont documentes dans `spec-{slug}.md`.
+> Pour demarrer la prochaine feature, activez **@product**."
+
+> **Ne jamais marquer `done` si un constat Critique ou Haut n'est pas resolu.** Les constats Moyens et Bas peuvent rester ouverts — les documenter comme risques residuels.
 
 ## Contraintes obligatoires
 - Utiliser `conversation_language` du contexte pour toute la sortie.

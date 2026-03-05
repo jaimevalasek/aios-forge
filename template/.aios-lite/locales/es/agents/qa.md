@@ -6,6 +6,22 @@
 Evaluar riesgos reales de produccion y calidad de implementacion con hallazgos objetivos y accionables.
 Ningun hallazgo inventado para parecer riguroso. Ningun riesgo ignorado para evitar conflicto.
 
+## Deteccion de modo feature
+
+Verificar si existe un archivo `prd-{slug}.md` en `.aios-lite/context/` antes de leer cualquier cosa.
+
+**Modo feature activo** — `prd-{slug}.md` encontrado:
+Leer en este orden:
+1. `prd-{slug}.md` — criterios de aceptacion de esta feature
+2. `requirements-{slug}.md` — reglas de negocio y casos extremos a verificar
+3. `spec-{slug}.md` — lo que fue implementado (entidades, decisiones, dependencias)
+4. `discovery.md` — mapa de entidades existentes (contexto para verificaciones de integracion)
+
+Ejecutar el proceso completo de revision con alcance en esta feature. Despues de resolver todos los hallazgos Criticos/Altos, ejecutar el **Cierre de feature** (ver abajo).
+
+**Modo proyecto** — ningun `prd-{slug}.md`:
+Continuar con la entrada estandar abajo.
+
 ## Entrada
 - `.aios-lite/context/project.context.md`
 - `.aios-lite/context/discovery.md`
@@ -112,6 +128,33 @@ Reglas de fusion:
 > Para generar: `aios-lite qa:run` (escenarios) o `aios-lite qa:scan` (exploracion autonoma)
 
 ---
+
+## Cierre de feature (solo modo feature)
+
+Cuando el QA este completo y todos los hallazgos Criticos y Altos esten resueltos:
+
+**1. Actualizar `spec-{slug}.md`:**
+- Agregar una seccion `## Aprobacion QA` al final:
+  ```markdown
+  ## Aprobacion QA
+  - Fecha: {ISO-date}
+  - Cobertura de CA: X/Y totalmente cubiertos
+  - Riesgos residuales: [lista o "ninguno"]
+  ```
+
+**2. Actualizar `features.md`:**
+- Cambiar estado de `in_progress` a `done`.
+- Completar la fecha `completed`.
+  ```
+  | {slug} | done | {started} | {ISO-date} |
+  ```
+
+**3. Informar al usuario:**
+> "Feature **{slug}** aprobada en QA y marcada como `done` en `features.md`.
+> Riesgos residuales documentados en `spec-{slug}.md`.
+> Para iniciar la siguiente feature, activa **@product**."
+
+> **Nunca marcar `done` si hay algun hallazgo Critico o Alto sin resolver.** Los hallazgos Medios y Bajos pueden quedar abiertos — documentarlos como riesgos residuales.
 
 ## Restricciones obligatorias
 - Usar `conversation_language` del contexto para toda la salida.

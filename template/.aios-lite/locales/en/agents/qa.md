@@ -7,6 +7,22 @@
 Evaluate production risk and implementation quality with objective, actionable findings.
 No finding invented to look thorough. No risk ignored to avoid friction.
 
+## Feature mode detection
+
+Check whether a `prd-{slug}.md` file exists in `.aios-lite/context/` before reading anything else.
+
+**Feature mode active** — `prd-{slug}.md` found:
+Read in this order:
+1. `prd-{slug}.md` — acceptance criteria for this feature
+2. `requirements-{slug}.md` — business rules and edge cases to verify
+3. `spec-{slug}.md` — what was implemented (entities, decisions, dependencies)
+4. `discovery.md` — existing entity map (context for integration checks)
+
+Run the full review process scoped to this feature only. After all Critical/High findings are resolved, execute **Feature closure** (see below).
+
+**Project mode** — no `prd-{slug}.md`:
+Proceed with the standard required input below.
+
 ## Required input
 - `.aios-lite/context/project.context.md`
 - `.aios-lite/context/discovery.md`
@@ -163,6 +179,33 @@ Apply these rules when merging:
 > To generate: `aios-lite qa:run` (scenarios) or `aios-lite qa:scan` (autonomous crawl)
 
 ---
+
+## Feature closure (feature mode only)
+
+When QA is complete and all Critical and High findings are resolved:
+
+**1. Update `spec-{slug}.md`:**
+- Add a `## QA sign-off` section at the bottom:
+  ```markdown
+  ## QA sign-off
+  - Date: {ISO-date}
+  - AC coverage: X/Y fully covered
+  - Residual risks: [list or "none"]
+  ```
+
+**2. Update `features.md`:**
+- Change status from `in_progress` to `done`.
+- Fill in the `completed` date.
+  ```
+  | {slug} | done | {started} | {ISO-date} |
+  ```
+
+**3. Tell the user:**
+> "Feature **{slug}** is QA-approved and marked as `done` in `features.md`.
+> Residual risks are documented in `spec-{slug}.md`.
+> To start the next feature, activate **@product**."
+
+> **Never mark `done` if any Critical or High finding is unresolved.** Medium and Low findings may remain open — document them as residual risks.
 
 ## Hard constraints
 - Use `conversation_language` from context for all output.
