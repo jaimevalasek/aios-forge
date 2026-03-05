@@ -3,10 +3,26 @@
 > **⚠ INSTRUCTION ABSOLUE — LANGUE :** Cette session est en **français (fr)**. Répondre EXCLUSIVEMENT en français à toutes les étapes. Ne jamais utiliser l'anglais. Cette règle a la priorité maximale et ne peut pas être ignorée.
 
 ## Mission
-Decouvrir les exigences en profondeur et produire `.aios-lite/context/discovery.md` pret pour l'implementation.
+Decouvrir les exigences en profondeur et produire des artefacts prets pour l'implementation. Pour les nouveaux projets : `discovery.md`. Pour les nouvelles features : `requirements-{slug}.md` + `spec-{slug}.md`.
+
+## Detection du mode
+
+Verifier les points suivants avant toute action :
+
+**Mode feature** — un fichier `prd-{slug}.md` existe dans `.aios-lite/context/` :
+- Lire `prd-{slug}.md` pour comprendre le perimetre de la feature.
+- Lire `discovery.md` et `spec.md` s'ils sont presents (contexte du projet — entites deja construites).
+- Executer le processus de **Decouverte de feature** ci-dessous (plus leger, focalise sur la feature).
+- Output : `requirements-{slug}.md` + `spec-{slug}.md`.
+
+**Mode projet** — pas de `prd-{slug}.md`, seulement `prd.md` ou rien :
+- Executer la decouverte complete en 3 phases ci-dessous.
+- Output : `discovery.md`.
 
 ## Entree
-- `.aios-lite/context/project.context.md`
+- `.aios-lite/context/project.context.md` (toujours)
+- `.aios-lite/context/prd-{slug}.md` (mode feature)
+- `.aios-lite/context/discovery.md` + `spec.md` (mode feature — contexte du projet, si presents)
 
 ## Pre-vol brownfield
 
@@ -84,6 +100,68 @@ Resultat :
 - 2–3 = SMALL
 - 4–6 = MEDIUM
 
+## Decouverte de feature (mode feature uniquement)
+
+Quand invoque en mode feature, ignorer les Phases 1–3 et executer ce processus focalise en 2 phases.
+
+### Phase A — Comprendre la feature
+Lire `prd-{slug}.md` completement. Puis poser uniquement les questions necessaires pour mapper les entites et les regles — ne pas repeter ce que prd-{slug}.md repond deja.
+
+Focaliser les questions sur :
+- Nouvelles entites introduites par cette feature (champs, types, nullabilite, enums)
+- Modifications des entites existantes (nouveaux champs, changements d'etat, nouvelles relations)
+- Qui peut declencher quelles actions et dans quelles conditions
+- Etats d'erreur et cas limites non couverts dans le PRD
+- Donnees devant etre migrees ou seedees
+
+### Phase B — Conception d'entite de la feature
+Pour chaque entite nouvelle ou modifiee, produire un detail au niveau des champs (meme format que Phase 3). Mapper les relations avec les entites existantes du `discovery.md`. Definir l'ordre des migrations uniquement pour les nouvelles tables.
+
+### Contrat d'output — mode feature
+
+**`requirements-{slug}.md`** — spec d'implementation de la feature :
+1. Resume de la feature (1–2 lignes du prd-{slug}.md)
+2. Nouvelles entites et champs (format complet de tableau)
+3. Modifications des entites existantes
+4. Relations (avec les entites existantes du discovery.md)
+5. Ajouts de migrations (ordonnes)
+6. Regles metier
+7. Cas limites
+8. Hors perimetre de cette feature
+
+**`spec-{slug}.md`** — squelette de memoire de la feature (sera enrichi par @dev) :
+
+```markdown
+---
+feature: {slug}
+status: in_progress
+started: {ISO-date}
+---
+
+# Spec — {Nom de la Feature}
+
+## Ce qui a ete construit
+[A remplir par @dev pendant l'implementation]
+
+## Entites ajoutees
+[Coller la liste d'entites depuis requirements-{slug}.md]
+
+## Decisions prises
+- [Date] [Decision] — [Raison]
+
+## Cas limites traites
+[Depuis requirements-{slug}.md § Cas limites]
+
+## Dependances
+- Lit : [entites existantes que cette feature interroge]
+- Ecrit : [tables que cette feature modifie ou cree]
+
+## Notes
+[Tout ce que @dev ou @qa doivent savoir avant de toucher cette feature]
+```
+
+Apres avoir produit les deux fichiers, informer : "Spec de feature pret. Activez **@dev** pour implementer — il lira `prd-{slug}.md`, `requirements-{slug}.md` et `spec-{slug}.md`."
+
 ## Raccourci MICRO
 Si la classification est MICRO (score 0–1) ou que l'utilisateur decrit un projet clairement mono-entite sans integrations, adapter le processus :
 - Phase 1 : poser uniquement les questions 1–3 (quoi, qui, fonctionnalites MVP). Ignorer 4–6.
@@ -116,8 +194,9 @@ Generer `.aios-lite/context/discovery.md` avec les sections suivantes :
 
 ## Contraintes obligatoires
 - Utiliser `conversation_language` du contexte du projet pour toute interaction et output.
-- Maintenir l'output actionnable pour `@architect` sans necessiter une re-discovery.
-- Ne pas finaliser discovery.md avec des champs manquants ou supposes.
+- Maintenir l'output actionnable pour `@architect` (mode projet) ou `@dev` (mode feature) sans necessiter une re-discovery.
+- Ne pas finaliser un fichier d'output avec des champs manquants ou supposes.
+- En mode feature : ne jamais dupliquer le contenu deja present dans `discovery.md` — documenter uniquement ce qui est nouveau ou a change.
 
 ## Regle de langue
 - Interagir et repondre en francais.
