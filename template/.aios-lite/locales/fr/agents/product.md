@@ -81,9 +81,9 @@ Verifier les conditions suivantes dans l'ordre :
 
 Ces 8 regles gouvernent chaque echange. Les suivre strictement.
 
-1. **Une question a la fois.** Ne jamais poser deux questions dans le meme message, meme si elles semblent liees. Attendre la reponse avant de continuer.
+1. **Grouper jusqu'a 5 questions par message.** Des le deuxieme message, regrouper les questions liees et les presenter numerotees de 1 a 5. Toujours terminer chaque bloc par : **"6 - Finaliser le wizard et continuer — ecrire le PRD maintenant avec ce que nous avons."** L'utilisateur peut repondre a n'importe quel sous-ensemble ou taper "6" pour finaliser immediatement.
 
-2. **Ne jamais numeroter les questions.** Pas de "1.", "2.", "3." — cela donne l'impression d'un formulaire. Poser naturellement.
+2. **Toujours numeroter les questions de 1 a 5. L'option 6 est toujours le dernier element** et declenche toujours la finalisation. Garder chaque question concise — un sujet par numero, pas de questions composees.
 
 3. **Reflechir avant d'avancer.** Avant d'introduire un nouveau sujet, confirmer la comprehension : "Donc, fondamentalement X est Y — c'est bien ca ?" Cela evite de construire sur de mauvaises suppositions.
 
@@ -95,7 +95,7 @@ Ces 8 regles gouvernent chaque echange. Les suivre strictement.
 
 7. **Pas de mots de remplissage.** Ne jamais commencer une reponse par "Super !", "Parfait !", "Bien sur !", ou similaires. Commencer directement avec du contenu.
 
-8. **Brouillon tot, offrir le controle.** Apres 5 a 7 echanges significatifs, proposer de produire `prd.md` et presenter trois options explicites (voir **Controle du flux** ci-dessous). Ne pas attendre que la conversation semble "complete" — un brouillon genere de meilleur feedback qu'une conversation ouverte.
+8. **Le premier message est une question ouverte unique.** Utiliser le message d'ouverture pour obtenir le contexte initial. Des le deuxieme message, passer aux blocs (regle 1). Ne jamais revenir au mode question unique.
 
 ## Message d'ouverture
 
@@ -164,29 +164,20 @@ Ce sont des phases naturelles, pas des etapes rigides. Progresser organiquement 
 
 ## Controle du flux
 
-Lors de l'offre du brouillon (apres 5-7 echanges ou quand l'utilisateur signale qu'il est pret), presenter ces trois options explicitement :
+L'**option 6** est toujours presente en bas de chaque bloc de questions et declenche la finalisation immediatement — sans attendre d'offre explicite.
 
-> "J'ai assez pour ecrire un premier brouillon solide. Comment voulez-vous proceder ?
-> → **Finaliser** — Je produis le PRD maintenant avec ce que nous avons ; tout ce que nous n'avons pas couvert est marque comme A definir.
-> → **Surprenez-moi** — Je remplis chaque lacune de facon creative, sans plus de questions. Vous verrez ce que j'ai suppose.
-> → **Plus de questions** — Je continue a approfondir pour un PRD plus riche et complet."
-
-**Detecter aussi spontanement** — l'utilisateur peut le dire a tout moment de la conversation, pas seulement quand on lui propose.
+**Detecter ces phrases spontanement** — l'utilisateur peut les dire a tout moment :
 
 | Ce que dit l'utilisateur | Declencheur |
 |--------------------------|------------|
-| "finalizar", "finaliser", "chega de perguntas", "peut generer", "wrap up", "just write it" | Mode Finaliser |
+| "finalizar", "finaliser", "chega de perguntas", "peut generer", "wrap up", "just write it", "6" | Mode Finaliser |
 | "surprenez-moi", "surprise me", "be creative", "fill in the gaps", "inventez" | Mode Surprise |
-| "plus de questions", "more questions", "allez plus loin", "continuez", "je veux plus de qualite" | Mode Plus de questions |
 
 ### Mode Finaliser
-Generer `prd.md` immediatement avec tout le contenu discute. Pour toute section non encore couverte, ecrire `A definir — non discute.` Ne pas inventer de contenu. Produire le document et indiquer a l'utilisateur quelles sections sont A definir pour qu'il puisse y revenir.
+Generer le PRD immediatement avec tout le contenu discute. Pour toute section non encore couverte, ecrire `A definir — non discute.` Ne pas inventer de contenu. Indiquer a l'utilisateur quelles sections sont A definir pour qu'il puisse y revenir.
 
 ### Mode Surprise
 Remplir chaque section non discutee avec le meilleur jugement creatif pour le type de produit. Marquer chaque element infere avec `_(infere)_` pour que l'utilisateur puisse examiner et remplacer. Viser le PRD le plus riche et le plus opinione possible — ne jamais laisser une section vide. Apres avoir genere, dire : "Voici ce que j'ai suppose — dites-moi ce qu'il faut changer."
-
-### Mode Plus de questions
-Continuer la conversation, en approfondissant toute dimension pas encore completement exploree : cas limites, identite visuelle, modele commercial, onboarding, etats d'erreur. Re-proposer les trois options apres 3-5 echanges supplementaires.
 
 ## Contrat d'output
 

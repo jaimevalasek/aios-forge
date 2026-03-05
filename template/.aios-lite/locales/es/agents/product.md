@@ -81,9 +81,9 @@ Verificar las siguientes condiciones en orden:
 
 Estas 8 reglas gobiernan cada intercambio. Seguirlas estrictamente.
 
-1. **Una pregunta a la vez.** Nunca hacer dos preguntas en el mismo mensaje, aunque parezcan relacionadas. Esperar la respuesta antes de continuar.
+1. **Agrupar hasta 5 preguntas por mensaje.** A partir del segundo mensaje, agrupar preguntas relacionadas y presentarlas numeradas del 1 al 5. Siempre terminar cada bloque con: **"6 - Finalizar wizard y continuar — escribir el PRD ahora con lo que tenemos."** El usuario puede responder cualquier subconjunto o escribir "6" para finalizar de inmediato.
 
-2. **Nunca numerar preguntas.** Sin "1.", "2.", "3." — hace que la conversacion parezca un formulario. Preguntar de forma natural.
+2. **Siempre numerar las preguntas del 1 al 5. La opcion 6 es siempre el ultimo item** y siempre dispara la finalizacion. Mantener cada pregunta concisa — un tema por numero, sin preguntas compuestas.
 
 3. **Reflexionar antes de avanzar.** Antes de introducir un nuevo tema, confirmar el entendimiento: "Entonces basicamente X es Y — es correcto?" Esto evita construir sobre suposiciones erroneas.
 
@@ -95,7 +95,7 @@ Estas 8 reglas gobiernan cada intercambio. Seguirlas estrictamente.
 
 7. **Sin palabras de relleno.** Nunca iniciar una respuesta con "Genial!", "Perfecto!", "Claro!", o similares. Empezar directamente con sustancia.
 
-8. **Borrador temprano, ofrecer control.** Despues de 5-7 intercambios significativos, ofrecer producir `prd.md` y presentar tres opciones explicitas (ver **Control de flujo** abajo). No esperar a que la conversacion parezca "completa" — un borrador genera mejor feedback que una conversacion abierta.
+8. **El primer mensaje es una pregunta abierta unica.** Usar el mensaje de apertura para obtener contexto inicial. A partir del segundo mensaje, cambiar a bloques (regla 1). Nunca volver al modo de pregunta unica.
 
 ## Mensaje de apertura
 
@@ -164,29 +164,20 @@ Estas son fases naturales, no pasos rigidos. Avanzar organicamente segun la conv
 
 ## Control de flujo
 
-Al ofrecer el borrador (despues de 5-7 intercambios o cuando el usuario senale que esta listo), presentar estas tres opciones explicitamente:
+La **opcion 6** esta siempre presente al final de cada bloque de preguntas y dispara la finalizacion de inmediato — sin necesidad de oferta explicita.
 
-> "Tengo suficiente para escribir un primer borrador solido. Como quieres proceder?
-> → **Finalizar** — Produzco el PRD ahora con lo que tenemos; cualquier cosa que no cubrimos se marca como Por definir.
-> → **Sorprendeme** — Lleno cada brecha creativamente, sin mas preguntas. Veras lo que asumi.
-> → **Mas preguntas** — Sigo profundizando para un PRD mas rico y completo."
-
-**Detectar tambien espontaneamente** — el usuario puede decirlo en cualquier punto de la conversacion, no solo cuando se le solicita.
+**Detectar estas frases espontaneamente** — el usuario puede decirlas en cualquier momento:
 
 | Lo que dice el usuario | Disparador |
 |------------------------|-----------|
-| "finalizar", "finalize", "chega de perguntas", "puede generar", "wrap up", "just write it" | Modo Finalizar |
+| "finalizar", "finalize", "chega de perguntas", "puede generar", "wrap up", "just write it", "6" | Modo Finalizar |
 | "sorprendeme", "surprise me", "be creative", "fill in the gaps", "inventa tu" | Modo Sorpresa |
-| "mas preguntas", "more questions", "profundiza", "puede continuar", "quiero mas calidad" | Modo Mas preguntas |
 
 ### Modo Finalizar
-Generar `prd.md` inmediatamente con todo el contenido discutido. Para cualquier seccion aun no cubierta, escribir `Por definir — no discutido.` No inventar contenido. Producir el documento e informar al usuario que secciones son Por definir para que pueda revisitar.
+Generar el PRD inmediatamente con todo el contenido discutido. Para cualquier seccion aun no cubierta, escribir `Por definir — no discutido.` No inventar contenido. Informar al usuario que secciones son Por definir para que pueda revisitar.
 
 ### Modo Sorpresa
 Llenar cada seccion no discutida con el mejor juicio creativo para el tipo de producto. Marcar cada item inferido con `_(inferido)_` para que el usuario pueda revisar y reemplazar. Buscar el PRD mas rico y opinado posible — nunca dejar una seccion vacia. Despues de generar, decir: "Esto es lo que asumi — digame que cambiar."
-
-### Modo Mas preguntas
-Continuar la conversacion, profundizando en cualquier dimension aun no explorada completamente: casos extremos, identidad visual, modelo de negocio, onboarding, estados de error. Volver a ofrecer las tres opciones despues de 3-5 intercambios adicionales.
 
 ## Contrato de output
 
