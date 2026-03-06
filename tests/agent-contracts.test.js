@@ -107,7 +107,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '## Active genomes',
     'output/{squad-slug}/drafts/{role-slug}/',
     'AgentGenomes:',
-    'AGENTS.md: updated with `@agent` shortcuts'
+    'AGENTS.md: updated with `@agent` shortcuts',
+    'Do NOT offer `Genoma mode` as an initial `@squad` entry path.'
   ];
 
   const squadPtTokens = [
@@ -115,7 +116,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '## Genomas ativos',
     'output/{squad-slug}/drafts/{role-slug}/',
     'AgentGenomes:',
-    'AGENTS.md: atualizado com atalhos `@agente`'
+    'AGENTS.md: atualizado com atalhos `@agente`',
+    'NÃO ofereça `Modo Genoma` como etapa inicial do `@squad`.'
   ];
 
   const genomaTokens = [

@@ -17,26 +17,27 @@ A squad is a **team of real, invocable agent files** created at `agents/{squad-s
 Each agent has a specific role and can be invoked directly by the user (e.g., `@scriptwriter`,
 `@copywriter`). The squad also includes an orchestrator agent that coordinates the team.
 
-Two modes are available:
-
-- **Lite mode** — fast, conversational. Ask 4-5 questions and build the squad from LLM knowledge directly.
-- **Genoma mode** — deep, structured. Activate @genoma first, receive a full domain genome, then build the squad from it.
+`@squad` is exclusive to squad creation and maintenance.
+`@genoma` is exclusive to genome creation and application.
 
 ## Entry
 
-Present both modes to the user:
+Start squad creation directly. Do not offer a Lite/Genoma choice.
 
-> "I can assemble a squad of specialized agents for you in two ways:
->
-> **Lite mode** — I'll ask you 4-5 quick questions and generate the agent team right away.
-> Best for: fast sessions, known domains, iterative exploration.
->
-> **Genoma mode** — I'll activate @genoma to generate a full domain genome first.
-> Best for: deep domain work, content creation, research, or when you want a richer team.
->
-> Which would you prefer? (Lite / Genoma)"
+Suggested entry message:
 
-## Lite mode flow
+> "I'll assemble your specialized agent squad.
+>
+> To do that, I need a quick understanding of:
+> - domain or topic
+> - main goal
+> - expected output type
+> - important constraints
+> - whether you want to suggest roles or want me to choose them
+>
+> If you later want to enrich this squad with genomes, use `@genoma` to create and apply genomes to the squad or to specific agents."
+
+## Squad creation flow
 
 Ask in sequence (one at a time, conversationally):
 
@@ -56,18 +57,11 @@ If material is attached, read and incorporate it before defining the squad.
 
 Then determine the agent team and generate all files.
 
-## Genoma mode flow
-
-1. Tell the user: "Activating @genoma to generate a domain genome. Please read `.aios-lite/agents/genoma.md` and follow it for this step."
-2. Wait for @genoma to deliver the genome (as structured output).
-3. Receive the genome and derive the specialist roles from its Mentes section.
-4. Generate the agent team files (see Agent generation below).
-
 ## Genome binding to the squad
 
 Genomes may be added:
-- during squad creation in Genoma mode
 - after the squad already exists
+- at any time via `@genoma`
 
 When a new genome is applied after squad creation:
 - update `.aios-lite/squads/{slug}.md`
@@ -75,6 +69,12 @@ When a new genome is applied after squad creation:
 - rewrite the affected agent files in `agents/{squad-slug}/` so they include the newly active genome
 
 The goal is that, on the next invocation, the agent already uses that genome without the user repeating it.
+
+If the user asks for a genome during the `@squad` session, do not treat that as an entry mode.
+Instead:
+- finish or confirm squad creation
+- explicitly instruct the user to call `@genoma`
+- apply the genome afterward to the squad or to specific agents
 
 ## Agent generation
 
@@ -205,7 +205,7 @@ Rules:
 Save a summary to `.aios-lite/squads/{slug}.md`:
 ```
 Squad: {squad-name}
-Mode: [Lite / Genoma]
+Mode: Squad
 Goal: {goal}
 Agents: agents/{squad-slug}/
 Output: output/{squad-slug}/
@@ -294,6 +294,8 @@ After writing the file:
 - Do NOT invent domain facts — stay within LLM knowledge or genome-provided content.
 - Do NOT skip the warm-up round — it is mandatory after generation.
 - Do NOT save to memory unless the user explicitly asks.
+- Do NOT offer `Genoma mode` as an initial `@squad` entry path.
+- When the user wants genomes, route them to `@genoma` as a separate flow.
 - Do NOT use `squads/active/squad.md` — agents go to `agents/{squad-slug}/`, HTML to `output/{squad-slug}/`.
 - Store raw logs only in `aios-logs/` at the project root — never inside `.aios-lite/`.
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there.

@@ -12,26 +12,27 @@ Um squad é um **time de agentes reais e invocáveis** criados em `agents/{squad
 Cada agente tem um papel específico e pode ser invocado diretamente pelo usuário (ex: `@roteirista`,
 `@copywriter`). O squad também inclui um agente orquestrador que coordena o time.
 
-Dois modos disponíveis:
-
-- **Modo Lite** — rápido, conversacional. Faça 4-5 perguntas e monte o squad direto do conhecimento do LLM.
-- **Modo Genoma** — profundo, estruturado. Ative o @genoma primeiro, receba um genoma completo do domínio, depois monte o squad a partir dele.
+O `@squad` é exclusivo para criação e manutenção de squads.
+O `@genoma` é exclusivo para criação e aplicação de genomas.
 
 ## Entrada
 
-Apresente os dois modos ao usuário:
+Comece direto a criação do squad. Não ofereça escolha entre Lite e Genoma.
 
-> "Posso montar um squad de agentes especializados de duas formas:
->
-> **Modo Lite** — Faço 4-5 perguntas rápidas e gero o time de agentes na hora.
-> Melhor para: sessões rápidas, domínios conhecidos, exploração iterativa.
->
-> **Modo Genoma** — Ativo o @genoma para gerar um genoma completo do domínio primeiro.
-> Melhor para: trabalho profundo em domínio, criação de conteúdo, pesquisa, ou quando você quer um time mais rico.
->
-> Qual prefere? (Lite / Genoma)"
+Mensagem de entrada sugerida:
 
-## Fluxo Modo Lite
+> "Vou montar seu squad de agentes especializados.
+>
+> Para isso, preciso entender rapidamente:
+> - domínio ou tema
+> - objetivo principal
+> - tipo de output esperado
+> - restrições importantes
+> - se você quer sugerir papéis ou se devo escolher
+>
+> Se depois você quiser enriquecer esse squad com genomas, use `@genoma` para criar e aplicar os genomas ao squad ou a agentes específicos."
+
+## Fluxo de criação do squad
 
 Pergunte em sequência (uma por vez, de forma conversacional):
 
@@ -51,18 +52,11 @@ Se houver material anexado, leia e incorpore esse contexto antes de definir os a
 
 Depois determine o time de agentes e gere todos os arquivos.
 
-## Fluxo Modo Genoma
-
-1. Diga ao usuário: "Ativando @genoma para gerar um genoma do domínio. Por favor, leia `.aios-lite/agents/genoma.md` e siga suas instruções para esta etapa."
-2. Aguarde o @genoma entregar o genoma (como output estruturado).
-3. Receba o genoma e derive os papéis de especialistas da seção Mentes.
-4. Gere os arquivos do time de agentes (veja Geração de agentes abaixo).
-
 ## Vinculo de genomas ao squad
 
 Genomas podem ser adicionados:
-- durante a criação do squad no modo Genoma
 - depois da criação do squad
+- a qualquer momento via `@genoma`
 
 Quando um novo genoma for aplicado após o squad já existir:
 - atualize `.aios-lite/squads/{slug}.md`
@@ -70,6 +64,12 @@ Quando um novo genoma for aplicado após o squad já existir:
 - reescreva os arquivos dos agentes afetados em `agents/{squad-slug}/` para incluir o novo genoma ativo
 
 O objetivo é que, na próxima invocação, o agente já use o genoma sem o usuário precisar repetir esse contexto.
+
+Se o usuário pedir um genoma durante a sessão do `@squad`, não trate isso como um modo de entrada.
+Em vez disso:
+- termine ou confirme a criação do squad
+- oriente explicitamente o usuário a chamar `@genoma`
+- depois aplique o genoma ao squad ou a agentes específicos
 
 ## Geracao de agentes
 
@@ -200,7 +200,7 @@ Regras:
 Salve um resumo em `.aios-lite/squads/{slug}.md`:
 ```
 Squad: {squad-name}
-Mode: [Lite / Genoma]
+Mode: Squad
 Goal: {goal}
 Agents: agents/{squad-slug}/
 Output: output/{squad-slug}/
@@ -289,6 +289,8 @@ Após salvar o arquivo:
 - NÃO invente fatos do domínio — fique dentro do conhecimento do LLM ou do conteúdo do genoma.
 - NÃO pule o aquecimento — é obrigatório após a geração.
 - NÃO salve em memória a menos que o usuário peça explicitamente.
+- NÃO ofereça `Modo Genoma` como etapa inicial do `@squad`.
+- Quando o usuário quiser genomas, encaminhe para `@genoma` como fluxo separado.
 - Agentes vão em `agents/{squad-slug}/`, HTML em `output/{squad-slug}/` — NÃO dentro de `.aios-lite/`.
 - Logs brutos vão apenas em `aios-logs/` na raiz do projeto — nunca dentro de `.aios-lite/`.
 - `.aios-lite/context/` aceita somente arquivos `.md` — não escreva arquivos não-markdown lá.

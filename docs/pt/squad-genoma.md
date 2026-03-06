@@ -76,7 +76,7 @@ Exemplo:
 
 ```md
 Squad: YouTube Creator
-Mode: Lite
+Mode: Squad
 Goal: Criar conteúdos virais com retenção forte
 Agents: agents/youtube-creator/
 Output: output/youtube-creator/
@@ -93,48 +93,24 @@ AgentGenomes:
 
 ---
 
-## Quando usar Lite e quando usar Genoma
+## Separação de responsabilidades
 
-### Modo Lite
+O fluxo recomendado agora é mais direto:
 
-Use quando você quer velocidade.
+- `@squad` cria e mantém squads
+- `@genoma` cria e aplica genomas
 
-Fluxo:
+Na prática:
 
-1. chama `@squad`
-2. responde 4 ou 5 perguntas
-3. o squad é criado na hora
-
-Bom para:
-
-- domínios já conhecidos
-- exploração rápida
-- primeira versão do squad
-
-### Modo Genoma
-
-Use quando você quer um domínio mais rico e melhor estruturado.
-
-Fluxo:
-
-1. chama `@squad`
-2. escolhe `Genoma`
-3. `@squad` aciona `@genoma`
-4. o genoma é gerado
-5. o squad nasce a partir desse genoma
-
-Bom para:
-
-- criação de conteúdo
-- pesquisa
-- nichos com linguagem própria
-- squads que você pretende reutilizar
+- `@squad` não deve abrir perguntando entre Lite e Genoma
+- `@squad` entra direto nas perguntas para criação dos agentes
+- `@genoma` é chamado separadamente quando o usuário quiser enriquecer o squad
 
 ---
 
 ## Fluxo recomendado de uso
 
-### Cenário 1: criar um squad em Lite
+### Cenário 1: criar um squad
 
 Exemplo de conversa:
 
@@ -142,7 +118,6 @@ Exemplo de conversa:
 @squad
 Quero montar um squad para YouTube.
 
-Modo: Lite
 Domínio: YouTube Creator focado em vídeos longos
 Objetivo: criar roteiros mais fortes e títulos com CTR alto
 Output: roteiros, títulos, ideias de thumbnail
