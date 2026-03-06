@@ -46,6 +46,14 @@ Ask in sequence (one at a time, conversationally):
 4. **Constraints**: "Any constraints I should know? (audience, tone, technical level, language)"
 5. (optional) **Roles hint**: "Do you have specific roles in mind, or should I choose the specialists?"
 
+The user may respond with:
+- short or long text
+- large pasted context
+- attached files
+- images and screenshots
+
+If material is attached, read and incorporate it before defining the squad.
+
 Then determine the agent team and generate all files.
 
 ## Genoma mode flow
@@ -54,6 +62,19 @@ Then determine the agent team and generate all files.
 2. Wait for @genoma to deliver the genome (as structured output).
 3. Receive the genome and derive the specialist roles from its Mentes section.
 4. Generate the agent team files (see Agent generation below).
+
+## Genome binding to the squad
+
+Genomes may be added:
+- during squad creation in Genoma mode
+- after the squad already exists
+
+When a new genome is applied after squad creation:
+- update `.aios-lite/squads/{slug}.md`
+- record whether the genome applies to the whole squad or to specific agents only
+- rewrite the affected agent files in `agents/{squad-slug}/` so they include the newly active genome
+
+The goal is that, on the next invocation, the agent already uses that genome without the user repeating it.
 
 ## Agent generation
 
@@ -88,6 +109,10 @@ how it thinks differently from the other agents in the squad]
 Squad: {squad-name} | Domain: {domain} | Goal: {goal}
 Other agents: @orquestrador, @{other-role-slugs}
 
+## Active genomes
+- [list genomes inherited from the squad]
+- [list genomes applied specifically to this agent, if any]
+
 ## Specialization
 [Detailed description: cognitive approach, focus areas, the questions this agent
 always asks, what it tends to overlook, and its characteristic output style.
@@ -98,10 +123,13 @@ Rich enough to produce genuinely distinct output from the other agents.]
 
 ## Hard constraints
 - Stay within your specialization — defer other tasks to the relevant agent
+- Always use this agent's active genomes as high-priority domain and style context
 - All deliverable files go to `output/{squad-slug}/`
 - Do not overwrite other agents' output files
+- Write technical session logs to `aios-logs/squads/{squad-slug}/` when logging is needed
 
 ## Output contract
+- Intermediate drafts: `output/{squad-slug}/drafts/{role-slug}/`
 - Deliverables: `output/{squad-slug}/`
 ```
 
@@ -127,17 +155,27 @@ synthesize outputs, manage the session HTML report.
 ## Routing guide
 [For each type of task/question, which agent(s) should handle it and why]
 
+## Squad genomes
+- [list genomes applied to the whole squad]
+- [list per-agent bindings when present]
+
 ## Hard constraints
 - Always involve all relevant specialists for each challenge
-- After each round, update `output/{squad-slug}/session.html` with results
+- Specialists must save structured intermediate content as `.md` in `output/{squad-slug}/drafts/`
+- The final session HTML is the responsibility of the generated squad @orquestrador
+- After each round, write a new HTML file to `output/{squad-slug}/sessions/{session-id}.html`
+- Update `output/{squad-slug}/latest.html` with the latest session content
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there
 
 ## Output contract
-- Session HTML: `output/{squad-slug}/session.html`
+- Agent drafts: `output/{squad-slug}/drafts/`
+- Session HTML: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
 - Agent deliverables: `output/{squad-slug}/`
+- Logs: `aios-logs/squads/{squad-slug}/`
 ```
 
-### Step 3 — Register agents in CLAUDE.md
+### Step 3 — Register agents in the project gateways
 
 Append a Squad section to `CLAUDE.md` at the project root:
 
@@ -148,6 +186,20 @@ Append a Squad section to `CLAUDE.md` at the project root:
 - /orquestrador -> agents/{squad-slug}/orquestrador.md
 ```
 
+Also append a section to `AGENTS.md` at the project root for Codex `@` usage:
+
+```markdown
+## Squad: {squad-name}
+- @{role1} -> `agents/{squad-slug}/{role1}.md`
+- @{role2} -> `agents/{squad-slug}/{role2}.md`
+- @orquestrador -> `agents/{squad-slug}/orquestrador.md`
+```
+
+Rules:
+- do not remove the framework's official agents
+- append the squad entries without overwriting existing content
+- if the squad is already registered, update only that squad section
+
 ### Step 4 — Save squad metadata
 
 Save a summary to `.aios-lite/squads/{slug}.md`:
@@ -157,6 +209,13 @@ Mode: [Lite / Genoma]
 Goal: {goal}
 Agents: agents/{squad-slug}/
 Output: output/{squad-slug}/
+Logs: aios-logs/squads/{squad-slug}/
+LatestSession: output/{squad-slug}/latest.html
+Genomes:
+- [genome applied to the whole squad]
+
+AgentGenomes:
+- {role-slug}: [genome-a], [genome-b]
 ```
 
 ## After generation — confirm and warm-up round (mandatory)
@@ -175,7 +234,7 @@ Agents created in `agents/{squad-slug}/`:
 You can invoke any agent directly (e.g. `@scriptwriter`) for focused work,
 or work through @orquestrador for coordinated sessions.
 
-CLAUDE.md updated with shortcuts.
+CLAUDE.md and AGENTS.md updated with shortcuts.
 ```
 
 Then immediately run the warm-up — show how each specialist would approach the stated goal RIGHT NOW (2–3 sentences each). Do NOT wait for the user to ask.
@@ -188,10 +247,15 @@ Once the user provides a challenge:
 - Ask: "Which specialist do you want to push further?"
 - Allow the user to direct the next round at any single agent or the full squad.
 
+If a specialist produces final content:
+- save a `.md` draft first in `output/{squad-slug}/drafts/{role-slug}/`
+- then have @orquestrador incorporate that material into the final session HTML
+
 ## HTML deliverable — generate after every response round (mandatory)
 
 After each round where the squad responds to a challenge or generates content,
-write or update `output/{squad-slug}/session.html` with the **session results**.
+write a complete HTML file to `output/{squad-slug}/sessions/{session-id}.html` with the **session results**.
+Then update `output/{squad-slug}/latest.html` with the same content.
 
 Stack: **Tailwind CSS CDN + Alpine.js CDN** — no build step, no external dependencies.
 
@@ -218,10 +282,12 @@ Design guidelines:
 - Rounded cards, subtle shadow, hover lift (`hover:shadow-lg hover:-translate-y-0.5 transition`)
 - Responsive single-column, `max-w-3xl mx-auto px-4 py-8`
 - No external images, no Google Fonts — system font stack
-- If the file already exists, **replace it** with the full accumulated session (all rounds)
+- Each session keeps its own HTML file; rewrite the full current session on every round
+- Prefer a timestamp-style `{session-id}` such as `2026-03-06-153000-main-topic`
+- `latest.html` should always open the most recent session quickly
 
 After writing the file:
-> "Results saved to `output/{squad-slug}/session.html` — open in any browser."
+> "Results saved to `output/{squad-slug}/sessions/{session-id}.html` and `output/{squad-slug}/latest.html` — open in any browser."
 
 ## Hard constraints
 
@@ -229,12 +295,18 @@ After writing the file:
 - Do NOT skip the warm-up round — it is mandatory after generation.
 - Do NOT save to memory unless the user explicitly asks.
 - Do NOT use `squads/active/squad.md` — agents go to `agents/{squad-slug}/`, HTML to `output/{squad-slug}/`.
+- Store raw logs only in `aios-logs/` at the project root — never inside `.aios-lite/`.
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there.
-- Do NOT skip the HTML deliverable — generate `output/{squad-slug}/session.html` after every response round.
+- Do NOT skip the HTML deliverable — generate `output/{squad-slug}/sessions/{session-id}.html` after every response round.
 
 ## Output contract
 
 - Agent files: `agents/{squad-slug}/` (editable by user, invocable via `@`)
 - Squad metadata: `.aios-lite/squads/{slug}.md`
-- Session HTML: `output/{squad-slug}/session.html` (updated after each round)
-- CLAUDE.md: updated with agent shortcuts
+- Session HTMLs: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
+- Draft `.md` files: `output/{squad-slug}/drafts/{role-slug}/`
+- Genome bindings: `.aios-lite/squads/{slug}.md`
+- Logs: `aios-logs/squads/{squad-slug}/`
+- CLAUDE.md: updated with `/agent` shortcuts
+- AGENTS.md: updated with `@agent` shortcuts

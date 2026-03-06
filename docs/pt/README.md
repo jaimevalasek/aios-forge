@@ -9,6 +9,7 @@ Bem-vindo à documentação em português do AIOS Lite — um framework leve de 
 | [Início Rápido](./inicio-rapido.md) | Instale, configure e comece em menos de 10 minutos |
 | [Cenários de Uso](./cenarios.md) | Exemplos completos e práticos para projetos MICRO, SMALL e MEDIUM |
 | [Guia de Agentes](./agentes.md) | Quando usar cada agente e o que ele entrega |
+| [Squad e Genoma](./squad-genoma.md) | Como criar squads, gerar genomas, aplicar genomas e publicar entregáveis HTML |
 | [Suporte Web3](./web3.md) | Guia para projetos dApp (Ethereum, Solana, Cardano) |
 
 ## Documentação em inglês

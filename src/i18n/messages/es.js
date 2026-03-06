@@ -655,12 +655,17 @@ module.exports = {
   squad_status: {
     no_squad: 'No se encontro ningun squad.',
     hint: 'Usa @squad en tu sesion de IA para armar un squad.',
-    squads_found: '{count} squad(s) en .aios-lite/squads/:',
+    squads_found: '{count} squad(s) encontrados:',
+    most_recent: '(mas reciente)',
     squad_item: '  [{file}]{marker}',
-    domain: '    Dominio     : {value}',
+    name: '    Squad       : {value}',
     mode: '    Modo        : {value}',
     goal: '    Objetivo    : {value}',
-    perspectives: '    Perspectivas: {count}'
+    agents: '    Agentes     : {specialists} especialistas / {total} total ({path})',
+    sessions: '    Sesiones    : {count} ({path})',
+    latest_html: '    Latest HTML : {value}',
+    logs: '    Logs        : {count} ({path})',
+    genomes: '    Genomas     : {count} en el squad / {agent_count} vinculos por agente'
   },
   scan_project: {
     scanning: 'aios-lite scan:project — escaneando {dir}',

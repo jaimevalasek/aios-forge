@@ -95,6 +95,7 @@ Rich enough to produce genuinely distinct output from the other agents.]
 - Stay within your specialization — defer other tasks to the relevant agent
 - All deliverable files go to `output/{squad-slug}/`
 - Do not overwrite other agents' output files
+- Write technical session logs to `aios-logs/squads/{squad-slug}/` when logging is needed
 
 ## Output contract
 - Deliverables: `output/{squad-slug}/`
@@ -124,12 +125,15 @@ synthesize outputs, manage the session HTML report.
 
 ## Hard constraints
 - Always involve all relevant specialists for each challenge
-- After each round, update `output/{squad-slug}/session.html` with results
+- After each round, write a new HTML file to `output/{squad-slug}/sessions/{session-id}.html`
+- Update `output/{squad-slug}/latest.html` with the latest session content
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there
 
 ## Output contract
-- Session HTML: `output/{squad-slug}/session.html`
+- Session HTML: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
 - Agent deliverables: `output/{squad-slug}/`
+- Logs: `aios-logs/squads/{squad-slug}/`
 ```
 
 ### Step 3 — Register agents in CLAUDE.md
@@ -152,6 +156,8 @@ Mode: [Lite / Genoma]
 Goal: {goal}
 Agents: agents/{squad-slug}/
 Output: output/{squad-slug}/
+Logs: aios-logs/squads/{squad-slug}/
+LatestSession: output/{squad-slug}/latest.html
 ```
 
 ## After generation — confirm and warm-up round (mandatory)
@@ -186,7 +192,8 @@ Once the user provides a challenge:
 ## HTML deliverable — generate after every response round (mandatory)
 
 After each round where the squad responds to a challenge or generates content,
-write or update `output/{squad-slug}/session.html` with the **session results**.
+write a complete HTML file to `output/{squad-slug}/sessions/{session-id}.html` with the **session results**.
+Then update `output/{squad-slug}/latest.html` with the same content.
 
 Stack: **Tailwind CSS CDN + Alpine.js CDN** — no build step, no external dependencies.
 
@@ -213,10 +220,12 @@ Design guidelines:
 - Rounded cards, subtle shadow, hover lift (`hover:shadow-lg hover:-translate-y-0.5 transition`)
 - Responsive single-column, `max-w-3xl mx-auto px-4 py-8`
 - No external images, no Google Fonts — system font stack
-- If the file already exists, **replace it** with the full accumulated session (all rounds)
+- Each session keeps its own HTML file; rewrite the full current session on every round
+- Prefer a timestamp-style `{session-id}` such as `2026-03-06-153000-main-topic`
+- `latest.html` should always open the most recent session quickly
 
 After writing the file:
-> "Results saved to `output/{squad-slug}/session.html` — open in any browser."
+> "Results saved to `output/{squad-slug}/sessions/{session-id}.html` and `output/{squad-slug}/latest.html` — open in any browser."
 
 ## Hard constraints
 
@@ -224,12 +233,15 @@ After writing the file:
 - Do NOT skip the warm-up round — it is mandatory after generation.
 - Do NOT save to memory unless the user explicitly asks.
 - Agents go to `agents/{squad-slug}/`, HTML to `output/{squad-slug}/` — NOT inside `.aios-lite/`.
+- Store raw logs only in `aios-logs/` at the project root — never inside `.aios-lite/`.
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there.
-- Do NOT skip the HTML deliverable — generate `output/{squad-slug}/session.html` after every response round.
+- Do NOT skip the HTML deliverable — generate `output/{squad-slug}/sessions/{session-id}.html` after every response round.
 
 ## Output contract
 
 - Agent files: `agents/{squad-slug}/` (editable by user, invocable via `@`)
 - Squad metadata: `.aios-lite/squads/{slug}.md`
-- Session HTML: `output/{squad-slug}/session.html` (updated after each round)
+- Session HTMLs: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
+- Logs: `aios-logs/squads/{squad-slug}/`
 - CLAUDE.md: updated with agent shortcuts

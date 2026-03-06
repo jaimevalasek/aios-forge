@@ -6,7 +6,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const AGENTS = ['setup', 'analyst', 'architect', 'ux-ui', 'pm', 'dev', 'qa', 'orchestrator'];
+const AGENTS = ['setup', 'analyst', 'architect', 'ux-ui', 'pm', 'dev', 'qa', 'orchestrator', 'squad', 'genoma'];
 
 async function read(filePath) {
   return fs.readFile(filePath, 'utf8');
@@ -94,4 +94,44 @@ test('core agent contracts include actionable sections', async () => {
       assert.equal(enContent.includes(token), true, `missing in en ${item.file}: ${token}`);
     }
   }
+});
+
+test('squad and genoma contracts include genome binding workflow', async () => {
+  const squadBase = await read(path.join(ROOT, 'template/.aios-lite/agents/squad.md'));
+  const squadPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/squad.md'));
+  const genomaBase = await read(path.join(ROOT, 'template/.aios-lite/agents/genoma.md'));
+  const genomaPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/genoma.md'));
+
+  const squadTokens = [
+    '## Genome binding to the squad',
+    '## Active genomes',
+    'output/{squad-slug}/drafts/{role-slug}/',
+    'AgentGenomes:',
+    'AGENTS.md: updated with `@agent` shortcuts'
+  ];
+
+  const squadPtTokens = [
+    '## Vinculo de genomas ao squad',
+    '## Genomas ativos',
+    'output/{squad-slug}/drafts/{role-slug}/',
+    'AgentGenomes:',
+    'AGENTS.md: atualizado com atalhos `@agente`'
+  ];
+
+  const genomaTokens = [
+    '[4] Apply this genome to an existing squad/agent',
+    'AgentGenomes:',
+    'Do not modify official `.aios-lite/agents/` files with user custom genomes'
+  ];
+
+  const genomaPtTokens = [
+    '[4] Aplicar este genoma a um squad/agente já existente',
+    'AgentGenomes:',
+    'Não modifique agentes oficiais de `.aios-lite/agents/` com genomas customizados do usuário'
+  ];
+
+  for (const token of squadTokens) assert.equal(squadBase.includes(token), true, `missing squad base token: ${token}`);
+  for (const token of squadPtTokens) assert.equal(squadPt.includes(token), true, `missing squad pt token: ${token}`);
+  for (const token of genomaTokens) assert.equal(genomaBase.includes(token), true, `missing genoma base token: ${token}`);
+  for (const token of genomaPtTokens) assert.equal(genomaPt.includes(token), true, `missing genoma pt token: ${token}`);
 });

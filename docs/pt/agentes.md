@@ -6,7 +6,7 @@
 
 ## Visão geral
 
-O AIOS Lite tem **8 agentes especializados**. Você não precisa usar todos — use apenas os que o tamanho do seu projeto exige.
+O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squad. Você não precisa usar todos — use apenas os que o contexto pede.
 
 ```
 @setup        ← sempre o primeiro
@@ -17,7 +17,11 @@ O AIOS Lite tem **8 agentes especializados**. Você não precisa usar todos — 
 @orchestrator ← apenas MEDIUM
 @dev          ← sempre o último antes do QA
 @qa           ← projetos SMALL e MEDIUM
+@squad        ← cria squads especializados no projeto
+@genoma       ← cria genomas de domínio reutilizáveis
 ```
+
+> Para o fluxo completo de `@squad` e `@genoma`, veja também [Squad e Genoma](./squad-genoma.md).
 
 ---
 
@@ -193,6 +197,52 @@ npx aios-lite parallel:status
 - `.aios-lite/context/parallel/shared-decisions.md`
 - `.aios-lite/context/parallel/agent-1.status.md` (e 2, 3...)
 - Cada lane tem seu escopo definido
+
+---
+
+## @squad
+
+**Quando usar:** Quando você quer criar um time de agentes especializados para um domínio específico dentro do projeto.
+
+**O que faz:**
+- Pergunta o objetivo e o tipo de trabalho
+- Cria agentes reais em `agents/{squad-slug}/`
+- Cria um `@orquestrador` próprio para esse squad
+- Registra metadata em `.aios-lite/squads/{slug}.md`
+
+**Como ativar:**
+```
+@squad
+```
+
+**Entrega:**
+- Agentes reais do squad
+- Metadata do squad
+- Estrutura de output e sessão
+
+> Guia completo: [Squad e Genoma](./squad-genoma.md)
+
+---
+
+## @genoma
+
+**Quando usar:** Quando você quer criar uma base de conhecimento de domínio reutilizável e aplicá-la a squads ou agentes específicos.
+
+**O que faz:**
+- Gera `O que saber`, `Mentes` e `Skills`
+- Pode salvar em `.aios-lite/genomas/`
+- Pode ser aplicado depois a um squad já existente
+
+**Como ativar:**
+```
+@genoma
+```
+
+**Entrega:**
+- Genoma estruturado
+- Opcionalmente, vínculo persistente com um squad
+
+> Guia completo: [Squad e Genoma](./squad-genoma.md)
 
 ---
 

@@ -215,14 +215,15 @@ const AGENT_DEFINITIONS = [
     command: '@squad',
     path: '.aios-lite/agents/squad.md',
     dependsOn: [],
-    output: '.aios-lite/squads/{slug}.md + {slug}.html'
+    output:
+      '.aios-lite/squads/{slug}.md + agents/{slug}/ + output/{slug}/sessions/{session-id}.html + output/{slug}/latest.html + aios-logs/squads/{slug}/'
   },
   {
     id: 'genoma',
     command: '@genoma',
     path: '.aios-lite/agents/genoma.md',
     dependsOn: [],
-    output: '.aios-lite/genomas/[slug].md'
+    output: '.aios-lite/genomas/[slug].md + optional binding in .aios-lite/squads/{slug}.md'
   }
 ];
 

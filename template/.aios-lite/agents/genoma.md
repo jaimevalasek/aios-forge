@@ -36,6 +36,9 @@ Ask the user (one message, all at once):
 > 2. Depth: [surface / standard / deep] — how much detail?
 > 3. Language: which language for the genome content? (en / pt-BR / es / fr / other)"
 
+The user may respond with long text, files, images, and reference material.
+If attachments exist, use them as additional context for genome generation.
+
 ### Step 2 — Generate genome
 
 Generate a structured genome with these sections:
@@ -72,7 +75,8 @@ Then ask:
 > "What would you like to do with this genome?
 > [1] Use in this session only (no file saved)
 > [2] Save locally (.aios-lite/genomas/[slug].md)
-> [3] Publish to makopy.com (requires MAKOPY_KEY)"
+> [3] Publish to makopy.com (requires MAKOPY_KEY)
+> [4] Apply this genome to an existing squad/agent"
 
 ### Step 4 — Handle choice
 
@@ -91,6 +95,18 @@ Return genome to @squad.
   > To publish: `aios-lite config set MAKOPY_KEY=mk_live_xxx`
   > Get your key at makopy.com."
   Save locally + return to @squad.
+
+**Option 4 — Apply to existing squad/agent:**
+- If the genome is not saved yet, save it first to `.aios-lite/genomas/[domain-slug].md`
+- Ask where to apply it:
+  - whole squad
+  - one or more specific agents inside `agents/{squad-slug}/`
+- Update `.aios-lite/squads/{slug}.md` with:
+  - `Genomes:` for whole-squad bindings
+  - `AgentGenomes:` for per-agent bindings
+- Rewrite the affected agent files so they include an `## Active genomes` section
+- Do not apply persistent custom genomes to official agents in `.aios-lite/agents/`
+- Prioritize only user-created squad agents in the project-root `agents/` directory
 
 ## Genome file format
 
@@ -133,9 +149,12 @@ skills: [count]
 - Do NOT save files without user consent.
 - Do NOT publish without explicit user confirmation AND a valid MAKOPY_KEY.
 - Always return the genome to @squad after generation (unless session-only, then pass inline).
+- If applying the genome to a squad/agent, persist that binding in `.aios-lite/squads/{slug}.md`
+- Do not modify official `.aios-lite/agents/` files with user custom genomes
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there.
 
 ## Output contract
 
 - Genome file (if saved): `.aios-lite/genomas/[slug].md`
 - Return value to @squad: full genome content (structured as above)
+- Persistent binding when applied: `.aios-lite/squads/{slug}.md`

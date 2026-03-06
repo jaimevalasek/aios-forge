@@ -32,6 +32,9 @@ Perguntar ao usuário (em uma mensagem, tudo de uma vez):
 > 2. Profundidade: [superficial / padrão / profundo] — quanto detalhe?
 > 3. Idioma: em qual idioma o conteúdo do genoma? (pt-BR / en / es / fr / outro)"
 
+O usuário pode responder com texto longo, arquivos, imagens e material de referência.
+Se houver anexos, use esse material como contexto adicional para gerar o genoma.
+
 ### Etapa 2 — Gerar genoma
 
 Gere um genoma estruturado com estas seções:
@@ -68,7 +71,8 @@ Depois perguntar:
 > "O que você quer fazer com este genoma?
 > [1] Usar só nesta sessão (sem salvar arquivo)
 > [2] Salvar localmente (.aios-lite/genomas/[slug].md)
-> [3] Publicar no makopy.com (requer MAKOPY_KEY)"
+> [3] Publicar no makopy.com (requer MAKOPY_KEY)
+> [4] Aplicar este genoma a um squad/agente já existente"
 
 ### Etapa 4 — Processar escolha
 
@@ -87,6 +91,18 @@ Retornar genoma para o @squad.
   > Para publicar: `aios-lite config set MAKOPY_KEY=mk_live_xxx`
   > Obtenha sua chave em makopy.com."
   Salvar localmente + retornar para @squad.
+
+**Opção 4 — Aplicar a squad/agente existente:**
+- Se o genoma ainda não estiver salvo, salve primeiro em `.aios-lite/genomas/[slug-domínio].md`
+- Pergunte ao usuário onde aplicar:
+  - squad inteiro
+  - um ou mais agentes específicos dentro de `agents/{squad-slug}/`
+- Atualize `.aios-lite/squads/{slug}.md` com:
+  - `Genomes:` para vínculos do squad inteiro
+  - `AgentGenomes:` para vínculos por agente
+- Reescreva os arquivos dos agentes afetados para incluir a seção `## Genomas ativos`
+- Não aplique genomas persistentes aos agentes oficiais de `.aios-lite/agents/`
+- Priorize apenas agentes criados pelo usuário em `agents/` na raiz do projeto
 
 ## Formato do arquivo de genoma
 
@@ -129,8 +145,12 @@ skills: [quantidade]
 - NÃO salve arquivos sem consentimento do usuário.
 - NÃO publique sem confirmação explícita do usuário E uma MAKOPY_KEY válida.
 - Sempre retorne o genoma para o @squad após a geração.
+- Se aplicar o genoma a um squad/agente, persista esse vínculo em `.aios-lite/squads/{slug}.md`
+- Não modifique agentes oficiais de `.aios-lite/agents/` com genomas customizados do usuário
+- `.aios-lite/context/` aceita somente `.md` — não escreva arquivos não-markdown lá.
 
 ## Contrato de output
 
 - Arquivo de genoma (se salvo): `.aios-lite/genomas/[slug].md`
 - Valor de retorno para @squad: conteúdo completo do genoma (estruturado como acima)
+- Vínculo persistente, quando aplicado: `.aios-lite/squads/{slug}.md`

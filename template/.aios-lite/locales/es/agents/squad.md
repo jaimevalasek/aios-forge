@@ -95,6 +95,7 @@ Suficientemente rico para producir output genuinamente distinto de los otros age
 - Quedarse dentro de la especializacion — delegar otras tareas al agente relevante
 - Todos los archivos entregables van a `output/{squad-slug}/`
 - No sobrescribir los archivos de output de otros agentes
+- Cuando haga falta registrar logs tecnicos, escribir en `aios-logs/squads/{squad-slug}/`
 
 ## Contrato de output
 - Entregables: `output/{squad-slug}/`
@@ -124,12 +125,15 @@ sintetizar outputs, gestionar el informe HTML de la sesion.
 
 ## Restricciones
 - Involucrar siempre a todos los especialistas relevantes para cada desafio
-- Despues de cada ronda, actualizar `output/{squad-slug}/session.html` con los resultados
+- Despues de cada ronda, escribir un nuevo HTML en `output/{squad-slug}/sessions/{session-id}.html`
+- Actualizar `output/{squad-slug}/latest.html` con el contenido de la sesion mas reciente
 - `.aios-lite/context/` acepta solo archivos `.md` — no escribir archivos no-markdown ahi
 
 ## Contrato de output
-- HTML de sesion: `output/{squad-slug}/session.html`
+- HTML de sesion: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
 - Entregables de agentes: `output/{squad-slug}/`
+- Logs: `aios-logs/squads/{squad-slug}/`
 ```
 
 ### Paso 3 — Registrar agentes en CLAUDE.md
@@ -152,6 +156,8 @@ Mode: [Lite / Genoma]
 Goal: {goal}
 Agents: agents/{squad-slug}/
 Output: output/{squad-slug}/
+Logs: aios-logs/squads/{squad-slug}/
+LatestSession: output/{squad-slug}/latest.html
 ```
 
 ## Despues de la generacion — confirmar y rodada de calentamiento (obligatorio)
@@ -186,7 +192,8 @@ Cuando el usuario traiga un desafio:
 ## Entregable HTML — generar despues de cada ronda de respuesta (obligatorio)
 
 Despues de cada ronda en la que el squad responde a un desafio o genera contenido,
-escribir o actualizar `output/{squad-slug}/session.html` con los **resultados de la sesion**.
+escribir un HTML completo en `output/{squad-slug}/sessions/{session-id}.html` con los **resultados de la sesion**.
+Luego actualizar `output/{squad-slug}/latest.html` con el mismo contenido.
 
 Stack: **Tailwind CSS CDN + Alpine.js CDN** — sin build, sin dependencias externas.
 
@@ -213,10 +220,12 @@ Directrices de diseno:
 - Tarjetas con bordes redondeados, sombra sutil, hover lift (`hover:shadow-lg hover:-translate-y-0.5 transition`)
 - Diseno responsivo en columna unica, `max-w-3xl mx-auto px-4 py-8`
 - Sin imagenes externas, sin Google Fonts — stack de fuentes del sistema
-- Si el archivo ya existe, **reemplazarlo** con la sesion completa acumulada (todas las rondas)
+- Cada sesion debe tener su propio HTML; reescribir la sesion actual completa en cada ronda
+- Preferir `{session-id}` con formato timestamp, por ejemplo `2026-03-06-153000-tema-principal`
+- `latest.html` debe abrir siempre la sesion mas reciente rapidamente
 
 Despues de guardar el archivo:
-> "Resultados guardados en `output/{squad-slug}/session.html` — abrir en cualquier navegador."
+> "Resultados guardados en `output/{squad-slug}/sessions/{session-id}.html` y `output/{squad-slug}/latest.html` — abrir en cualquier navegador."
 
 ## Restricciones
 
@@ -224,12 +233,15 @@ Despues de guardar el archivo:
 - NO saltarse el calentamiento — es obligatorio tras la generacion.
 - NO guardar en memoria a menos que el usuario lo pida explicitamente.
 - Agentes van en `agents/{squad-slug}/`, HTML en `output/{squad-slug}/` — NO dentro de `.aios-lite/`.
+- Los logs brutos van solo en `aios-logs/` en la raiz del proyecto — nunca dentro de `.aios-lite/`.
 - `.aios-lite/context/` acepta solo archivos `.md` — no escribir archivos no-markdown ahi.
-- NO saltarse el entregable HTML — generar `output/{squad-slug}/session.html` despues de cada ronda de respuesta.
+- NO saltarse el entregable HTML — generar `output/{squad-slug}/sessions/{session-id}.html` despues de cada ronda de respuesta.
 
 ## Contrato de output
 
 - Archivos de agentes: `agents/{squad-slug}/` (editables por el usuario, invocables via `@`)
 - Metadatos del squad: `.aios-lite/squads/{slug}.md`
-- HTML de sesion: `output/{squad-slug}/session.html` (actualizado despues de cada ronda)
+- HTMLs de sesion: `output/{squad-slug}/sessions/{session-id}.html`
+- Latest HTML: `output/{squad-slug}/latest.html`
+- Logs: `aios-logs/squads/{squad-slug}/`
 - CLAUDE.md: actualizado con atajos de agentes
