@@ -30,6 +30,8 @@ const { runQaRun } = require('./commands/qa-run');
 const { runQaScan } = require('./commands/qa-scan');
 const { runQaReport } = require('./commands/qa-report');
 const { runScanProject } = require('./commands/scan-project');
+const { runConfig } = require('./commands/config');
+const { runSquadStatus } = require('./commands/squad-status');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'init',
@@ -90,6 +92,9 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'qa-report',
   'scan:project',
   'scan-project',
+  'config',
+  'squad:status',
+  'squad-status',
   'version',
   '--version',
   '-v'
@@ -153,6 +158,8 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_qa_scan');
   logHelpLine(t, logger, 'cli.help_qa_report');
   logHelpLine(t, logger, 'cli.help_scan_project');
+  logHelpLine(t, logger, 'cli.help_config');
+  logHelpLine(t, logger, 'cli.help_squad_status');
 }
 
 function commandSupportsJson(command) {
@@ -266,6 +273,10 @@ async function main() {
       result = await runQaReport({ args, options, logger: commandLogger, t });
     } else if (command === 'scan:project' || command === 'scan-project') {
       result = await runScanProject({ args, options, logger: commandLogger, t });
+    } else if (command === 'config') {
+      result = await runConfig({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:status' || command === 'squad-status') {
+      result = await runSquadStatus({ args, options, logger: commandLogger, t });
     } else {
       const message = t('cli.unknown_command', { command });
       if (jsonMode) {

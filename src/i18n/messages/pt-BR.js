@@ -53,6 +53,12 @@ module.exports = {
       'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=pt-BR]',
     help_qa_report:
       'aios-lite qa:report [path] [--html] [--json] [--locale=pt-BR]',
+    help_scan_project:
+      'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=pt-BR]',
+    help_config:
+      'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
+    help_squad_status:
+      'aios-lite squad:status [path] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erro: {message}'
@@ -632,6 +638,26 @@ module.exports = {
   qa_report: {
     not_found: 'Nenhum relatorio QA encontrado. Execute: aios-lite qa:run ou aios-lite qa:scan',
     html_report_written: 'Relatorio HTML escrito: {path}'
+  },
+  config: {
+    usage_error:
+      'Uso: aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
+    set_ok: 'Chave configurada: {key} (salva em {path})',
+    show_header: 'Config global: {path}',
+    show_empty: '  (nenhuma chave configurada)',
+    show_line: '  {key} = {value}',
+    get_line: '{key} = {value}',
+    key_not_found: 'Chave nao encontrada: {key}'
+  },
+  squad_status: {
+    no_squad: 'Nenhum squad ativo encontrado.',
+    hint: 'Use @squad na sua sessao de IA para montar um squad.',
+    squad_found: 'Squad ativo: {path}',
+    domain: '  Dominio   : {value}',
+    mode: '  Modo      : {value}',
+    goal: '  Objetivo  : {value}',
+    perspectives: '  Perspectivas: {count}',
+    created: '  Criado em : {value}'
   },
   scan_project: {
     scanning: 'aios-lite scan:project — escaneando {dir}',

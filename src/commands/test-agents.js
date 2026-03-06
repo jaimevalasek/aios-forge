@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { TEMPLATE_DIR } = require('../installer');
 
-const AGENTS = ['setup', 'analyst', 'architect', 'pm', 'ux-ui', 'dev', 'qa', 'orchestrator'];
+const AGENTS = ['setup', 'analyst', 'architect', 'pm', 'ux-ui', 'dev', 'qa', 'orchestrator', 'squad', 'genoma'];
 const LOCALES = ['en', 'pt-BR', 'es', 'fr'];
 
 // Sections expected in base agents (English heading variants)

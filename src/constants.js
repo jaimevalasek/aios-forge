@@ -23,6 +23,8 @@ const MANAGED_FILES = [
   '.aios-lite/agents/dev.md',
   '.aios-lite/agents/qa.md',
   '.aios-lite/agents/orchestrator.md',
+  '.aios-lite/agents/squad.md',
+  '.aios-lite/agents/genoma.md',
   '.aios-lite/locales/en/agents/setup.md',
   '.aios-lite/locales/en/agents/analyst.md',
   '.aios-lite/locales/en/agents/architect.md',
@@ -32,6 +34,8 @@ const MANAGED_FILES = [
   '.aios-lite/locales/en/agents/dev.md',
   '.aios-lite/locales/en/agents/qa.md',
   '.aios-lite/locales/en/agents/orchestrator.md',
+  '.aios-lite/locales/en/agents/squad.md',
+  '.aios-lite/locales/en/agents/genoma.md',
   '.aios-lite/locales/pt-BR/agents/setup.md',
   '.aios-lite/locales/pt-BR/agents/analyst.md',
   '.aios-lite/locales/pt-BR/agents/architect.md',
@@ -41,6 +45,8 @@ const MANAGED_FILES = [
   '.aios-lite/locales/pt-BR/agents/dev.md',
   '.aios-lite/locales/pt-BR/agents/qa.md',
   '.aios-lite/locales/pt-BR/agents/orchestrator.md',
+  '.aios-lite/locales/pt-BR/agents/squad.md',
+  '.aios-lite/locales/pt-BR/agents/genoma.md',
   '.aios-lite/locales/es/agents/setup.md',
   '.aios-lite/locales/es/agents/analyst.md',
   '.aios-lite/locales/es/agents/architect.md',
@@ -50,6 +56,8 @@ const MANAGED_FILES = [
   '.aios-lite/locales/es/agents/dev.md',
   '.aios-lite/locales/es/agents/qa.md',
   '.aios-lite/locales/es/agents/orchestrator.md',
+  '.aios-lite/locales/es/agents/squad.md',
+  '.aios-lite/locales/es/agents/genoma.md',
   '.aios-lite/locales/fr/agents/setup.md',
   '.aios-lite/locales/fr/agents/analyst.md',
   '.aios-lite/locales/fr/agents/architect.md',
@@ -59,6 +67,8 @@ const MANAGED_FILES = [
   '.aios-lite/locales/fr/agents/dev.md',
   '.aios-lite/locales/fr/agents/qa.md',
   '.aios-lite/locales/fr/agents/orchestrator.md',
+  '.aios-lite/locales/fr/agents/squad.md',
+  '.aios-lite/locales/fr/agents/genoma.md',
   '.aios-lite/skills/static/laravel-conventions.md',
   '.aios-lite/skills/static/tall-stack-patterns.md',
   '.aios-lite/skills/static/jetstream-setup.md',
@@ -199,6 +209,20 @@ const AGENT_DEFINITIONS = [
       '.aios-lite/context/prd.md'
     ],
     output: '.aios-lite/context/parallel/*.status.md'
+  },
+  {
+    id: 'squad',
+    command: '@squad',
+    path: '.aios-lite/agents/squad.md',
+    dependsOn: [],
+    output: '.aios-lite/squads/active/squad.md'
+  },
+  {
+    id: 'genoma',
+    command: '@genoma',
+    path: '.aios-lite/agents/genoma.md',
+    dependsOn: [],
+    output: '.aios-lite/genomas/[slug].md'
   }
 ];
 

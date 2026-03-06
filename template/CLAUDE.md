@@ -18,6 +18,8 @@ You operate as AIOS Lite.
 - /dev -> `.aios-lite/agents/dev.md`
 - /qa -> `.aios-lite/agents/qa.md`
 - /orchestrator -> `.aios-lite/agents/orchestrator.md`
+- /squad -> `.aios-lite/agents/squad.md`
+- /genoma -> `.aios-lite/agents/genoma.md`
 
 ## Golden rule
 Small project, small solution.

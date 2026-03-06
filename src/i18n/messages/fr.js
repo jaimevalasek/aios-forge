@@ -42,6 +42,22 @@ module.exports = {
       'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=fr]',
     help_mcp_doctor:
       'aios-lite mcp:doctor [path] [--strict-env] [--json] [--locale=fr]',
+    help_qa_doctor:
+      'aios-lite qa:doctor [path] [--json] [--locale=fr]',
+    help_qa_init:
+      'aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=fr]',
+    help_qa_run:
+      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json] [--locale=fr]',
+    help_qa_scan:
+      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=fr]',
+    help_qa_report:
+      'aios-lite qa:report [path] [--html] [--json] [--locale=fr]',
+    help_scan_project:
+      'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=fr]',
+    help_config:
+      'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=fr]',
+    help_squad_status:
+      'aios-lite squad:status [path] [--json] [--locale=fr]',
     unknown_command: 'Commande inconnue : {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erreur : {message}'
@@ -632,6 +648,26 @@ module.exports = {
   qa_report: {
     not_found: 'Aucun rapport QA trouve. Executez : aios-lite qa:run ou aios-lite qa:scan',
     html_report_written: 'Rapport HTML ecrit : {path}'
+  },
+  config: {
+    usage_error:
+      'Utilisation : aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=fr]',
+    set_ok: 'Cle configuree : {key} (sauvegardee dans {path})',
+    show_header: 'Config globale : {path}',
+    show_empty: '  (aucune cle configuree)',
+    show_line: '  {key} = {value}',
+    get_line: '{key} = {value}',
+    key_not_found: 'Cle introuvable : {key}'
+  },
+  squad_status: {
+    no_squad: 'Aucun squad actif trouve.',
+    hint: 'Utilisez @squad dans votre session IA pour constituer un squad.',
+    squad_found: 'Squad actif : {path}',
+    domain: '  Domaine     : {value}',
+    mode: '  Mode        : {value}',
+    goal: '  Objectif    : {value}',
+    perspectives: '  Perspectives : {count}',
+    created: '  Cree le     : {value}'
   },
   scan_project: {
     scanning: 'aios-lite scan:project — analyse de {dir}',

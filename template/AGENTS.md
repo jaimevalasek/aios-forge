@@ -23,6 +23,8 @@ There are no slash commands in Codex. Invoke agents by describing your intent:
 | @dev | "implement the feature", "use the dev agent" |
 | @qa | "write the tests", "use the qa agent" |
 | @orchestrator | "coordinate this session", "use the orchestrator agent" |
+| @squad | "assemble a squad", "use the squad agent", "montar squad" |
+| @genoma | "generate a genome", "use the genoma agent", "gerar genoma" |
 
 When invoked, read the corresponding agent file listed below and follow its instructions exactly.
 
@@ -36,6 +38,8 @@ When invoked, read the corresponding agent file listed below and follow its inst
 - @dev → `.aios-lite/agents/dev.md`
 - @qa → `.aios-lite/agents/qa.md`
 - @orchestrator → `.aios-lite/agents/orchestrator.md`
+- @squad → `.aios-lite/agents/squad.md`
+- @genoma → `.aios-lite/agents/genoma.md`
 
 ## Session protocol
 If `.aios-lite/context/spec.md` exists, read it at session start and update it at session end.

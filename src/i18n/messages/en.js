@@ -53,6 +53,10 @@ module.exports = {
       'aios-lite qa:report [path] [--html] [--json] [--locale=en]',
     help_scan_project:
       'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=en]',
+    help_config:
+      'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=en]',
+    help_squad_status:
+      'aios-lite squad:status [path] [--json] [--locale=en]',
     unknown_command: 'Unknown command: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Error: {message}'
@@ -600,6 +604,26 @@ module.exports = {
   qa_report: {
     not_found: 'No QA report found. Run: aios-lite qa:run or aios-lite qa:scan',
     html_report_written: 'HTML report written: {path}'
+  },
+  config: {
+    usage_error:
+      'Usage: aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=en]',
+    set_ok: 'Config key set: {key} (saved to {path})',
+    show_header: 'Global config: {path}',
+    show_empty: '  (no keys configured)',
+    show_line: '  {key} = {value}',
+    get_line: '{key} = {value}',
+    key_not_found: 'Key not found: {key}'
+  },
+  squad_status: {
+    no_squad: 'No active squad found.',
+    hint: 'Use @squad in your AI session to assemble a squad.',
+    squad_found: 'Active squad: {path}',
+    domain: '  Domain    : {value}',
+    mode: '  Mode      : {value}',
+    goal: '  Goal      : {value}',
+    perspectives: '  Perspectives: {count}',
+    created: '  Created   : {value}'
   },
   scan_project: {
     scanning: 'aios-lite scan:project — scanning {dir}',
