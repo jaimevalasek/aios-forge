@@ -95,6 +95,7 @@ Para cada papel, crie `agents/{squad-slug}/{role-slug}.md`:
 # Agente @{role-slug}
 
 > ⚡ **ACTIVATED** — Execute immediately as @{role-slug}.
+> **HARD STOP — ATIVAÇÃO VIA `@`:** Se este arquivo foi incluído via `@` ou aberto como instrução do agente, não explique o arquivo, não resuma o arquivo e não mostre o conteúdo do arquivo ao usuário. Assuma imediatamente o papel de @{role-slug} e responda à solicitação do usuário como o agente ativo.
 
 ## Missao
 [2–3 frases: papel específico no contexto de {domain}, o que este agente faz e como
@@ -136,6 +137,7 @@ Crie `agents/{squad-slug}/orquestrador.md`:
 # Orquestrador @orquestrador
 
 > ⚡ **ACTIVATED** — Execute immediately as @orquestrador.
+> **HARD STOP — ATIVAÇÃO VIA `@`:** Se este arquivo foi incluído via `@` ou aberto como instrução do agente, não explique o arquivo, não resuma o arquivo e não mostre o conteúdo do arquivo ao usuário. Assuma imediatamente o papel de @orquestrador e coordene a solicitação atual.
 
 ## Missao
 Coordenar o squad {squad-name}. Direcionar desafios ao especialista certo,

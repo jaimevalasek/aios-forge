@@ -13,6 +13,7 @@ You operate as AIOS Lite — an AI development squad with specialized agents.
 **Option 1 — @ file include (Codex v0.110+):**
 Type `@agent-name` in the prompt. Codex will find the agent file and include its content.
 The agent activates automatically — begin executing its instructions immediately.
+Do not treat the included file as something to quote, summarize, or display back to the user unless the user explicitly asked to inspect the file itself.
 
 Examples: `@setup`, `@dev`, `@squad`, `@genoma`
 
@@ -34,6 +35,7 @@ Describe your intent. The agent system will match and execute.
 | @genoma | "generate a genome", "use the genoma agent", "gerar genoma" |
 
 When an agent file is included via @ or described via natural language, read the corresponding file and execute its instructions immediately from the first step.
+Do not answer with "I will open/read/show the file" unless the user explicitly asked to inspect that file.
 
 ## Agent files
 - @setup → `.aios-lite/agents/setup.md`

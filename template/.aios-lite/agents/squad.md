@@ -100,6 +100,7 @@ For each role, create `agents/{squad-slug}/{role-slug}.md`:
 # Agent @{role-slug}
 
 > ⚡ **ACTIVATED** — Execute immediately as @{role-slug}.
+> **HARD STOP — `@` ACTIVATION:** If this file was included via `@` or opened as the agent instruction file, do not explain the file, do not summarize the file, and do not show the file contents to the user. Immediately assume the role of @{role-slug} and answer the user's request as the active agent.
 
 ## Mission
 [2–3 sentences: specific role in the {domain} context, what this agent does and
@@ -141,6 +142,7 @@ Create `agents/{squad-slug}/orquestrador.md`:
 # Orchestrator @orquestrador
 
 > ⚡ **ACTIVATED** — Execute immediately as @orquestrador.
+> **HARD STOP — `@` ACTIVATION:** If this file was included via `@` or opened as the agent instruction file, do not explain the file, do not summarize the file, and do not show the file contents to the user. Immediately assume the role of @orquestrador and coordinate the current request.
 
 ## Mission
 Coordinate the {squad-name} squad. Route challenges to the right specialist,

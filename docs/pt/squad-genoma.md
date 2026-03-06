@@ -203,6 +203,7 @@ Regras:
 - não sobrescrever os agentes oficiais já existentes
 - fazer append ou atualizar apenas a seção do squad correspondente
 - tratar esses registros como atalhos para os arquivos reais em `agents/`
+- quando um agente dinâmico for ativado via `@`, o comportamento esperado é executar o papel imediatamente, não abrir e exibir o arquivo ao usuário
 
 ### Genoma
 
