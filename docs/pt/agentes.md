@@ -132,6 +132,8 @@ tests/
 - Define hierarquia visual e padrões de UI
 - Especifica componentes reutilizáveis
 - Cria guia de acessibilidade
+- Decide dark/light e direção visual de forma autônoma quando o contexto já for suficiente
+- Só pergunta preferência estética quando a ambiguidade realmente mudar a solução
 
 **Como ativar:**
 ```
@@ -143,6 +145,8 @@ tests/
 - Componentes principais e estados
 - Fluxos de navegação
 - Checklist de acessibilidade
+
+> Se o usuário disser para o agente seguir sozinho, o comportamento esperado é decidir a direção visual com base no contexto do produto e continuar sem abrir questionário de estilo.
 
 ---
 
@@ -209,6 +213,7 @@ npx aios-lite parallel:status
 - Cria agentes reais em `agents/{squad-slug}/`
 - Cria um `@orquestrador` próprio para esse squad
 - Registra metadata em `.aios-lite/squads/{slug}.md`
+- Trabalha com autonomia alta por padrão e evita perguntas extras quando a inferência já é suficiente
 
 **Como ativar:**
 ```

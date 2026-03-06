@@ -16,30 +16,26 @@ Produce UI/UX that makes the user proud to show the result — intentional, mode
 
 ---
 
-## Step 0 — Visual style intake
+## Step 0 — Autonomous visual direction decision
 
-> **⚠ HARD STOP — blocking gate.**
-> Do not read context files. Do not write HTML, CSS, or any spec. Do not proceed to Step 1.
-> Ask ONLY this question and wait for the user's answer before doing anything else.
+Read the context files before deciding theme, direction, and visual density.
 
-Ask the user:
+Main rule:
+- If the user gave an explicit theme or style preference, obey it
+- If the user did not mention theme, decide on your own from the product context
+- Ask only 1 short style question if the ambiguity is material and would actually change the solution
+- If the user wants the agent to proceed autonomously, do not ask — choose and execute
 
-> "Which visual style do you want for this project?
->
-> **A — Clean & Luminous** (Apple, Linear, Stripe)
-> White or light background, generous whitespace, single accent color, typography does the heavy lifting, subtle animations. The product is good enough that it doesn't need to shout.
->
-> **B — Bold & Cinematic** (Framer, Vercel, Awwwards)
-> Animated dark hero, bold paired colors, scroll animations, large impactful typography, high-quality imagery. The user stops scrolling.
->
-> **C — Default / Skip** — skip this choice and let the craft guide decide. The agent will apply `interface-design.md` principles and choose the most appropriate direction based on the product domain, without enforcing A or B.
->
-> Or describe your preference freely."
+Default theme heuristic:
+- Dashboard, SaaS, platform, academy, library, content product, or app with persistent navigation/high density -> prefer premium dark or controlled dark
+- Institutional landing page, wellness product, lighter consumer experience, local service, clear editorial experience -> prefer light or warmed light
+- Fintech, B2B, technical product, or long-reading interface -> prefer controlled contrast, never pure black with stark white
 
-Wait for the answer. Once received:
-- If **A or B**: confirm the chosen style in one sentence, then proceed to Step 1.
-- If **C / skip / pular / padrão / default**: skip style confirmation, go directly to Step 1 — apply `interface-design.md` as the sole design authority, let domain exploration (Step 2) drive the visual direction organically.
-- Never mix styles after this point.
+If you must ask, use at most:
+> "I can proceed with premium dark, or would you prefer light?"
+
+Never turn this into a questionnaire.
+Never block the work if the inference is already good enough.
 
 ---
 
@@ -72,6 +68,7 @@ Identity test: remove the product name — can someone still identify what this 
 - **Precision & Density** — dashboards, admin, dev tools. Borders-only, compact, cool slate.
 - **Warmth & Approachability** — consumer apps, onboarding. Shadows, generous spacing, warm tones.
 - **Sophistication & Trust** — fintech, enterprise. Cold palette, restrained layers, firm typography.
+- **Premium Dark Platform** — premium dark product UI, controlled contrast, restrained layers, catalog cards, and clean navigation.
 - **Minimal & Calm** — near-monochrome, whitespace as design element, hairline borders.
 
 ### For landing pages and sites (project_type=site)
@@ -260,13 +257,15 @@ Produce a complete `index.html` in the project root with:
 ## For apps and dashboards (project_type ≠ site)
 
 Follow the standard flow from `interface-design.md`:
-- Use Precision & Density / Warmth & Approachability / Sophistication & Trust / Minimal & Calm
+- Use Precision & Density / Warmth & Approachability / Sophistication & Trust / Premium Dark Platform / Minimal & Calm
 - Output: `ui-spec.md` with token block, screen map, component state matrix, responsive rules, handoff notes
 
 ---
 
 ## Working rules
 - Stack first: use the project's existing design system before proposing custom UI.
+- Autonomous decision-making: infer dark/light and visual direction from context whenever possible.
+- Ask about style only when the ambiguity would materially change the result.
 - Define complete design tokens: spacing scale, type scale, semantic colors, radius, depth strategy.
 - Depth: commit to ONE approach — never mix borders-only with shadows on the same surface.
 - Accessibility first: keyboard flow, visible focus rings, semantic HTML, 4.5:1 contrast minimum.
@@ -303,4 +302,5 @@ Follow the standard flow from `interface-design.md`:
 - Use `conversation_language` from project context for all interaction and output.
 - Do not redesign business rules defined in discovery/architecture.
 - Generic output is failure. If another AI would produce the same result from the same prompt, revise.
+- Do not open style questionnaires when the context already allows a strong enough inference.
 - Real copy only — no "Lorem ipsum", no "[Your headline here]", no placeholder text in final output.

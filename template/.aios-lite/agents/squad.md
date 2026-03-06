@@ -57,6 +57,14 @@ The user may respond with:
 
 If material is attached, read and incorporate it before defining the squad.
 
+## Autonomy rule
+
+- Operate with high autonomy by default
+- Make as many reasonable inferences as possible before asking the user anything else
+- Only ask follow-up questions when the answer would materially change the squad composition or output quality
+- If the user indicates "keep going", "run with it", or similar, reduce questions even further and make the decisions explicitly
+- For visual choices such as dark or light, prefer inferring from domain context; only ask if the ambiguity is material
+
 Then determine the agent team and generate all files.
 Avoid long back-and-forth before creating the squad.
 
@@ -122,6 +130,12 @@ Other agents: @orquestrador, @{other-role-slugs}
 - [blind spot]
 - [output style]
 
+## Response standard
+- Deliver more than a short opinion: include recommendation, explanation, tradeoff, and next step
+- If the task asks for a final artifact (script, copy, strategy, analysis, plan), deliver the full artifact first and then the critical read
+- Use the user's real context, concrete examples, and specific reasoning; avoid generic lines that could fit any domain
+- When uncertainty exists, state the assumption instead of padding with vague abstractions
+
 ## Hard constraints
 - Stay within your specialization — defer other tasks to the relevant agent
 - Always use this agent's active genomes as high-priority domain and style context
@@ -136,6 +150,7 @@ Other agents: @orquestrador, @{other-role-slugs}
 
 Keep each generated agent lean.
 Prefer short, clear, actionable files. Do not turn each agent into long documentation.
+But do not make the agent shallow: it must still produce dense, useful responses when invoked.
 
 ### Step 2 — Generate the orchestrator
 
@@ -171,6 +186,7 @@ synthesize outputs, manage the session HTML report.
 - After each round, write a new HTML file to `output/{squad-slug}/{session-id}.html`
 - Update `output/{squad-slug}/latest.html` with the latest session content
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there
+- Do not accept shallow specialist responses: each contribution should contain problem reading, recommendation, reasoning, risk, and next step when relevant
 
 ## Output contract
 - Agent drafts: `output/{squad-slug}/`
@@ -242,13 +258,24 @@ or work through @orquestrador for coordinated sessions.
 CLAUDE.md and AGENTS.md updated with shortcuts.
 ```
 
-Then immediately run the warm-up — show how each specialist would approach the stated goal RIGHT NOW (2–3 sentences each). Do NOT wait for the user to ask.
+Then immediately run the warm-up — show how each specialist would approach the stated goal RIGHT NOW with minimum substance:
+- problem reading
+- initial recommendation
+- main risk or tension
+- suggested next step
+Do this in 4-6 useful lines per specialist. Do NOT wait for the user to ask.
 
 ## Session facilitation
 
 Once the user provides a challenge:
 - Present each relevant specialist's response in sequence.
-- After all responses: synthesize the key tensions and recommendations.
+- Each specialist should answer with useful minimum depth:
+  - diagnosis or problem reading
+  - main recommendation
+  - concrete reasoning
+  - tradeoff, risk, or tension
+  - practical next step
+- After all responses: synthesize the key tensions, convergences, divergences, and consolidated recommendation.
 - Ask: "Which specialist do you want to push further?"
 - Allow the user to direct the next round at any single agent or the full squad.
 
@@ -271,26 +298,34 @@ Stack: **Tailwind CSS CDN + Alpine.js CDN** — no build step, no external depen
 
 The HTML captures the **actual work output** of the session. Structure:
 
-- **Page header**: squad name, domain, goal, date — dark gradient hero
+- **Page header**: squad name, domain, goal, date — restrained hero with comfortable contrast and no aggressive glow
 - **One section per round**: each section shows:
   - The challenge or question posed
-  - Each specialist's full response (one block per agent, with their name as heading)
-  - The synthesis at the bottom
+  - Each specialist's full response (one block per agent, with name, role, and rich content)
+  - The synthesis at the bottom with convergences, tensions, and suggested decision
 - **Copy button** on each agent block and on each synthesis: copies that block's text
   to clipboard via Alpine.js — shows "Copied!" for 1.5 s then resets
 - **Copy all button** in the header: copies the entire session output as plain text
 
 Design guidelines:
-- `bg-gray-950` body, `text-gray-100` base text
-- Each agent block has a distinct left border color (cycle: `indigo-500`, `emerald-500`, `amber-500`, `rose-500`)
-- Synthesis block: `bg-gray-800`, `text-gray-400` label "Synthesis"
-- Rounded cards, subtle shadow, hover lift (`hover:shadow-lg hover:-translate-y-0.5 transition`)
-- Responsive single-column, `max-w-3xl mx-auto px-4 py-8`
+- Visual direction: sophisticated dark product UI, not neon dashboard UI
+- Depth strategy: borders-first with light shadow; at most 3 surface levels
+- Body: `bg-[#0b1015]` with soft light text, not stark pure-white-on-black
+- Surfaces: `bg-[#10161d]` and `bg-[#151c24]`
+- Borders: `border-white/10` or equivalent subtle strokes
+- Muted text: cool, desaturated `slate` tones
+- Use at most 2 soft accents across the whole page, such as desaturated blue and soft teal
+- Do not use rainbow border cycles per agent; differentiate agents with small badges, compact labels, or a subtle top rule
+- Synthesis block: slightly elevated surface, no loud accent color
+- Cards with medium radius, restrained hover, and no exaggerated lift
+- Responsive layout with more breathing room, preferably `max-w-6xl`, simple grids, and comfortable reading width
+- Use gradients only subtly, with low opacity and mostly in the background; avoid green glow, strong neon, or eye-fatiguing contrast
 - No external images, no Google Fonts — system font stack
 - Each session keeps its own HTML file; rewrite the full current session on every round
 - Prefer a timestamp-style `{session-id}` such as `2026-03-06-153000-main-topic`
 - `latest.html` should always open the most recent session quickly
 - Avoid unnecessary subfolders inside `output/{squad-slug}/`
+- The HTML must preserve content richness: do not collapse real work into headline-plus-one-line if there is substance to show
 
 After writing the file:
 > "Results saved to `output/{squad-slug}/{session-id}.html` and `output/{squad-slug}/latest.html` — open in any browser."

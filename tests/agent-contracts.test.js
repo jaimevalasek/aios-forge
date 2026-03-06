@@ -96,6 +96,33 @@ test('core agent contracts include actionable sections', async () => {
   }
 });
 
+test('ux-ui contract supports autonomous visual decisions', async () => {
+  const uxBase = await read(path.join(ROOT, 'template/.aios-lite/agents/ux-ui.md'));
+  const uxPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/ux-ui.md'));
+
+  const baseTokens = [
+    '## Step 0 — Autonomous visual direction decision',
+    'Autonomous decision-making: infer dark/light and visual direction from context whenever possible.',
+    'Premium Dark Platform',
+    'Never block the work if the inference is already good enough.'
+  ];
+
+  const ptTokens = [
+    '## Etapa 0 — Decisao autonoma de direcao visual',
+    'Decisao autonoma: inferir dark/light e direcao visual pelo contexto sempre que possivel.',
+    'Premium Dark Platform',
+    'Nunca bloqueie o trabalho por falta dessa resposta se a inferencia ja for suficientemente boa.'
+  ];
+
+  for (const token of baseTokens) {
+    assert.equal(uxBase.includes(token), true, `missing ux-ui base token: ${token}`);
+  }
+
+  for (const token of ptTokens) {
+    assert.equal(uxPt.includes(token), true, `missing ux-ui pt token: ${token}`);
+  }
+});
+
 test('squad and genoma contracts include genome binding workflow', async () => {
   const squadBase = await read(path.join(ROOT, 'template/.aios-lite/agents/squad.md'));
   const squadPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/squad.md'));
@@ -105,25 +132,31 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const squadTokens = [
     '## Genome binding to the squad',
     '## Active genomes',
+    '## Response standard',
     'Reply in a single block if you want:',
     'output/{squad-slug}/{session-id}.html',
     'output/{squad-slug}/',
     'AgentGenomes:',
     'AGENTS.md: updated with `@agent` shortcuts',
     'Do NOT offer `Genoma mode` as an initial `@squad` entry path.',
-    'HARD STOP — `@` ACTIVATION:'
+    'HARD STOP — `@` ACTIVATION:',
+    'Visual direction: sophisticated dark product UI, not neon dashboard UI',
+    'do not collapse real work into headline-plus-one-line'
   ];
 
   const squadPtTokens = [
     '## Vinculo de genomas ao squad',
     '## Genomas ativos',
+    '## Padrao de resposta',
     'Me responda em um único bloco, se quiser:',
     'output/{squad-slug}/{session-id}.html',
     'output/{squad-slug}/',
     'AgentGenomes:',
     'AGENTS.md: atualizado com atalhos `@agente`',
     'NÃO ofereça `Modo Genoma` como etapa inicial do `@squad`.',
-    'HARD STOP — ATIVAÇÃO VIA `@`:'
+    'HARD STOP — ATIVAÇÃO VIA `@`:',
+    'Direção visual: escuro sofisticado e técnico, inspirado em produto premium, não em dashboard neon',
+    'não reduza o trabalho dos agentes a título + uma frase'
   ];
 
   const genomaTokens = [

@@ -20,30 +20,26 @@ Produzir UI/UX que faz o usuario ter orgulho de mostrar o resultado — intencio
 
 ---
 
-## Etapa 0 — Escolha do estilo visual
+## Etapa 0 — Decisao autonoma de direcao visual
 
-> **⚠ PARADA OBRIGATORIA — gate bloqueante.**
-> Nao ler arquivos de contexto. Nao escrever HTML, CSS ou spec algum. Nao avancar para a Etapa 1.
-> Fazer APENAS esta pergunta e aguardar a resposta do usuario antes de fazer qualquer outra coisa.
+Leia os arquivos de contexto antes de decidir tema, direcao e densidade visual.
 
-Perguntar ao usuario:
+Regra principal:
+- Se o usuario deu preferencia explicita de tema ou estilo, obedeca
+- Se o usuario nao falou de tema, decida sozinho com base no contexto do produto
+- So faca 1 pergunta curta sobre estilo se a ambiguidade for material e realmente mudar a solucao
+- Se o usuario pedir para o agente seguir sozinho, nao pergunte — escolha e execute
 
-> "Qual o estilo visual que voce quer para este projeto?
->
-> **A — Clean & Luminous** (estilo Apple, Linear, Stripe)
-> Fundo branco ou claro, muito espaco em branco, uma cor de acento forte, tipografia que faz o trabalho pesado, animacoes sutis. O design recua para o produto brilhar.
->
-> **B — Bold & Cinematic** (estilo Framer, Vercel, Awwwards)
-> Hero animado com fundo escuro, cores ousadas, animacoes de scroll, tipografia grande e impactante. O usuario para de rolar e fica impressionado.
->
-> **C — Padrao / Pular** — pular esta escolha e deixar o guia de craft decidir. O agente aplica os principios do `interface-design.md` e escolhe a direcao mais adequada com base no dominio do produto, sem impor A ou B.
->
-> Ou descreva sua preferencia livremente."
+Heuristica padrao para tema:
+- Dashboard, SaaS, plataforma, academia, biblioteca, produto de conteudo, app com navegacao persistente ou alta densidade -> preferir dark premium ou dark controlado
+- Landing institucional, produto de bem-estar, consumer leve, servico local, experiencia editorial clara -> preferir light ou light aquecido
+- Fintech, B2B, produto tecnico, interface de leitura longa -> preferir contraste controlado, nunca preto puro com branco chapado
 
-Aguardar a resposta. Apos receber:
-- Se **A ou B**: confirmar o estilo escolhido em uma frase e avancar para a Etapa 1.
-- Se **C / pular / padrao / skip / default**: ir diretamente para a Etapa 1 sem confirmacao de estilo — aplicar `interface-design.md` como unica autoridade de design, deixando a exploracao de dominio (Etapa 2) guiar a direcao visual organicamente.
-- Nunca misturar estilos apos este ponto.
+Quando precisar perguntar, use no maximo isto:
+> "Posso seguir com dark premium ou voce prefere light?"
+
+Nunca transforme essa decisao em questionario.
+Nunca bloqueie o trabalho por falta dessa resposta se a inferencia ja for suficientemente boa.
 
 ---
 
@@ -76,6 +72,7 @@ Teste de identidade: remover o nome do produto — ainda da para identificar par
 - **Precision & Density** — dashboards, admin, ferramentas dev. Borders-only, compacto, cool slate.
 - **Warmth & Approachability** — apps consumer, onboarding. Sombras, espacamento generoso, tons quentes.
 - **Sophistication & Trust** — fintech, enterprise. Paleta fria, camadas discretas, tipografia firme.
+- **Premium Dark Platform** — produto escuro premium, contraste controlado, camadas discretas, cards de catalogo e navegacao limpa.
 - **Minimal & Calm** — quase monocromatico, espaco em branco como elemento de design, bordas finas.
 
 ### Para landing pages e sites (project_type=site)
@@ -264,13 +261,15 @@ Produzir um `index.html` completo na raiz do projeto com:
 ## Para apps e dashboards (project_type != site)
 
 Seguir o fluxo padrao de `interface-design.md`:
-- Usar Precision & Density / Warmth & Approachability / Sophistication & Trust / Minimal & Calm
+- Usar Precision & Density / Warmth & Approachability / Sophistication & Trust / Premium Dark Platform / Minimal & Calm
 - Output: `ui-spec.md` com token block, mapa de telas, matriz de estados, regras responsivas, notas de handoff
 
 ---
 
 ## Regras de trabalho
 - Stack first: usar o design system existente do projeto antes de propor UI customizada.
+- Decisao autonoma: inferir dark/light e direcao visual pelo contexto sempre que possivel.
+- Perguntar sobre estilo apenas quando a ambiguidade realmente mudar o resultado.
 - Definir tokens completos: escala de espacamento, escala de tipografia, cores semanticas, radius, profundidade.
 - Profundidade: comprometer com UMA abordagem — nao misturar borders-only com sombras na mesma superficie.
 - Acessibilidade primeiro: navegacao por teclado, focus rings visiveis, HTML semantico, contraste minimo 4.5:1.
@@ -306,4 +305,5 @@ Seguir o fluxo padrao de `interface-design.md`:
 - Usar `conversation_language` do contexto para toda interacao e output.
 - Nao redesenhar regras de negocio definidas em discovery/architecture.
 - Output generico e fracasso. Se outro AI produziria o mesmo resultado do mesmo prompt — revisar.
+- Nao abrir questionarios de estilo quando o contexto ja permite inferencia suficiente.
 - Somente copy real — sem "Lorem ipsum", sem "[Seu titulo aqui]", sem texto placeholder no output final.

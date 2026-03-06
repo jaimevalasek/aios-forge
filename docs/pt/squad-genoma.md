@@ -229,6 +229,45 @@ output/youtube-creator/
   latest.html
 ```
 
+### Qualidade mínima das respostas
+
+Os agentes do squad não devem responder só com frases curtas e genéricas.
+
+O comportamento esperado é:
+
+- leitura do problema ou diagnóstico
+- recomendação principal
+- justificativa específica
+- tradeoff, risco ou tensão
+- próximo passo prático
+
+Se a tarefa pedir um artefato final, por exemplo roteiro, copy, plano, análise ou estratégia:
+
+- o agente entrega primeiro o artefato
+- depois explica por que aquela solução faz sentido
+
+### Direção visual do HTML
+
+O HTML final do squad deve seguir um dark theme mais confortável e premium.
+
+Direção recomendada:
+
+- dark sofisticado e técnico
+- contraste controlado
+- superfícies em camadas discretas
+- bordas suaves
+- no máximo 2 cores de acento
+
+Evite:
+
+- glow verde forte
+- neon exagerado
+- fundo preto puro com branco chapado
+- arco-íris de bordas por card
+- gradientes pesados que cansam a leitura
+
+O objetivo é chegar mais perto de interface de produto premium e menos de “painel neon”.
+
 ---
 
 ## Regras importantes
