@@ -102,6 +102,26 @@ test('agent:prompt --json returns structured payload without human logs', async 
   assert.equal(typeof parsed.prompt, 'string');
 });
 
+test('dashboard:init --dry-run --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  const dashboardDir = path.join(dir, 'dashboard-install');
+  const cli = await runCli([
+    'dashboard:init',
+    dir,
+    `--dir=${dashboardDir}`,
+    '--repo=https://example.com/aios-lite-dashboard.git',
+    '--dry-run',
+    '--json'
+  ]);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.dryRun, true);
+  assert.equal(parsed.dashboardDir, path.resolve(dashboardDir));
+  assert.equal(parsed.repo, 'https://example.com/aios-lite-dashboard.git');
+});
+
 test('locale:apply --json returns structured payload without human logs', async () => {
   const dir = await makeTempDir();
   const install = await runCli(['install', dir, '--json']);

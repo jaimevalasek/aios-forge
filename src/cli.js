@@ -32,6 +32,22 @@ const { runQaReport } = require('./commands/qa-report');
 const { runScanProject } = require('./commands/scan-project');
 const { runConfig } = require('./commands/config');
 const { runSquadStatus } = require('./commands/squad-status');
+const {
+  runDashboardInit,
+  runDashboardDev,
+  runDashboardOpen
+} = require('./commands/dashboard');
+const {
+  runRuntimeInit,
+  runRuntimeTaskStart,
+  runRuntimeStart,
+  runRuntimeUpdate,
+  runRuntimeTaskFinish,
+  runRuntimeFinish,
+  runRuntimeTaskFail,
+  runRuntimeFail,
+  runRuntimeStatus
+} = require('./commands/runtime');
 
 const JSON_SUPPORTED_COMMANDS = new Set([
   'init',
@@ -93,8 +109,32 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'scan:project',
   'scan-project',
   'config',
+  'dashboard:init',
+  'dashboard-init',
+  'dashboard:dev',
+  'dashboard-dev',
+  'dashboard:open',
+  'dashboard-open',
   'squad:status',
   'squad-status',
+  'runtime:init',
+  'runtime-init',
+  'runtime:task:start',
+  'runtime-task-start',
+  'runtime:start',
+  'runtime-start',
+  'runtime:update',
+  'runtime-update',
+  'runtime:task:finish',
+  'runtime-task-finish',
+  'runtime:finish',
+  'runtime-finish',
+  'runtime:task:fail',
+  'runtime-task-fail',
+  'runtime:fail',
+  'runtime-fail',
+  'runtime:status',
+  'runtime-status',
   'version',
   '--version',
   '-v'
@@ -159,7 +199,19 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_qa_report');
   logHelpLine(t, logger, 'cli.help_scan_project');
   logHelpLine(t, logger, 'cli.help_config');
+  logHelpLine(t, logger, 'cli.help_dashboard_init');
+  logHelpLine(t, logger, 'cli.help_dashboard_dev');
+  logHelpLine(t, logger, 'cli.help_dashboard_open');
   logHelpLine(t, logger, 'cli.help_squad_status');
+  logHelpLine(t, logger, 'cli.help_runtime_init');
+  logHelpLine(t, logger, 'cli.help_runtime_task_start');
+  logHelpLine(t, logger, 'cli.help_runtime_start');
+  logHelpLine(t, logger, 'cli.help_runtime_update');
+  logHelpLine(t, logger, 'cli.help_runtime_task_finish');
+  logHelpLine(t, logger, 'cli.help_runtime_finish');
+  logHelpLine(t, logger, 'cli.help_runtime_task_fail');
+  logHelpLine(t, logger, 'cli.help_runtime_fail');
+  logHelpLine(t, logger, 'cli.help_runtime_status');
 }
 
 function commandSupportsJson(command) {
@@ -275,8 +327,32 @@ async function main() {
       result = await runScanProject({ args, options, logger: commandLogger, t });
     } else if (command === 'config') {
       result = await runConfig({ args, options, logger: commandLogger, t });
+    } else if (command === 'dashboard:init' || command === 'dashboard-init') {
+      result = await runDashboardInit({ args, options, logger: commandLogger, t });
+    } else if (command === 'dashboard:dev' || command === 'dashboard-dev') {
+      result = await runDashboardDev({ args, options, logger: commandLogger, t });
+    } else if (command === 'dashboard:open' || command === 'dashboard-open') {
+      result = await runDashboardOpen({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:status' || command === 'squad-status') {
       result = await runSquadStatus({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:init' || command === 'runtime-init') {
+      result = await runRuntimeInit({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:task:start' || command === 'runtime-task-start') {
+      result = await runRuntimeTaskStart({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:start' || command === 'runtime-start') {
+      result = await runRuntimeStart({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:update' || command === 'runtime-update') {
+      result = await runRuntimeUpdate({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:task:finish' || command === 'runtime-task-finish') {
+      result = await runRuntimeTaskFinish({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:finish' || command === 'runtime-finish') {
+      result = await runRuntimeFinish({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:task:fail' || command === 'runtime-task-fail') {
+      result = await runRuntimeTaskFail({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:fail' || command === 'runtime-fail') {
+      result = await runRuntimeFail({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:status' || command === 'runtime-status') {
+      result = await runRuntimeStatus({ args, options, logger: commandLogger, t });
     } else {
       const message = t('cli.unknown_command', { command });
       if (jsonMode) {

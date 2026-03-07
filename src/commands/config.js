@@ -81,4 +81,10 @@ async function runConfig({ args, options, logger, t }) {
   return { ok: false, error: { code: 'usage_error' } };
 }
 
-module.exports = { runConfig };
+module.exports = {
+  runConfig,
+  readConfig,
+  writeConfig,
+  CONFIG_DIR,
+  CONFIG_FILE
+};

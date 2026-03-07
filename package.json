@@ -1,6 +1,6 @@
 {
   "name": "aios-lite",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lightweight AI agent framework for software projects.",
   "keywords": [
     "ai",
@@ -38,5 +38,8 @@
     "test": "node --test",
     "lint": "node --check src/*.js src/commands/*.js src/i18n/*.js src/i18n/messages/*.js bin/*.js",
     "ci": "npm run lint && npm test"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2"
   }
 }

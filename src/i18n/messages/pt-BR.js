@@ -57,8 +57,32 @@ module.exports = {
       'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=pt-BR]',
     help_config:
       'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
+    help_dashboard_init:
+      'aios-lite dashboard:init [path] [--dir=<path>] [--repo=<git-url>] [--project-name=<nome>] [--skip-install] [--dry-run] [--json] [--locale=pt-BR]',
+    help_dashboard_dev:
+      'aios-lite dashboard:dev [path] [--dir=<path>] [--host=127.0.0.1] [--port=3000] [--project-name=<nome>] [--dry-run] [--json] [--locale=pt-BR]',
+    help_dashboard_open:
+      'aios-lite dashboard:open [path] [--host=127.0.0.1] [--port=3000] [--url=<url>] [--dry-run] [--json] [--locale=pt-BR]',
     help_squad_status:
       'aios-lite squad:status [path] [--json] [--locale=pt-BR]',
+    help_runtime_init:
+      'aios-lite runtime:init [path] [--json] [--locale=pt-BR]',
+    help_runtime_task_start:
+      'aios-lite runtime:task:start [path] --title=<texto> [--squad=<slug>] [--session=<chave>] [--goal=<texto>] [--by=<agente>] [--task=<chave>] [--json] [--locale=pt-BR]',
+    help_runtime_start:
+      'aios-lite runtime:start [path] --agent=<nome> [--squad=<slug>] [--session=<chave>] [--title=<texto>] [--run=<chave>] [--json] [--locale=pt-BR]',
+    help_runtime_update:
+      'aios-lite runtime:update [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+    help_runtime_task_finish:
+      'aios-lite runtime:task:finish [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
+    help_runtime_finish:
+      'aios-lite runtime:finish [path] --run=<chave> [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+    help_runtime_task_fail:
+      'aios-lite runtime:task:fail [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
+    help_runtime_fail:
+      'aios-lite runtime:fail [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+    help_runtime_status:
+      'aios-lite runtime:status [path] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erro: {message}'
@@ -648,6 +672,53 @@ module.exports = {
     show_line: '  {key} = {value}',
     get_line: '{key} = {value}',
     key_not_found: 'Chave nao encontrada: {key}'
+  },
+  dashboard: {
+    project_missing: 'O caminho do projeto nao existe ou nao e uma pasta: {path}',
+    init_dir_not_empty:
+      'O diretorio do dashboard ja existe e nao esta vazio: {path}. Use --dir com um caminho vazio ou reutilize a instalacao existente.',
+    not_initialized:
+      'O dashboard nao esta inicializado em: {path}. Execute `aios-lite dashboard:init` primeiro.',
+    clone_start: 'Clonando dashboard de {repo} para {path}...',
+    clone_failed: 'Falha ao clonar o dashboard: {detail}',
+    install_start: 'Instalando dependencias do dashboard em {path}...',
+    install_failed: 'Falha ao instalar dependencias do dashboard: {detail}',
+    init_ok: 'Dashboard pronto em: {path}',
+    project_registered: 'Projeto registrado no dashboard: {name} ({path})',
+    next_steps: 'Proximos passos:',
+    step_dev: '1. Inicie o dashboard: aios-lite dashboard:dev {path}',
+    step_open:
+      '2. Abra o dashboard no navegador: aios-lite dashboard:open --host={host} --port={port}',
+    dry_run_summary: '[dry-run] Comando do dashboard preparado para: {path}',
+    dev_start: 'Iniciando servidor dev do dashboard em {path} na URL http://{host}:{port} ...',
+    open_ready: 'URL do dashboard pronta: {url}',
+    open_start: 'Abrindo dashboard: {url}',
+    open_failed: 'Nao foi possivel abrir a URL do dashboard automaticamente: {detail}'
+  },
+  runtime: {
+    option_required: 'Opcao obrigatoria ausente: {option}',
+    store_missing:
+      'Runtime store nao encontrado: {path}. Execute: aios-lite runtime:init',
+    init_ok: 'Runtime store inicializado: {path}',
+    task_start_ok: 'Task iniciada: {task} ({path})',
+    start_ok: 'Execucao iniciada: {run} ({path})',
+    update_ok: 'Execucao atualizada: {run} ({path})',
+    task_finish_ok: 'Task concluida: {task} ({path})',
+    finish_ok: 'Execucao concluida: {run} ({path})',
+    task_fail_ok: 'Task marcada como falha: {task} ({path})',
+    fail_ok: 'Execucao marcada como falha: {run} ({path})',
+    status_title: 'Status do runtime: {path}',
+    status_db: 'Banco: {path}',
+    status_task_counts:
+      'Tasks -> Fila: {queued} | Rodando: {running} | Concluidas: {completed} | Falhas: {failed}',
+    status_counts:
+      'Runs  -> Fila: {queued} | Rodando: {running} | Concluidas: {completed} | Falhas: {failed}',
+    status_no_active_tasks: 'Nenhuma task ativa.',
+    status_active_tasks_title: 'Tasks ativas:',
+    status_active_task_line: '- {task} | squad: {squad} | status: {status} | trabalho: {title}',
+    status_no_active: 'Nenhuma execucao ativa de agente.',
+    status_active_title: 'Execucoes ativas:',
+    status_active_line: '- {agent} | squad: {squad} | status: {status} | trabalho: {title}'
   },
   squad_status: {
     no_squad: 'Nenhum squad encontrado.',
