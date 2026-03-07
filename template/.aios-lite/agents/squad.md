@@ -91,6 +91,22 @@ Instead:
 
 After gathering information, determine **3–5 specialized roles** the domain requires.
 
+But do not treat the squad as just a folder of agents.
+Every new squad must also include:
+- a short manifesto at `agents/{squad-slug}/agents.md`
+- a structured manifest at `agents/{squad-slug}/squad.manifest.json`
+- permanent executors in `agents/{squad-slug}/`
+- metadata at `.aios-lite/squads/{slug}.md`
+- `output/`, `aios-logs/`, and `media/` directories
+
+Before writing the executor files, derive:
+- **squad skills**: reusable domain capabilities
+- **squad MCPs**: external access truly needed, with justification
+- **subagent policy**: when temporary investigation/parallelism is appropriate
+
+Do not keep skills, MCPs, or subagents implicit.
+Record them explicitly in both the squad text manifesto and the squad JSON manifest.
+
 **Examples of role sets:**
 - YouTube creator → `scriptwriter`, `title-generator`, `copywriter`, `trend-analyst`
 - Legal research → `case-analyst`, `devils-advocate`, `precedent-hunter`, `plain-language-writer`
@@ -103,7 +119,93 @@ After gathering information, determine **3–5 specialized roles** the domain re
 - Max 50 characters, no trailing hyphens
 - Example: "YouTube viral scripts about AI" → `youtube-viral-scripts-ai`
 
-### Step 1 — Generate each specialist agent
+### Step 1 — Generate the squad manifesto
+
+Create `agents/{squad-slug}/agents.md`:
+
+```markdown
+# Squad {squad-name}
+
+## Mission
+[one clear sentence]
+
+## Does
+- [3 to 5 bullets]
+
+## Does not do
+- [2 to 4 clear boundaries]
+
+## Permanent executors
+- @orquestrador — [role]
+- @{role1} — [role]
+- @{role2} — [role]
+
+## Squad skills
+- [skill-slug] — [one-line description]
+- [skill-slug] — [one-line description]
+
+## Squad MCPs
+- [mcp-slug] — [when to use it and why]
+
+## Subagent policy
+- Use subagents only for isolated investigation, broad reading, comparison, or parallel work
+- Do not use subagents as substitutes for skills or permanent executors
+
+## Outputs and review
+- Drafts: `output/{squad-slug}/`
+- Final HTML: `output/{squad-slug}/{session-id}.html`
+- Logs: `aios-logs/{squad-slug}/`
+- Media: `media/{squad-slug}/`
+- Every final delivery must go through critical read and synthesis by @orquestrador
+```
+
+The squad `agents.md` must stay short and map-like.
+Do not duplicate the full executor prompts inside it.
+
+Also create `agents/{squad-slug}/squad.manifest.json` with this minimum schema:
+
+```json
+{
+  "schemaVersion": "1.0.0",
+  "slug": "{squad-slug}",
+  "name": "{squad-name}",
+  "mission": "{mission}",
+  "goal": "{goal}",
+  "visibility": "private",
+  "aiosLiteCompatibility": "^1.1.0",
+  "rules": {
+    "outputsDir": "output/{squad-slug}",
+    "logsDir": "aios-logs/{squad-slug}",
+    "mediaDir": "media/{squad-slug}",
+    "reviewPolicy": ["clarity", "density", "consistency", "next-step"]
+  },
+  "skills": [
+    { "slug": "{skill-1}", "title": "{skill-title-1}", "description": "{skill-desc-1}" }
+  ],
+  "mcps": [
+    { "slug": "{mcp-1}", "required": false, "purpose": "{purpose}" }
+  ],
+  "subagents": {
+    "allowed": true,
+    "when": ["broad research", "comparison", "large-context summarization", "parallel analysis"]
+  },
+  "executors": [
+    {
+      "slug": "orquestrador",
+      "title": "Orchestrator",
+      "role": "Coordinates the squad and publishes the final HTML.",
+      "file": "agents/{squad-slug}/orquestrador.md",
+      "skills": [],
+      "genomes": []
+    }
+  ],
+  "genomes": []
+}
+```
+
+The JSON manifest must reflect the real structure written to the filesystem.
+
+### Step 2 — Generate each specialist agent
 
 For each role, create `agents/{squad-slug}/{role-slug}.md`:
 
@@ -152,7 +254,12 @@ Keep each generated agent lean.
 Prefer short, clear, actionable files. Do not turn each agent into long documentation.
 But do not make the agent shallow: it must still produce dense, useful responses when invoked.
 
-### Step 2 — Generate the orchestrator
+In each executor, make it clear:
+- which squad skills it relies on the most
+- when to delegate to another executor
+- when to ask @orquestrador for a temporary subagent
+
+### Step 3 — Generate the orchestrator
 
 Create `agents/{squad-slug}/orquestrador.md`:
 
@@ -179,6 +286,16 @@ synthesize outputs, manage the session HTML report.
 - [list genomes applied to the whole squad]
 - [list per-agent bindings when present]
 
+## Squad skills
+- [skill-slug]: [when to use it]
+
+## Squad MCPs
+- [mcp-slug]: [when to use it and why]
+
+## Subagent policy
+- Use subagents only for isolated investigation, comparison, broad reading, or parallel work
+- Do not use subagents as substitutes for skills or permanent executors
+
 ## Hard constraints
 - Always involve all relevant specialists for each challenge
 - Specialists must save structured intermediate content as `.md` directly inside `output/{squad-slug}/`
@@ -194,9 +311,10 @@ synthesize outputs, manage the session HTML report.
 - Latest HTML: `output/{squad-slug}/latest.html`
 - Agent deliverables: `output/{squad-slug}/`
 - Logs: `aios-logs/{squad-slug}/`
+- Media: `media/{squad-slug}/`
 ```
 
-### Step 3 — Register agents in the project gateways
+### Step 4 — Register agents in the project gateways
 
 Append a Squad section to `CLAUDE.md` at the project root:
 
@@ -221,7 +339,7 @@ Rules:
 - append the squad entries without overwriting existing content
 - if the squad is already registered, update only that squad section
 
-### Step 4 — Save squad metadata
+### Step 5 — Save squad metadata
 
 Save a summary to `.aios-lite/squads/{slug}.md`:
 ```
@@ -229,14 +347,26 @@ Squad: {squad-name}
 Mode: Squad
 Goal: {goal}
 Agents: agents/{squad-slug}/
+Manifest: agents/{squad-slug}/squad.manifest.json
 Output: output/{squad-slug}/
 Logs: aios-logs/{squad-slug}/
+Media: media/{squad-slug}/
 LatestSession: output/{squad-slug}/latest.html
 Genomes:
 - [genome applied to the whole squad]
 
 AgentGenomes:
 - {role-slug}: [genome-a], [genome-b]
+
+Skills:
+- [skill-slug] — [description]
+
+MCPs:
+- [mcp-slug] — [justification]
+
+Subagents:
+- Allowed: yes
+- When: [broad research], [comparison], [summarization], [parallelism]
 ```
 
 ## After generation — confirm and warm-up round (mandatory)
@@ -256,6 +386,7 @@ You can invoke any agent directly (e.g. `@scriptwriter`) for focused work,
 or work through @orquestrador for coordinated sessions.
 
 CLAUDE.md and AGENTS.md updated with shortcuts.
+Squad manifests created at `agents/{squad-slug}/agents.md` and `agents/{squad-slug}/squad.manifest.json`.
 ```
 
 Then immediately run the warm-up — show how each specialist would approach the stated goal RIGHT NOW with minimum substance:
@@ -339,17 +470,23 @@ After writing the file:
 - When the user wants genomes, route them to `@genoma` as a separate flow.
 - Do NOT use `squads/active/squad.md` — agents go to `agents/{squad-slug}/`, HTML to `output/{squad-slug}/`.
 - Store raw logs only in `aios-logs/{squad-slug}/` at the project root — never inside `.aios-lite/`.
+- Store squad media only in `media/{squad-slug}/` at the project root.
 - `.aios-lite/context/` accepts only `.md` files — do not write non-markdown files there.
 - Do NOT skip the HTML deliverable — generate `output/{squad-slug}/{session-id}.html` after every response round.
+- Do NOT create a squad without `agents.md` and `squad.manifest.json`.
+- Do NOT keep skills, MCPs, and subagents implicit — declare them explicitly in the squad.
 
 ## Output contract
 
 - Agent files: `agents/{squad-slug}/` (editable by user, invocable via `@`)
+- Squad text manifesto: `agents/{squad-slug}/agents.md`
+- Squad JSON manifest: `agents/{squad-slug}/squad.manifest.json`
 - Squad metadata: `.aios-lite/squads/{slug}.md`
 - Session HTMLs: `output/{squad-slug}/{session-id}.html`
 - Latest HTML: `output/{squad-slug}/latest.html`
 - Draft `.md` files: `output/{squad-slug}/`
 - Genome bindings: `.aios-lite/squads/{slug}.md`
 - Logs: `aios-logs/{squad-slug}/`
+- Media: `media/{squad-slug}/`
 - CLAUDE.md: updated with `/agent` shortcuts
 - AGENTS.md: updated with `@agent` shortcuts

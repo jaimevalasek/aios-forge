@@ -49,6 +49,68 @@ async function openRuntimeDb(targetDir, options = {}) {
   db.pragma('foreign_keys = ON');
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS squads (
+      squad_slug TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      mission TEXT,
+      goal TEXT,
+      status TEXT NOT NULL DEFAULT 'active',
+      visibility TEXT NOT NULL DEFAULT 'private',
+      manifest_json TEXT,
+      agents_dir TEXT,
+      output_dir TEXT,
+      logs_dir TEXT,
+      media_dir TEXT,
+      latest_session_path TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_executors (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      executor_slug TEXT NOT NULL,
+      title TEXT,
+      role TEXT,
+      file_path TEXT,
+      skills_json TEXT,
+      genomes_json TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE (squad_slug, executor_slug),
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_skills (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      skill_slug TEXT NOT NULL,
+      title TEXT,
+      description TEXT,
+      UNIQUE (squad_slug, skill_slug),
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_mcps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      mcp_slug TEXT NOT NULL,
+      required INTEGER NOT NULL DEFAULT 0,
+      purpose TEXT,
+      UNIQUE (squad_slug, mcp_slug),
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_genomes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      genome_slug TEXT NOT NULL,
+      scope_type TEXT NOT NULL DEFAULT 'squad',
+      agent_slug TEXT,
+      UNIQUE (squad_slug, genome_slug, scope_type, agent_slug),
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS tasks (
       task_key TEXT PRIMARY KEY,
       squad_slug TEXT,
@@ -103,6 +165,11 @@ async function openRuntimeDb(targetDir, options = {}) {
       FOREIGN KEY (run_key) REFERENCES agent_runs(run_key) ON DELETE SET NULL
     );
 
+    CREATE INDEX IF NOT EXISTS idx_squads_updated ON squads(updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_squad_executors_squad ON squad_executors(squad_slug, updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_squad_skills_squad ON squad_skills(squad_slug);
+    CREATE INDEX IF NOT EXISTS idx_squad_mcps_squad ON squad_mcps(squad_slug);
+    CREATE INDEX IF NOT EXISTS idx_squad_genomes_squad ON squad_genomes(squad_slug);
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_tasks_squad ON tasks(squad_slug, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_agent_runs_status ON agent_runs(status, updated_at DESC);
@@ -232,6 +299,133 @@ function attachArtifact(db, options) {
     file_path: String(options.filePath).trim(),
     created_at: now
   });
+}
+
+function normalizeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function upsertSquadManifest(db, options) {
+  const now = nowIso();
+  const slug = String(options.slug).trim();
+  const manifest = options.manifest && typeof options.manifest === 'object' ? options.manifest : {};
+  const skills = normalizeArray(manifest.skills);
+  const mcps = normalizeArray(manifest.mcps);
+  const executors = normalizeArray(manifest.executors);
+  const genomes = normalizeArray(manifest.genomes);
+
+  db.prepare(`
+    INSERT INTO squads (
+      squad_slug, name, mission, goal, status, visibility, manifest_json,
+      agents_dir, output_dir, logs_dir, media_dir, latest_session_path,
+      created_at, updated_at
+    ) VALUES (
+      @squad_slug, @name, @mission, @goal, @status, @visibility, @manifest_json,
+      @agents_dir, @output_dir, @logs_dir, @media_dir, @latest_session_path,
+      @created_at, @updated_at
+    )
+    ON CONFLICT(squad_slug) DO UPDATE SET
+      name = excluded.name,
+      mission = excluded.mission,
+      goal = excluded.goal,
+      status = excluded.status,
+      visibility = excluded.visibility,
+      manifest_json = excluded.manifest_json,
+      agents_dir = excluded.agents_dir,
+      output_dir = excluded.output_dir,
+      logs_dir = excluded.logs_dir,
+      media_dir = excluded.media_dir,
+      latest_session_path = excluded.latest_session_path,
+      updated_at = excluded.updated_at
+  `).run({
+    squad_slug: slug,
+    name: String(options.name || manifest.name || slug).trim(),
+    mission: options.mission ? String(options.mission).trim() : manifest.mission ? String(manifest.mission).trim() : null,
+    goal: options.goal ? String(options.goal).trim() : manifest.goal ? String(manifest.goal).trim() : null,
+    status: String(options.status || 'active').trim(),
+    visibility: String(options.visibility || manifest.visibility || 'private').trim(),
+    manifest_json: JSON.stringify(manifest),
+    agents_dir: options.agentsDir ? String(options.agentsDir).trim() : null,
+    output_dir: options.outputDir ? String(options.outputDir).trim() : null,
+    logs_dir: options.logsDir ? String(options.logsDir).trim() : null,
+    media_dir: options.mediaDir ? String(options.mediaDir).trim() : null,
+    latest_session_path: options.latestSessionPath ? String(options.latestSessionPath).trim() : null,
+    created_at: now,
+    updated_at: now
+  });
+
+  db.prepare('DELETE FROM squad_executors WHERE squad_slug = ?').run(slug);
+  db.prepare('DELETE FROM squad_skills WHERE squad_slug = ?').run(slug);
+  db.prepare('DELETE FROM squad_mcps WHERE squad_slug = ?').run(slug);
+  db.prepare('DELETE FROM squad_genomes WHERE squad_slug = ?').run(slug);
+
+  const insertExecutor = db.prepare(`
+    INSERT INTO squad_executors (
+      squad_slug, executor_slug, title, role, file_path, skills_json, genomes_json,
+      created_at, updated_at
+    ) VALUES (
+      @squad_slug, @executor_slug, @title, @role, @file_path, @skills_json, @genomes_json,
+      @created_at, @updated_at
+    )
+  `);
+
+  for (const executor of executors) {
+    insertExecutor.run({
+      squad_slug: slug,
+      executor_slug: String(executor.slug || '').trim(),
+      title: executor.title ? String(executor.title).trim() : null,
+      role: executor.role ? String(executor.role).trim() : null,
+      file_path: executor.file ? String(executor.file).trim() : null,
+      skills_json: JSON.stringify(normalizeArray(executor.skills)),
+      genomes_json: JSON.stringify(normalizeArray(executor.genomes)),
+      created_at: now,
+      updated_at: now
+    });
+  }
+
+  const insertSkill = db.prepare(`
+    INSERT INTO squad_skills (squad_slug, skill_slug, title, description)
+    VALUES (@squad_slug, @skill_slug, @title, @description)
+  `);
+
+  for (const skill of skills) {
+    insertSkill.run({
+      squad_slug: slug,
+      skill_slug: String(skill.slug || '').trim(),
+      title: skill.title ? String(skill.title).trim() : null,
+      description: skill.description ? String(skill.description).trim() : null
+    });
+  }
+
+  const insertMcp = db.prepare(`
+    INSERT INTO squad_mcps (squad_slug, mcp_slug, required, purpose)
+    VALUES (@squad_slug, @mcp_slug, @required, @purpose)
+  `);
+
+  for (const mcp of mcps) {
+    insertMcp.run({
+      squad_slug: slug,
+      mcp_slug: String(mcp.slug || '').trim(),
+      required: mcp.required ? 1 : 0,
+      purpose: mcp.purpose ? String(mcp.purpose).trim() : null
+    });
+  }
+
+  const insertGenome = db.prepare(`
+    INSERT INTO squad_genomes (squad_slug, genome_slug, scope_type, agent_slug)
+    VALUES (@squad_slug, @genome_slug, @scope_type, @agent_slug)
+  `);
+
+  for (const genome of genomes) {
+    insertGenome.run({
+      squad_slug: slug,
+      genome_slug: String(genome.slug || '').trim(),
+      scope_type: String(genome.scope || 'squad').trim(),
+      agent_slug: genome.agentSlug ? String(genome.agentSlug).trim() : null
+    });
+  }
+
+  return slug;
 }
 
 function inferArtifactKind(filePath) {
@@ -449,6 +643,7 @@ module.exports = {
   resolveRuntimePaths,
   runtimeStoreExists,
   openRuntimeDb,
+  upsertSquadManifest,
   startTask,
   updateTask,
   startRun,

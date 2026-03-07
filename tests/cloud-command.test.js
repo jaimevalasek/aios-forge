@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const Database = require('better-sqlite3');
 const { createTranslator } = require('../src/i18n');
 const {
   runCloudImportSquad,
@@ -195,6 +196,24 @@ test('cloud:import:squad imports snapshot into .aios-lite/cloud-imports', async 
   );
   assert.match(orchestratorRaw, /Coordene as tarefas do squad/);
 
+  const agentsManifestRaw = await fs.readFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'agents.md'),
+    'utf8'
+  );
+  assert.match(agentsManifestRaw, /## Squad skills/);
+  assert.match(agentsManifestRaw, /## Squad MCPs/);
+
+  const squadManifestRaw = await fs.readFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'squad.manifest.json'),
+    'utf8'
+  );
+  const squadManifest = JSON.parse(squadManifestRaw);
+  assert.equal(squadManifest.slug, 'youtube-creator');
+  assert.equal(squadManifest.rules.mediaDir, 'media/youtube-creator');
+  assert.equal(Array.isArray(squadManifest.executors), true);
+
+  await assert.doesNotReject(() => fs.access(path.join(projectDir, 'media', 'youtube-creator')));
+
   const stubRaw = await fs.readFile(
     path.join(projectDir, 'agents', 'youtube-creator', 'roteirista-viral.md'),
     'utf8'
@@ -207,6 +226,15 @@ test('cloud:import:squad imports snapshot into .aios-lite/cloud-imports', async 
     'utf8'
   );
   assert.match(genomeRaw, /# O que saber/);
+
+  const db = new Database(path.join(projectDir, '.aios-lite', 'runtime', 'aios.sqlite'), { readonly: true });
+  const indexedSquad = db
+    .prepare('SELECT squad_slug, media_dir, manifest_json FROM squads WHERE squad_slug = ?')
+    .get('youtube-creator');
+  assert.equal(indexedSquad.squad_slug, 'youtube-creator');
+  assert.equal(indexedSquad.media_dir, 'media/youtube-creator');
+  assert.match(indexedSquad.manifest_json, /structured-domain-output/);
+  db.close();
 });
 
 test('cloud:import:squad --dry-run validates remote snapshot without writing files', async () => {
@@ -335,6 +363,7 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads'), { recursive: true });
   await fs.mkdir(path.join(projectDir, '.aios-lite', 'genomas'), { recursive: true });
   await fs.mkdir(path.join(projectDir, 'agents', 'youtube-creator'), { recursive: true });
+  await fs.mkdir(path.join(projectDir, 'media', 'youtube-creator'), { recursive: true });
 
   await fs.writeFile(
     path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator.md'),
@@ -355,6 +384,93 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
     'utf8'
   );
 
+  await fs.writeFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'agents.md'),
+    [
+      '# Squad YouTube Creator',
+      '',
+      '## Mission',
+      'Criar ativos editoriais para YouTube.',
+      '',
+      '## Squad skills',
+      '- roteiro-short-form — Estruturar roteiro',
+      '',
+      '## Squad MCPs',
+      '- web-search — Buscar referências atuais',
+    ].join('\n'),
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'squad.manifest.json'),
+    JSON.stringify(
+      {
+        schemaVersion: '1.0.0',
+        slug: 'youtube-creator',
+        name: 'YouTube Creator',
+        mission: 'Criar ativos editoriais para YouTube.',
+        goal: 'Criar roteiros e assets',
+        visibility: 'private',
+        aiosLiteCompatibility: '^1.1.1',
+        rules: {
+          outputsDir: 'output/youtube-creator',
+          logsDir: 'aios-logs/youtube-creator',
+          mediaDir: 'media/youtube-creator',
+          reviewPolicy: ['clareza', 'densidade']
+        },
+        skills: [
+          {
+            slug: 'roteiro-short-form',
+            title: 'Roteiro short form',
+            description: 'Estruturar roteiro com hook e retenção.'
+          }
+        ],
+        mcps: [
+          {
+            slug: 'web-search',
+            required: false,
+            purpose: 'Buscar referências atuais.'
+          }
+        ],
+        subagents: {
+          allowed: true,
+          when: ['pesquisa ampla', 'comparação']
+        },
+        executors: [
+          {
+            slug: 'orquestrador',
+            title: 'Orquestrador',
+            role: 'Coordena o squad.',
+            file: 'agents/youtube-creator/orquestrador.md',
+            skills: [],
+            genomes: []
+          },
+          {
+            slug: 'roteirista-viral',
+            title: 'Roteirista Viral',
+            role: 'Cria roteiros fortes.',
+            file: 'agents/youtube-creator/roteirista-viral.md',
+            skills: ['roteiro-short-form'],
+            genomes: ['copy-ctr']
+          }
+        ],
+        genomes: [
+          {
+            slug: 'storytelling-retencao',
+            scope: 'squad',
+            agentSlug: null
+          },
+          {
+            slug: 'copy-ctr',
+            scope: 'agent',
+            agentSlug: 'roteirista-viral'
+          }
+        ]
+      },
+      null,
+      2
+    ),
+    'utf8'
+  );
   await fs.writeFile(
     path.join(projectDir, 'agents', 'youtube-creator', 'orquestrador.md'),
     '# Orquestrador\n\nCoordena o squad.\n',
@@ -405,5 +521,11 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   assert.equal(result.response.received.squad.slug, 'youtube-creator');
   assert.equal(result.response.received.version.versionNumber, '1.0.0');
   assert.equal(result.response.received.version.agentsManifestJson.length, 2);
+  assert.equal(result.response.received.version.manifestJson.slug, 'youtube-creator');
+  assert.equal(result.response.received.version.manifestJson.rules.mediaDir, 'media/youtube-creator');
+  assert.equal(result.response.received.version.manifestJson.skills[0].slug, 'roteiro-short-form');
+  assert.equal(result.response.received.version.manifestJson.mcps[0].slug, 'web-search');
+  assert.equal(result.response.received.version.manifestJson.subagents.allowed, true);
+  assert.equal(result.response.received.version.genomesManifestJson.genomes.length, 2);
   assert.equal(result.response.received.appliedGenomes.length, 2);
 });

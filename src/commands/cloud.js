@@ -3,6 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { ensureDir, exists, nowStamp, toRelativeSafe } = require('../utils');
+const { openRuntimeDb, upsertSquadManifest } = require('../runtime-store');
 
 function sanitizeSegment(value, fallback) {
   const normalized = String(value || fallback || '')
@@ -81,6 +82,18 @@ function localSquadOutputDir(projectDir, slug) {
 
 function localSquadLogsDir(projectDir, slug) {
   return path.join(projectDir, 'aios-logs', sanitizeSegment(slug, 'squad'));
+}
+
+function localSquadMediaDir(projectDir, slug) {
+  return path.join(projectDir, 'media', sanitizeSegment(slug, 'squad'));
+}
+
+function localSquadTextManifestPath(projectDir, slug) {
+  return path.join(localSquadAgentsDir(projectDir, slug), 'agents.md');
+}
+
+function localSquadJsonManifestPath(projectDir, slug) {
+  return path.join(localSquadAgentsDir(projectDir, slug), 'squad.manifest.json');
 }
 
 function localGenomeFilePath(projectDir, slug) {
@@ -194,6 +207,151 @@ function normalizeAgentsManifest(agentsManifestJson) {
     .filter((agent) => Boolean(agent.slug));
 }
 
+async function loadLocalSquadManifest(projectDir, slug) {
+  const manifestPath = localSquadJsonManifestPath(projectDir, slug);
+  if (!(await exists(manifestPath))) {
+    return null;
+  }
+
+  const raw = await fs.readFile(manifestPath, 'utf8').catch(() => null);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function deriveFallbackSkills(snapshot) {
+  const domain = String(snapshot?.squad?.name || snapshot?.squad?.slug || 'squad');
+  return [
+    {
+      slug: 'structured-domain-output',
+      title: 'Structured domain output',
+      description: `Produce structured outputs for ${domain}.`
+    },
+    {
+      slug: 'critical-synthesis',
+      title: 'Critical synthesis',
+      description: 'Consolidate specialist reasoning into a practical next step.'
+    }
+  ];
+}
+
+function deriveFallbackMcps(snapshot) {
+  const items = [{ slug: 'filesystem', required: true, purpose: 'Persist local drafts, manifests, outputs, logs, and media.' }];
+  if ((snapshot?.squad?.visibility || '').toUpperCase() === 'FREE') {
+    items.push({ slug: 'web-search', required: false, purpose: 'Optional external research when the task requires current references.' });
+  }
+  return items;
+}
+
+function buildLocalSquadManifest(snapshot, agents) {
+  const source = snapshot?.version?.manifestJson && typeof snapshot.version.manifestJson === 'object'
+    ? snapshot.version.manifestJson
+    : {};
+  const slug = sanitizeSegment(snapshot.squad.slug, 'squad');
+  const executors = agents.map((agent) => ({
+    slug: agent.slug,
+    title: agent.title,
+    role: agent.description || (agent.slug === 'orquestrador' ? 'Coordinates the squad and publishes the final HTML.' : null),
+    file: `agents/${slug}/${agent.slug}.md`,
+    skills: agent.slug === 'orquestrador' ? [] : ['structured-domain-output'],
+    genomes: (snapshot.appliedGenomes || [])
+      .filter((item) => item.scopeType === 'SQUAD' || normalizeAgentSlug(item.agentSlug) === agent.slug)
+      .map((item) => sanitizeSegment(item.genome.slug, 'genoma'))
+  }));
+
+  const genomes = (snapshot.appliedGenomes || []).map((item) => ({
+    slug: sanitizeSegment(item.genome.slug, 'genoma'),
+    scope: String(item.scopeType || 'SQUAD').toLowerCase(),
+    agentSlug: item.agentSlug ? normalizeAgentSlug(item.agentSlug) : null
+  }));
+
+  return {
+    schemaVersion: String(source.schemaVersion || snapshot?.version?.schemaVersion || '1.0.0'),
+    slug,
+    name: String(source.name || snapshot.squad.name),
+    mission: String(source.mission || snapshot.squad.description || `Operate the ${snapshot.squad.name} squad.`),
+    goal: String(source.goal || snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Lite Cloud'),
+    visibility: String(source.visibility || String(snapshot.squad.visibility || 'PRIVATE').toLowerCase()),
+    aiosLiteCompatibility: String(
+      source.aiosLiteCompatibility ||
+        snapshot?.version?.compatibilityMin ||
+        '^1.1.0'
+    ),
+    rules: {
+      outputsDir: `output/${slug}`,
+      logsDir: `aios-logs/${slug}`,
+      mediaDir: `media/${slug}`,
+      reviewPolicy: Array.isArray(source?.rules?.reviewPolicy)
+        ? source.rules.reviewPolicy
+        : ['clarity', 'density', 'consistency', 'next-step']
+    },
+    skills: Array.isArray(source.skills) && source.skills.length > 0 ? source.skills : deriveFallbackSkills(snapshot),
+    mcps: Array.isArray(source.mcps) && source.mcps.length > 0 ? source.mcps : deriveFallbackMcps(snapshot),
+    subagents: source.subagents && typeof source.subagents === 'object'
+      ? source.subagents
+      : {
+          allowed: true,
+          when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
+        },
+    executors: Array.isArray(source.executors) && source.executors.length > 0 ? source.executors : executors,
+    genomes
+  };
+}
+
+function buildSquadTextManifest(snapshot, manifest) {
+  const lines = [
+    `# Squad ${manifest.name}`,
+    '',
+    '## Mission',
+    manifest.mission,
+    '',
+    '## Does',
+    `- Deliver outputs for the domain: ${snapshot.squad.name}`,
+    `- Target goal: ${manifest.goal}`,
+    '- Coordinate specialists through the local orchestrator',
+    '',
+    '## Does not do',
+    '- Replace the AIOS Lite official agents',
+    '- Use subagents as a substitute for permanent executors or skills',
+    '',
+    '## Permanent executors'
+  ];
+
+  for (const executor of manifest.executors || []) {
+    lines.push(`- @${executor.slug} — ${executor.role || executor.title || 'Specialist executor'}`);
+  }
+
+  lines.push('', '## Squad skills');
+  for (const skill of manifest.skills || []) {
+    lines.push(`- ${skill.slug} — ${skill.description || skill.title || 'Reusable capability'}`);
+  }
+
+  lines.push('', '## Squad MCPs');
+  for (const mcp of manifest.mcps || []) {
+    lines.push(`- ${mcp.slug} — ${mcp.purpose || 'External integration'}`);
+  }
+
+  lines.push(
+    '',
+    '## Subagent policy',
+    '- Use subagents only for isolated investigation, broad reading, comparison, or parallel work.',
+    '- Do not use subagents as a substitute for permanent executors or reusable skills.',
+    '',
+    '## Outputs and review',
+    `- Drafts: \`output/${manifest.slug}/\``,
+    `- Final HTML: \`output/${manifest.slug}/{session-id}.html\``,
+    `- Logs: \`aios-logs/${manifest.slug}/\``,
+    `- Media: \`media/${manifest.slug}/\``,
+    '- Final outputs should include recommendation, reasoning, tradeoff, and next step.'
+  );
+
+  return `${lines.join('\n')}\n`;
+}
+
 function buildAgentStub(snapshot, agent) {
   const lines = [
     `# ${agent.title}`,
@@ -286,10 +444,14 @@ function buildInstalledManifest(snapshot, sourceUrl, agents) {
 async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   const slug = sanitizeSegment(payload.squad.slug, 'squad');
   const agents = normalizeAgentsManifest(payload.version.agentsManifestJson);
+  const squadManifest = buildLocalSquadManifest(payload, agents);
   const metadataPath = localSquadMetadataPath(projectDir, slug);
   const agentsDir = localSquadAgentsDir(projectDir, slug);
+  const textManifestPath = localSquadTextManifestPath(projectDir, slug);
+  const jsonManifestPath = localSquadJsonManifestPath(projectDir, slug);
   const outputDir = localSquadOutputDir(projectDir, slug);
   const logsDir = localSquadLogsDir(projectDir, slug);
+  const mediaDir = localSquadMediaDir(projectDir, slug);
   const manifestPath = installedManifestPath(projectDir, slug);
 
   if (!force && (await exists(metadataPath))) {
@@ -300,10 +462,13 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   await ensureDir(agentsDir);
   await ensureDir(outputDir);
   await ensureDir(logsDir);
+  await ensureDir(mediaDir);
   await ensureDir(path.dirname(manifestPath));
 
   const metadata = buildSquadMetadata(payload, { sourceUrl });
   await fs.writeFile(metadataPath, metadata, 'utf8');
+  await fs.writeFile(textManifestPath, buildSquadTextManifest(payload, squadManifest), 'utf8');
+  await fs.writeFile(jsonManifestPath, `${JSON.stringify(squadManifest, null, 2)}\n`, 'utf8');
   await fs.writeFile(
     manifestPath,
     `${JSON.stringify(buildInstalledManifest(payload, sourceUrl, agents), null, 2)}\n`,
@@ -340,12 +505,35 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
     writtenGenomes.push(genomePath);
   }
 
+  const runtimeHandle = await openRuntimeDb(projectDir);
+  try {
+    upsertSquadManifest(runtimeHandle.db, {
+      slug,
+      name: squadManifest.name,
+      mission: squadManifest.mission,
+      goal: squadManifest.goal,
+      visibility: squadManifest.visibility,
+      status: 'active',
+      manifest: squadManifest,
+      agentsDir: `agents/${slug}`,
+      outputDir: `output/${slug}`,
+      logsDir: `aios-logs/${slug}`,
+      mediaDir: `media/${slug}`,
+      latestSessionPath: `output/${slug}/latest.html`
+    });
+  } finally {
+    runtimeHandle.db.close();
+  }
+
   return {
     metadataPath,
+    textManifestPath,
+    jsonManifestPath,
     manifestPath,
     agentsDir,
     outputDir,
     logsDir,
+    mediaDir,
     writtenAgents,
     writtenGenomes
   };
@@ -835,11 +1023,17 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
   const agentsDirRel = normalizeRel(extractField(content, 'Agents') || `agents/${slug}`);
   const outputDirRel = normalizeRel(extractField(content, 'Output') || `output/${slug}`);
   const logsDirRel = normalizeRel(extractField(content, 'Logs') || `aios-logs/${slug}`);
+  const mediaDirRel = normalizeRel(extractField(content, 'Media') || `media/${slug}`);
   const agentsDirAbs = path.join(projectDir, agentsDirRel);
+  const localManifest = (await loadLocalSquadManifest(projectDir, slug)) || {};
+  const textManifestPath = path.join(agentsDirAbs, 'agents.md');
+  const textManifest = (await fs.readFile(textManifestPath, 'utf8').catch(() => null)) || null;
   const agentFiles = await listAgentFiles(agentsDirAbs);
   const agentsManifestJson = [];
 
   for (const filePath of agentFiles) {
+    const baseName = path.basename(filePath);
+    if (baseName === 'agents.md' || baseName === 'squad.manifest.json') continue;
     const markdown = await fs.readFile(filePath, 'utf8');
     const agentSlug = sanitizeSegment(path.basename(filePath, '.md'), 'agent');
     agentsManifestJson.push({
@@ -850,16 +1044,59 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
     });
   }
 
+  const normalizedManifest =
+    localManifest && typeof localManifest === 'object'
+      ? {
+          ...localManifest,
+          slug: sanitizeSegment(localManifest.slug || slug, 'squad'),
+          name: String(localManifest.name || squadName),
+          mission: String(localManifest.mission || extractField(content, 'Description', 'Descricao') || goal || squadName),
+          goal: String(localManifest.goal || goal || ''),
+          visibility: String(localManifest.visibility || options.visibility || 'private').toLowerCase(),
+          aiosLiteCompatibility: String(
+            localManifest.aiosLiteCompatibility ||
+              options['compatibility-min'] ||
+              '^1.1.0'
+          ),
+          rules: {
+            ...(localManifest.rules && typeof localManifest.rules === 'object' ? localManifest.rules : {}),
+            outputsDir: localManifest?.rules?.outputsDir || outputDirRel,
+            logsDir: localManifest?.rules?.logsDir || logsDirRel,
+            mediaDir: localManifest?.rules?.mediaDir || mediaDirRel
+          },
+          skills: Array.isArray(localManifest.skills) ? localManifest.skills : [],
+          mcps: Array.isArray(localManifest.mcps) ? localManifest.mcps : [],
+          subagents:
+            localManifest.subagents && typeof localManifest.subagents === 'object'
+              ? localManifest.subagents
+              : {
+                  allowed: true,
+                  when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
+                },
+          executors: Array.isArray(localManifest.executors)
+            ? localManifest.executors
+            : agentsManifestJson.map((agent) => ({
+                slug: agent.slug,
+                title: agent.name,
+                role: agent.description,
+                file: `${agentsDirRel}/${agent.slug}.md`,
+                skills: [],
+                genomes: []
+              })),
+          genomes: Array.isArray(localManifest.genomes) ? localManifest.genomes : []
+        }
+      : null;
+
   return {
     kind: 'aioslite.squad',
     exportVersion: 1,
     squad: {
       id: null,
-      name: squadName,
+      name: normalizedManifest?.name || squadName,
       slug: sanitizeSegment(slug, 'squad'),
-      description: extractField(content, 'Description', 'Descricao') || null,
-      goal,
-      visibility: String(options.visibility || 'PRIVATE').toUpperCase(),
+      description: extractField(content, 'Description', 'Descricao') || normalizedManifest?.mission || null,
+      goal: normalizedManifest?.goal || goal,
+      visibility: String(options.visibility || normalizedManifest?.visibility || 'PRIVATE').toUpperCase(),
       status: 'PUBLISHED',
       ownerUsername: String(options.owner || 'local'),
       projectName: null
@@ -877,13 +1114,21 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
       sourceType: 'local_publish',
       isCurrent: true,
       createdAt: new Date().toISOString(),
-      manifestJson: {
-        metadataPath: normalizeRel(path.relative(projectDir, metadataPath)),
-        outputDir: outputDirRel,
-        logsDir: logsDirRel
-      },
+      manifestJson:
+        normalizedManifest || {
+          metadataPath: normalizeRel(path.relative(projectDir, metadataPath)),
+          textManifestPath: normalizeRel(path.relative(projectDir, textManifestPath)),
+          outputDir: outputDirRel,
+          logsDir: logsDirRel,
+          mediaDir: mediaDirRel
+        },
       agentsManifestJson,
-      genomesManifestJson: null
+      genomesManifestJson: {
+        textManifestPath: textManifest
+          ? normalizeRel(path.relative(projectDir, textManifestPath))
+          : null,
+        genomes: normalizedManifest?.genomes || []
+      }
     },
     appliedGenomes: await buildAppliedGenomesFromMetadata(projectDir, content, options)
   };
