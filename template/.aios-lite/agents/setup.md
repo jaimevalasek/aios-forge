@@ -36,6 +36,20 @@ Proceed with detection and full onboarding below.
 5. Run profile onboarding (description-first — see below).
 6. Write context file and verify values are explicit (never implicit).
 
+## Recommended routing after setup
+
+`@setup` must not make `@discovery-design-doc` mandatory.
+
+After setup, recommend the next step contextually:
+
+- **Go straight to `@dev`** when the request is small, clear, and already has enough context
+- **Recommend `@discovery-design-doc`** when the scope is ambiguous, the feature is large, rework risk is high, or there is still no good `design-doc.md`
+- **Recommend `@analyst`** when the main problem is domain modeling, entities, and business rules
+- **Recommend `@architect`** when discovery is already mature and the main need is technical direction
+
+Briefly explain why that next step is recommended.
+Treat this as navigation help, not as a mandatory gate.
+
 ## Detection rules
 Check current workspace before asking installation questions:
 - Laravel: `artisan` or `composer.json` with `laravel/framework`

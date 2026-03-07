@@ -72,6 +72,8 @@ Preciso de uma landing page com:
 
 Não precisa de @analyst (domínio simples), não precisa de @architect (estrutura trivial), não precisa de @qa (sem lógica crítica a testar). O @dev tem contexto suficiente para entregar direto.
 
+> Se até num projeto MICRO o pedido vier muito vago, você ainda pode encaixar `@discovery-design-doc` antes do `@dev`. Isso é exceção útil, não fluxo padrão.
+
 ---
 
 ## Cenário 2 — API REST com autenticação (SMALL)
@@ -186,6 +188,22 @@ Objetivo: mapear pacientes, médicos, agendamentos e regras de negócio.
 - LGPD: health_notes precisa de criptografia ou controle de acesso
 - Conflito de horários: critical path, requer lock otimista
 ```
+
+### Onde `@discovery-design-doc` entraria neste cenário
+
+Se antes do `@analyst` você ainda não souber bem:
+- o recorte do MVP
+- o que fica fora de escopo
+- quais módulos atuais serão afetados
+- ou se a API já está pronta para implementação
+
+vale inserir:
+
+```text
+@setup -> @discovery-design-doc -> @analyst -> @architect -> @dev
+```
+
+Isso ajuda especialmente quando o projeto já existe e a clínica quer adicionar uma feature grande sem sair codando cedo demais.
 
 ### Passo 5: @architect — Estrutura do projeto
 

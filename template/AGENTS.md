@@ -23,6 +23,7 @@ Describe your intent. The agent system will match and execute.
 | Agent | Natural language examples |
 |-------|--------------------------|
 | @setup | "start the project setup", "use the setup agent", "iniciar o setup" |
+| @discovery-design-doc | "prepare the discovery and design doc", "use the discovery design doc agent" |
 | @analyst | "analyze the requirements", "use the analyst agent" |
 | @architect | "design the architecture", "use the architect agent" |
 | @ux-ui | "design the UI", "use the ux-ui agent" |
@@ -39,6 +40,7 @@ Do not answer with "I will open/read/show the file" unless the user explicitly a
 
 ## Agent files
 - @setup → `.aios-lite/agents/setup.md`
+- @discovery-design-doc → `.aios-lite/agents/discovery-design-doc.md`
 - @analyst → `.aios-lite/agents/analyst.md`
 - @architect → `.aios-lite/agents/architect.md`
 - @ux-ui → `.aios-lite/agents/ux-ui.md`

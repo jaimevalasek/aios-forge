@@ -57,6 +57,7 @@ async function openRuntimeDb(targetDir, options = {}) {
       status TEXT NOT NULL DEFAULT 'active',
       visibility TEXT NOT NULL DEFAULT 'private',
       manifest_json TEXT,
+      context_json TEXT,
       agents_dir TEXT,
       output_dir TEXT,
       logs_dir TEXT,
@@ -213,6 +214,13 @@ function ensureLegacyColumns(db) {
   if (!agentRunColumnNames.has('task_key')) {
     db.exec('ALTER TABLE agent_runs ADD COLUMN task_key TEXT');
   }
+
+  const squadColumns = db.prepare('PRAGMA table_info(squads)').all();
+  const squadColumnNames = new Set(squadColumns.map((column) => column.name));
+
+  if (!squadColumnNames.has('context_json')) {
+    db.exec('ALTER TABLE squads ADD COLUMN context_json TEXT');
+  }
 }
 
 function insertEvent(db, record) {
@@ -309,6 +317,12 @@ function upsertSquadManifest(db, options) {
   const now = nowIso();
   const slug = String(options.slug).trim();
   const manifest = options.manifest && typeof options.manifest === 'object' ? options.manifest : {};
+  const context =
+    options.context && typeof options.context === 'object'
+      ? options.context
+      : manifest.context && typeof manifest.context === 'object'
+        ? manifest.context
+        : null;
   const skills = normalizeArray(manifest.skills);
   const mcps = normalizeArray(manifest.mcps);
   const executors = normalizeArray(manifest.executors);
@@ -317,10 +331,12 @@ function upsertSquadManifest(db, options) {
   db.prepare(`
     INSERT INTO squads (
       squad_slug, name, mission, goal, status, visibility, manifest_json,
+      context_json,
       agents_dir, output_dir, logs_dir, media_dir, latest_session_path,
       created_at, updated_at
     ) VALUES (
       @squad_slug, @name, @mission, @goal, @status, @visibility, @manifest_json,
+      @context_json,
       @agents_dir, @output_dir, @logs_dir, @media_dir, @latest_session_path,
       @created_at, @updated_at
     )
@@ -331,6 +347,7 @@ function upsertSquadManifest(db, options) {
       status = excluded.status,
       visibility = excluded.visibility,
       manifest_json = excluded.manifest_json,
+      context_json = excluded.context_json,
       agents_dir = excluded.agents_dir,
       output_dir = excluded.output_dir,
       logs_dir = excluded.logs_dir,
@@ -345,6 +362,7 @@ function upsertSquadManifest(db, options) {
     status: String(options.status || 'active').trim(),
     visibility: String(options.visibility || manifest.visibility || 'private').trim(),
     manifest_json: JSON.stringify(manifest),
+    context_json: context ? JSON.stringify(context) : null,
     agents_dir: options.agentsDir ? String(options.agentsDir).trim() : null,
     output_dir: options.outputDir ? String(options.outputDir).trim() : null,
     logs_dir: options.logsDir ? String(options.logsDir).trim() : null,

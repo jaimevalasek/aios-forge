@@ -82,6 +82,22 @@ O agente `@setup` detecta o framework, faz as perguntas e gera o `project.contex
 | **SMALL** — 2–3 pontos | `@setup → @analyst → @architect → @ux-ui → @dev → @qa` |
 | **MEDIUM** — 4–6 pontos | `@setup → @analyst → @architect → @ux-ui → @pm → @orchestrator → @dev → @qa` |
 
+### Atalho recomendado quando o escopo ainda está nebuloso
+
+Se a demanda ainda estiver vaga, se a feature for grande ou se houver risco alto de retrabalho, use:
+
+```text
+@setup -> @discovery-design-doc -> proximo agente recomendado
+```
+
+Exemplos:
+- projeto novo ainda mal definido
+- feature grande em sistema existente
+- integrações sensíveis como billing, webhooks, Stripe ou permissões
+
+Esse passo de `@discovery-design-doc` é **recomendado quando agrega clareza**, não obrigatório.
+Se o pedido já estiver claro e pequeno, siga o fluxo normal.
+
 **Não sabe o tamanho?** Responda 3 perguntas:
 1. Quantos tipos de usuário? (1=0pt, 2=1pt, 3+=2pt)
 2. Quantas integrações externas? (0=0pt, 1-2=1pt, 3+=2pt)

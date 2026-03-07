@@ -1,6 +1,6 @@
 # Squad e Genoma
 
-> Guia prático para usar `@squad` e `@genoma` no AIOS Lite.
+> Guia prático para usar `@squad` e `@genoma` no AIOS Lite sem confundir time operacional, skill e camada cognitiva.
 
 ---
 
@@ -8,25 +8,123 @@
 
 `@squad` e `@genoma` resolvem problemas diferentes:
 
-- `@squad` cria um **time operacional de agentes reais** em `agents/{squad-slug}/`
+- `@squad` cria uma **squad modular** em `agents/{squad-slug}/`
 - `@genoma` cria uma **base estruturada de conhecimento e lentes cognitivas** em `.aios-lite/genomas/{slug}.md`
 
 Em termos simples:
 
-- `@genoma` define **o que saber** e **como pensar**
-- `@squad` transforma isso em **agentes executáveis**
+- `skill` define **o que saber fazer**
+- `genoma` define **como pensar**
+- `@squad` organiza isso em **manifesto, executores, output, logs e media**
 - o `@orquestrador` gerado para cada squad consolida o trabalho em HTML
+
+---
+
+## Distinção central: skill, genoma, executor e subagente
+
+Essa separação precisa ficar estável no sistema:
+
+- `skill` é capacidade operacional reutilizável
+- `genoma` é lente cognitiva, repertório e forma de pensar
+- `agente executor` é um trabalhador permanente da squad
+- `subagente` é uma unidade temporária de investigação, comparação ou paralelismo
+- `agents.md` é o manifesto curto da squad, não é um executor
+
+### Skill
+
+Use skill para descrever algo como:
+
+- estruturar roteiro
+- revisar arquitetura
+- sintetizar briefing
+- analisar hook
+- extrair critérios de aceite
+
+Skill responde à pergunta:
+
+> "O que este sistema sabe fazer bem?"
+
+### Genoma
+
+Use genoma para descrever algo como:
+
+- mente de estrategista editorial
+- mente de copywriter de retenção
+- mente de advogado cético
+- mente de criador viral
+
+Genoma responde à pergunta:
+
+> "Com que lentes este sistema pensa, julga e escolhe?"
+
+### Agente executor
+
+É o papel operacional fixo do squad:
+
+- `@roteirista-viral`
+- `@copywriter-de-titulos`
+- `@analista-de-retencao`
+- `@orquestrador`
+
+### Subagente
+
+É temporário e não define a identidade principal da squad.
+
+Use para:
+
+- pesquisa ampla
+- comparação de alternativas
+- resumo de material grande
+- leitura paralela
+
+Não use subagente como substituto de:
+
+- skill
+- genoma
+- executor permanente
 
 ---
 
 ## O que é um squad
 
-Um squad é um conjunto de agentes criados para um objetivo específico.
+Um squad é uma unidade operacional modular criada para um objetivo específico.
+
+Ela não é só uma pasta com agentes. Uma squad bem formada tem:
+
+- manifesto curto em `agents/{squad-slug}/agents.md`
+- manifesto estruturado em `agents/{squad-slug}/squad.manifest.json`
+- `design-doc` local em `agents/{squad-slug}/design-doc.md`
+- `readiness` local em `agents/{squad-slug}/readiness.md`
+- executores permanentes em `agents/{squad-slug}/`
+- metadata em `.aios-lite/squads/{slug}.md`
+- outputs em `output/{squad-slug}/`
+- logs em `aios-logs/{squad-slug}/`
+- mídia em `media/{squad-slug}/`
+
+Antes de escrever essa estrutura, o `@squad` deve consolidar um mini pacote de:
+
+- discovery do problema
+- design doc do escopo atual
+- leitura de prontidao
+
+Quando esse pacote e materializado, ele passa a existir como parte da squad:
+
+- `agents/{squad-slug}/design-doc.md`
+- `agents/{squad-slug}/readiness.md`
+
+Esse passo existe para evitar squads montadas em cima de contexto vago demais.
+Na pratica, o `@squad` decide:
+
+- se o pedido parece `modo projeto` ou `modo feature`
+- quais skills e documentos realmente precisam entrar agora
+- o que pode ficar fora do contexto ativo por enquanto
 
 Exemplo:
 
 ```text
 agents/youtube-creator/
+  agents.md
+  squad.manifest.json
   roteirista-viral.md
   estrategista-de-titulos.md
   analista-de-retencao.md
@@ -34,25 +132,71 @@ agents/youtube-creator/
   orquestrador.md
 ```
 
-Esses agentes não são os agentes oficiais da aios-lite. Eles são agentes do seu projeto.
+Esses agentes não são os agentes oficiais da aios-lite. Eles são executores do seu projeto.
 
 ---
 
 ## O que é um genoma
 
-Um genoma é um artefato de domínio. Ele descreve:
+Um genoma é um artefato de domínio e cognição. Ele descreve:
 
 - `O que saber`: conceitos, tensões, heurísticas e linguagem do domínio
 - `Mentes`: perspectivas cognitivas úteis para pensar naquele domínio
-- `Skills`: fragmentos curtos de capacidade reutilizável
+- `Padrões de julgamento`: o que valorizar, evitar e tensionar
+- `Skills`: fragmentos curtos de capacidade reutilizável que podem nascer desse domínio
 
-Exemplo de genoma:
+Exemplo:
 
 ```text
 .aios-lite/genomas/storytelling-retencao-youtube.md
 ```
 
-Esse genoma não faz trabalho sozinho. Ele enriquece o trabalho dos agentes.
+Esse genoma não faz trabalho sozinho. Ele não substitui o agente. Ele não substitui skill. Ele enriquece a forma como os agentes executam suas skills.
+
+### Como pensar no genoma na prática
+
+O jeito mais útil de entender genoma é:
+
+- `skill` = ferramenta
+- `genoma` = mente
+
+Exemplo:
+
+- o agente `@roteirista-viral` pode ter a skill de `roteiro-short-form`
+- o genoma `storytelling-retencao-youtube` muda como esse agente pensa:
+  - que tipo de hook priorizar
+  - que tensão narrativa abrir
+  - que payoff prometer
+  - o que evitar por soar genérico
+
+Então, para o sistema:
+
+- skill sem genoma pode executar
+- genoma sem skill não executa
+- executor com skill + genoma tende a entregar melhor
+
+---
+
+## Genoma não é clone literal de pessoa
+
+Se você quiser usar uma inspiração autoral, prefira este pensamento:
+
+- melhor: `genoma de estilo editorial`
+- melhor: `genoma de raciocínio`
+- melhor: `genoma de storytelling`
+- evitar como regra principal: `clone da pessoa X`
+
+O uso mais saudável é:
+
+- "genoma de copy de retenção"
+- "genoma de estratégia editorial para YouTube"
+- "genoma de narrativa emocional"
+
+Isso deixa o sistema:
+
+- mais reutilizável
+- mais consistente
+- menos confuso com persona, executor e skill
 
 ---
 
@@ -66,7 +210,7 @@ O modelo recomendado é:
 4. chamar os agentes normalmente
 
 Depois que o genoma é aplicado, o usuário não deveria precisar repetir isso em toda sessão.
-O vínculo precisa ficar salvo no metadata do squad.
+O vínculo precisa ficar salvo no metadata do squad e refletido no manifesto da squad.
 
 Exemplo:
 
@@ -79,8 +223,10 @@ Squad: YouTube Creator
 Mode: Squad
 Goal: Criar conteúdos virais com retenção forte
 Agents: agents/youtube-creator/
+Manifest: agents/youtube-creator/squad.manifest.json
 Output: output/youtube-creator/
 Logs: aios-logs/youtube-creator/
+Media: media/youtube-creator/
 LatestSession: output/youtube-creator/latest.html
 
 Genomes:
@@ -90,6 +236,55 @@ AgentGenomes:
 - roteirista-viral: .aios-lite/genomas/redacao-emocional-youtube.md
 - copywriter-thumbnail: .aios-lite/genomas/copy-ctr-youtube.md
 ```
+
+---
+
+## Estrutura modular que o `@squad` deve gerar
+
+O contrato atual esperado de uma squad é este:
+
+```text
+agents/{squad-slug}/
+  agents.md
+  squad.manifest.json
+  orquestrador.md
+  {executor-1}.md
+  {executor-2}.md
+
+output/{squad-slug}/
+aios-logs/{squad-slug}/
+media/{squad-slug}/
+.aios-lite/squads/{squad-slug}.md
+```
+
+### `agents.md`
+
+É o manifesto curto da squad.
+
+Deve explicar:
+
+- missão
+- faz
+- não faz
+- executores permanentes
+- skills da squad
+- MCPs da squad
+- política de subagentes
+- saídas e revisão
+
+### `squad.manifest.json`
+
+É a versão estruturada da mesma squad, pensada para:
+
+- SQLite local
+- dashboard
+- export/import
+- sync com `aioslite.com`
+
+Ou seja:
+
+- `agents.md` é a leitura curta para humano/LLM
+- `squad.manifest.json` é o contrato para sistema
 
 ---
 
@@ -103,8 +298,8 @@ O fluxo recomendado agora é mais direto:
 Na prática:
 
 - `@squad` não deve abrir perguntando entre Lite e Genoma
-- `@squad` entra direto nas perguntas para criação dos agentes
-- `@genoma` é chamado separadamente quando o usuário quiser enriquecer o squad
+- `@squad` entra direto nas perguntas para criação da squad
+- `@genoma` é chamado separadamente quando o usuário quiser enriquecer a squad
 
 ---
 
@@ -112,7 +307,7 @@ Na prática:
 
 ### Cenário 1: criar um squad
 
-Exemplo de conversa:
+Exemplo:
 
 ```text
 @squad
@@ -127,20 +322,21 @@ Papéis: pode escolher
 
 Resultado esperado:
 
-- criação de agentes em `agents/youtube-creator/`
+- criação de manifesto em `agents/youtube-creator/agents.md`
+- criação de manifesto JSON em `agents/youtube-creator/squad.manifest.json`
+- criação de executores em `agents/youtube-creator/`
 - criação de metadata em `.aios-lite/squads/youtube-creator.md`
+- criação de `output/youtube-creator/`, `aios-logs/youtube-creator/` e `media/youtube-creator/`
 - geração de `output/youtube-creator/latest.html`
 
 ### Cenário 2: criar um genoma depois
-
-Depois do squad já existir:
 
 ```text
 @genoma
 Quero um genoma para storytelling com retenção alta em vídeos longos do YouTube Brasil.
 ```
 
-Depois de gerar e salvar:
+Depois:
 
 ```text
 Aplicar este genoma ao squad youtube-creator.
@@ -151,6 +347,7 @@ Resultado esperado:
 
 - genoma salvo em `.aios-lite/genomas/...`
 - vínculo salvo no metadata do squad
+- manifesto da squad refletindo o vínculo
 - agente `roteirista-viral.md` reescrito com `## Genomas ativos`
 
 ### Cenário 3: usar o agente depois disso
@@ -173,6 +370,13 @@ agents/{squad-slug}/
 output/{squad-slug}/
 .aios-lite/squads/{squad-slug}.md
 aios-logs/{squad-slug}/
+media/{squad-slug}/
+```
+
+### Genoma
+
+```text
+.aios-lite/genomas/{genoma-slug}.md
 ```
 
 ### Registro nos gateways
@@ -182,42 +386,14 @@ Quando o squad é criado, o comportamento esperado é registrar os agentes dinâ
 - `CLAUDE.md` para uso via `/agente` no Claude Code
 - `AGENTS.md` para uso via `@agente` no Codex
 
-Exemplo:
-
-```md
-## Squad: YouTube Creator
-- /roteirista-viral -> agents/youtube-creator/roteirista-viral.md
-- /estrategista-de-titulos -> agents/youtube-creator/estrategista-de-titulos.md
-- /orquestrador -> agents/youtube-creator/orquestrador.md
-```
-
-```md
-## Squad: YouTube Creator
-- @roteirista-viral -> `agents/youtube-creator/roteirista-viral.md`
-- @estrategista-de-titulos -> `agents/youtube-creator/estrategista-de-titulos.md`
-- @orquestrador -> `agents/youtube-creator/orquestrador.md`
-```
-
-Regras:
-
-- não sobrescrever os agentes oficiais já existentes
-- fazer append ou atualizar apenas a seção do squad correspondente
-- tratar esses registros como atalhos para os arquivos reais em `agents/`
-- quando um agente dinâmico for ativado via `@`, o comportamento esperado é executar o papel imediatamente, não abrir e exibir o arquivo ao usuário
-
-### Genoma
-
-```text
-.aios-lite/genomas/{genoma-slug}.md
-```
-
-### Drafts e HTML final
+### Drafts, mídia e HTML final
 
 O fluxo recomendado é:
 
 1. cada agente especialista gera conteúdo intermediário em Markdown
 2. o `@orquestrador` do squad consolida esse material
 3. o `@orquestrador` publica o HTML final da sessão
+4. qualquer arquivo de mídia vai para `media/{squad-slug}/`
 
 Exemplo:
 
@@ -227,9 +403,79 @@ output/youtube-creator/
   2026-03-06-153000-copy-copywriter-thumbnail.md
   2026-03-06-153000-video-ingles.html
   latest.html
+
+media/youtube-creator/
+  referencia-thumb-01.png
+  frame-estudo-02.jpg
+  audio-gancho-01.mp3
 ```
 
-### Qualidade mínima das respostas
+Regra prática:
+
+- texto, markdown, html, json e logs podem ser indexados e acompanhados no runtime
+- mídia deve ficar no filesystem do projeto em `media/`
+
+---
+
+## Regras importantes
+
+### 1. O orquestrador responsável pelo HTML é o do squad
+
+Não é o `@orchestrator` oficial da aios-lite.
+
+É o `@orquestrador` gerado dentro de `agents/{squad-slug}/`.
+
+### 2. Genoma não deve alterar agentes oficiais da aios-lite
+
+Não aplique genomas customizados do usuário em:
+
+```text
+.aios-lite/agents/
+```
+
+Os genomas devem ser aplicados aos agentes criados em:
+
+```text
+agents/{squad-slug}/
+```
+
+### 3. O usuário pode mandar contexto grande
+
+Tanto no `@squad` quanto no `@genoma`, o usuário pode enviar:
+
+- textos longos
+- PDFs ou arquivos
+- prints
+- imagens
+- anotações brutas
+- exemplos de referência
+
+### 4. Um genoma pode ser do squad inteiro ou de um agente
+
+Use no squad inteiro quando o contexto vale para todos.
+
+Use por agente quando o contexto for específico.
+
+### 5. HTML final não substitui o chat
+
+O agente ainda responde na sessão.
+
+O HTML é o entregável persistido e organizado para consulta e cópia.
+
+### 6. Estrutura de pastas deve ser leve
+
+Prefira:
+
+- `agents/{squad-slug}/`
+- `output/{squad-slug}/`
+- `aios-logs/{squad-slug}/`
+- `media/{squad-slug}/`
+
+Evite criar subpastas demais sem necessidade.
+
+---
+
+## Qualidade mínima das respostas
 
 Os agentes do squad não devem responder só com frases curtas e genéricas.
 
@@ -241,12 +487,14 @@ O comportamento esperado é:
 - tradeoff, risco ou tensão
 - próximo passo prático
 
-Se a tarefa pedir um artefato final, por exemplo roteiro, copy, plano, análise ou estratégia:
+Se a tarefa pedir um artefato final:
 
 - o agente entrega primeiro o artefato
 - depois explica por que aquela solução faz sentido
 
-### Direção visual do HTML
+---
+
+## Direção visual do HTML
 
 O HTML final do squad deve seguir um dark theme mais confortável e premium.
 
@@ -266,214 +514,28 @@ Evite:
 - arco-íris de bordas por card
 - gradientes pesados que cansam a leitura
 
-O objetivo é chegar mais perto de interface de produto premium e menos de “painel neon”.
-
----
-
-## Regras importantes
-
-### 1. O orquestrador responsável pelo HTML é o do squad
-
-Não é o `@orchestrator` oficial da aios-lite.
-
-É o `@orquestrador` gerado dentro de `agents/{squad-slug}/`.
-
-Ele é quem:
-
-- coleta drafts dos especialistas
-- sintetiza a rodada
-- publica o HTML final
-
-### 2. Genoma não deve alterar agentes oficiais da aios-lite
-
-Não aplique genomas customizados do usuário em:
-
-```text
-.aios-lite/agents/
-```
-
-Esses agentes são infraestrutura do framework.
-
-Os genomas devem ser aplicados aos agentes criados em:
-
-```text
-agents/{squad-slug}/
-```
-
-### 3. O usuário pode mandar contexto grande
-
-Tanto no `@squad` quanto no `@genoma`, o usuário pode enviar:
-
-- textos longos
-- PDFs ou arquivos
-- prints
-- imagens
-- anotações brutas
-- exemplos de referência
-
-Esse material deve ser tratado como contexto de entrada válido.
-
-### 4. Um genoma pode ser do squad inteiro ou de um agente
-
-Use no squad inteiro quando o contexto vale para todos.
-
-Exemplo:
-
-- estratégia editorial do canal
-- tom de voz global
-- posicionamento do nicho
-
-Use por agente quando o contexto for específico.
-
-Exemplo:
-
-- só o roteirista precisa de um genoma de storytelling
-- só o copywriter precisa de um genoma de CTR
-
-### 5. HTML final não substitui o chat
-
-O agente ainda responde na sessão.
-
-O HTML é o entregável persistido e organizado para consulta e cópia.
-
-### 6. Estrutura de pastas deve ser leve
-
-Prefira:
-
-- `agents/{squad-slug}/`
-- `output/{squad-slug}/`
-- `aios-logs/{squad-slug}/`
-
-Evite criar subpastas demais sem necessidade.
-
----
-
-## Exemplos práticos
-
-### Exemplo A: YouTube Creator
-
-Squad:
-
-- `@roteirista-viral`
-- `@estrategista-de-titulos`
-- `@copywriter-thumbnail`
-- `@analista-de-retencao`
-- `@orquestrador`
-
-Genomas possíveis:
-
-- `storytelling-retencao-youtube`
-- `copy-ctr-thumbnail`
-- `estrategia-editorial-canal`
-
-Aplicação sugerida:
-
-- `storytelling-retencao-youtube` → `@roteirista-viral`
-- `copy-ctr-thumbnail` → `@copywriter-thumbnail`
-- `estrategia-editorial-canal` → squad inteiro
-
-### Exemplo B: Squad jurídico
-
-Squad:
-
-- `@analista-de-casos`
-- `@advogado-do-diabo`
-- `@redator-claro`
-- `@caçador-de-precedentes`
-- `@orquestrador`
-
-Genomas possíveis:
-
-- `direito-trabalhista-brasil`
-- `argumentacao-juridica-clara`
-- `jurisprudencia-operacional`
-
-### Exemplo C: Squad para landing pages
-
-Squad:
-
-- `@estrategista-de-oferta`
-- `@copywriter-de-landing`
-- `@analista-de-objeções`
-- `@designer-de-conversao`
-- `@orquestrador`
-
-Genomas possíveis:
-
-- `copy-de-conversao`
-- `estrutura-de-oferta`
-- `psicologia-de-objecoes`
-
 ---
 
 ## Boas práticas
 
-- comece com Lite quando ainda estiver descobrindo o problema
-- crie genomas depois para enriquecer o squad existente
+- comece criando a squad antes de enriquecer com genomas
 - aplique genomas ao menor escopo possível
+- use `agents.md` como mapa curto da squad
+- use `squad.manifest.json` como contrato de runtime e sync
 - deixe o orquestrador do squad cuidar do HTML final
 - use drafts `.md` para manter rastreabilidade entre agentes e entregável final
-- evite tratar genoma como “clone de pessoa”
-
-Melhor:
-
-- genoma de domínio
-- genoma de abordagem
-- genoma de heurísticas
-
-Pior:
-
-- “copiar exatamente o cérebro de fulano”
 
 ---
 
-## Perguntas frequentes
+## O que ainda vem pela frente
 
-### Posso criar vários genomas para o mesmo squad?
+O modelo atual já suporta squads modulares, publish/import e genomas vinculados.
 
-Sim. O importante é controlar bem o escopo:
+Os próximos blocos naturais do framework são:
 
-- alguns no nível do squad
-- outros no nível de agentes específicos
+- capability oficial de `Discovery / Design-Doc`
+- score formal de prontidão antes de implementação
+- uso mais claro de skills e arquivos sob demanda
+- herança disso pelo `@squad` na criação de novas squads
 
-### Posso chamar `@genoma` sem passar por `@squad`?
-
-Sim. Esse é um fluxo válido.
-
-### Posso criar o squad primeiro e aplicar genomas depois?
-
-Sim. Esse é um dos melhores fluxos.
-
-### Os agentes dinâmicos aparecem no Claude Code e no Codex?
-
-Esse é o comportamento desejado do fluxo:
-
-- Claude Code: via registro em `CLAUDE.md` com `/agente`
-- Codex: via registro em `AGENTS.md` com `@agente`
-
-Na prática, os agentes continuam sendo arquivos reais em `agents/`. Os gateways servem como atalhos explícitos para esses arquivos.
-
-### O agente final precisa sempre gerar HTML?
-
-Não. O ideal é:
-
-- especialista gera Markdown em `output/{squad-slug}/`
-- orquestrador do squad gera HTML em `output/{squad-slug}/`
-
-### O HTML fica gigante?
-
-Não precisa. O modelo atual é um HTML por sessão, reescrito por rodada, com `latest.html` como atalho.
-
----
-
-## Resumo operacional
-
-Use `@squad` para montar a equipe.
-
-Use `@genoma` para criar conhecimento reaproveitável.
-
-Aplique genomas ao squad ou a agentes específicos.
-
-Deixe os especialistas gerar drafts `.md`.
-
-Deixe o `@orquestrador` do squad publicar o HTML final.
+Ou seja: a base de squad/genoma já existe, mas ainda vai ficar mais forte quando o fluxo completo de discovery/design estiver costurado no core.

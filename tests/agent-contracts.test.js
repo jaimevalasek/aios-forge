@@ -6,7 +6,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
-const AGENTS = ['setup', 'analyst', 'architect', 'ux-ui', 'pm', 'dev', 'qa', 'orchestrator', 'squad', 'genoma'];
+const AGENTS = ['setup', 'discovery-design-doc', 'analyst', 'architect', 'ux-ui', 'pm', 'dev', 'qa', 'orchestrator', 'squad', 'genoma'];
 
 async function read(filePath) {
   return fs.readFile(filePath, 'utf8');
@@ -61,16 +61,20 @@ test('setup agent contract includes required context fields and service sections
 test('core agent contracts include actionable sections', async () => {
   const checks = [
     {
+      file: 'discovery-design-doc.md',
+      tokens: ['Mission', 'Responsibilities', 'Output contract', 'design-doc.md', 'readiness.md']
+    },
+    {
       file: 'analyst.md',
       tokens: ['Phase 1', 'Phase 2', 'Phase 3', 'Classification']
     },
     {
       file: 'architect.md',
-      tokens: ['Rules', 'Responsibilities', 'Output contract']
+      tokens: ['Rules', 'Responsibilities', 'Output contract', 'design-doc.md', 'readiness.md']
     },
     {
       file: 'dev.md',
-      tokens: ['Working rules', 'Implementation strategy', 'Laravel conventions', 'Responsibility boundary', 'Atomic execution']
+      tokens: ['Working rules', 'Implementation strategy', 'Laravel conventions', 'Responsibility boundary', 'Atomic execution', 'design-doc.md', 'readiness.md']
     },
     {
       file: 'orchestrator.md',
@@ -94,6 +98,90 @@ test('core agent contracts include actionable sections', async () => {
       assert.equal(enContent.includes(token), true, `missing in en ${item.file}: ${token}`);
     }
   }
+});
+
+test('discovery-design-doc contract formalizes design doc and readiness outputs', async () => {
+  const baseContent = await read(path.join(ROOT, 'template/.aios-lite/agents/discovery-design-doc.md'));
+  const ptContent = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/discovery-design-doc.md'));
+
+  const baseTokens = [
+    '.aios-lite/context/design-doc.md',
+    '.aios-lite/context/readiness.md',
+    'Identify what is already defined and what is still ambiguous',
+    'If readiness is low, do not pretend certainty.',
+    'ready for planning',
+    'Governance / references',
+    'Context and motivation',
+    'Glossary / key terms',
+    'Technical flow step-by-step',
+    'Risks and mitigations',
+    'Roadmap / MVP cut',
+    '## Guided questioning',
+    '## Discovery vs design-doc',
+    '## Mode detection',
+    '## Objective readiness rubric',
+    'Project mode',
+    'Feature mode',
+    '## Skills and docs on demand',
+    'Recommended docs/skills to load next',
+    'Readiness total score',
+    '0 to 5'
+  ];
+
+  const ptTokens = [
+    '.aios-lite/context/design-doc.md',
+    '.aios-lite/context/readiness.md',
+    'Identificar o que ja esta definido e o que ainda esta ambiguo',
+    'Se a prontidao estiver baixa, nao finja certeza.',
+    'ready for planning',
+    'Governanca / referencias',
+    'Contexto e motivacao',
+    'Glossario / termos-chave',
+    'Fluxo tecnico passo a passo',
+    'Riscos e mitigacoes',
+    'Roadmap / corte de MVP',
+    '## Perguntas guiadas',
+    '## Discovery vs design-doc',
+    '## Deteccao de modo',
+    '## Rubrica objetiva de prontidao',
+    'Modo projeto',
+    'Modo feature',
+    '## Skills e documentos sob demanda',
+    'Docs/skills recomendados para carregar a seguir',
+    'Readiness score total',
+    '0 a 5'
+  ];
+
+  for (const token of baseTokens) {
+    assert.equal(baseContent.includes(token), true, `missing discovery-design-doc base token: ${token}`);
+  }
+
+  for (const token of ptTokens) {
+    assert.equal(ptContent.includes(token), true, `missing discovery-design-doc pt token: ${token}`);
+  }
+});
+
+test('analyst, architect, and dev consume design-doc/readiness and use context on demand', async () => {
+  const analystBase = await read(path.join(ROOT, 'template/.aios-lite/agents/analyst.md'));
+  const analystPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/analyst.md'));
+  const architectBase = await read(path.join(ROOT, 'template/.aios-lite/agents/architect.md'));
+  const architectPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/architect.md'));
+  const devBase = await read(path.join(ROOT, 'template/.aios-lite/agents/dev.md'));
+  const devPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/dev.md'));
+
+  const analystBaseTokens = ['## Skills and docs on demand', 'design-doc.md', 'readiness.md'];
+  const analystPtTokens = ['## Skills e documentos sob demanda', 'design-doc.md', 'readiness.md'];
+  const architectBaseTokens = ['design-doc.md', 'readiness.md', 'Load architecture docs and skills on demand'];
+  const architectPtTokens = ['design-doc.md', 'readiness.md', 'Carregar documentos e skills de arquitetura sob demanda'];
+  const devBaseTokens = ['design-doc.md', 'readiness.md', 'minimum context package', 'needs more discovery'];
+  const devPtTokens = ['design-doc.md', 'readiness.md', 'pacote minimo de contexto', 'needs more discovery'];
+
+  for (const token of analystBaseTokens) assert.equal(analystBase.includes(token), true, `missing analyst base token: ${token}`);
+  for (const token of analystPtTokens) assert.equal(analystPt.includes(token), true, `missing analyst pt token: ${token}`);
+  for (const token of architectBaseTokens) assert.equal(architectBase.includes(token), true, `missing architect base token: ${token}`);
+  for (const token of architectPtTokens) assert.equal(architectPt.includes(token), true, `missing architect pt token: ${token}`);
+  for (const token of devBaseTokens) assert.equal(devBase.includes(token), true, `missing dev base token: ${token}`);
+  for (const token of devPtTokens) assert.equal(devPt.includes(token), true, `missing dev pt token: ${token}`);
 });
 
 test('ux-ui contract supports autonomous visual decisions', async () => {
@@ -130,10 +218,15 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const genomaPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/genoma.md'));
 
   const squadTokens = [
+    '## Discovery and design-doc before the squad',
     '## Genome binding to the squad',
     '## Active genomes',
     '## Response standard',
     'Reply in a single block if you want:',
+    'project mode',
+    'feature mode',
+    'minimum docs/skills package',
+    'readiness',
     'agents/{squad-slug}/agents.md',
     'agents/{squad-slug}/squad.manifest.json',
     '## Squad skills',
@@ -151,10 +244,15 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   ];
 
   const squadPtTokens = [
+    '## Discovery e design doc antes da squad',
     '## Vinculo de genomas ao squad',
     '## Genomas ativos',
     '## Padrao de resposta',
     'Me responda em um único bloco, se quiser:',
+    'modo projeto',
+    'modo feature',
+    'pacote minimo de docs/skills',
+    'prontidao',
     'agents/{squad-slug}/agents.md',
     'agents/{squad-slug}/squad.manifest.json',
     '## Skills da squad',

@@ -9,7 +9,7 @@ Bem-vindo à documentação em português do AIOS Lite — um framework leve de 
 | [Início Rápido](./inicio-rapido.md) | Instale, configure e comece em menos de 10 minutos |
 | [Cenários de Uso](./cenarios.md) | Exemplos completos e práticos para projetos MICRO, SMALL e MEDIUM |
 | [Guia de Agentes](./agentes.md) | Quando usar cada agente e o que ele entrega |
-| [Squad e Genoma](./squad-genoma.md) | Como criar squads, gerar genomas, aplicar genomas e publicar entregáveis HTML |
+| [Squad e Genoma](./squad-genoma.md) | Como criar squads modulares, diferenciar skill de genoma, aplicar genomas e publicar entregáveis HTML |
 | [Suporte Web3](./web3.md) | Guia para projetos dApp (Ethereum, Solana, Cardano) |
 
 ## Documentação em inglês
@@ -35,3 +35,10 @@ npx aios-lite doctor
 ```
 
 Depois, abra seu AI IDE e digite `/setup` para começar.
+
+Fluxo recomendado:
+- `@setup` primeiro
+- `@discovery-design-doc` quando o escopo ainda estiver vago ou a feature for grande
+- `@analyst` / `@architect` / `@dev` conforme a clareza e o tipo do trabalho
+
+Esse passo de `discovery-design-doc` e recomendado, nao obrigatorio.

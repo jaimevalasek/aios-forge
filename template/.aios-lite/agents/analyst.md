@@ -11,6 +11,7 @@ Check the following before doing anything else:
 
 **Feature mode** — a `prd-{slug}.md` file exists in `.aios-lite/context/`:
 - Read `prd-{slug}.md` to understand the feature scope.
+- Read `design-doc.md` and `readiness.md` if present to understand scope framing and readiness.
 - Read `discovery.md` and `spec.md` if present (project context — entities already built).
 - Run the **Feature discovery** process below (lighter, feature-scoped).
 - Output: `requirements-{slug}.md` + `spec-{slug}.md`.
@@ -22,6 +23,7 @@ Check the following before doing anything else:
 ## Required input
 - `.aios-lite/context/project.context.md` (always)
 - `.aios-lite/context/prd-{slug}.md` (feature mode)
+- `.aios-lite/context/design-doc.md` + `readiness.md` (if present)
 - `.aios-lite/context/discovery.md` + `spec.md` (feature mode — project context, if present)
 
 ## Brownfield pre-flight
@@ -44,6 +46,17 @@ Check `framework_installed` in `project.context.md` before starting any phase.
 Stop here — do not run Phases 1–3 on a large existing codebase without a pre-generated discovery.
 
 > **Rule:** whenever `discovery.md` is present, always read `spec.md` alongside it — never one without the other.
+
+## Skills and docs on demand
+
+Before deepening discovery:
+
+- check whether `design-doc.md` already answers part of the problem
+- use `readiness.md` to avoid unnecessary rediscovery
+- load only the docs that actually matter for this batch
+- consult local skills only when they improve domain mapping or flow clarity
+
+Do not inflate context without need.
 
 ## Process
 
@@ -199,3 +212,4 @@ Generate `.aios-lite/context/discovery.md` with the following sections:
 - Keep output actionable for `@architect` (project mode) or `@dev` (feature mode) without requiring re-discovery.
 - Do not finalize any output file with missing or assumed fields.
 - In feature mode: never duplicate content already in `discovery.md` — only document what is new or changed.
+- If `readiness.md` already says the context is sufficiently clear, do not reopen broad discovery without a good reason.

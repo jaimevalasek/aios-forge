@@ -96,6 +96,14 @@ function localSquadJsonManifestPath(projectDir, slug) {
   return path.join(localSquadAgentsDir(projectDir, slug), 'squad.manifest.json');
 }
 
+function localSquadDesignDocPath(projectDir, slug) {
+  return path.join(localSquadAgentsDir(projectDir, slug), 'design-doc.md');
+}
+
+function localSquadReadinessPath(projectDir, slug) {
+  return path.join(localSquadAgentsDir(projectDir, slug), 'readiness.md');
+}
+
 function localGenomeFilePath(projectDir, slug) {
   return path.join(projectDir, '.aios-lite', 'genomas', `${sanitizeSegment(slug, 'genoma')}.md`);
 }
@@ -252,6 +260,7 @@ function buildLocalSquadManifest(snapshot, agents) {
     ? snapshot.version.manifestJson
     : {};
   const slug = sanitizeSegment(snapshot.squad.slug, 'squad');
+  const sourceContext = source.context && typeof source.context === 'object' ? source.context : {};
   const executors = agents.map((agent) => ({
     slug: agent.slug,
     title: agent.title,
@@ -297,6 +306,29 @@ function buildLocalSquadManifest(snapshot, agents) {
           allowed: true,
           when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
         },
+    context: {
+      mode: String(
+        sourceContext.mode ||
+          (snapshot?.version?.designDocMarkdown && /feature mode|modo feature/i.test(snapshot.version.designDocMarkdown)
+            ? 'feature'
+            : 'project')
+      ),
+      summary: String(
+        sourceContext.summary ||
+          source.goal ||
+          snapshot.squad.goal ||
+          snapshot.squad.description ||
+          'Imported squad context.'
+      ),
+      designDocPath: `agents/${slug}/design-doc.md`,
+      readinessPath: `agents/${slug}/readiness.md`,
+      docsPackage: Array.isArray(sourceContext.docsPackage)
+        ? sourceContext.docsPackage
+        : ['project.context.md', 'design-doc.md', 'readiness.md'],
+      readiness: sourceContext.readiness && typeof sourceContext.readiness === 'object'
+        ? sourceContext.readiness
+        : null
+    },
     executors: Array.isArray(source.executors) && source.executors.length > 0 ? source.executors : executors,
     genomes
   };
@@ -346,6 +378,8 @@ function buildSquadTextManifest(snapshot, manifest) {
     `- Final HTML: \`output/${manifest.slug}/{session-id}.html\``,
     `- Logs: \`aios-logs/${manifest.slug}/\``,
     `- Media: \`media/${manifest.slug}/\``,
+    `- Design doc: \`agents/${manifest.slug}/design-doc.md\``,
+    `- Readiness: \`agents/${manifest.slug}/readiness.md\``,
     '- Final outputs should include recommendation, reasoning, tradeoff, and next step.'
   );
 
@@ -391,6 +425,9 @@ function buildSquadMetadata(snapshot, options = {}) {
     `Agents: agents/${slug}/`,
     `Output: output/${slug}/`,
     `Logs: aios-logs/${slug}/`,
+    `Media: media/${slug}/`,
+    `DesignDoc: agents/${slug}/design-doc.md`,
+    `Readiness: agents/${slug}/readiness.md`,
     `LatestSession: output/${slug}/latest.html`,
     `SourceUrl: ${options.sourceUrl || '—'}`,
     `SourceVersion: ${snapshot.version.versionNumber}`,
@@ -441,6 +478,62 @@ function buildInstalledManifest(snapshot, sourceUrl, agents) {
   };
 }
 
+function buildSquadDesignDoc(snapshot, manifest) {
+  if (snapshot?.version?.designDocMarkdown) {
+    const content = String(snapshot.version.designDocMarkdown);
+    return content.endsWith('\n') ? content : `${content}\n`;
+  }
+
+  return [
+    `# Design Doc - ${manifest.name}`,
+    '',
+    '## Context and motivation',
+    snapshot.squad.description || manifest.goal || 'Imported squad context.',
+    '',
+    '## Objective',
+    manifest.goal || 'Operate the imported squad for the target domain.',
+    '',
+    '## Scope',
+    '- Materialize the squad locally with manifest, executors, outputs, logs, and media.',
+    '- Preserve the operational and cognitive blueprint published in the cloud.',
+    '',
+    '## Out of scope',
+    '- Rewriting imported executors automatically beyond the published snapshot.',
+    '- Inventing undocumented MCPs or genomes.'
+  ].join('\n') + '\n';
+}
+
+function buildSquadReadiness(snapshot, manifest) {
+  if (snapshot?.version?.readinessMarkdown) {
+    const content = String(snapshot.version.readinessMarkdown);
+    return content.endsWith('\n') ? content : `${content}\n`;
+  }
+
+  const readiness = manifest?.context?.readiness && typeof manifest.context.readiness === 'object'
+    ? manifest.context.readiness
+    : {
+        level: 'medium',
+        totalScore: 15,
+        maxScore: 25
+      };
+
+  return [
+    `# Readiness - ${manifest.name}`,
+    '',
+    `- Readiness score total: ${readiness.totalScore ?? 15}`,
+    `- Readiness score maximo: ${readiness.maxScore ?? 25}`,
+    `- Readiness level: ${readiness.level || 'medium'}`,
+    '',
+    '## What is already clear',
+    '- The squad structure and executors are defined in the imported snapshot.',
+    '- Outputs, logs, media, and genomes can be materialized locally.',
+    '',
+    '## What is still missing',
+    '- Local project-specific refinements after import.',
+    '- Any additional feature context not present in the published snapshot.'
+  ].join('\n') + '\n';
+}
+
 async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   const slug = sanitizeSegment(payload.squad.slug, 'squad');
   const agents = normalizeAgentsManifest(payload.version.agentsManifestJson);
@@ -452,6 +545,8 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   const outputDir = localSquadOutputDir(projectDir, slug);
   const logsDir = localSquadLogsDir(projectDir, slug);
   const mediaDir = localSquadMediaDir(projectDir, slug);
+  const designDocPath = localSquadDesignDocPath(projectDir, slug);
+  const readinessPath = localSquadReadinessPath(projectDir, slug);
   const manifestPath = installedManifestPath(projectDir, slug);
 
   if (!force && (await exists(metadataPath))) {
@@ -469,6 +564,8 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   await fs.writeFile(metadataPath, metadata, 'utf8');
   await fs.writeFile(textManifestPath, buildSquadTextManifest(payload, squadManifest), 'utf8');
   await fs.writeFile(jsonManifestPath, `${JSON.stringify(squadManifest, null, 2)}\n`, 'utf8');
+  await fs.writeFile(designDocPath, buildSquadDesignDoc(payload, squadManifest), 'utf8');
+  await fs.writeFile(readinessPath, buildSquadReadiness(payload, squadManifest), 'utf8');
   await fs.writeFile(
     manifestPath,
     `${JSON.stringify(buildInstalledManifest(payload, sourceUrl, agents), null, 2)}\n`,
@@ -515,6 +612,7 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
       visibility: squadManifest.visibility,
       status: 'active',
       manifest: squadManifest,
+      context: squadManifest.context,
       agentsDir: `agents/${slug}`,
       outputDir: `output/${slug}`,
       logsDir: `aios-logs/${slug}`,
@@ -529,6 +627,8 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
     metadataPath,
     textManifestPath,
     jsonManifestPath,
+    designDocPath,
+    readinessPath,
     manifestPath,
     agentsDir,
     outputDir,
@@ -815,6 +915,8 @@ async function runCloudImportSquad({ args, options = {}, logger, t }) {
     materializedAgentsDir: materialized ? toRelativeSafe(projectDir, materialized.agentsDir) : null,
     materializedOutputDir: materialized ? toRelativeSafe(projectDir, materialized.outputDir) : null,
     materializedLogsDir: materialized ? toRelativeSafe(projectDir, materialized.logsDir) : null,
+    materializedDesignDocFile: materialized ? toRelativeSafe(projectDir, materialized.designDocPath) : null,
+    materializedReadinessFile: materialized ? toRelativeSafe(projectDir, materialized.readinessPath) : null,
     writtenAgents: materialized ? materialized.writtenAgents.map((file) => toRelativeSafe(projectDir, file)) : [],
     writtenGenomes: materialized ? materialized.writtenGenomes.map((file) => toRelativeSafe(projectDir, file)) : []
   };
@@ -1027,13 +1129,22 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
   const agentsDirAbs = path.join(projectDir, agentsDirRel);
   const localManifest = (await loadLocalSquadManifest(projectDir, slug)) || {};
   const textManifestPath = path.join(agentsDirAbs, 'agents.md');
+  const designDocPath = path.join(agentsDirAbs, 'design-doc.md');
+  const readinessPath = path.join(agentsDirAbs, 'readiness.md');
   const textManifest = (await fs.readFile(textManifestPath, 'utf8').catch(() => null)) || null;
+  const designDocMarkdown = (await fs.readFile(designDocPath, 'utf8').catch(() => null)) || null;
+  const readinessMarkdown = (await fs.readFile(readinessPath, 'utf8').catch(() => null)) || null;
   const agentFiles = await listAgentFiles(agentsDirAbs);
   const agentsManifestJson = [];
 
   for (const filePath of agentFiles) {
     const baseName = path.basename(filePath);
-    if (baseName === 'agents.md' || baseName === 'squad.manifest.json') continue;
+    if (
+      baseName === 'agents.md' ||
+      baseName === 'squad.manifest.json' ||
+      baseName === 'design-doc.md' ||
+      baseName === 'readiness.md'
+    ) continue;
     const markdown = await fs.readFile(filePath, 'utf8');
     const agentSlug = sanitizeSegment(path.basename(filePath, '.md'), 'agent');
     agentsManifestJson.push({
@@ -1072,6 +1183,23 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
               : {
                   allowed: true,
                   when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
+                },
+          context:
+            localManifest.context && typeof localManifest.context === 'object'
+              ? {
+                  ...localManifest.context,
+                  designDocPath: localManifest.context.designDocPath || `${agentsDirRel}/design-doc.md`,
+                  readinessPath: localManifest.context.readinessPath || `${agentsDirRel}/readiness.md`,
+                  docsPackage: Array.isArray(localManifest.context.docsPackage)
+                    ? localManifest.context.docsPackage
+                    : ['project.context.md', 'design-doc.md', 'readiness.md']
+                }
+              : {
+                  mode: 'project',
+                  summary: goal || squadName,
+                  designDocPath: `${agentsDirRel}/design-doc.md`,
+                  readinessPath: `${agentsDirRel}/readiness.md`,
+                  docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md']
                 },
           executors: Array.isArray(localManifest.executors)
             ? localManifest.executors
@@ -1114,10 +1242,19 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
       sourceType: 'local_publish',
       isCurrent: true,
       createdAt: new Date().toISOString(),
+      designDocMarkdown,
+      readinessMarkdown,
       manifestJson:
         normalizedManifest || {
           metadataPath: normalizeRel(path.relative(projectDir, metadataPath)),
           textManifestPath: normalizeRel(path.relative(projectDir, textManifestPath)),
+          context: {
+            mode: 'project',
+            summary: goal || squadName,
+            designDocPath: normalizeRel(path.relative(projectDir, designDocPath)),
+            readinessPath: normalizeRel(path.relative(projectDir, readinessPath)),
+            docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md']
+          },
           outputDir: outputDirRel,
           logsDir: logsDirRel,
           mediaDir: mediaDirRel

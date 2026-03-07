@@ -6,6 +6,7 @@ const MANAGED_FILES = [
   'OPENCODE.md',
   '.gemini/GEMINI.md',
   '.gemini/commands/aios-setup.toml',
+  '.gemini/commands/aios-discovery-design-doc.toml',
   '.gemini/commands/aios-analyst.toml',
   '.gemini/commands/aios-architect.toml',
   '.gemini/commands/aios-ux-ui.toml',
@@ -15,6 +16,7 @@ const MANAGED_FILES = [
   '.gemini/commands/aios-orchestrator.toml',
   '.aios-lite/config.md',
   '.aios-lite/agents/setup.md',
+  '.aios-lite/agents/discovery-design-doc.md',
   '.aios-lite/agents/analyst.md',
   '.aios-lite/agents/architect.md',
   '.aios-lite/agents/ux-ui.md',
@@ -26,6 +28,7 @@ const MANAGED_FILES = [
   '.aios-lite/agents/squad.md',
   '.aios-lite/agents/genoma.md',
   '.aios-lite/locales/en/agents/setup.md',
+  '.aios-lite/locales/en/agents/discovery-design-doc.md',
   '.aios-lite/locales/en/agents/analyst.md',
   '.aios-lite/locales/en/agents/architect.md',
   '.aios-lite/locales/en/agents/ux-ui.md',
@@ -37,6 +40,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/en/agents/squad.md',
   '.aios-lite/locales/en/agents/genoma.md',
   '.aios-lite/locales/pt-BR/agents/setup.md',
+  '.aios-lite/locales/pt-BR/agents/discovery-design-doc.md',
   '.aios-lite/locales/pt-BR/agents/analyst.md',
   '.aios-lite/locales/pt-BR/agents/architect.md',
   '.aios-lite/locales/pt-BR/agents/ux-ui.md',
@@ -48,6 +52,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/pt-BR/agents/squad.md',
   '.aios-lite/locales/pt-BR/agents/genoma.md',
   '.aios-lite/locales/es/agents/setup.md',
+  '.aios-lite/locales/es/agents/discovery-design-doc.md',
   '.aios-lite/locales/es/agents/analyst.md',
   '.aios-lite/locales/es/agents/architect.md',
   '.aios-lite/locales/es/agents/ux-ui.md',
@@ -59,6 +64,7 @@ const MANAGED_FILES = [
   '.aios-lite/locales/es/agents/squad.md',
   '.aios-lite/locales/es/agents/genoma.md',
   '.aios-lite/locales/fr/agents/setup.md',
+  '.aios-lite/locales/fr/agents/discovery-design-doc.md',
   '.aios-lite/locales/fr/agents/analyst.md',
   '.aios-lite/locales/fr/agents/architect.md',
   '.aios-lite/locales/fr/agents/ux-ui.md',
@@ -97,6 +103,7 @@ const REQUIRED_FILES = [
   'OPENCODE.md',
   '.gemini/GEMINI.md',
   '.gemini/commands/aios-setup.toml',
+  '.gemini/commands/aios-discovery-design-doc.toml',
   '.gemini/commands/aios-analyst.toml',
   '.gemini/commands/aios-architect.toml',
   '.gemini/commands/aios-ux-ui.toml',
@@ -106,6 +113,7 @@ const REQUIRED_FILES = [
   '.gemini/commands/aios-orchestrator.toml',
   '.aios-lite/config.md',
   '.aios-lite/agents/setup.md',
+  '.aios-lite/agents/discovery-design-doc.md',
   '.aios-lite/agents/analyst.md',
   '.aios-lite/agents/ux-ui.md',
   '.aios-lite/agents/dev.md',
@@ -134,6 +142,13 @@ const AGENT_DEFINITIONS = [
     path: '.aios-lite/agents/setup.md',
     dependsOn: [],
     output: '.aios-lite/context/project.context.md'
+  },
+  {
+    id: 'discovery-design-doc',
+    command: '@discovery-design-doc',
+    path: '.aios-lite/agents/discovery-design-doc.md',
+    dependsOn: ['.aios-lite/context/project.context.md'],
+    output: '.aios-lite/context/design-doc.md + .aios-lite/context/readiness.md'
   },
   {
     id: 'product',
@@ -216,7 +231,7 @@ const AGENT_DEFINITIONS = [
     path: '.aios-lite/agents/squad.md',
     dependsOn: [],
     output:
-      '.aios-lite/squads/{slug}.md + agents/{slug}/agents.md + agents/{slug}/squad.manifest.json + agents/{slug}/ + output/{slug}/{session-id}.html + output/{slug}/latest.html + aios-logs/{slug}/ + media/{slug}/'
+      '.aios-lite/squads/{slug}.md + agents/{slug}/agents.md + agents/{slug}/squad.manifest.json + agents/{slug}/design-doc.md + agents/{slug}/readiness.md + agents/{slug}/ + output/{slug}/{session-id}.html + output/{slug}/latest.html + aios-logs/{slug}/ + media/{slug}/'
   },
   {
     id: 'genoma',

@@ -7,6 +7,8 @@ Transformar a discovery em arquitetura tecnica com direcao concreta de implement
 
 ## Entrada
 - `.aios-lite/context/project.context.md`
+- `.aios-lite/context/design-doc.md` (se existir)
+- `.aios-lite/context/readiness.md` (se existir)
 - `.aios-lite/context/discovery.md`
 
 ## Regras
@@ -14,6 +16,8 @@ Transformar a discovery em arquitetura tecnica com direcao concreta de implement
 - Manter arquitetura proporcional a classificacao. Nunca aplicar padroes MEDIUM em projeto MICRO.
 - Preferir decisoes simples e manteniveis em vez de complexidade especulativa.
 - Se uma decisao for adiada, documentar o motivo.
+- Se `readiness.md` apontar baixa prontidao, devolver bloqueios arquiteturais em vez de fingir certeza.
+- Carregar documentos e skills de arquitetura sob demanda, nao como pacote gigante.
 
 ## Responsabilidades
 - Definir estrutura de pastas/modulos por stack e tamanho da classificacao.
@@ -21,6 +25,7 @@ Transformar a discovery em arquitetura tecnica com direcao concreta de implement
 - Definir relacionamentos entre models a partir do discovery.
 - Definir limites de servicos e pontos de integracao.
 - Definir preocupacoes basicas de seguranca e observabilidade.
+- Usar `design-doc.md` como documento de decisao do escopo atual quando ele existir.
 
 ## Estrutura de pastas por stack e tamanho
 

@@ -10,6 +10,7 @@ You operate as AIOS Lite.
 
 ## Agents
 - /setup -> `.aios-lite/agents/setup.md`
+- /discovery-design-doc -> `.aios-lite/agents/discovery-design-doc.md`
 - /analyst -> `.aios-lite/agents/analyst.md`
 - /architect -> `.aios-lite/agents/architect.md`
 - /ux-ui -> `.aios-lite/agents/ux-ui.md`

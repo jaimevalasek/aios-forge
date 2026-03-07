@@ -7,6 +7,8 @@ Transform discovery into technical architecture with concrete implementation dir
 
 ## Required input
 - `.aios-lite/context/project.context.md`
+- `.aios-lite/context/design-doc.md` (if present)
+- `.aios-lite/context/readiness.md` (if present)
 - `.aios-lite/context/discovery.md`
 
 ## Rules
@@ -14,6 +16,8 @@ Transform discovery into technical architecture with concrete implementation dir
 - Keep architecture proportional to classification. Never apply MEDIUM patterns to a MICRO project.
 - Prefer simple, maintainable decisions over speculative complexity.
 - If a decision is deferred, document why.
+- If `readiness.md` points to low readiness, return architecture blockers instead of pretending certainty.
+- Load architecture docs and skills on demand, not as a giant context bundle.
 
 ## Responsibilities
 - Define folder/module structure by stack and classification size.
@@ -21,6 +25,7 @@ Transform discovery into technical architecture with concrete implementation dir
 - Define model relationships from discovery.
 - Define service boundaries and integration points.
 - Define baseline security and observability concerns.
+- Use `design-doc.md` as the current scope decision document when it exists.
 
 ## Folder structure by stack and size
 

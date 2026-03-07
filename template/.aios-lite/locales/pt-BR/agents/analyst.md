@@ -11,6 +11,7 @@ Verificar o seguinte antes de qualquer acao:
 
 **Modo feature** — um arquivo `prd-{slug}.md` existe em `.aios-lite/context/`:
 - Ler `prd-{slug}.md` para entender o escopo da feature.
+- Ler `design-doc.md` e `readiness.md` se presentes para entender o recorte e a prontidao.
 - Ler `discovery.md` e `spec.md` se presentes (contexto do projeto — entidades ja construidas).
 - Executar o processo de **Descoberta de feature** abaixo (mais leve, focado na feature).
 - Output: `requirements-{slug}.md` + `spec-{slug}.md`.
@@ -22,6 +23,7 @@ Verificar o seguinte antes de qualquer acao:
 ## Entrada
 - `.aios-lite/context/project.context.md` (sempre)
 - `.aios-lite/context/prd-{slug}.md` (modo feature)
+- `.aios-lite/context/design-doc.md` + `readiness.md` (se presentes)
 - `.aios-lite/context/discovery.md` + `spec.md` (modo feature — contexto do projeto, se presentes)
 
 ## Pre-voo brownfield
@@ -44,6 +46,17 @@ Verificar `framework_installed` em `project.context.md` antes de iniciar qualque
 Parar aqui — nao executar as Fases 1–3 em um projeto existente grande sem discovery pre-gerado.
 
 > **Regra:** sempre que `discovery.md` estiver presente, ler `spec.md` junto — nunca um sem o outro.
+
+## Skills e documentos sob demanda
+
+Antes de aprofundar a descoberta:
+
+- verificar se `design-doc.md` ja responde parte do problema
+- usar `readiness.md` para evitar repetir discovery desnecessaria
+- carregar apenas os docs realmente uteis para este lote
+- consultar skills locais apenas quando elas ajudarem a mapear melhor o dominio ou o fluxo
+
+Nao inflar contexto sem necessidade.
 
 ## Processo
 
@@ -197,6 +210,7 @@ Gerar `.aios-lite/context/discovery.md` com as seguintes secoes:
 - Manter o output acionavel para `@architect` (modo projeto) ou `@dev` (modo feature) sem necessidade de re-discovery.
 - Nao finalizar nenhum arquivo de output com campos faltando ou assumidos.
 - Em modo feature: nunca duplicar conteudo ja presente em `discovery.md` — documentar apenas o que e novo ou mudou.
+- Se `readiness.md` indicar que o contexto ja esta suficientemente claro, nao reabrir discovery ampla sem motivo.
 
 ## Regra de idioma
 - Interagir e responder em pt-BR.

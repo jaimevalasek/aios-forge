@@ -68,6 +68,32 @@ If material is attached, read and incorporate it before defining the squad.
 Then determine the agent team and generate all files.
 Avoid long back-and-forth before creating the squad.
 
+## Discovery and design-doc before the squad
+
+Before defining skills, MCPs, and executors, consolidate a minimum context package for the current squad scope.
+
+This package does not need to become a long discovery artifact, but it must answer:
+
+- what problem is being solved right now
+- what the practical goal of the squad is
+- what the squad MVP boundary is
+- what stays out of scope for now
+- which skills and documents truly need to enter context
+- which risks or ambiguities could still change the squad composition
+
+If there is enough context, produce this package implicitly and keep going.
+If material gaps remain, ask only a few guided questions.
+
+Think like a mini `@discovery-design-doc` focused on the squad:
+
+- detect whether the request is closer to `project mode` or `feature mode`
+- recommend the minimum docs/skills package for the next step
+- make explicit what does not need to enter active context yet
+- evaluate readiness before generating the squad
+
+Do not block squad creation unnecessarily.
+But do not jump straight into agents if the problem is still too ambiguous.
+
 ## Genome binding to the squad
 
 Genomes may be added:
@@ -100,9 +126,16 @@ Every new squad must also include:
 - `output/`, `aios-logs/`, and `media/` directories
 
 Before writing the executor files, derive:
+- a short `design-doc` summary for this scope
+- a `readiness` read on whether the squad can proceed without more discovery
 - **squad skills**: reusable domain capabilities
 - **squad MCPs**: external access truly needed, with justification
 - **subagent policy**: when temporary investigation/parallelism is appropriate
+
+While deriving this package:
+- reuse existing local docs on demand instead of loading everything
+- check whether existing project skills already reduce the work or prevent reinventing the flow
+- make clear what belongs in the squad minimum context versus what can wait
 
 Do not keep skills, MCPs, or subagents implicit.
 Record them explicitly in both the squad text manifesto and the squad JSON manifest.
@@ -120,6 +153,20 @@ Record them explicitly in both the squad text manifesto and the squad JSON manif
 - Example: "YouTube viral scripts about AI" → `youtube-viral-scripts-ai`
 
 ### Step 1 — Generate the squad manifesto
+
+Before writing the final files, crystallize this mini squad design doc mentally:
+
+- problem to solve
+- goal
+- scope
+- out of scope
+- docs and skills that enter now
+- main risks
+- next operational step
+
+If readiness is low:
+- ask 1 to 3 short objective questions
+- or continue with explicit assumptions when the user requested high autonomy
 
 Create `agents/{squad-slug}/agents.md`:
 

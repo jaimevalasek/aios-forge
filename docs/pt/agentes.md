@@ -10,6 +10,7 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 
 ```
 @setup        ← sempre o primeiro
+@discovery-design-doc ← quando precisa clarear escopo e gerar design doc vivo
 @analyst      ← projetos SMALL e MEDIUM
 @architect    ← projetos SMALL e MEDIUM
 @ux-ui        ← quando há interfaces (SMALL e MEDIUM)
@@ -34,6 +35,7 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 - Confirma stack, classificação e idioma
 - Define o plano de execução (quais agentes serão usados)
 - Orienta o desenvolvedor sobre os próximos passos
+- Recomenda `@discovery-design-doc` quando houver ambiguidade, feature grande ou risco alto, mas sem tornar isso obrigatório
 
 **Como ativar:**
 ```
@@ -53,6 +55,11 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 - Resumo do contexto do projeto
 - Geração opcional do `spec.md` (documento vivo para acompanhar o projeto entre sessões)
 
+**Regra importante:**
+- `@setup` continua sendo o primeiro agente
+- `@discovery-design-doc` entra como recomendação contextual, não como etapa obrigatória
+- se o pedido já estiver claro e pequeno, o fluxo pode seguir direto para `@dev`, `@analyst` ou `@architect`
+
 ---
 
 ## @analyst
@@ -64,6 +71,8 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 - Fase 2 (Modelagem): Mapeia entidades, atributos e regras de negócio
 - Fase 3 (Análise): Produz tabela de entidades com campos e tipos
 - Identifica integrações externas e riscos
+- Em modo feature, passa a consumir `design-doc.md` e `readiness.md` quando já existirem
+- Usa skills e documentos sob demanda para evitar reabrir discovery desnecessária
 
 **Como ativar:**
 ```
@@ -89,6 +98,39 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 
 ---
 
+## @discovery-design-doc
+
+**Quando usar:** Quando a demanda ainda está vaga, quando você quer um `design-doc.md` vivo antes de implementar, ou quando precisa medir se o contexto já está pronto para planejamento/execução.
+
+**O que faz:**
+- transforma briefing bruto em problema claro
+- identifica o que já está definido e o que ainda falta
+- produz `.aios-lite/context/design-doc.md`
+- produz `.aios-lite/context/readiness.md`
+- detecta `modo projeto` ou `modo feature`
+- recomenda skills e documentos sob demanda para a próxima etapa
+- recomenda o próximo agente ou documento do fluxo
+
+**Como ativar:**
+```
+@discovery-design-doc
+```
+
+**Entrega:**
+- `design-doc.md` com objetivo, escopo, fora de escopo, módulos afetados, integrações, riscos, decisões e critérios de aceite
+- `readiness.md` com score objetivo por dimensão, nível de prontidão e próximo passo recomendado
+
+**Quando preferir este agente ao @analyst:**
+- quando o problema ainda está ambíguo
+- quando você precisa de um documento vivo de decisão antes de modelar tudo
+- quando a dúvida principal é escopo e prontidão, não modelagem profunda de entidades
+- quando o projeto já existe e você quer planejar uma feature grande sem sair codando cedo demais
+
+**Quando preferir @analyst:**
+- quando o problema principal é domínio, entidades, regras de negócio e modelagem de dados
+
+---
+
 ## @architect
 
 **Quando usar:** Após @analyst, em projetos SMALL e MEDIUM.
@@ -97,6 +139,8 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 - Escolhe a estrutura de pastas proporcional ao tamanho do projeto
 - Documenta decisões técnicas (banco de dados, autenticação, etc.)
 - Define padrões de código para o time
+- Usa `design-doc.md` como documento de decisão do escopo atual
+- Respeita `readiness.md`; se a prontidão ainda estiver baixa, devolve bloqueios em vez de fingir certeza
 
 **Como ativar:**
 ```
@@ -210,10 +254,20 @@ npx aios-lite parallel:status
 
 **O que faz:**
 - Pergunta o objetivo e o tipo de trabalho
-- Cria agentes reais em `agents/{squad-slug}/`
+- Consolida um mini pacote de `discovery/design-doc/readiness` antes de compor a squad
+- Gera uma squad modular, não apenas uma pasta de agentes
+- Cria `agents/{squad-slug}/agents.md`
+- Cria `agents/{squad-slug}/squad.manifest.json`
+- Cria `agents/{squad-slug}/design-doc.md`
+- Cria `agents/{squad-slug}/readiness.md`
+- Cria executores reais em `agents/{squad-slug}/`
 - Cria um `@orquestrador` próprio para esse squad
 - Registra metadata em `.aios-lite/squads/{slug}.md`
+- Declara `skills`, `MCPs`, política de `subagentes` e diretório `media/`
 - Trabalha com autonomia alta por padrão e evita perguntas extras quando a inferência já é suficiente
+- Detecta se o pedido parece mais `modo projeto` ou `modo feature`
+- Recomenda skills e documentos sob demanda em vez de inflar o contexto inteiro
+- Materializa o pacote minimo de contexto da squad para o runtime, dashboard e cloud
 
 **Como ativar:**
 ```
@@ -221,9 +275,11 @@ npx aios-lite parallel:status
 ```
 
 **Entrega:**
-- Agentes reais do squad
+- Manifesto textual da squad
+- Manifesto JSON da squad
+- Executores reais do squad
 - Metadata do squad
-- Estrutura de output e sessão
+- Estrutura de output, logs, mídia e sessão
 
 > Guia completo: [Squad e Genoma](./squad-genoma.md)
 
@@ -237,6 +293,7 @@ npx aios-lite parallel:status
 - Gera `O que saber`, `Mentes` e `Skills`
 - Pode salvar em `.aios-lite/genomas/`
 - Pode ser aplicado depois a um squad já existente
+- Atua como camada cognitiva do sistema, não como executor
 
 **Como ativar:**
 ```
@@ -247,6 +304,12 @@ npx aios-lite parallel:status
 - Genoma estruturado
 - Opcionalmente, vínculo persistente com um squad
 
+**Não confundir:**
+- `skill` = capacidade operacional
+- `genoma` = forma de pensar, lentes e repertório
+- `executor` = quem faz o trabalho
+- `subagente` = investigação temporária
+
 > Guia completo: [Squad e Genoma](./squad-genoma.md)
 
 ---
@@ -256,10 +319,12 @@ npx aios-lite parallel:status
 **Quando usar:** Sempre — é o agente que escreve o código.
 
 **O que faz:**
-- Lê o contexto, discovery, arquitetura e (se existir) ui-spec
+- Lê o contexto, `design-doc.md`, `readiness.md`, discovery, arquitetura e (se existir) `ui-spec`
 - Implementa os módulos na ordem correta
 - Segue as convenções definidas pelo @architect
 - Registra decisões em `shared-decisions.md` (MEDIUM)
+- Carrega skills e docs detalhados sob demanda, em vez de inflar contexto inteiro
+- Não deve seguir para implementação quando `readiness.md` ainda apontar falta de discovery ou de arquitetura
 
 **Como ativar:**
 ```

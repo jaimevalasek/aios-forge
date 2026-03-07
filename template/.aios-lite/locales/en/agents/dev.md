@@ -13,10 +13,12 @@ Check whether a `prd-{slug}.md` file exists in `.aios-lite/context/` before read
 **Feature mode active** — `prd-{slug}.md` found:
 Read in this order before writing any code:
 1. `prd-{slug}.md` — what the feature must do
-2. `requirements-{slug}.md` — entities, business rules, edge cases (from @analyst)
-3. `spec-{slug}.md` — feature memory: decisions already made, dependencies
-4. `spec.md` — project-level memory: conventions and patterns (if present)
-5. `discovery.md` — existing entity map (to avoid conflicts with existing tables)
+2. `design-doc.md` — living decision doc for the current scope (if present)
+3. `readiness.md` — confirm whether implementation can start or if discovery/architecture is still missing
+4. `requirements-{slug}.md` — entities, business rules, edge cases (from @analyst)
+5. `spec-{slug}.md` — feature memory: decisions already made, dependencies
+6. `spec.md` — project-level memory: conventions and patterns (if present)
+7. `discovery.md` — existing entity map (to avoid conflicts with existing tables)
 
 During implementation, update `spec-{slug}.md` after each significant decision. Do not touch `spec.md` unless the change affects the whole project architecture.
 
@@ -32,10 +34,12 @@ Proceed with the standard required input below.
 ## Required input
 1. `.aios-lite/context/project.context.md`
 2. `.aios-lite/context/skeleton-system.md` *(if present — read first for quick structural orientation)*
-3. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
-4. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
-5. `.aios-lite/context/prd.md` (if present)
-6. `.aios-lite/context/ui-spec.md` (if present)
+3. `.aios-lite/context/design-doc.md` *(if present — treat as the current scope decision document)*
+4. `.aios-lite/context/readiness.md` *(if present — verify the scope is ready for implementation)*
+5. `.aios-lite/context/architecture.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
+6. `.aios-lite/context/discovery.md` *(SMALL/MEDIUM only — not generated for MICRO; skip if absent)*
+7. `.aios-lite/context/prd.md` (if present)
+8. `.aios-lite/context/ui-spec.md` (if present)
 
 > **MICRO projects:** only `project.context.md` is guaranteed. Infer implementation direction from it directly — do not wait for architecture.md or discovery.md.
 
@@ -53,6 +57,7 @@ If `framework_installed=true` in `project.context.md`:
 - Implement services/use-cases before UI handlers.
 - Add tests or validation checks aligned with risk.
 - Follow the architecture sequence — do not skip dependencies.
+- If `readiness.md` says `needs more discovery` or `needs architecture clarification`, do not act as if the scope were implementation-ready.
 
 ## Laravel conventions
 
@@ -150,6 +155,8 @@ For stacks not listed above, apply the same separation principles:
 - Keep changes small and reviewable.
 - Enforce server-side validation and authorization.
 - Reuse project skills in `.aios-lite/skills/static` and `.aios-lite/skills/dynamic`.
+- Load detailed skills and documents on demand, not all at once.
+- Decide the minimum context package for the current implementation batch before coding.
 
 ## Atomic execution
 Work in small, validated steps — never implement an entire feature in one pass:

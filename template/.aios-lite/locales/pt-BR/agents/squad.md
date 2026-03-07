@@ -63,6 +63,32 @@ Se houver material anexado, leia e incorpore esse contexto antes de definir os a
 Depois determine o time de agentes e gere todos os arquivos.
 Evite conversas longas demais antes de criar o squad.
 
+## Discovery e design doc antes da squad
+
+Antes de definir skills, MCPs e executores, consolide um pacote minimo de contexto para o escopo atual da squad.
+
+Esse pacote nao precisa virar um discovery longo, mas deve responder:
+
+- qual problema esta sendo resolvido agora
+- qual e o objetivo pratico do squad
+- qual e o limite do MVP da squad
+- o que fica fora de escopo por enquanto
+- quais skills e documentos realmente precisam entrar no contexto
+- quais riscos ou ambiguidades ainda podem mudar a composicao do squad
+
+Se houver contexto suficiente, produza implicitamente esse pacote e siga.
+Se houver lacunas materiais, faca poucas perguntas guiadas.
+
+Pense como um mini `@discovery-design-doc` focado na squad:
+
+- detectar se o pedido e mais `modo projeto` ou mais `modo feature`
+- recomendar o pacote minimo de docs/skills para a proxima etapa
+- explicitar o que ainda nao precisa entrar no contexto ativo
+- avaliar a prontidao antes de gerar o squad
+
+Nao bloqueie a criacao da squad sem necessidade.
+Mas tambem nao pule direto para agentes se o problema ainda estiver ambiguo demais.
+
 ## Vinculo de genomas ao squad
 
 Genomas podem ser adicionados:
@@ -95,9 +121,16 @@ Toda squad nova deve nascer com:
 - diretórios de `output/`, `aios-logs/` e `media/`
 
 Antes de escrever os agentes, derive:
+- um resumo curto de `design-doc` para este escopo
+- uma leitura de `readiness` para saber se ja da para seguir sem mais discovery
 - **skills da squad**: capacidades reutilizáveis do domínio
 - **MCPs da squad**: acessos externos realmente necessários, com justificativa
 - **política de subagentes**: quando vale usar investigação/paralelismo temporário
+
+Ao derivar esse pacote:
+- reutilize documentos locais existentes sob demanda, em vez de carregar tudo
+- verifique se ha skills do projeto que ja reduzem o trabalho ou evitam reinventar o fluxo
+- deixe claro o que pertence ao contexto minimo da squad e o que pode ficar para depois
 
 Não transforme skills, MCPs ou subagentes em texto solto.
 Registre isso explicitamente no manifesto textual e no manifesto JSON da squad.
@@ -115,6 +148,20 @@ Registre isso explicitamente no manifesto textual e no manifesto JSON da squad.
 - Exemplo: "YouTube roteiros virais sobre IA" → `youtube-roteiros-virais-ia`
 
 ### Passo 1 — Gere o manifesto da squad
+
+Antes de escrever os arquivos finais, cristalize mentalmente este mini design doc da squad:
+
+- problema a resolver
+- objetivo
+- escopo
+- fora de escopo
+- skills e docs que entram agora
+- principais riscos
+- proximo passo operacional
+
+Se a prontidao estiver baixa:
+- faca 1 a 3 perguntas curtas e objetivas
+- ou siga com hipoteses explicitas quando o usuario tiver pedido autonomia alta
 
 Crie `agents/{squad-slug}/agents.md`:
 

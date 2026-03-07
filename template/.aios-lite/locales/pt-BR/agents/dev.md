@@ -12,10 +12,12 @@ Verificar se um arquivo `prd-{slug}.md` existe em `.aios-lite/context/` antes de
 **Modo feature ativo** — `prd-{slug}.md` encontrado:
 Ler nesta ordem antes de escrever qualquer codigo:
 1. `prd-{slug}.md` — o que a feature deve fazer
-2. `requirements-{slug}.md` — entidades, regras de negocio, casos extremos (do @analyst)
-3. `spec-{slug}.md` — memoria da feature: decisoes ja tomadas, dependencias
-4. `spec.md` — memoria do projeto: convencoes e padroes (se existir)
-5. `discovery.md` — mapa de entidades existentes (para evitar conflitos)
+2. `design-doc.md` — decisao viva do escopo atual (se existir)
+3. `readiness.md` — verificar se ja da para implementar ou se ainda falta discovery/arquitetura
+4. `requirements-{slug}.md` — entidades, regras de negocio, casos extremos (do @analyst)
+5. `spec-{slug}.md` — memoria da feature: decisoes ja tomadas, dependencias
+6. `spec.md` — memoria do projeto: convencoes e padroes (se existir)
+7. `discovery.md` — mapa de entidades existentes (para evitar conflitos)
 
 Durante a implementacao, atualizar `spec-{slug}.md` apos cada decisao relevante. Nao tocar em `spec.md` a menos que a mudanca afete toda a arquitetura do projeto.
 
@@ -31,10 +33,12 @@ Prosseguir com a entrada padrao abaixo.
 ## Entrada
 1. `.aios-lite/context/project.context.md`
 2. `.aios-lite/context/skeleton-system.md` *(se existir — ler primeiro para orientacao rapida da estrutura)*
-3. `.aios-lite/context/architecture.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
-4. `.aios-lite/context/discovery.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
-5. `.aios-lite/context/prd.md` (se existir)
-6. `.aios-lite/context/ui-spec.md` (se existir)
+3. `.aios-lite/context/design-doc.md` *(se existir — usar como documento de decisao do escopo atual)*
+4. `.aios-lite/context/readiness.md` *(se existir — verificar se o contexto ja esta pronto para implementacao)*
+5. `.aios-lite/context/architecture.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
+6. `.aios-lite/context/discovery.md` *(apenas SMALL/MEDIUM — não gerado para MICRO; ignorar se ausente)*
+7. `.aios-lite/context/prd.md` (se existir)
+8. `.aios-lite/context/ui-spec.md` (se existir)
 
 > **Projetos MICRO:** apenas `project.context.md` é garantido. Inferir a direção de implementação a partir dele diretamente — não esperar por architecture.md ou discovery.md.
 
@@ -52,6 +56,7 @@ Se `framework_installed=true` em `project.context.md`:
 - Implementar services/use-cases antes dos handlers de UI.
 - Adicionar testes ou verificacoes alinhadas ao risco.
 - Seguir a sequencia da arquitetura — nao pular dependencias.
+- Se `readiness.md` indicar `needs more discovery` ou `needs architecture clarification`, nao seguir como se o escopo estivesse pronto.
 
 ## Convencoes Laravel
 
@@ -149,6 +154,8 @@ Para stacks nao listadas acima, aplicar os mesmos principios de separacao:
 - Manter mudancas pequenas e revisaveis.
 - Aplicar validacao e autorizacao no lado servidor.
 - Reutilizar skills do projeto em `.aios-lite/skills/static` e `.aios-lite/skills/dynamic`.
+- Carregar skills e documentos detalhados sob demanda, nao todos de uma vez.
+- Antes de implementar, decidir qual e o pacote minimo de contexto necessario para este lote.
 
 ## Execucao atomica
 Trabalhar em passos pequenos e validados — nunca implementar uma feature inteira de uma so vez:

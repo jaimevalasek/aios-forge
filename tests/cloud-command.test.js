@@ -58,6 +58,8 @@ function createSnapshot() {
       sourceType: 'dashboard_publish',
       isCurrent: true,
       createdAt: new Date().toISOString(),
+      designDocMarkdown: '# Design Doc - YouTube Creator\n\n## Objective\nCriar ativos editoriais.\n',
+      readinessMarkdown: '# Readiness - YouTube Creator\n\n- Readiness score total: 18\n- Readiness level: medium\n',
       manifestJson: null,
       agentsManifestJson: [
         {
@@ -211,8 +213,17 @@ test('cloud:import:squad imports snapshot into .aios-lite/cloud-imports', async 
   assert.equal(squadManifest.slug, 'youtube-creator');
   assert.equal(squadManifest.rules.mediaDir, 'media/youtube-creator');
   assert.equal(Array.isArray(squadManifest.executors), true);
+  assert.equal(squadManifest.context.designDocPath, 'agents/youtube-creator/design-doc.md');
 
   await assert.doesNotReject(() => fs.access(path.join(projectDir, 'media', 'youtube-creator')));
+  await assert.doesNotReject(() => fs.access(path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md')));
+  await assert.doesNotReject(() => fs.access(path.join(projectDir, 'agents', 'youtube-creator', 'readiness.md')));
+
+  const designDocRaw = await fs.readFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md'),
+    'utf8'
+  );
+  assert.match(designDocRaw, /Design Doc - YouTube Creator/);
 
   const stubRaw = await fs.readFile(
     path.join(projectDir, 'agents', 'youtube-creator', 'roteirista-viral.md'),
@@ -229,11 +240,12 @@ test('cloud:import:squad imports snapshot into .aios-lite/cloud-imports', async 
 
   const db = new Database(path.join(projectDir, '.aios-lite', 'runtime', 'aios.sqlite'), { readonly: true });
   const indexedSquad = db
-    .prepare('SELECT squad_slug, media_dir, manifest_json FROM squads WHERE squad_slug = ?')
+    .prepare('SELECT squad_slug, media_dir, manifest_json, context_json FROM squads WHERE squad_slug = ?')
     .get('youtube-creator');
   assert.equal(indexedSquad.squad_slug, 'youtube-creator');
   assert.equal(indexedSquad.media_dir, 'media/youtube-creator');
   assert.match(indexedSquad.manifest_json, /structured-domain-output/);
+  assert.match(indexedSquad.context_json, /design-doc\.md/);
   db.close();
 });
 
@@ -401,6 +413,16 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
     'utf8'
   );
   await fs.writeFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md'),
+    '# Design Doc - YouTube Creator\n\n## Objective\nCriar roteiros e assets.\n',
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, 'agents', 'youtube-creator', 'readiness.md'),
+    '# Readiness - YouTube Creator\n\n- Readiness score total: 20\n- Readiness level: high\n',
+    'utf8'
+  );
+  await fs.writeFile(
     path.join(projectDir, 'agents', 'youtube-creator', 'squad.manifest.json'),
     JSON.stringify(
       {
@@ -434,6 +456,18 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
         subagents: {
           allowed: true,
           when: ['pesquisa ampla', 'comparação']
+        },
+        context: {
+          mode: 'project',
+          summary: 'Squad para ativos editoriais do YouTube.',
+          designDocPath: 'agents/youtube-creator/design-doc.md',
+          readinessPath: 'agents/youtube-creator/readiness.md',
+          docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md'],
+          readiness: {
+            level: 'high',
+            totalScore: 20,
+            maxScore: 25
+          }
         },
         executors: [
           {
@@ -526,6 +560,9 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   assert.equal(result.response.received.version.manifestJson.skills[0].slug, 'roteiro-short-form');
   assert.equal(result.response.received.version.manifestJson.mcps[0].slug, 'web-search');
   assert.equal(result.response.received.version.manifestJson.subagents.allowed, true);
+  assert.equal(result.response.received.version.manifestJson.context.designDocPath, 'agents/youtube-creator/design-doc.md');
+  assert.match(result.response.received.version.designDocMarkdown, /Design Doc - YouTube Creator/);
+  assert.match(result.response.received.version.readinessMarkdown, /Readiness score total: 20/);
   assert.equal(result.response.received.version.genomesManifestJson.genomes.length, 2);
   assert.equal(result.response.received.appliedGenomes.length, 2);
 });

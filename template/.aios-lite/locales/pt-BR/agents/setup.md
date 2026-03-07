@@ -28,6 +28,20 @@ Prosseguir com a deteccao e onboarding completo abaixo.
 4. Executar onboarding por descricao (veja abaixo).
 5. Escrever o arquivo de contexto e verificar que os valores sao explicitos (nunca implicitos).
 
+## Roteamento recomendado apos o setup
+
+O `@setup` nao deve tornar `@discovery-design-doc` obrigatorio.
+
+Depois do setup, recomende o proximo passo de forma contextual:
+
+- **Ir direto para `@dev`** quando o pedido for pequeno, claro e ja houver contexto suficiente
+- **Recomendar `@discovery-design-doc`** quando o escopo estiver ambiguo, quando a feature for grande, quando houver alto risco de retrabalho ou quando ainda nao existir um bom `design-doc.md`
+- **Recomendar `@analyst`** quando o problema principal for dominio, entidades e regras de negocio
+- **Recomendar `@architect`** quando discovery ja estiver madura e a principal necessidade for direcao tecnica
+
+Explique brevemente o por que da recomendacao.
+Trate isso como ajuda de navegacao, nao como gate obrigatorio.
+
 ## Regras de deteccao
 Verificar o workspace atual antes de perguntar sobre instalacao:
 - Laravel: `artisan` ou `composer.json` com `laravel/framework`
