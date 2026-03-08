@@ -123,6 +123,7 @@ test('discovery-design-doc contract formalizes design doc and readiness outputs'
     'Project mode',
     'Feature mode',
     '## Skills and docs on demand',
+    '.aios-lite/squads/{squad-slug}/skills/',
     'Recommended docs/skills to load next',
     'Readiness total score',
     '0 to 5'
@@ -147,6 +148,7 @@ test('discovery-design-doc contract formalizes design doc and readiness outputs'
     'Modo projeto',
     'Modo feature',
     '## Skills e documentos sob demanda',
+    '.aios-lite/squads/{squad-slug}/skills/',
     'Docs/skills recomendados para carregar a seguir',
     'Readiness score total',
     '0 a 5'
@@ -173,8 +175,8 @@ test('analyst, architect, and dev consume design-doc/readiness and use context o
   const analystPtTokens = ['## Skills e documentos sob demanda', 'design-doc.md', 'readiness.md'];
   const architectBaseTokens = ['design-doc.md', 'readiness.md', 'Load architecture docs and skills on demand'];
   const architectPtTokens = ['design-doc.md', 'readiness.md', 'Carregar documentos e skills de arquitetura sob demanda'];
-  const devBaseTokens = ['design-doc.md', 'readiness.md', 'minimum context package', 'needs more discovery'];
-  const devPtTokens = ['design-doc.md', 'readiness.md', 'pacote minimo de contexto', 'needs more discovery'];
+  const devBaseTokens = ['design-doc.md', 'readiness.md', 'minimum context package', 'needs more discovery', '.aios-lite/squads/{squad-slug}/skills/'];
+  const devPtTokens = ['design-doc.md', 'readiness.md', 'pacote minimo de contexto', 'needs more discovery', '.aios-lite/squads/{squad-slug}/skills/'];
 
   for (const token of analystBaseTokens) assert.equal(analystBase.includes(token), true, `missing analyst base token: ${token}`);
   for (const token of analystPtTokens) assert.equal(analystPt.includes(token), true, `missing analyst pt token: ${token}`);
@@ -219,6 +221,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
 
   const squadTokens = [
     '## Discovery and design-doc before the squad',
+    '## Parallel squads rule',
+    '## AIOS Lite local dashboard',
     '## Genome binding to the squad',
     '## Active genomes',
     '## Response standard',
@@ -227,9 +231,26 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'feature mode',
     'minimum docs/skills package',
     'readiness',
-    'agents/{squad-slug}/agents.md',
-    'agents/{squad-slug}/squad.manifest.json',
+    'aios-lite dashboard:init .',
+    'aios-lite dashboard:dev . --port=3000',
+    'aios-lite dashboard:open . --port=3000',
+    '## Squad content items',
+    'contentBlueprints',
+    'do not freeze the system into fixed fields like `script`, `titles`, or `description`',
+    'AIOS Lite fixes the shell (`content_key`, `contentType`, `layoutType`, `payload_json`), not the domain-specific inner content',
+    'Quick heuristic to choose `layoutType`:',
+    'Heuristic to design `contentBlueprints`:',
+    'prefer 1 strong primary blueprint before inventing many shallow blueprints',
+    '"sections": [',
+    '"key": "{section-key-1}"',
+    '"blockTypes": ["rich-text"]',
+    '- `blocks`',
+    'output/{squad-slug}/{content-key}/index.html',
+    'output/{squad-slug}/{content-key}/content.json',
+    '.aios-lite/squads/{squad-slug}/agents/agents.md',
+    '.aios-lite/squads/{squad-slug}/squad.manifest.json',
     '## Squad skills',
+    '## Installed squad skills',
     '## Squad MCPs',
     '## Subagent policy',
     'media/{squad-slug}/',
@@ -238,6 +259,7 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'AgentGenomes:',
     'AGENTS.md: updated with `@agent` shortcuts',
     'Do NOT offer `Genoma mode` as an initial `@squad` entry path.',
+    'do not silently reuse the old squad',
     'HARD STOP — `@` ACTIVATION:',
     'Visual direction: sophisticated dark product UI, not neon dashboard UI',
     'do not collapse real work into headline-plus-one-line'
@@ -245,6 +267,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
 
   const squadPtTokens = [
     '## Discovery e design doc antes da squad',
+    '## Regra de paralelismo entre squads',
+    '## Dashboard local do AIOS Lite',
     '## Vinculo de genomas ao squad',
     '## Genomas ativos',
     '## Padrao de resposta',
@@ -253,9 +277,26 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'modo feature',
     'pacote minimo de docs/skills',
     'prontidao',
-    'agents/{squad-slug}/agents.md',
-    'agents/{squad-slug}/squad.manifest.json',
+    'aios-lite dashboard:init .',
+    'aios-lite dashboard:dev . --port=3000',
+    'aios-lite dashboard:open . --port=3000',
+    '## Conteudos da squad',
+    'contentBlueprints',
+    'nao congele o sistema em campos fixos como `roteiro`, `titulos` ou `descricao`',
+    'o AIOS Lite fixa a casca (`content_key`, `contentType`, `layoutType`, `payload_json`), nao o conteudo interno do dominio',
+    'Heuristica rapida para escolher `layoutType`:',
+    'Heuristica para desenhar `contentBlueprints`:',
+    'prefira 1 blueprint principal bem resolvido antes de inventar varios blueprints superficiais',
+    '"sections": [',
+    '"key": "{section-key-1}"',
+    '"blockTypes": ["rich-text"]',
+    '- `blocks`',
+    'output/{squad-slug}/{content-key}/index.html',
+    'output/{squad-slug}/{content-key}/content.json',
+    '.aios-lite/squads/{squad-slug}/agents/agents.md',
+    '.aios-lite/squads/{squad-slug}/squad.manifest.json',
     '## Skills da squad',
+    '## Skills instaladas da squad',
     '## MCPs da squad',
     '## Politica de subagentes',
     'media/{squad-slug}/',
@@ -264,6 +305,7 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'AgentGenomes:',
     'AGENTS.md: atualizado com atalhos `@agente`',
     'NÃO ofereça `Modo Genoma` como etapa inicial do `@squad`.',
+    'nao reutilize silenciosamente a squad antiga',
     'HARD STOP — ATIVAÇÃO VIA `@`:',
     'Direção visual: escuro sofisticado e técnico, inspirado em produto premium, não em dashboard neon',
     'não reduza o trabalho dos agentes a título + uma frase'

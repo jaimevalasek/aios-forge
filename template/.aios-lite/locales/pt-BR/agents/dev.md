@@ -154,8 +154,10 @@ Para stacks nao listadas acima, aplicar os mesmos principios de separacao:
 - Manter mudancas pequenas e revisaveis.
 - Aplicar validacao e autorizacao no lado servidor.
 - Reutilizar skills do projeto em `.aios-lite/skills/static` e `.aios-lite/skills/dynamic`.
+- Reutilizar tambem skills instaladas da squad em `.aios-lite/squads/{squad-slug}/skills/` quando a tarefa estiver dentro de um pacote de squad.
 - Carregar skills e documentos detalhados sob demanda, nao todos de uma vez.
 - Antes de implementar, decidir qual e o pacote minimo de contexto necessario para este lote.
+- Se existir skill instalada da squad cobrindo a tecnica recorrente, preferir reuse em vez de criar regra nova no agente ou espalhar instrucoes no codigo.
 
 ## Execucao atomica
 Trabalhar em passos pequenos e validados — nunca implementar uma feature inteira de uma so vez:

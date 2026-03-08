@@ -68,11 +68,35 @@ function installedGenomeManifestPath(projectDir, slug) {
   return path.join(installedRoot(projectDir), 'genomes', sanitizeSegment(slug, 'genoma'), 'manifest.json');
 }
 
-function localSquadMetadataPath(projectDir, slug) {
+function localSquadPackageDir(projectDir, slug) {
+  return path.join(projectDir, '.aios-lite', 'squads', sanitizeSegment(slug, 'squad'));
+}
+
+function localSquadSummaryPath(projectDir, slug) {
+  return path.join(localSquadPackageDir(projectDir, slug), 'squad.md');
+}
+
+function localLegacySquadMetadataPath(projectDir, slug) {
   return path.join(projectDir, '.aios-lite', 'squads', `${sanitizeSegment(slug, 'squad')}.md`);
 }
 
 function localSquadAgentsDir(projectDir, slug) {
+  return path.join(localSquadPackageDir(projectDir, slug), 'agents');
+}
+
+function localSquadSkillsDir(projectDir, slug) {
+  return path.join(localSquadPackageDir(projectDir, slug), 'skills');
+}
+
+function localSquadTemplatesDir(projectDir, slug) {
+  return path.join(localSquadPackageDir(projectDir, slug), 'templates');
+}
+
+function localSquadDocsDir(projectDir, slug) {
+  return path.join(localSquadPackageDir(projectDir, slug), 'docs');
+}
+
+function localLegacySquadAgentsDir(projectDir, slug) {
   return path.join(projectDir, 'agents', sanitizeSegment(slug, 'squad'));
 }
 
@@ -93,15 +117,39 @@ function localSquadTextManifestPath(projectDir, slug) {
 }
 
 function localSquadJsonManifestPath(projectDir, slug) {
-  return path.join(localSquadAgentsDir(projectDir, slug), 'squad.manifest.json');
+  return path.join(localSquadPackageDir(projectDir, slug), 'squad.manifest.json');
 }
 
 function localSquadDesignDocPath(projectDir, slug) {
-  return path.join(localSquadAgentsDir(projectDir, slug), 'design-doc.md');
+  return path.join(localSquadDocsDir(projectDir, slug), 'design-doc.md');
 }
 
 function localSquadReadinessPath(projectDir, slug) {
-  return path.join(localSquadAgentsDir(projectDir, slug), 'readiness.md');
+  return path.join(localSquadDocsDir(projectDir, slug), 'readiness.md');
+}
+
+function localSquadRulesDocPath(projectDir, slug) {
+  return path.join(localSquadDocsDir(projectDir, slug), 'squad-rules.md');
+}
+
+function localSquadOutputContractsPath(projectDir, slug) {
+  return path.join(localSquadDocsDir(projectDir, slug), 'output-contracts.md');
+}
+
+function localLegacySquadTextManifestPath(projectDir, slug) {
+  return path.join(localLegacySquadAgentsDir(projectDir, slug), 'agents.md');
+}
+
+function localLegacySquadJsonManifestPath(projectDir, slug) {
+  return path.join(localLegacySquadAgentsDir(projectDir, slug), 'squad.manifest.json');
+}
+
+function localLegacySquadDesignDocPath(projectDir, slug) {
+  return path.join(localLegacySquadAgentsDir(projectDir, slug), 'design-doc.md');
+}
+
+function localLegacySquadReadinessPath(projectDir, slug) {
+  return path.join(localLegacySquadAgentsDir(projectDir, slug), 'readiness.md');
 }
 
 function localGenomeFilePath(projectDir, slug) {
@@ -216,7 +264,10 @@ function normalizeAgentsManifest(agentsManifestJson) {
 }
 
 async function loadLocalSquadManifest(projectDir, slug) {
-  const manifestPath = localSquadJsonManifestPath(projectDir, slug);
+  const preferredPath = localSquadJsonManifestPath(projectDir, slug);
+  const manifestPath = (await exists(preferredPath))
+    ? preferredPath
+    : localLegacySquadJsonManifestPath(projectDir, slug);
   if (!(await exists(manifestPath))) {
     return null;
   }
@@ -255,17 +306,53 @@ function deriveFallbackMcps(snapshot) {
   return items;
 }
 
+function normalizeContentBlueprints(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item, index) => {
+      if (!item || typeof item !== 'object') return null;
+
+      const slug = sanitizeSegment(item.slug || `blueprint-${index + 1}`, `blueprint-${index + 1}`);
+      const contentType = String(item.contentType || 'content').trim() || 'content';
+      const layoutType = String(item.layoutType || 'document').trim() || 'document';
+      const description = item.description ? String(item.description).trim() : null;
+      const sections = Array.isArray(item.sections)
+        ? item.sections
+            .map((section, sectionIndex) => {
+              if (!section || typeof section !== 'object') return null;
+
+              const key = sanitizeSegment(section.key || `section-${sectionIndex + 1}`, `section-${sectionIndex + 1}`);
+              const label = String(section.label || section.key || key).trim();
+              const blockTypes = Array.isArray(section.blockTypes)
+                ? section.blockTypes.map((blockType) => String(blockType).trim()).filter(Boolean)
+                : [];
+
+              if (!key || !label) return null;
+              return { key, label, blockTypes };
+            })
+            .filter(Boolean)
+        : [];
+
+      return { slug, contentType, layoutType, description, sections };
+    })
+    .filter(Boolean);
+}
+
 function buildLocalSquadManifest(snapshot, agents) {
   const source = snapshot?.version?.manifestJson && typeof snapshot.version.manifestJson === 'object'
     ? snapshot.version.manifestJson
     : {};
   const slug = sanitizeSegment(snapshot.squad.slug, 'squad');
+  const explicitMode = typeof source.mode === 'string' ? source.mode : null;
+  const mode = String(explicitMode || (source.storagePolicy?.primary === 'files' ? 'builder' : 'content')).trim();
   const sourceContext = source.context && typeof source.context === 'object' ? source.context : {};
+  const packageRoot = `.aios-lite/squads/${slug}`;
   const executors = agents.map((agent) => ({
     slug: agent.slug,
     title: agent.title,
     role: agent.description || (agent.slug === 'orquestrador' ? 'Coordinates the squad and publishes the final HTML.' : null),
-    file: `agents/${slug}/${agent.slug}.md`,
+    file: `${packageRoot}/agents/${agent.slug}.md`,
     skills: agent.slug === 'orquestrador' ? [] : ['structured-domain-output'],
     genomes: (snapshot.appliedGenomes || [])
       .filter((item) => item.scopeType === 'SQUAD' || normalizeAgentSlug(item.agentSlug) === agent.slug)
@@ -280,8 +367,10 @@ function buildLocalSquadManifest(snapshot, agents) {
 
   return {
     schemaVersion: String(source.schemaVersion || snapshot?.version?.schemaVersion || '1.0.0'),
+    packageVersion: String(source.packageVersion || snapshot?.version?.versionNumber || '1.0.0'),
     slug,
     name: String(source.name || snapshot.squad.name),
+    mode,
     mission: String(source.mission || snapshot.squad.description || `Operate the ${snapshot.squad.name} squad.`),
     goal: String(source.goal || snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Lite Cloud'),
     visibility: String(source.visibility || String(snapshot.squad.visibility || 'PRIVATE').toLowerCase()),
@@ -298,6 +387,24 @@ function buildLocalSquadManifest(snapshot, agents) {
         ? source.rules.reviewPolicy
         : ['clarity', 'density', 'consistency', 'next-step']
     },
+    storagePolicy:
+      source.storagePolicy && typeof source.storagePolicy === 'object'
+        ? source.storagePolicy
+        : {
+            primary: mode === 'builder' ? 'files' : 'sqlite',
+            artifacts: mode === 'builder' ? 'files+sqlite' : 'sqlite-json',
+            exports: { html: true, markdown: true, json: true }
+          },
+    package: {
+      rootDir: packageRoot,
+      agentsDir: `${packageRoot}/agents`,
+      skillsDir: `${packageRoot}/skills`,
+      templatesDir: `${packageRoot}/templates`,
+      docsDir: `${packageRoot}/docs`
+    },
+    baseRoles: Array.isArray(source.baseRoles) && source.baseRoles.length > 0
+      ? source.baseRoles
+      : ['orchestrator', 'discovery-lead', 'design-doc-lead', 'planner', 'implementer', 'reviewer', 'docs-maintainer'],
     skills: Array.isArray(source.skills) && source.skills.length > 0 ? source.skills : deriveFallbackSkills(snapshot),
     mcps: Array.isArray(source.mcps) && source.mcps.length > 0 ? source.mcps : deriveFallbackMcps(snapshot),
     subagents: source.subagents && typeof source.subagents === 'object'
@@ -306,6 +413,7 @@ function buildLocalSquadManifest(snapshot, agents) {
           allowed: true,
           when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
         },
+    contentBlueprints: normalizeContentBlueprints(source.contentBlueprints),
     context: {
       mode: String(
         sourceContext.mode ||
@@ -320,8 +428,8 @@ function buildLocalSquadManifest(snapshot, agents) {
           snapshot.squad.description ||
           'Imported squad context.'
       ),
-      designDocPath: `agents/${slug}/design-doc.md`,
-      readinessPath: `agents/${slug}/readiness.md`,
+      designDocPath: `${packageRoot}/docs/design-doc.md`,
+      readinessPath: `${packageRoot}/docs/readiness.md`,
       docsPackage: Array.isArray(sourceContext.docsPackage)
         ? sourceContext.docsPackage
         : ['project.context.md', 'design-doc.md', 'readiness.md'],
@@ -378,8 +486,9 @@ function buildSquadTextManifest(snapshot, manifest) {
     `- Final HTML: \`output/${manifest.slug}/{session-id}.html\``,
     `- Logs: \`aios-logs/${manifest.slug}/\``,
     `- Media: \`media/${manifest.slug}/\``,
-    `- Design doc: \`agents/${manifest.slug}/design-doc.md\``,
-    `- Readiness: \`agents/${manifest.slug}/readiness.md\``,
+    `- Package root: \`.aios-lite/squads/${manifest.slug}/\``,
+    `- Design doc: \`.aios-lite/squads/${manifest.slug}/docs/design-doc.md\``,
+    `- Readiness: \`.aios-lite/squads/${manifest.slug}/docs/readiness.md\``,
     '- Final outputs should include recommendation, reasoning, tradeoff, and next step.'
   );
 
@@ -418,16 +527,21 @@ function buildAgentStub(snapshot, agent) {
 function buildSquadMetadata(snapshot, options = {}) {
   const slug = sanitizeSegment(snapshot.squad.slug, 'squad');
   const installedAt = new Date().toISOString();
+  const packageRoot = `.aios-lite/squads/${slug}`;
   const lines = [
     `Squad: ${snapshot.squad.name}`,
-    'Mode: CloudImport',
+    `Mode: ${snapshot?.version?.manifestJson?.mode || 'CloudImport'}`,
     `Goal: ${snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Lite Cloud'}`,
-    `Agents: agents/${slug}/`,
+    `Package: ${packageRoot}/`,
+    `Agents: ${packageRoot}/agents/`,
+    `Skills: ${packageRoot}/skills/`,
+    `Templates: ${packageRoot}/templates/`,
+    `Docs: ${packageRoot}/docs/`,
     `Output: output/${slug}/`,
     `Logs: aios-logs/${slug}/`,
     `Media: media/${slug}/`,
-    `DesignDoc: agents/${slug}/design-doc.md`,
-    `Readiness: agents/${slug}/readiness.md`,
+    `DesignDoc: ${packageRoot}/docs/design-doc.md`,
+    `Readiness: ${packageRoot}/docs/readiness.md`,
     `LatestSession: output/${slug}/latest.html`,
     `SourceUrl: ${options.sourceUrl || '—'}`,
     `SourceVersion: ${snapshot.version.versionNumber}`,
@@ -469,6 +583,7 @@ function buildInstalledManifest(snapshot, sourceUrl, agents) {
       compatibilityMax: snapshot.version.compatibilityMax,
       schemaVersion: snapshot.version.schemaVersion
     },
+    packageRoot: `.aios-lite/squads/${sanitizeSegment(snapshot.squad.slug, 'squad')}`,
     agents: agents.map((agent) => ({
       slug: agent.slug,
       title: agent.title,
@@ -534,12 +649,98 @@ function buildSquadReadiness(snapshot, manifest) {
   ].join('\n') + '\n';
 }
 
+function buildSkillMarkdown(skill) {
+  const title = String(skill?.title || skill?.slug || 'Skill').trim();
+  const description = skill?.description ? String(skill.description).trim() : 'Reusable squad capability.';
+  return [`# ${title}`, '', description, ''].join('\n');
+}
+
+function buildTemplateJson(type, slug, manifest) {
+  if (type === 'discovery') {
+    return {
+      squad: manifest.slug,
+      mode: manifest.mode,
+      summary: '',
+      goals: [],
+      constraints: [],
+      references: []
+    };
+  }
+
+  if (type === 'design-doc') {
+    return {
+      squad: manifest.slug,
+      mode: manifest.mode,
+      problem: '',
+      scope: [],
+      outOfScope: [],
+      deliverables: []
+    };
+  }
+
+  return {
+    squad: manifest.slug,
+    blueprint: slug,
+    contentType: 'content',
+    layoutType: 'document',
+    title: '',
+    blocks: []
+  };
+}
+
+function buildRulesDoc(manifest) {
+  return [
+    `# Squad Rules - ${manifest.name}`,
+    '',
+    '## Mission',
+    manifest.mission,
+    '',
+    '## Operating mode',
+    `- Mode: ${manifest.mode}`,
+    '- Keep agents light and load skills on demand.',
+    '- Use discovery and design doc before implementation or heavy generation.',
+    '',
+    '## Persistence',
+    `- Primary: ${manifest.storagePolicy?.primary || 'sqlite'}`,
+    `- Artifacts: ${manifest.storagePolicy?.artifacts || 'sqlite-json'}`,
+    ''
+  ].join('\n');
+}
+
+function buildOutputContractsDoc(manifest) {
+  const blueprints = Array.isArray(manifest.contentBlueprints) ? manifest.contentBlueprints : [];
+  const lines = [
+    `# Output Contracts - ${manifest.name}`,
+    '',
+    '## Persistence rule',
+    `- Mode: ${manifest.mode}`,
+    `- Primary storage: ${manifest.storagePolicy?.primary || 'sqlite'}`,
+    '',
+    '## Blueprints'
+  ];
+
+  if (blueprints.length === 0) {
+    lines.push('- No explicit content blueprints were declared.');
+  } else {
+    for (const blueprint of blueprints) {
+      lines.push(`- ${blueprint.slug} (${blueprint.contentType} / ${blueprint.layoutType})`);
+    }
+  }
+
+  lines.push('');
+  return lines.join('\n');
+}
+
 async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   const slug = sanitizeSegment(payload.squad.slug, 'squad');
   const agents = normalizeAgentsManifest(payload.version.agentsManifestJson);
   const squadManifest = buildLocalSquadManifest(payload, agents);
-  const metadataPath = localSquadMetadataPath(projectDir, slug);
+  const packageDir = localSquadPackageDir(projectDir, slug);
+  const metadataPath = localSquadSummaryPath(projectDir, slug);
   const agentsDir = localSquadAgentsDir(projectDir, slug);
+  const skillsDir = localSquadSkillsDir(projectDir, slug);
+  const templatesDir = localSquadTemplatesDir(projectDir, slug);
+  const docsDir = localSquadDocsDir(projectDir, slug);
   const textManifestPath = localSquadTextManifestPath(projectDir, slug);
   const jsonManifestPath = localSquadJsonManifestPath(projectDir, slug);
   const outputDir = localSquadOutputDir(projectDir, slug);
@@ -547,14 +748,19 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   const mediaDir = localSquadMediaDir(projectDir, slug);
   const designDocPath = localSquadDesignDocPath(projectDir, slug);
   const readinessPath = localSquadReadinessPath(projectDir, slug);
+  const rulesDocPath = localSquadRulesDocPath(projectDir, slug);
+  const outputContractsPath = localSquadOutputContractsPath(projectDir, slug);
   const manifestPath = installedManifestPath(projectDir, slug);
 
   if (!force && (await exists(metadataPath))) {
     throw new Error(`Imported squad already materialized: ${metadataPath}`);
   }
 
-  await ensureDir(path.dirname(metadataPath));
+  await ensureDir(packageDir);
   await ensureDir(agentsDir);
+  await ensureDir(skillsDir);
+  await ensureDir(templatesDir);
+  await ensureDir(docsDir);
   await ensureDir(outputDir);
   await ensureDir(logsDir);
   await ensureDir(mediaDir);
@@ -566,6 +772,8 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
   await fs.writeFile(jsonManifestPath, `${JSON.stringify(squadManifest, null, 2)}\n`, 'utf8');
   await fs.writeFile(designDocPath, buildSquadDesignDoc(payload, squadManifest), 'utf8');
   await fs.writeFile(readinessPath, buildSquadReadiness(payload, squadManifest), 'utf8');
+  await fs.writeFile(rulesDocPath, buildRulesDoc(squadManifest), 'utf8');
+  await fs.writeFile(outputContractsPath, buildOutputContractsDoc(squadManifest), 'utf8');
   await fs.writeFile(
     manifestPath,
     `${JSON.stringify(buildInstalledManifest(payload, sourceUrl, agents), null, 2)}\n`,
@@ -578,6 +786,28 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
     const body = agent.body || buildAgentStub(payload, agent);
     await fs.writeFile(filePath, body.endsWith('\n') ? body : `${body}\n`, 'utf8');
     writtenAgents.push(filePath);
+  }
+
+  const writtenSkills = [];
+  for (const skill of squadManifest.skills || []) {
+    const filePath = path.join(skillsDir, `${sanitizeSegment(skill.slug, 'skill')}.md`);
+    await fs.writeFile(filePath, buildSkillMarkdown(skill), 'utf8');
+    writtenSkills.push(filePath);
+  }
+
+  const templateEntries = [
+    { slug: 'discovery', filePath: path.join(templatesDir, 'discovery.template.json') },
+    { slug: 'design-doc', filePath: path.join(templatesDir, 'design-doc.template.json') },
+    { slug: 'artifact', filePath: path.join(templatesDir, 'artifact.template.json') }
+  ];
+  const writtenTemplates = [];
+  for (const template of templateEntries) {
+    await fs.writeFile(
+      template.filePath,
+      `${JSON.stringify(buildTemplateJson(template.slug, template.slug, squadManifest), null, 2)}\n`,
+      'utf8'
+    );
+    writtenTemplates.push(template.filePath);
   }
 
   const writtenGenomes = [];
@@ -607,13 +837,15 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
     upsertSquadManifest(runtimeHandle.db, {
       slug,
       name: squadManifest.name,
+      mode: squadManifest.mode,
       mission: squadManifest.mission,
       goal: squadManifest.goal,
       visibility: squadManifest.visibility,
       status: 'active',
       manifest: squadManifest,
       context: squadManifest.context,
-      agentsDir: `agents/${slug}`,
+      packageDir: `.aios-lite/squads/${slug}`,
+      agentsDir: `.aios-lite/squads/${slug}/agents`,
       outputDir: `output/${slug}`,
       logsDir: `aios-logs/${slug}`,
       mediaDir: `media/${slug}`,
@@ -629,12 +861,20 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
     jsonManifestPath,
     designDocPath,
     readinessPath,
+    rulesDocPath,
+    outputContractsPath,
     manifestPath,
+    packageDir,
     agentsDir,
+    skillsDir,
+    templatesDir,
+    docsDir,
     outputDir,
     logsDir,
     mediaDir,
     writtenAgents,
+    writtenSkills,
+    writtenTemplates,
     writtenGenomes
   };
 }
@@ -911,13 +1151,19 @@ async function runCloudImportSquad({ args, options = {}, logger, t }) {
     relativeLatestFile: toRelativeSafe(projectDir, written.latestPath),
     relativeArchiveFile: toRelativeSafe(projectDir, written.archivePath),
     materializedMetadataFile: materialized ? toRelativeSafe(projectDir, materialized.metadataPath) : null,
+    materializedPackageDir: materialized ? toRelativeSafe(projectDir, materialized.packageDir) : null,
     materializedManifestFile: materialized ? toRelativeSafe(projectDir, materialized.manifestPath) : null,
     materializedAgentsDir: materialized ? toRelativeSafe(projectDir, materialized.agentsDir) : null,
+    materializedSkillsDir: materialized ? toRelativeSafe(projectDir, materialized.skillsDir) : null,
+    materializedTemplatesDir: materialized ? toRelativeSafe(projectDir, materialized.templatesDir) : null,
+    materializedDocsDir: materialized ? toRelativeSafe(projectDir, materialized.docsDir) : null,
     materializedOutputDir: materialized ? toRelativeSafe(projectDir, materialized.outputDir) : null,
     materializedLogsDir: materialized ? toRelativeSafe(projectDir, materialized.logsDir) : null,
     materializedDesignDocFile: materialized ? toRelativeSafe(projectDir, materialized.designDocPath) : null,
     materializedReadinessFile: materialized ? toRelativeSafe(projectDir, materialized.readinessPath) : null,
     writtenAgents: materialized ? materialized.writtenAgents.map((file) => toRelativeSafe(projectDir, file)) : [],
+    writtenSkills: materialized ? materialized.writtenSkills.map((file) => toRelativeSafe(projectDir, file)) : [],
+    writtenTemplates: materialized ? materialized.writtenTemplates.map((file) => toRelativeSafe(projectDir, file)) : [],
     writtenGenomes: materialized ? materialized.writtenGenomes.map((file) => toRelativeSafe(projectDir, file)) : []
   };
 }
@@ -1109,7 +1355,10 @@ async function buildAppliedGenomesFromMetadata(projectDir, metadataContent, opti
 }
 
 async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
-  const metadataPath = localSquadMetadataPath(projectDir, slug);
+  const packageSummaryPath = localSquadSummaryPath(projectDir, slug);
+  const metadataPath = (await exists(packageSummaryPath))
+    ? packageSummaryPath
+    : localLegacySquadMetadataPath(projectDir, slug);
   if (!(await exists(metadataPath))) {
     throw new Error(`Squad metadata not found: ${metadataPath}`);
   }
@@ -1122,15 +1371,23 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
 
   const squadName = extractField(content, 'Squad') || slug;
   const goal = extractField(content, 'Goal', 'Objetivo') || firstParagraph(content) || null;
-  const agentsDirRel = normalizeRel(extractField(content, 'Agents') || `agents/${slug}`);
+  const packageRootRel = `.aios-lite/squads/${slug}`;
+  const agentsDirRel = normalizeRel(extractField(content, 'Agents') || `${packageRootRel}/agents`);
   const outputDirRel = normalizeRel(extractField(content, 'Output') || `output/${slug}`);
   const logsDirRel = normalizeRel(extractField(content, 'Logs') || `aios-logs/${slug}`);
   const mediaDirRel = normalizeRel(extractField(content, 'Media') || `media/${slug}`);
   const agentsDirAbs = path.join(projectDir, agentsDirRel);
   const localManifest = (await loadLocalSquadManifest(projectDir, slug)) || {};
-  const textManifestPath = path.join(agentsDirAbs, 'agents.md');
-  const designDocPath = path.join(agentsDirAbs, 'design-doc.md');
-  const readinessPath = path.join(agentsDirAbs, 'readiness.md');
+  const packageDirRel = normalizeRel(localManifest?.package?.rootDir || packageRootRel);
+  const textManifestPath = (await exists(localSquadTextManifestPath(projectDir, slug)))
+    ? localSquadTextManifestPath(projectDir, slug)
+    : localLegacySquadTextManifestPath(projectDir, slug);
+  const designDocPath = (await exists(localSquadDesignDocPath(projectDir, slug)))
+    ? localSquadDesignDocPath(projectDir, slug)
+    : localLegacySquadDesignDocPath(projectDir, slug);
+  const readinessPath = (await exists(localSquadReadinessPath(projectDir, slug)))
+    ? localSquadReadinessPath(projectDir, slug)
+    : localLegacySquadReadinessPath(projectDir, slug);
   const textManifest = (await fs.readFile(textManifestPath, 'utf8').catch(() => null)) || null;
   const designDocMarkdown = (await fs.readFile(designDocPath, 'utf8').catch(() => null)) || null;
   const readinessMarkdown = (await fs.readFile(readinessPath, 'utf8').catch(() => null)) || null;
@@ -1161,6 +1418,8 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
           ...localManifest,
           slug: sanitizeSegment(localManifest.slug || slug, 'squad'),
           name: String(localManifest.name || squadName),
+          packageVersion: String(localManifest.packageVersion || versionNumber),
+          mode: String(localManifest.mode || 'content'),
           mission: String(localManifest.mission || extractField(content, 'Description', 'Descricao') || goal || squadName),
           goal: String(localManifest.goal || goal || ''),
           visibility: String(localManifest.visibility || options.visibility || 'private').toLowerCase(),
@@ -1175,6 +1434,27 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
             logsDir: localManifest?.rules?.logsDir || logsDirRel,
             mediaDir: localManifest?.rules?.mediaDir || mediaDirRel
           },
+          storagePolicy:
+            localManifest.storagePolicy && typeof localManifest.storagePolicy === 'object'
+              ? localManifest.storagePolicy
+              : {
+                  primary: String(localManifest.mode || 'content') === 'builder' ? 'files' : 'sqlite',
+                  artifacts: String(localManifest.mode || 'content') === 'builder' ? 'files+sqlite' : 'sqlite-json',
+                  exports: { html: true, markdown: true, json: true }
+                },
+          package:
+            localManifest.package && typeof localManifest.package === 'object'
+              ? localManifest.package
+              : {
+                  rootDir: packageDirRel,
+                  agentsDir: `${packageDirRel}/agents`,
+                  skillsDir: `${packageDirRel}/skills`,
+                  templatesDir: `${packageDirRel}/templates`,
+                  docsDir: `${packageDirRel}/docs`
+                },
+          baseRoles: Array.isArray(localManifest.baseRoles)
+            ? localManifest.baseRoles
+            : ['orchestrator', 'discovery-lead', 'design-doc-lead', 'planner', 'implementer', 'reviewer', 'docs-maintainer'],
           skills: Array.isArray(localManifest.skills) ? localManifest.skills : [],
           mcps: Array.isArray(localManifest.mcps) ? localManifest.mcps : [],
           subagents:
@@ -1184,12 +1464,13 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
                   allowed: true,
                   when: ['broad research', 'comparison', 'large-context summarization', 'parallel analysis']
                 },
+          contentBlueprints: normalizeContentBlueprints(localManifest.contentBlueprints),
           context:
             localManifest.context && typeof localManifest.context === 'object'
               ? {
                   ...localManifest.context,
-                  designDocPath: localManifest.context.designDocPath || `${agentsDirRel}/design-doc.md`,
-                  readinessPath: localManifest.context.readinessPath || `${agentsDirRel}/readiness.md`,
+                  designDocPath: localManifest.context.designDocPath || `${packageDirRel}/docs/design-doc.md`,
+                  readinessPath: localManifest.context.readinessPath || `${packageDirRel}/docs/readiness.md`,
                   docsPackage: Array.isArray(localManifest.context.docsPackage)
                     ? localManifest.context.docsPackage
                     : ['project.context.md', 'design-doc.md', 'readiness.md']
@@ -1197,8 +1478,8 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
               : {
                   mode: 'project',
                   summary: goal || squadName,
-                  designDocPath: `${agentsDirRel}/design-doc.md`,
-                  readinessPath: `${agentsDirRel}/readiness.md`,
+                  designDocPath: `${packageDirRel}/docs/design-doc.md`,
+                  readinessPath: `${packageDirRel}/docs/readiness.md`,
                   docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md']
                 },
           executors: Array.isArray(localManifest.executors)
@@ -1207,7 +1488,7 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
                 slug: agent.slug,
                 title: agent.name,
                 role: agent.description,
-                file: `${agentsDirRel}/${agent.slug}.md`,
+                file: `${packageDirRel}/agents/${agent.slug}.md`,
                 skills: [],
                 genomes: []
               })),
@@ -1246,8 +1527,22 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
       readinessMarkdown,
       manifestJson:
         normalizedManifest || {
+          packageVersion: versionNumber,
+          mode: 'content',
           metadataPath: normalizeRel(path.relative(projectDir, metadataPath)),
           textManifestPath: normalizeRel(path.relative(projectDir, textManifestPath)),
+          package: {
+            rootDir: packageDirRel,
+            agentsDir: `${packageDirRel}/agents`,
+            skillsDir: `${packageDirRel}/skills`,
+            templatesDir: `${packageDirRel}/templates`,
+            docsDir: `${packageDirRel}/docs`
+          },
+          storagePolicy: {
+            primary: 'sqlite',
+            artifacts: 'sqlite-json',
+            exports: { html: true, markdown: true, json: true }
+          },
           context: {
             mode: 'project',
             summary: goal || squadName,

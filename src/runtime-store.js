@@ -52,12 +52,14 @@ async function openRuntimeDb(targetDir, options = {}) {
     CREATE TABLE IF NOT EXISTS squads (
       squad_slug TEXT PRIMARY KEY,
       name TEXT NOT NULL,
+      mode TEXT NOT NULL DEFAULT 'content',
       mission TEXT,
       goal TEXT,
       status TEXT NOT NULL DEFAULT 'active',
       visibility TEXT NOT NULL DEFAULT 'private',
       manifest_json TEXT,
       context_json TEXT,
+      package_dir TEXT,
       agents_dir TEXT,
       output_dir TEXT,
       logs_dir TEXT,
@@ -135,6 +137,7 @@ async function openRuntimeDb(targetDir, options = {}) {
       title TEXT,
       status TEXT NOT NULL,
       summary TEXT,
+      used_skills_json TEXT,
       output_path TEXT,
       started_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
@@ -166,6 +169,29 @@ async function openRuntimeDb(targetDir, options = {}) {
       FOREIGN KEY (run_key) REFERENCES agent_runs(run_key) ON DELETE SET NULL
     );
 
+    CREATE TABLE IF NOT EXISTS content_items (
+      content_key TEXT PRIMARY KEY,
+      task_key TEXT,
+      run_key TEXT,
+      squad_slug TEXT NOT NULL,
+      session_key TEXT,
+      title TEXT NOT NULL,
+      content_type TEXT NOT NULL,
+      layout_type TEXT NOT NULL DEFAULT 'document',
+      status TEXT NOT NULL DEFAULT 'completed',
+      summary TEXT,
+      blueprint_slug TEXT,
+      used_skills_json TEXT,
+      payload_json TEXT,
+      json_path TEXT,
+      html_path TEXT,
+      created_by_agent TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (task_key) REFERENCES tasks(task_key) ON DELETE SET NULL,
+      FOREIGN KEY (run_key) REFERENCES agent_runs(run_key) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_squads_updated ON squads(updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_squad_executors_squad ON squad_executors(squad_slug, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_squad_skills_squad ON squad_skills(squad_slug);
@@ -178,6 +204,8 @@ async function openRuntimeDb(targetDir, options = {}) {
     CREATE INDEX IF NOT EXISTS idx_agent_runs_squad ON agent_runs(squad_slug, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_agent_events_run ON agent_events(run_key, created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_artifacts_task ON artifacts(task_key, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_content_items_squad ON content_items(squad_slug, updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_content_items_task ON content_items(task_key, updated_at DESC);
   `);
 
   ensureLegacyColumns(db);
@@ -215,11 +243,34 @@ function ensureLegacyColumns(db) {
     db.exec('ALTER TABLE agent_runs ADD COLUMN task_key TEXT');
   }
 
+  if (!agentRunColumnNames.has('used_skills_json')) {
+    db.exec('ALTER TABLE agent_runs ADD COLUMN used_skills_json TEXT');
+  }
+
   const squadColumns = db.prepare('PRAGMA table_info(squads)').all();
   const squadColumnNames = new Set(squadColumns.map((column) => column.name));
 
   if (!squadColumnNames.has('context_json')) {
     db.exec('ALTER TABLE squads ADD COLUMN context_json TEXT');
+  }
+
+  if (!squadColumnNames.has('mode')) {
+    db.exec("ALTER TABLE squads ADD COLUMN mode TEXT NOT NULL DEFAULT 'content'");
+  }
+
+  if (!squadColumnNames.has('package_dir')) {
+    db.exec('ALTER TABLE squads ADD COLUMN package_dir TEXT');
+  }
+
+  const contentItemColumns = db.prepare('PRAGMA table_info(content_items)').all();
+  const contentItemColumnNames = new Set(contentItemColumns.map((column) => column.name));
+
+  if (!contentItemColumnNames.has('blueprint_slug')) {
+    db.exec('ALTER TABLE content_items ADD COLUMN blueprint_slug TEXT');
+  }
+
+  if (!contentItemColumnNames.has('used_skills_json')) {
+    db.exec('ALTER TABLE content_items ADD COLUMN used_skills_json TEXT');
   }
 }
 
@@ -309,8 +360,92 @@ function attachArtifact(db, options) {
   });
 }
 
+function upsertContentItem(db, options) {
+  const now = nowIso();
+  const contentKey = String(options.contentKey || createTaskKey(options.title || 'content')).trim();
+  const usedSkillsJson = normalizeStringArray(options.usedSkills).length > 0 ? JSON.stringify(normalizeStringArray(options.usedSkills)) : null;
+
+  db.prepare(`
+    INSERT INTO content_items (
+      content_key, task_key, run_key, squad_slug, session_key, title, content_type, layout_type,
+      status, summary, blueprint_slug, used_skills_json, payload_json, json_path, html_path, created_by_agent, created_at, updated_at
+    ) VALUES (
+      @content_key, @task_key, @run_key, @squad_slug, @session_key, @title, @content_type, @layout_type,
+      @status, @summary, @blueprint_slug, @used_skills_json, @payload_json, @json_path, @html_path, @created_by_agent, @created_at, @updated_at
+    )
+    ON CONFLICT(content_key) DO UPDATE SET
+      task_key = excluded.task_key,
+      run_key = excluded.run_key,
+      squad_slug = excluded.squad_slug,
+      session_key = excluded.session_key,
+      title = excluded.title,
+      content_type = excluded.content_type,
+      layout_type = excluded.layout_type,
+      status = excluded.status,
+      summary = excluded.summary,
+      blueprint_slug = excluded.blueprint_slug,
+      used_skills_json = excluded.used_skills_json,
+      payload_json = excluded.payload_json,
+      json_path = excluded.json_path,
+      html_path = excluded.html_path,
+      created_by_agent = excluded.created_by_agent,
+      updated_at = excluded.updated_at
+  `).run({
+    content_key: contentKey,
+    task_key: options.taskKey ? String(options.taskKey).trim() : null,
+    run_key: options.runKey ? String(options.runKey).trim() : null,
+    squad_slug: String(options.squadSlug).trim(),
+    session_key: options.sessionKey ? String(options.sessionKey).trim() : null,
+    title: String(options.title || contentKey).trim(),
+    content_type: String(options.contentType || 'content').trim(),
+    layout_type: String(options.layoutType || 'document').trim(),
+    status: String(options.status || 'completed').trim(),
+    summary: options.summary ? String(options.summary).trim() : null,
+    blueprint_slug: options.blueprintSlug ? String(options.blueprintSlug).trim() : null,
+    used_skills_json: usedSkillsJson,
+    payload_json:
+      options.payload && typeof options.payload === 'object'
+        ? JSON.stringify(options.payload)
+        : options.payloadJson
+          ? String(options.payloadJson)
+          : null,
+    json_path: options.jsonPath ? String(options.jsonPath).trim() : null,
+    html_path: options.htmlPath ? String(options.htmlPath).trim() : null,
+    created_by_agent: options.createdByAgent ? String(options.createdByAgent).trim() : null,
+    created_at: now,
+    updated_at: now
+  });
+
+  return contentKey;
+}
+
 function normalizeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function normalizeStringArray(value) {
+  const values = Array.isArray(value)
+    ? value
+    : typeof value === 'string'
+      ? value.split(',')
+      : [];
+
+  return Array.from(
+    new Set(
+      values
+        .map((entry) => String(entry || '').trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+function parseJsonArray(value) {
+  if (!value) return [];
+  try {
+    return normalizeStringArray(JSON.parse(value));
+  } catch {
+    return [];
+  }
 }
 
 function upsertSquadManifest(db, options) {
@@ -330,24 +465,26 @@ function upsertSquadManifest(db, options) {
 
   db.prepare(`
     INSERT INTO squads (
-      squad_slug, name, mission, goal, status, visibility, manifest_json,
+      squad_slug, name, mode, mission, goal, status, visibility, manifest_json,
       context_json,
-      agents_dir, output_dir, logs_dir, media_dir, latest_session_path,
+      package_dir, agents_dir, output_dir, logs_dir, media_dir, latest_session_path,
       created_at, updated_at
     ) VALUES (
-      @squad_slug, @name, @mission, @goal, @status, @visibility, @manifest_json,
+      @squad_slug, @name, @mode, @mission, @goal, @status, @visibility, @manifest_json,
       @context_json,
-      @agents_dir, @output_dir, @logs_dir, @media_dir, @latest_session_path,
+      @package_dir, @agents_dir, @output_dir, @logs_dir, @media_dir, @latest_session_path,
       @created_at, @updated_at
     )
     ON CONFLICT(squad_slug) DO UPDATE SET
       name = excluded.name,
+      mode = excluded.mode,
       mission = excluded.mission,
       goal = excluded.goal,
       status = excluded.status,
       visibility = excluded.visibility,
       manifest_json = excluded.manifest_json,
       context_json = excluded.context_json,
+      package_dir = excluded.package_dir,
       agents_dir = excluded.agents_dir,
       output_dir = excluded.output_dir,
       logs_dir = excluded.logs_dir,
@@ -357,12 +494,14 @@ function upsertSquadManifest(db, options) {
   `).run({
     squad_slug: slug,
     name: String(options.name || manifest.name || slug).trim(),
+    mode: String(options.mode || manifest.mode || 'content').trim(),
     mission: options.mission ? String(options.mission).trim() : manifest.mission ? String(manifest.mission).trim() : null,
     goal: options.goal ? String(options.goal).trim() : manifest.goal ? String(manifest.goal).trim() : null,
     status: String(options.status || 'active').trim(),
     visibility: String(options.visibility || manifest.visibility || 'private').trim(),
     manifest_json: JSON.stringify(manifest),
     context_json: context ? JSON.stringify(context) : null,
+    package_dir: options.packageDir ? String(options.packageDir).trim() : manifest?.package?.rootDir ? String(manifest.package.rootDir).trim() : null,
     agents_dir: options.agentsDir ? String(options.agentsDir).trim() : null,
     output_dir: options.outputDir ? String(options.outputDir).trim() : null,
     logs_dir: options.logsDir ? String(options.logsDir).trim() : null,
@@ -458,6 +597,7 @@ function startRun(db, options) {
   const status = normalizeStatus(options.status, 'running');
   const agentKind = String(options.agentKind || (options.squadSlug ? 'squad' : 'official')).trim();
   const taskKey = options.taskKey ? String(options.taskKey).trim() : null;
+  const usedSkillsJson = normalizeStringArray(options.usedSkills).length > 0 ? JSON.stringify(normalizeStringArray(options.usedSkills)) : null;
 
   if (taskKey) {
     const taskExists = db.prepare('SELECT task_key FROM tasks WHERE task_key = ?').get(taskKey);
@@ -469,10 +609,10 @@ function startRun(db, options) {
   db.prepare(`
     INSERT INTO agent_runs (
       run_key, task_key, agent_name, agent_kind, squad_slug, session_key, title,
-      status, summary, output_path, started_at, updated_at, finished_at
+      status, summary, used_skills_json, output_path, started_at, updated_at, finished_at
     ) VALUES (
       @run_key, @task_key, @agent_name, @agent_kind, @squad_slug, @session_key, @title,
-      @status, @summary, @output_path, @started_at, @updated_at, @finished_at
+      @status, @summary, @used_skills_json, @output_path, @started_at, @updated_at, @finished_at
     )
   `).run({
     run_key: runKey,
@@ -484,6 +624,7 @@ function startRun(db, options) {
     title: options.title ? String(options.title).trim() : null,
     status,
     summary: options.summary ? String(options.summary).trim() : null,
+    used_skills_json: usedSkillsJson,
     output_path: options.outputPath ? String(options.outputPath).trim() : null,
     started_at: now,
     updated_at: now,
@@ -503,7 +644,7 @@ function startRun(db, options) {
 
 function updateRun(db, options) {
   const now = nowIso();
-  const existing = db.prepare('SELECT run_key, status FROM agent_runs WHERE run_key = ?').get(options.runKey);
+  const existing = db.prepare('SELECT run_key, status, used_skills_json FROM agent_runs WHERE run_key = ?').get(options.runKey);
   if (!existing) {
     throw new Error(`Run not found: ${options.runKey}`);
   }
@@ -517,11 +658,14 @@ function updateRun(db, options) {
   }
 
   const nextStatus = normalizeStatus(options.status, existing.status || 'running');
+  const existingUsedSkills = parseJsonArray(existing.used_skills_json);
+  const nextUsedSkills = normalizeStringArray([...(existingUsedSkills || []), ...normalizeStringArray(options.usedSkills)]);
   db.prepare(`
     UPDATE agent_runs
     SET
       status = @status,
       summary = COALESCE(@summary, summary),
+      used_skills_json = COALESCE(@used_skills_json, used_skills_json),
       output_path = COALESCE(@output_path, output_path),
       task_key = COALESCE(@task_key, task_key),
       updated_at = @updated_at,
@@ -534,6 +678,7 @@ function updateRun(db, options) {
     run_key: String(options.runKey),
     status: nextStatus,
     summary: options.summary ? String(options.summary).trim() : null,
+    used_skills_json: nextUsedSkills.length > 0 ? JSON.stringify(nextUsedSkills) : null,
     output_path: options.outputPath ? String(options.outputPath).trim() : null,
     task_key: taskKey,
     updated_at: now
@@ -590,14 +735,14 @@ function getStatusSnapshot(db) {
   }
 
   const activeRuns = db.prepare(`
-    SELECT run_key, task_key, agent_name, agent_kind, squad_slug, session_key, title, status, summary, output_path, started_at, updated_at
+    SELECT run_key, task_key, agent_name, agent_kind, squad_slug, session_key, title, status, summary, used_skills_json, output_path, started_at, updated_at
     FROM agent_runs
     WHERE status IN ('queued', 'running')
     ORDER BY updated_at DESC, started_at DESC
   `).all();
 
   const recentRuns = db.prepare(`
-    SELECT run_key, task_key, agent_name, agent_kind, squad_slug, session_key, title, status, summary, output_path, started_at, updated_at, finished_at
+    SELECT run_key, task_key, agent_name, agent_kind, squad_slug, session_key, title, status, summary, used_skills_json, output_path, started_at, updated_at, finished_at
     FROM agent_runs
     ORDER BY updated_at DESC, started_at DESC
     LIMIT 20
@@ -646,6 +791,27 @@ function getStatusSnapshot(db) {
     LIMIT 20
   `).all();
 
+  const recentContentItems = db.prepare(`
+    SELECT
+      content_key, task_key, run_key, squad_slug, session_key, title, content_type, layout_type,
+      status, summary, blueprint_slug, used_skills_json, json_path, html_path, created_by_agent, created_at, updated_at
+    FROM content_items
+    ORDER BY updated_at DESC, created_at DESC
+    LIMIT 20
+  `).all();
+
+  for (const row of activeRuns) {
+    row.used_skills = parseJsonArray(row.used_skills_json);
+  }
+
+  for (const row of recentRuns) {
+    row.used_skills = parseJsonArray(row.used_skills_json);
+  }
+
+  for (const row of recentContentItems) {
+    row.used_skills = parseJsonArray(row.used_skills_json);
+  }
+
   return {
     taskCounts,
     counts,
@@ -653,7 +819,8 @@ function getStatusSnapshot(db) {
     recentTasks,
     activeRuns,
     recentRuns,
-    recentArtifacts
+    recentArtifacts,
+    recentContentItems
   };
 }
 
@@ -667,6 +834,7 @@ module.exports = {
   startRun,
   updateRun,
   attachArtifact,
+  upsertContentItem,
   getStatusSnapshot,
   createRunKey,
   createTaskKey

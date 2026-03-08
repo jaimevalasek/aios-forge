@@ -8,14 +8,14 @@
 
 `@squad` e `@genoma` resolvem problemas diferentes:
 
-- `@squad` cria uma **squad modular** em `agents/{squad-slug}/`
+- `@squad` cria uma **squad modular em pacote** sob `.aios-lite/squads/{squad-slug}/`
 - `@genoma` cria uma **base estruturada de conhecimento e lentes cognitivas** em `.aios-lite/genomas/{slug}.md`
 
 Em termos simples:
 
 - `skill` define **o que saber fazer**
 - `genoma` define **como pensar**
-- `@squad` organiza isso em **manifesto, executores, output, logs e media**
+- `@squad` organiza isso em **pacote versionável, executores leves, output, logs e media**
 - o `@orquestrador` gerado para cada squad consolida o trabalho em HTML
 
 ---
@@ -89,17 +89,73 @@ Não use subagente como substituto de:
 
 Um squad é uma unidade operacional modular criada para um objetivo específico.
 
+O AIOS Lite suporta varias squads paralelas no mesmo projeto.
+
+Regra pratica:
+
+- se voce quer uma nova squad, o `@squad` deve criar uma nova squad
+- ele nao deve assumir upgrade de uma squad antiga so porque o dominio parece parecido
+- melhoria, refatoracao ou manutencao de squad existente so entram quando isso for pedido explicitamente
+
 Ela não é só uma pasta com agentes. Uma squad bem formada tem:
 
-- manifesto curto em `agents/{squad-slug}/agents.md`
-- manifesto estruturado em `agents/{squad-slug}/squad.manifest.json`
-- `design-doc` local em `agents/{squad-slug}/design-doc.md`
-- `readiness` local em `agents/{squad-slug}/readiness.md`
-- executores permanentes em `agents/{squad-slug}/`
-- metadata em `.aios-lite/squads/{slug}.md`
+- manifesto curto em `.aios-lite/squads/{squad-slug}/agents/agents.md`
+- manifesto estruturado em `.aios-lite/squads/{squad-slug}/squad.manifest.json`
+- `design-doc` local em `.aios-lite/squads/{squad-slug}/docs/design-doc.md`
+- `readiness` local em `.aios-lite/squads/{squad-slug}/docs/readiness.md`
+- executores permanentes em `.aios-lite/squads/{squad-slug}/agents/`
+- metadata em `.aios-lite/squads/{slug}/squad.md`
 - outputs em `output/{squad-slug}/`
 - logs em `aios-logs/{squad-slug}/`
 - mídia em `media/{squad-slug}/`
+
+Para squads de conteudo, o ideal nao e despejar tudo solto no `output/`.
+O modelo recomendado e:
+
+- `output/{squad-slug}/{content-key}/content.json`
+- `output/{squad-slug}/{content-key}/index.html`
+
+Assim o runtime e o dashboard podem tratar cada entrega como um conteudo real, e nao so como um arquivo solto.
+
+O importante aqui e: o AIOS Lite **nao fixa os campos internos** desse conteudo.
+Ele fixa apenas a casca:
+
+- `content_key`
+- `contentType`
+- `layoutType`
+- `payload_json`
+
+O resto nasce do dominio da squad.
+Uma squad de YouTube pode ter `roteiro` e `thumb-prompts`.
+Uma squad juridica pode ter `parecer`, `riscos` e `clausulas`.
+Uma squad de produto pode ter `prd`, `edge-cases` e `rollout`.
+
+Por isso a squad deve declarar `contentBlueprints` no manifesto JSON.
+Esse blueprint e o contrato dinamico do entregavel e precisa ser generico o suficiente para:
+
+- ser salvo no SQLite local
+- ser renderizado no dashboard
+- ser publicado no `aioslite.com`
+- ser exportado/importado em outro projeto
+
+### Como escolher o `layoutType`
+
+Use uma heurística simples:
+
+- `document`: quando a entrega principal for longa e linear
+- `tabs`: quando houver várias saídas irmãs no mesmo pacote
+- `accordion`: quando houver alternativas, comparações, opções ou FAQs
+- `stack`: quando a leitura for uma sequência de blocos independentes
+- `mixed`: quando o pacote precisar combinar hero, seções e componentes diferentes
+
+### Como desenhar um `contentBlueprint`
+
+- derive `sections` do objetivo real da squad
+- use a linguagem do domínio do usuário quando ela fizer sentido
+- aproveite skills e docs locais que já apontem entregáveis recorrentes
+- aproveite tambem skills instaladas em `.aios-lite/squads/{squad-slug}/skills/`
+- prefira 1 blueprint principal forte antes de criar vários superficiais
+- escolha `blockTypes` pelo padrão de leitura esperado, não pelo efeito visual
 
 Antes de escrever essa estrutura, o `@squad` deve consolidar um mini pacote de:
 
@@ -109,8 +165,8 @@ Antes de escrever essa estrutura, o `@squad` deve consolidar um mini pacote de:
 
 Quando esse pacote e materializado, ele passa a existir como parte da squad:
 
-- `agents/{squad-slug}/design-doc.md`
-- `agents/{squad-slug}/readiness.md`
+- `.aios-lite/squads/{squad-slug}/docs/design-doc.md`
+- `.aios-lite/squads/{squad-slug}/docs/readiness.md`
 
 Esse passo existe para evitar squads montadas em cima de contexto vago demais.
 Na pratica, o `@squad` decide:
@@ -122,7 +178,7 @@ Na pratica, o `@squad` decide:
 Exemplo:
 
 ```text
-agents/youtube-creator/
+.aios-lite/squads/youtube-creator/agents/
   agents.md
   squad.manifest.json
   roteirista-viral.md
@@ -175,6 +231,14 @@ Então, para o sistema:
 - genoma sem skill não executa
 - executor com skill + genoma tende a entregar melhor
 
+Quando uma skill vier do catálogo online ou de outro pacote, ela deve ser salva em:
+
+```text
+.aios-lite/squads/{squad-slug}/skills/{dominio}/{skill-slug}.md
+```
+
+Depois disso, essa skill passa a ser parte real do pacote local da squad e deve ser considerada pelos agentes sob demanda.
+
 ---
 
 ## Genoma não é clone literal de pessoa
@@ -222,8 +286,8 @@ Exemplo:
 Squad: YouTube Creator
 Mode: Squad
 Goal: Criar conteúdos virais com retenção forte
-Agents: agents/youtube-creator/
-Manifest: agents/youtube-creator/squad.manifest.json
+Agents: .aios-lite/squads/youtube-creator/agents/
+Manifest: .aios-lite/squads/youtube-creator/squad.manifest.json
 Output: output/youtube-creator/
 Logs: aios-logs/youtube-creator/
 Media: media/youtube-creator/
@@ -244,17 +308,25 @@ AgentGenomes:
 O contrato atual esperado de uma squad é este:
 
 ```text
-agents/{squad-slug}/
-  agents.md
+.aios-lite/squads/{squad-slug}/
   squad.manifest.json
-  orquestrador.md
-  {executor-1}.md
-  {executor-2}.md
+  squad.md
+  agents/
+    agents.md
+    orquestrador.md
+    {executor-1}.md
+    {executor-2}.md
+  skills/
+  templates/
+  docs/
+    design-doc.md
+    readiness.md
+    squad-rules.md
+    output-contracts.md
 
 output/{squad-slug}/
 aios-logs/{squad-slug}/
 media/{squad-slug}/
-.aios-lite/squads/{squad-slug}.md
 ```
 
 ### `agents.md`
@@ -281,10 +353,83 @@ Deve explicar:
 - export/import
 - sync com `aioslite.com`
 
+O manifesto também deve declarar:
+
+- `mode: content | builder`
+- `storagePolicy`
+- `package`
+- `contentBlueprints`
+
 Ou seja:
 
 - `agents.md` é a leitura curta para humano/LLM
 - `squad.manifest.json` é o contrato para sistema
+
+Exemplo de `contentBlueprints` dentro do manifesto:
+
+```json
+{
+  "contentBlueprints": [
+    {
+      "slug": "entregavel-principal",
+      "contentType": "domain-package",
+      "layoutType": "tabs",
+      "description": "Contrato do entregável principal desta squad.",
+      "sections": [
+        {
+          "key": "visao-geral",
+          "label": "Visão geral",
+          "blockTypes": ["hero", "rich-text"]
+        },
+        {
+          "key": "itens-principais",
+          "label": "Itens principais",
+          "blockTypes": ["bullet-list", "tags", "accordion"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Perceba que:
+
+- `sections` nao sao uma lista fixa global do framework
+- cada squad escolhe `key`, `label` e `blockTypes` conforme o dominio
+- o dashboard so precisa saber renderizar os blocos declarativos, nao o dominio em si
+
+### Contrato minimo de `content.json`
+
+Quando o squad publicar um entregavel estruturado, o `content.json` precisa ter pelo menos:
+
+- `contentKey`
+- `title`
+- `contentType`
+- `layoutType`
+- `blocks`
+
+E o `layoutType` deve ser um destes:
+
+- `document`
+- `tabs`
+- `accordion`
+- `stack`
+- `mixed`
+
+Cada item de `blocks` precisa ser um objeto com `type`.
+Para alguns blocos, o contrato minimo tambem importa:
+
+- `tabs` precisa de `items`, e cada item precisa de `label` e `blocks`
+- `accordion` precisa de `items`, e cada item precisa de `title` e `content` ou `blocks`
+- `section` precisa de `blocks`
+
+Se o JSON estiver malformado:
+
+- o HTML ainda pode existir como arquivo
+- o artifact ainda pode ser registrado
+- mas o runtime nao indexa esse pacote como `content_item`
+
+Isso evita que dashboard e cloud passem a depender de payloads quebrados.
 
 ---
 
@@ -322,10 +467,10 @@ Papéis: pode escolher
 
 Resultado esperado:
 
-- criação de manifesto em `agents/youtube-creator/agents.md`
-- criação de manifesto JSON em `agents/youtube-creator/squad.manifest.json`
-- criação de executores em `agents/youtube-creator/`
-- criação de metadata em `.aios-lite/squads/youtube-creator.md`
+- criação de manifesto em `.aios-lite/squads/youtube-creator/agents/agents.md`
+- criação de manifesto JSON em `.aios-lite/squads/youtube-creator/squad.manifest.json`
+- criação de executores em `.aios-lite/squads/youtube-creator/agents/`
+- criação de resumo em `.aios-lite/squads/youtube-creator/squad.md`
 - criação de `output/youtube-creator/`, `aios-logs/youtube-creator/` e `media/youtube-creator/`
 - geração de `output/youtube-creator/latest.html`
 
@@ -366,7 +511,7 @@ O agente já deve operar com os genomas vinculados, sem o usuário repetir tudo.
 ### Squad
 
 ```text
-agents/{squad-slug}/
+.aios-lite/squads/{squad-slug}/agents/
 output/{squad-slug}/
 .aios-lite/squads/{squad-slug}.md
 aios-logs/{squad-slug}/
@@ -423,7 +568,7 @@ Regra prática:
 
 Não é o `@orchestrator` oficial da aios-lite.
 
-É o `@orquestrador` gerado dentro de `agents/{squad-slug}/`.
+É o `@orquestrador` gerado dentro de `.aios-lite/squads/{squad-slug}/agents/`.
 
 ### 2. Genoma não deve alterar agentes oficiais da aios-lite
 
@@ -436,7 +581,7 @@ Não aplique genomas customizados do usuário em:
 Os genomas devem ser aplicados aos agentes criados em:
 
 ```text
-agents/{squad-slug}/
+.aios-lite/squads/{squad-slug}/agents/
 ```
 
 ### 3. O usuário pode mandar contexto grande
@@ -466,7 +611,7 @@ O HTML é o entregável persistido e organizado para consulta e cópia.
 
 Prefira:
 
-- `agents/{squad-slug}/`
+- `.aios-lite/squads/{squad-slug}/agents/`
 - `output/{squad-slug}/`
 - `aios-logs/{squad-slug}/`
 - `media/{squad-slug}/`

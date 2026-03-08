@@ -45,6 +45,7 @@ Se o projeto for brownfield e o recorte for especifico, prefira modo feature.
 - Quando a entrada estiver fraca, faca perguntas guiadas; nao espere contexto perfeito de primeira.
 - Antes de recomendar implementacao, verifique se ja existem skills ou docs locais relevantes para esse escopo.
 - Carregue skills e documentos detalhados apenas quando eles melhorarem materialmente a decisao atual.
+- Se o trabalho estiver dentro de uma squad, verifique tambem as skills instaladas em `.aios-lite/squads/{squad-slug}/skills/` antes de propor novas especializacoes.
 
 ## Rubrica objetiva de prontidao
 
@@ -82,6 +83,7 @@ Mapa sugerido:
 Antes de fechar o hand-off, avalie explicitamente:
 
 - quais skills locais em `.aios-lite/skills/static/` ou `.aios-lite/skills/dynamic/` importam para este escopo
+- quais skills instaladas da squad em `.aios-lite/squads/{squad-slug}/skills/` ja cobrem parte do trabalho
 - quais documentos de contexto devem entrar na proxima etapa (`discovery.md`, `architecture.md`, `prd.md`, `spec.md`, `ui-spec.md`)
 - quais referencias ainda nao precisam entrar no contexto ativo
 

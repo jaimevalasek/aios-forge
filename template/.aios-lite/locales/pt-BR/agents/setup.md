@@ -39,6 +39,14 @@ Depois do setup, recomende o proximo passo de forma contextual:
 - **Recomendar `@analyst`** quando o problema principal for dominio, entidades e regras de negocio
 - **Recomendar `@architect`** quando discovery ja estiver madura e a principal necessidade for direcao tecnica
 
+Se o usuario pedir visualizacao operacional do projeto ou painel local do AIOS Lite, recomende os comandos de dashboard:
+
+- `aios-lite dashboard:init .`
+- `aios-lite dashboard:dev . --port=3000`
+- `aios-lite dashboard:open . --port=3000`
+
+Se ele pedir outra porta, usar a porta informada.
+
 Explique brevemente o por que da recomendacao.
 Trate isso como ajuda de navegacao, nao como gate obrigatorio.
 

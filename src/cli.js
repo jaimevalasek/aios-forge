@@ -32,6 +32,7 @@ const { runQaReport } = require('./commands/qa-report');
 const { runScanProject } = require('./commands/scan-project');
 const { runConfig } = require('./commands/config');
 const { runSquadStatus } = require('./commands/squad-status');
+const { runSquadDoctor } = require('./commands/squad-doctor');
 const {
   runDashboardInit,
   runDashboardDev,
@@ -39,6 +40,7 @@ const {
 } = require('./commands/dashboard');
 const {
   runRuntimeInit,
+  runRuntimeIngest,
   runRuntimeTaskStart,
   runRuntimeStart,
   runRuntimeUpdate,
@@ -123,8 +125,12 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'dashboard-open',
   'squad:status',
   'squad-status',
+  'squad:doctor',
+  'squad-doctor',
   'runtime:init',
   'runtime-init',
+  'runtime:ingest',
+  'runtime-ingest',
   'runtime:task:start',
   'runtime-task-start',
   'runtime:start',
@@ -217,7 +223,9 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_dashboard_dev');
   logHelpLine(t, logger, 'cli.help_dashboard_open');
   logHelpLine(t, logger, 'cli.help_squad_status');
+  logHelpLine(t, logger, 'cli.help_squad_doctor');
   logHelpLine(t, logger, 'cli.help_runtime_init');
+  logHelpLine(t, logger, 'cli.help_runtime_ingest');
   logHelpLine(t, logger, 'cli.help_runtime_task_start');
   logHelpLine(t, logger, 'cli.help_runtime_start');
   logHelpLine(t, logger, 'cli.help_runtime_update');
@@ -353,8 +361,12 @@ async function main() {
       result = await runDashboardOpen({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:status' || command === 'squad-status') {
       result = await runSquadStatus({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:doctor' || command === 'squad-doctor') {
+      result = await runSquadDoctor({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:init' || command === 'runtime-init') {
       result = await runRuntimeInit({ args, options, logger: commandLogger, t });
+    } else if (command === 'runtime:ingest' || command === 'runtime-ingest') {
+      result = await runRuntimeIngest({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:task:start' || command === 'runtime-task-start') {
       result = await runRuntimeTaskStart({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:start' || command === 'runtime-start') {

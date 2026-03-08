@@ -154,8 +154,10 @@ For stacks not listed above, apply the same separation principles:
 - Keep changes small and reviewable.
 - Enforce server-side validation and authorization.
 - Reuse project skills in `.aios-lite/skills/static` and `.aios-lite/skills/dynamic`.
+- Also reuse squad-installed skills in `.aios-lite/squads/{squad-slug}/skills/` when the task belongs to a squad package.
 - Load detailed skills and documents on demand, not all at once.
 - Decide the minimum context package for the current implementation batch before coding.
+- If an installed squad skill already covers the recurring technique, prefer reuse instead of inventing a new rule inside the agent or scattering instructions into code.
 
 ## Atomic execution
 Work in small, validated steps — never implement an entire feature in one pass:

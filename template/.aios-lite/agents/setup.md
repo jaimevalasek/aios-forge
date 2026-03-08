@@ -47,6 +47,14 @@ After setup, recommend the next step contextually:
 - **Recommend `@analyst`** when the main problem is domain modeling, entities, and business rules
 - **Recommend `@architect`** when discovery is already mature and the main need is technical direction
 
+If the user asks for operational visualization or the local AIOS Lite dashboard, recommend the dashboard commands:
+
+- `aios-lite dashboard:init .`
+- `aios-lite dashboard:dev . --port=3000`
+- `aios-lite dashboard:open . --port=3000`
+
+If they request a different port, use that port.
+
 Briefly explain why that next step is recommended.
 Treat this as navigation help, not as a mandatory gate.
 

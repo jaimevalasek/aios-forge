@@ -43,6 +43,7 @@ If the project is brownfield and the feature is specific, prefer feature mode.
 - Ask guided questions when the input is weak; do not wait passively for perfect initial context.
 - Before recommending implementation, check whether relevant local skills or context docs already exist.
 - Load skills and detailed docs only when they materially improve the current decision.
+- If the work belongs to a squad, also inspect installed skills in `.aios-lite/squads/{squad-slug}/skills/` before proposing new specializations.
 
 ## Objective readiness rubric
 
@@ -80,6 +81,7 @@ Suggested map:
 Before finalizing the hand-off, explicitly evaluate:
 
 - which local skills in `.aios-lite/skills/static/` or `.aios-lite/skills/dynamic/` matter for this scope
+- which installed squad skills in `.aios-lite/squads/{squad-slug}/skills/` already cover part of the work
 - which context docs should be read next (`discovery.md`, `architecture.md`, `prd.md`, `spec.md`, `ui-spec.md`)
 - which references are unnecessary right now and should stay out of the active context
 

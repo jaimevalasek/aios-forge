@@ -59,6 +59,10 @@ O AIOS Lite tem agentes oficiais de projeto e também pode criar agentes de squa
 - `@setup` continua sendo o primeiro agente
 - `@discovery-design-doc` entra como recomendação contextual, não como etapa obrigatória
 - se o pedido já estiver claro e pequeno, o fluxo pode seguir direto para `@dev`, `@analyst` ou `@architect`
+- se o usuário pedir o painel local do AIOS Lite, o fluxo correto é via CLI:
+  - `aios-lite dashboard:init .`
+  - `aios-lite dashboard:dev . --port=3000`
+  - `aios-lite dashboard:open . --port=3000`
 
 ---
 
@@ -256,18 +260,23 @@ npx aios-lite parallel:status
 - Pergunta o objetivo e o tipo de trabalho
 - Consolida um mini pacote de `discovery/design-doc/readiness` antes de compor a squad
 - Gera uma squad modular, não apenas uma pasta de agentes
-- Cria `agents/{squad-slug}/agents.md`
-- Cria `agents/{squad-slug}/squad.manifest.json`
-- Cria `agents/{squad-slug}/design-doc.md`
-- Cria `agents/{squad-slug}/readiness.md`
-- Cria executores reais em `agents/{squad-slug}/`
+- Cria `.aios-lite/squads/{squad-slug}/agents/agents.md`
+- Cria `.aios-lite/squads/{squad-slug}/squad.manifest.json`
+- Cria `.aios-lite/squads/{squad-slug}/docs/design-doc.md`
+- Cria `.aios-lite/squads/{squad-slug}/docs/readiness.md`
+- Cria executores reais em `.aios-lite/squads/{squad-slug}/agents/`
 - Cria um `@orquestrador` próprio para esse squad
-- Registra metadata em `.aios-lite/squads/{slug}.md`
+- Registra metadata em `.aios-lite/squads/{slug}/squad.md`
 - Declara `skills`, `MCPs`, política de `subagentes` e diretório `media/`
+- Declara `contentBlueprints` quando a squad for orientada a conteúdo
 - Trabalha com autonomia alta por padrão e evita perguntas extras quando a inferência já é suficiente
 - Detecta se o pedido parece mais `modo projeto` ou `modo feature`
 - Recomenda skills e documentos sob demanda em vez de inflar o contexto inteiro
+- Reaproveita skills instaladas em `.aios-lite/squads/{slug}/skills/` antes de criar especializações novas
 - Materializa o pacote minimo de contexto da squad para o runtime, dashboard e cloud
+- Pode organizar entregáveis estruturados como `content.json + index.html` por `content_key`
+- Usa `contentBlueprints` como contrato dinâmico do domínio; o framework fixa a casca do conteúdo, não os campos internos
+- Quando o usuário pedir painel local da squad, deve apontar para os comandos oficiais `dashboard:*` do AIOS Lite, não procurar um app manualmente no workspace
 
 **Como ativar:**
 ```
@@ -309,6 +318,11 @@ npx aios-lite parallel:status
 - `genoma` = forma de pensar, lentes e repertório
 - `executor` = quem faz o trabalho
 - `subagente` = investigação temporária
+
+Quando uma skill vier do catálogo online ou de outro pacote, ela deve ser salva em:
+- `.aios-lite/squads/{slug}/skills/{dominio}/{skill-slug}.md`
+
+Depois disso, ela passa a ser parte real do pacote local da squad e deve ser considerada pelos agentes sob demanda.
 
 > Guia completo: [Squad e Genoma](./squad-genoma.md)
 

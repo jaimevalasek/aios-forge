@@ -65,8 +65,12 @@ module.exports = {
       'aios-lite dashboard:open [path] [--host=127.0.0.1] [--port=3000] [--url=<url>] [--dry-run] [--json] [--locale=pt-BR]',
     help_squad_status:
       'aios-lite squad:status [path] [--json] [--locale=pt-BR]',
+    help_squad_doctor:
+      'aios-lite squad:doctor [path] [--squad=<slug>] [--stale-minutes=5] [--json] [--locale=pt-BR]',
     help_runtime_init:
       'aios-lite runtime:init [path] [--json] [--locale=pt-BR]',
+    help_runtime_ingest:
+      'aios-lite runtime:ingest [path] [--squad=<slug>] [--agent=<nome>] [--session=<chave>] [--task=<chave>] [--json] [--locale=pt-BR]',
     help_runtime_task_start:
       'aios-lite runtime:task:start [path] --title=<texto> [--squad=<slug>] [--session=<chave>] [--goal=<texto>] [--by=<agente>] [--task=<chave>] [--json] [--locale=pt-BR]',
     help_runtime_start:
@@ -720,6 +724,7 @@ module.exports = {
     store_missing:
       'Runtime store nao encontrado: {path}. Execute: aios-lite runtime:init',
     init_ok: 'Runtime store inicializado: {path}',
+    ingest_ok: 'Conteudos indexados no runtime: {indexed} | ignorados: {skipped} ({path})',
     task_start_ok: 'Task iniciada: {task} ({path})',
     start_ok: 'Execucao iniciada: {run} ({path})',
     update_ok: 'Execucao atualizada: {run} ({path})',
@@ -754,6 +759,25 @@ module.exports = {
     latest_html: '    Latest HTML : {value}',
     logs: '    Logs        : {count} ({path})',
     genomes: '    Genomas     : {count} no squad / {agent_count} vinculos por agente'
+  },
+  squad_doctor: {
+    prefix_ok: 'OK',
+    prefix_warn: 'AVISO',
+    prefix_fail: 'FALHA',
+    report_title: 'Relatorio da squad {squad}: {path}',
+    check_line: '[{prefix}] {message}',
+    check_metadata: 'Metadata da squad presente: {path}',
+    check_manifest: 'Manifesto da squad presente: {path}',
+    check_rules: 'Rules/agents.md presente: {path}',
+    check_design_doc: 'Design doc da squad: {path}',
+    check_readiness: 'Readiness da squad: {path}',
+    check_executors: 'Executores declarados: {count} | arquivos ausentes: {missing}',
+    check_output_dir: 'Diretorio de output da squad: {path}',
+    check_media_dir: 'Diretorio de media da squad: {path}',
+    check_runtime_missing: 'Runtime store ausente. Execute aios-lite runtime:init.',
+    check_active_runs: 'Runs ativas: {count} | possivelmente travadas (> {minutes} min): {stale}',
+    check_content_indexing: 'Conteudos indexados: {indexed} | arquivos pendentes de indexacao: {pending}',
+    summary: 'Resumo -> checks OK: {passed} | avisos: {warned} | falhas: {failed}'
   },
   scan_project: {
     scanning: 'aios-lite scan:project — escaneando {dir}',

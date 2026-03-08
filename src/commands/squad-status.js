@@ -192,6 +192,90 @@ async function buildSquadRecordFromMetadata(targetDir, file) {
   };
 }
 
+async function buildSquadRecordFromPackageDir(targetDir, slug) {
+  const packageDir = path.join(targetDir, SQUADS_DIR, slug);
+  const manifestPath = path.join(packageDir, 'squad.manifest.json');
+  const summaryPath = path.join(packageDir, 'squad.md');
+  const manifestRaw = await fs.readFile(manifestPath, 'utf8').catch(() => null);
+  if (!manifestRaw) return null;
+
+  let manifest = null;
+  try {
+    manifest = JSON.parse(manifestRaw);
+  } catch {
+    manifest = null;
+  }
+  if (!manifest || typeof manifest !== 'object') return null;
+
+  const summaryContent = await fs.readFile(summaryPath, 'utf8').catch(() => null);
+  const rules = manifest.rules && typeof manifest.rules === 'object' ? manifest.rules : {};
+  const packageInfo = manifest.package && typeof manifest.package === 'object' ? manifest.package : {};
+  const agentsDir = normalizeRel(packageInfo.agentsDir || path.join(SQUADS_DIR, slug, 'agents'));
+  const outputDir = normalizeRel(rules.outputsDir || `${OUTPUT_ROOT}/${slug}`);
+  const logsDir = normalizeRel(rules.logsDir || `${normalizeRel(LOGS_ROOT)}/${slug}`);
+  const latestSession = normalizeRel(
+    extractField(summaryContent || '', 'LatestSession', 'Latest Session', 'UltimaSessao', 'DerniereSession') ||
+      `${OUTPUT_ROOT}/${slug}/latest.html`
+  );
+  const genomes = Array.isArray(manifest.genomes)
+    ? manifest.genomes
+        .map((item) => item?.slug)
+        .filter(Boolean)
+    : [];
+  const agentGenomes = Array.isArray(manifest.genomes)
+    ? manifest.genomes
+        .filter((item) => item?.agentSlug)
+        .map((item) => `${item.agentSlug}: ${item.slug}`)
+    : [];
+
+  const agents = await collectDirStats(targetDir, agentsDir, {
+    filter: (entry, stat) => stat.isFile() && entry.endsWith('.md')
+  });
+  const specialists = agents.entries.filter(
+    (entry) => entry.name !== 'orquestrador.md' && entry.name !== 'agents.md'
+  );
+
+  const sessions = await collectDirStats(targetDir, outputDir, {
+    filter: (entry, stat) => stat.isFile() && SESSION_HTML_RE.test(entry) && entry !== 'latest.html'
+  });
+  const logs = await collectDirStats(targetDir, logsDir, {
+    filter: (entry, stat) => stat.isFile()
+  });
+  const outputExists = await pathExists(path.join(targetDir, outputDir));
+  const latestHtml = latestSession
+    ? {
+        absPath: path.join(targetDir, latestSession),
+        mtime: (await fs.stat(path.join(targetDir, latestSession)).catch(() => null))?.mtime || null
+      }
+    : await getLatestHtml(path.join(targetDir, outputDir));
+  const manifestStat = await fs.stat(manifestPath).catch(() => null);
+
+  return {
+    slug,
+    file: `${slug}/squad.manifest.json`,
+    metadataPath: manifestPath,
+    squadName: String(manifest.name || slug),
+    mode: String(manifest.mode || 'content'),
+    goal: String(manifest.goal || '—'),
+    agentsDir,
+    outputDir,
+    logsDir,
+    genomes,
+    agentGenomes,
+    latestSession,
+    agentCount: agents.entries.length,
+    specialistCount: specialists.length,
+    sessionCount: sessions.entries.length,
+    logCount: logs.entries.length,
+    latestHtml: latestHtml
+      ? normalizeRel(path.relative(targetDir, latestHtml.absPath))
+      : outputExists && (await pathExists(path.join(targetDir, outputDir, 'session.html')))
+        ? normalizeRel(path.join(outputDir, 'session.html'))
+        : '—',
+    mtime: latestHtml?.mtime || manifestStat?.mtime || null
+  };
+}
+
 async function buildFallbackSquadRecords(targetDir, metadataSlugs) {
   const agentsRootAbs = path.join(targetDir, AGENTS_ROOT);
   const entries = await readDirNames(agentsRootAbs);
@@ -244,11 +328,24 @@ async function buildFallbackSquadRecords(targetDir, metadataSlugs) {
 async function runSquadStatus({ args, logger, t }) {
   const targetDir = path.resolve(process.cwd(), args[0] || '.');
   const squadsDir = path.join(targetDir, SQUADS_DIR);
-  const metadataEntries = await readDirNames(squadsDir);
-  const mdFiles = metadataEntries.filter((file) => file.endsWith('.md') && !SKIP_FILES.has(file));
+  const metadataEntries = await fs.readdir(squadsDir, { withFileTypes: true }).catch(() => []);
+  const packageDirs = metadataEntries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter(Boolean);
+  const mdFiles = metadataEntries
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((file) => file.endsWith('.md') && !SKIP_FILES.has(file));
 
   const squads = [];
+  for (const slug of packageDirs) {
+    const squad = await buildSquadRecordFromPackageDir(targetDir, slug);
+    if (squad) squads.push(squad);
+  }
+
   for (const file of mdFiles) {
+    if (packageDirs.includes(file.replace(/\.md$/, ''))) continue;
     const squad = await buildSquadRecordFromMetadata(targetDir, file);
     if (squad) squads.push(squad);
   }

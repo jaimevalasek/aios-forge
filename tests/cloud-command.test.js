@@ -60,7 +60,24 @@ function createSnapshot() {
       createdAt: new Date().toISOString(),
       designDocMarkdown: '# Design Doc - YouTube Creator\n\n## Objective\nCriar ativos editoriais.\n',
       readinessMarkdown: '# Readiness - YouTube Creator\n\n- Readiness score total: 18\n- Readiness level: medium\n',
-      manifestJson: null,
+      manifestJson: {
+        slug: 'youtube-creator',
+        mission: 'Criar ativos editoriais para YouTube.',
+        goal: 'Criar conteudo de video.',
+        visibility: 'private',
+        contentBlueprints: [
+          {
+            slug: 'pacote-editorial',
+            contentType: 'editorial-package',
+            layoutType: 'tabs',
+            description: 'Entrega principal do squad para videos.',
+            sections: [
+              { key: 'roteiro', label: 'Roteiro', blockTypes: ['hero', 'rich-text'] },
+              { key: 'apoios', label: 'Apoios', blockTypes: ['bullet-list', 'tags', 'accordion'] }
+            ]
+          }
+        ]
+      },
       agentsManifestJson: [
         {
           slug: 'orquestrador',
@@ -186,47 +203,53 @@ test('cloud:import:squad imports snapshot into .aios-lite/cloud-imports', async 
   assert.equal(imported.squad.slug, 'youtube-creator');
   assert.equal(imported.version.versionNumber, '1.0.0');
 
-  const metadataRaw = await fs.readFile(path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator.md'), 'utf8');
-  assert.match(metadataRaw, /Mode: CloudImport/);
-  assert.match(metadataRaw, /Agents: agents\/youtube-creator\//);
+  const metadataRaw = await fs.readFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'squad.md'),
+    'utf8'
+  );
+  assert.match(metadataRaw, /Package: \.aios-lite\/squads\/youtube-creator\//);
+  assert.match(metadataRaw, /Agents: \.aios-lite\/squads\/youtube-creator\/agents\//);
   assert.match(metadataRaw, /storytelling-retencao\.md/);
   assert.match(metadataRaw, /roteirista-viral: \.aios-lite\/genomas\/copy-ctr\.md/);
 
   const orchestratorRaw = await fs.readFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'orquestrador.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'orquestrador.md'),
     'utf8'
   );
   assert.match(orchestratorRaw, /Coordene as tarefas do squad/);
 
   const agentsManifestRaw = await fs.readFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'agents.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'agents.md'),
     'utf8'
   );
   assert.match(agentsManifestRaw, /## Squad skills/);
   assert.match(agentsManifestRaw, /## Squad MCPs/);
 
   const squadManifestRaw = await fs.readFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'squad.manifest.json'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'squad.manifest.json'),
     'utf8'
   );
   const squadManifest = JSON.parse(squadManifestRaw);
   assert.equal(squadManifest.slug, 'youtube-creator');
   assert.equal(squadManifest.rules.mediaDir, 'media/youtube-creator');
   assert.equal(Array.isArray(squadManifest.executors), true);
-  assert.equal(squadManifest.context.designDocPath, 'agents/youtube-creator/design-doc.md');
+  assert.equal(squadManifest.context.designDocPath, '.aios-lite/squads/youtube-creator/docs/design-doc.md');
+  assert.equal(squadManifest.contentBlueprints[0].slug, 'pacote-editorial');
+  assert.equal(squadManifest.contentBlueprints[0].sections[0].key, 'roteiro');
+  assert.deepEqual(squadManifest.contentBlueprints[0].sections[1].blockTypes, ['bullet-list', 'tags', 'accordion']);
 
   await assert.doesNotReject(() => fs.access(path.join(projectDir, 'media', 'youtube-creator')));
-  await assert.doesNotReject(() => fs.access(path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md')));
-  await assert.doesNotReject(() => fs.access(path.join(projectDir, 'agents', 'youtube-creator', 'readiness.md')));
+  await assert.doesNotReject(() => fs.access(path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs', 'design-doc.md')));
+  await assert.doesNotReject(() => fs.access(path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs', 'readiness.md')));
 
   const designDocRaw = await fs.readFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs', 'design-doc.md'),
     'utf8'
   );
   assert.match(designDocRaw, /Design Doc - YouTube Creator/);
 
   const stubRaw = await fs.readFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'roteirista-viral.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'roteirista-viral.md'),
     'utf8'
   );
   assert.match(stubRaw, /Imported from AIOS Lite Cloud/);
@@ -372,19 +395,21 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   const logger = createLogger();
   const { t } = createTranslator('pt-BR');
 
-  await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads'), { recursive: true });
+  await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents'), { recursive: true });
+  await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs'), { recursive: true });
   await fs.mkdir(path.join(projectDir, '.aios-lite', 'genomas'), { recursive: true });
-  await fs.mkdir(path.join(projectDir, 'agents', 'youtube-creator'), { recursive: true });
   await fs.mkdir(path.join(projectDir, 'media', 'youtube-creator'), { recursive: true });
 
   await fs.writeFile(
-    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'squad.md'),
     [
       'Squad: YouTube Creator',
       'Goal: Criar roteiros e assets',
-      'Agents: agents/youtube-creator/',
+      'Package: .aios-lite/squads/youtube-creator/',
+      'Agents: .aios-lite/squads/youtube-creator/agents/',
       'Output: output/youtube-creator/',
       'Logs: aios-logs/youtube-creator/',
+      'Media: media/youtube-creator/',
       '',
       'Genomes:',
       '- .aios-lite/genomas/storytelling-retencao.md',
@@ -397,7 +422,7 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   );
 
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'agents.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'agents.md'),
     [
       '# Squad YouTube Creator',
       '',
@@ -413,22 +438,24 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
     'utf8'
   );
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'design-doc.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs', 'design-doc.md'),
     '# Design Doc - YouTube Creator\n\n## Objective\nCriar roteiros e assets.\n',
     'utf8'
   );
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'readiness.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'docs', 'readiness.md'),
     '# Readiness - YouTube Creator\n\n- Readiness score total: 20\n- Readiness level: high\n',
     'utf8'
   );
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'squad.manifest.json'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'squad.manifest.json'),
     JSON.stringify(
       {
         schemaVersion: '1.0.0',
+        packageVersion: '1.0.0',
         slug: 'youtube-creator',
         name: 'YouTube Creator',
+        mode: 'content',
         mission: 'Criar ativos editoriais para YouTube.',
         goal: 'Criar roteiros e assets',
         visibility: 'private',
@@ -457,11 +484,31 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
           allowed: true,
           when: ['pesquisa ampla', 'comparação']
         },
+        contentBlueprints: [
+          {
+            slug: 'pacote-editorial',
+            contentType: 'editorial-package',
+            layoutType: 'tabs',
+            description: 'Entrega principal do squad.',
+            sections: [
+              {
+                key: 'roteiro',
+                label: 'Roteiro',
+                blockTypes: ['hero', 'rich-text']
+              },
+              {
+                key: 'apoios',
+                label: 'Apoios',
+                blockTypes: ['bullet-list', 'tags', 'accordion']
+              }
+            ]
+          }
+        ],
         context: {
           mode: 'project',
           summary: 'Squad para ativos editoriais do YouTube.',
-          designDocPath: 'agents/youtube-creator/design-doc.md',
-          readinessPath: 'agents/youtube-creator/readiness.md',
+          designDocPath: '.aios-lite/squads/youtube-creator/docs/design-doc.md',
+          readinessPath: '.aios-lite/squads/youtube-creator/docs/readiness.md',
           docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md'],
           readiness: {
             level: 'high',
@@ -474,7 +521,7 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
             slug: 'orquestrador',
             title: 'Orquestrador',
             role: 'Coordena o squad.',
-            file: 'agents/youtube-creator/orquestrador.md',
+            file: '.aios-lite/squads/youtube-creator/agents/orquestrador.md',
             skills: [],
             genomes: []
           },
@@ -482,7 +529,7 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
             slug: 'roteirista-viral',
             title: 'Roteirista Viral',
             role: 'Cria roteiros fortes.',
-            file: 'agents/youtube-creator/roteirista-viral.md',
+            file: '.aios-lite/squads/youtube-creator/agents/roteirista-viral.md',
             skills: ['roteiro-short-form'],
             genomes: ['copy-ctr']
           }
@@ -506,12 +553,12 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
     'utf8'
   );
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'orquestrador.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'orquestrador.md'),
     '# Orquestrador\n\nCoordena o squad.\n',
     'utf8'
   );
   await fs.writeFile(
-    path.join(projectDir, 'agents', 'youtube-creator', 'roteirista-viral.md'),
+    path.join(projectDir, '.aios-lite', 'squads', 'youtube-creator', 'agents', 'roteirista-viral.md'),
     '# Roteirista Viral\n\nCria roteiros fortes.\n',
     'utf8'
   );
@@ -560,7 +607,10 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   assert.equal(result.response.received.version.manifestJson.skills[0].slug, 'roteiro-short-form');
   assert.equal(result.response.received.version.manifestJson.mcps[0].slug, 'web-search');
   assert.equal(result.response.received.version.manifestJson.subagents.allowed, true);
-  assert.equal(result.response.received.version.manifestJson.context.designDocPath, 'agents/youtube-creator/design-doc.md');
+  assert.equal(result.response.received.version.manifestJson.contentBlueprints[0].slug, 'pacote-editorial');
+  assert.equal(result.response.received.version.manifestJson.contentBlueprints[0].sections[0].key, 'roteiro');
+  assert.deepEqual(result.response.received.version.manifestJson.contentBlueprints[0].sections[1].blockTypes, ['bullet-list', 'tags', 'accordion']);
+  assert.equal(result.response.received.version.manifestJson.context.designDocPath, '.aios-lite/squads/youtube-creator/docs/design-doc.md');
   assert.match(result.response.received.version.designDocMarkdown, /Design Doc - YouTube Creator/);
   assert.match(result.response.received.version.readinessMarkdown, /Readiness score total: 20/);
   assert.equal(result.response.received.version.genomesManifestJson.genomes.length, 2);

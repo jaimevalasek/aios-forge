@@ -231,14 +231,14 @@ const AGENT_DEFINITIONS = [
     path: '.aios-lite/agents/squad.md',
     dependsOn: [],
     output:
-      '.aios-lite/squads/{slug}.md + agents/{slug}/agents.md + agents/{slug}/squad.manifest.json + agents/{slug}/design-doc.md + agents/{slug}/readiness.md + agents/{slug}/ + output/{slug}/{session-id}.html + output/{slug}/latest.html + aios-logs/{slug}/ + media/{slug}/'
+      '.aios-lite/squads/{slug}/squad.manifest.json + .aios-lite/squads/{slug}/squad.md + .aios-lite/squads/{slug}/agents/ + .aios-lite/squads/{slug}/skills/ + .aios-lite/squads/{slug}/templates/ + .aios-lite/squads/{slug}/docs/ + output/{slug}/{session-id}.html + output/{slug}/{content-key}/content.json + output/{slug}/{content-key}/index.html + output/{slug}/latest.html + aios-logs/{slug}/ + media/{slug}/'
   },
   {
     id: 'genoma',
     command: '@genoma',
     path: '.aios-lite/agents/genoma.md',
     dependsOn: [],
-    output: '.aios-lite/genomas/[slug].md + optional binding in .aios-lite/squads/{slug}.md'
+    output: '.aios-lite/genomas/[slug].md + optional binding in .aios-lite/squads/{slug}/squad.md or .aios-lite/squads/{slug}/squad.manifest.json'
   }
 ];
 
