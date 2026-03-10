@@ -152,6 +152,34 @@ Instead:
 - explicitly instruct the user to call `@genoma`
 - apply the genome afterward to the squad or to specific agents
 
+## Genome audit trail
+
+When a genome is applied to a squad or executor, record it in `squad.manifest.json`:
+
+```json
+"genomes": [
+  {
+    "slug": "genome-slug",
+    "scope": "squad",
+    "appliedAt": "2026-03-10T15:30:00Z",
+    "version": "1.0.0",
+    "hash": "<sha256 of first 500 chars of genome content>",
+    "affectedExecutors": ["writer", "editor"]
+  }
+]
+```
+
+Also record in `squad.md` (metadata textual):
+```
+Genomes:
+- genome-slug (v1.0.0) — applied 2026-03-10 — affects: writer, editor
+```
+
+When applying a genome that was already applied before:
+- Compare hash — if different, it is an update
+- Show semantic diff: "genome-slug changed: added section X, removed constraint Y"
+- Ask for confirmation before rewriting any executor files
+
 ## Agent generation
 
 After gathering information, determine **3–5 specialized roles** the domain requires.

@@ -198,3 +198,23 @@ test('semantic deep - readiness contradiction warns', async () => {
   const result = await runSquadValidate({ args: [dir], options: { squad: slug }, logger });
   assert.ok(result.warnings.some(w => w.includes('blocker')));
 });
+
+// --- Fase 4: Legacy squad handling ---
+
+test('validate handles squad without manifest gracefully', async () => {
+  const dir = await makeTempDir();
+  const slug = 'legacy-squad';
+  // Create squad directory structure without manifest
+  const squadDir = path.join(dir, '.aios-lite', 'squads', slug);
+  await fs.mkdir(path.join(squadDir, 'agents'), { recursive: true });
+  await fs.writeFile(path.join(squadDir, 'agents', 'agents.md'), '# Squad\n');
+  await fs.writeFile(path.join(squadDir, 'agents', 'writer.md'), '# Writer\n');
+  // NO squad.manifest.json
+  const logger = createCollectLogger();
+  const result = await runSquadValidate({ args: [dir], options: { squad: slug }, logger });
+  // Should fail gracefully — not throw
+  assert.ok(!result.valid);
+  assert.ok(result.errors.length > 0);
+  // Error should mention manifest not found
+  assert.ok(result.errors.some(e => e.includes('Manifest') || e.includes('manifest') || e.includes('invalid')));
+});

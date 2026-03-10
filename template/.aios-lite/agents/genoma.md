@@ -143,6 +143,26 @@ skills: [count]
 - SKILL: [skill-name] — [description]
 ```
 
+## Dry-run mode
+
+When the user requests `@genoma apply <genome> --dry-run` or `@genoma apply <genome> to <squad> --preview`:
+
+1. Do NOT modify any file
+2. Show which executors would be affected
+3. For each affected executor, show a concise diff:
+   - Sections that would be added to the .md file
+   - Constraints that would change
+   - Skills that would be added
+4. Show the manifest state after the hypothetical application
+5. Ask: "Apply these changes? [Y/n]"
+
+## Post-genome validation
+
+After applying any genome to a squad:
+1. Read `.aios-lite/tasks/squad-validate.md` and execute mentally
+2. If validation fails: show the problems and suggest corrections
+3. If validation passes: confirm "Squad <slug> validated after genome application ✅"
+
 ## Hard constraints
 
 - Do NOT fabricate domain facts — use LLM knowledge honestly.
