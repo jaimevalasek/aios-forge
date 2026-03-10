@@ -155,5 +155,37 @@
       }
     }
   },
+  "ports": {
+    "type": "object",
+    "description": "Declaração de inputs e outputs para conexão inter-squad",
+    "properties": {
+      "inputs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["key"],
+          "properties": {
+            "key": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+            "dataType": { "type": "string", "enum": ["text", "json", "file", "file-list", "any"], "default": "any" },
+            "description": { "type": "string" },
+            "required": { "type": "boolean", "default": false }
+          }
+        }
+      },
+      "outputs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["key"],
+          "properties": {
+            "key": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+            "dataType": { "type": "string", "enum": ["text", "json", "file", "file-list", "any"], "default": "any" },
+            "description": { "type": "string" },
+            "contentBlueprintSlug": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
   "additionalProperties": true
 }

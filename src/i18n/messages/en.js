@@ -69,6 +69,8 @@ module.exports = {
       'aios-lite squad:validate [path] --squad=<slug> [--locale=en]',
     help_squad_export:
       'aios-lite squad:export [path] --squad=<slug> [--locale=en]',
+    help_squad_pipeline:
+      'aios-lite squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=en]',
     help_runtime_init:
       'aios-lite runtime:init [path] [--json] [--locale=en]',
     help_runtime_ingest:

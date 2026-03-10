@@ -62,6 +62,8 @@ module.exports = {
       'aios-lite squad:validate [path] --squad=<slug> [--locale=es]',
     help_squad_export:
       'aios-lite squad:export [path] --squad=<slug> [--locale=es]',
+    help_squad_pipeline:
+      'aios-lite squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=es]',
     unknown_command: 'Comando desconocido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Error: {message}'

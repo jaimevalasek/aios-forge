@@ -71,6 +71,8 @@ If the user includes a subcommand, route to the corresponding task:
 - `@squad extend <slug>` → read and execute `.aios-lite/tasks/squad-extend.md` (Fase 3)
 - `@squad repair <slug>` → read and execute `.aios-lite/tasks/squad-repair.md` (Fase 4)
 - `@squad export <slug>` → read and execute `.aios-lite/tasks/squad-export.md` (Fase 3)
+- `@squad pipeline <sub> [args]` → read and execute `.aios-lite/tasks/squad-pipeline.md`
+- `@squad create --from-artisan <id>` → read artisan PRD and use as blueprint source (see Artisan integration below)
 
 If no subcommand is given (just `@squad` or `@squad` with freeform text):
 → Run the full flow: design → create → validate in sequence.
@@ -151,6 +153,20 @@ Instead:
 - finish or confirm squad creation
 - explicitly instruct the user to call `@genoma`
 - apply the genome afterward to the squad or to specific agents
+
+## Artisan integration
+
+When the user provides `--from-artisan <id>`:
+
+1. Look for the artisan PRD at `.aios-lite/squads/.artisan/<id>.md` (filesystem fallback)
+2. If not found there, check the project SQLite database (table: `artisan_squads`, column: `prd_markdown`)
+3. Read the Squad PRD markdown
+4. Use it as input for the design phase — skip the initial questions since the PRD already has them answered
+5. Extract: domain, goal, mode, proposed executors, skills, constraints, content blueprints
+6. Generate the blueprint from the PRD content
+7. Show: "Lendo PRD do Artisan `<id>`. Posso gerar o blueprint com base nele — quer ajustar algo antes?"
+8. Proceed with create → validate as normal
+9. After successful creation, if the artisan record is accessible, update its status to `created`
 
 ## Genome audit trail
 

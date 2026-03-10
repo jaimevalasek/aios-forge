@@ -13,7 +13,16 @@
 
 ## Processo
 
-### Passo 0 — Verificar templates disponíveis
+### Passo 0 — Verificar artisan input e templates disponíveis
+
+Se o usuário forneceu `--from-artisan <id>`:
+1. Procure `.aios-lite/squads/.artisan/<id>.md`
+2. Se encontrar, leia o Squad PRD
+3. Extraia: domain, goal, mode, executors propostos, skills, constraints, content blueprints
+4. Use como base para o blueprint — pule para o Passo 5 (calcular readiness)
+5. Mostre ao usuário: "Li o PRD do Artisan. Posso gerar o blueprint com base nele — quer ajustar algo?"
+
+Caso contrário, verifique templates:
 Verifique se existe `.aios-lite/templates/squads/`. Se existir, liste os templates disponíveis e pergunte:
 "Quer partir de um template? Opções: content-basic, research-analysis, software-delivery, media-channel — ou começar do zero."
 Se o usuário escolher um template, leia o `template.json` e use como base para o blueprint (executores, content blueprints, mode).

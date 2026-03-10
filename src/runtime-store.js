@@ -220,6 +220,100 @@ async function openRuntimeDb(targetDir, options = {}) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_squad_analyses_squad ON squad_analyses(squad_slug, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS squad_ports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      port_type TEXT NOT NULL CHECK(port_type IN ('input', 'output')),
+      port_key TEXT NOT NULL,
+      data_type TEXT DEFAULT 'any',
+      description TEXT,
+      required INTEGER DEFAULT 0,
+      content_blueprint_slug TEXT,
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug),
+      UNIQUE(squad_slug, port_type, port_key)
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_pipelines (
+      slug TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      status TEXT DEFAULT 'draft' CHECK(status IN ('draft', 'active', 'paused', 'archived')),
+      trigger_mode TEXT DEFAULT 'manual' CHECK(trigger_mode IN ('manual', 'on_output', 'scheduled')),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS pipeline_nodes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pipeline_slug TEXT NOT NULL,
+      squad_slug TEXT NOT NULL,
+      position_x REAL DEFAULT 0,
+      position_y REAL DEFAULT 0,
+      config_json TEXT,
+      FOREIGN KEY (pipeline_slug) REFERENCES squad_pipelines(slug),
+      FOREIGN KEY (squad_slug) REFERENCES squads(squad_slug),
+      UNIQUE(pipeline_slug, squad_slug)
+    );
+
+    CREATE TABLE IF NOT EXISTS pipeline_edges (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pipeline_slug TEXT NOT NULL,
+      source_squad TEXT NOT NULL,
+      source_port TEXT NOT NULL,
+      target_squad TEXT NOT NULL,
+      target_port TEXT NOT NULL,
+      transform_json TEXT,
+      FOREIGN KEY (pipeline_slug) REFERENCES squad_pipelines(slug)
+    );
+
+    CREATE TABLE IF NOT EXISTS squad_handoffs (
+      id TEXT PRIMARY KEY,
+      pipeline_slug TEXT,
+      from_squad TEXT NOT NULL,
+      from_port TEXT NOT NULL,
+      to_squad TEXT NOT NULL,
+      to_port TEXT NOT NULL,
+      payload_json TEXT,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'consumed', 'failed', 'expired')),
+      created_at TEXT NOT NULL,
+      consumed_at TEXT,
+      FOREIGN KEY (from_squad) REFERENCES squads(squad_slug),
+      FOREIGN KEY (to_squad) REFERENCES squads(squad_slug)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_squad_pipelines_status ON squad_pipelines(status, updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_pipeline_nodes_pipeline ON pipeline_nodes(pipeline_slug);
+    CREATE INDEX IF NOT EXISTS idx_pipeline_edges_pipeline ON pipeline_edges(pipeline_slug);
+    CREATE INDEX IF NOT EXISTS idx_squad_handoffs_to ON squad_handoffs(to_squad, status, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS artisan_squads (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      status TEXT DEFAULT 'draft' CHECK(status IN ('draft', 'refining', 'ready', 'created', 'archived')),
+      domain TEXT,
+      goal TEXT,
+      mode TEXT DEFAULT 'content',
+      prd_markdown TEXT,
+      summary TEXT,
+      confidence REAL DEFAULT 0,
+      tags_json TEXT DEFAULT '[]',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS artisan_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      artisan_id TEXT NOT NULL,
+      role TEXT NOT NULL CHECK(role IN ('user', 'assistant', 'system')),
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (artisan_id) REFERENCES artisan_squads(id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_artisan_squads_status ON artisan_squads(status, updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_artisan_messages_artisan ON artisan_messages(artisan_id, created_at ASC);
   `);
 
   ensureLegacyColumns(db);
@@ -597,6 +691,208 @@ function upsertSquadManifest(db, options) {
   }
 
   return slug;
+}
+
+// ─── Pipeline CRUD ────────────────────────────────────────────────────────────
+
+function upsertPipeline(db, options) {
+  const now = nowIso();
+  const slug = String(options.slug).trim();
+  db.prepare(`
+    INSERT INTO squad_pipelines (slug, name, description, status, trigger_mode, created_at, updated_at)
+    VALUES (@slug, @name, @description, @status, @trigger_mode, @created_at, @updated_at)
+    ON CONFLICT(slug) DO UPDATE SET
+      name = excluded.name,
+      description = COALESCE(excluded.description, description),
+      status = excluded.status,
+      trigger_mode = excluded.trigger_mode,
+      updated_at = excluded.updated_at
+  `).run({
+    slug,
+    name: String(options.name || slug).trim(),
+    description: options.description ? String(options.description).trim() : null,
+    status: String(options.status || 'draft').trim(),
+    trigger_mode: String(options.triggerMode || 'manual').trim(),
+    created_at: now,
+    updated_at: now
+  });
+  return slug;
+}
+
+function addPipelineNode(db, options) {
+  db.prepare(`
+    INSERT INTO pipeline_nodes (pipeline_slug, squad_slug, position_x, position_y, config_json)
+    VALUES (@pipeline_slug, @squad_slug, @position_x, @position_y, @config_json)
+    ON CONFLICT(pipeline_slug, squad_slug) DO UPDATE SET
+      position_x = excluded.position_x,
+      position_y = excluded.position_y,
+      config_json = COALESCE(excluded.config_json, config_json)
+  `).run({
+    pipeline_slug: String(options.pipelineSlug).trim(),
+    squad_slug: String(options.squadSlug).trim(),
+    position_x: Number(options.positionX || 0),
+    position_y: Number(options.positionY || 0),
+    config_json: options.config ? JSON.stringify(options.config) : null
+  });
+}
+
+function updateNodePosition(db, options) {
+  db.prepare(`
+    UPDATE pipeline_nodes SET position_x = @position_x, position_y = @position_y
+    WHERE pipeline_slug = @pipeline_slug AND squad_slug = @squad_slug
+  `).run({
+    pipeline_slug: String(options.pipelineSlug).trim(),
+    squad_slug: String(options.squadSlug).trim(),
+    position_x: Number(options.positionX || 0),
+    position_y: Number(options.positionY || 0)
+  });
+}
+
+function addPipelineEdge(db, options) {
+  db.prepare(`
+    INSERT INTO pipeline_edges (pipeline_slug, source_squad, source_port, target_squad, target_port, transform_json)
+    VALUES (@pipeline_slug, @source_squad, @source_port, @target_squad, @target_port, @transform_json)
+  `).run({
+    pipeline_slug: String(options.pipelineSlug).trim(),
+    source_squad: String(options.sourceSquad).trim(),
+    source_port: String(options.sourcePort).trim(),
+    target_squad: String(options.targetSquad).trim(),
+    target_port: String(options.targetPort).trim(),
+    transform_json: options.transform ? JSON.stringify(options.transform) : null
+  });
+}
+
+function removePipelineEdge(db, id) {
+  db.prepare('DELETE FROM pipeline_edges WHERE id = ?').run(id);
+}
+
+function getPipelineDAG(db, pipelineSlug) {
+  const pipeline = db.prepare('SELECT * FROM squad_pipelines WHERE slug = ?').get(pipelineSlug);
+  if (!pipeline) return null;
+  const nodes = db.prepare('SELECT * FROM pipeline_nodes WHERE pipeline_slug = ?').all(pipelineSlug);
+  const edges = db.prepare('SELECT * FROM pipeline_edges WHERE pipeline_slug = ?').all(pipelineSlug);
+  return { pipeline, nodes, edges };
+}
+
+function listPipelines(db) {
+  return db.prepare('SELECT * FROM squad_pipelines ORDER BY updated_at DESC').all();
+}
+
+function upsertSquadPorts(db, squadSlug, ports) {
+  db.prepare('DELETE FROM squad_ports WHERE squad_slug = ?').run(squadSlug);
+  const insert = db.prepare(`
+    INSERT INTO squad_ports (squad_slug, port_type, port_key, data_type, description, required, content_blueprint_slug)
+    VALUES (@squad_slug, @port_type, @port_key, @data_type, @description, @required, @content_blueprint_slug)
+  `);
+  const all = [...(ports.inputs || []).map(p => ({ ...p, type: 'input' })), ...(ports.outputs || []).map(p => ({ ...p, type: 'output' }))];
+  for (const port of all) {
+    insert.run({
+      squad_slug: String(squadSlug).trim(),
+      port_type: port.type,
+      port_key: String(port.key).trim(),
+      data_type: String(port.dataType || 'any').trim(),
+      description: port.description ? String(port.description).trim() : null,
+      required: port.required ? 1 : 0,
+      content_blueprint_slug: port.contentBlueprintSlug ? String(port.contentBlueprintSlug).trim() : null
+    });
+  }
+}
+
+function getTopologicalOrder(db, pipelineSlug) {
+  const nodes = db.prepare('SELECT squad_slug FROM pipeline_nodes WHERE pipeline_slug = ?').all(pipelineSlug);
+  const edges = db.prepare('SELECT source_squad, target_squad FROM pipeline_edges WHERE pipeline_slug = ?').all(pipelineSlug);
+
+  const slugs = nodes.map(n => n.squad_slug);
+  const inDegree = Object.fromEntries(slugs.map(s => [s, 0]));
+  const adj = Object.fromEntries(slugs.map(s => [s, []]));
+
+  for (const { source_squad, target_squad } of edges) {
+    if (adj[source_squad] !== undefined && inDegree[target_squad] !== undefined) {
+      adj[source_squad].push(target_squad);
+      inDegree[target_squad]++;
+    }
+  }
+
+  const queue = slugs.filter(s => inDegree[s] === 0);
+  const order = [];
+
+  while (queue.length > 0) {
+    const node = queue.shift();
+    order.push(node);
+    for (const neighbor of (adj[node] || [])) {
+      inDegree[neighbor]--;
+      if (inDegree[neighbor] === 0) queue.push(neighbor);
+    }
+  }
+
+  return order.length === slugs.length ? order : null; // null = cycle detected
+}
+
+// ─── Artisan CRUD ─────────────────────────────────────────────────────────────
+
+function createArtisanSquad(db, options) {
+  const now = nowIso();
+  const id = options.id || `artisan-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const slug = options.slug || id;
+  db.prepare(`
+    INSERT INTO artisan_squads (id, slug, title, status, domain, goal, mode, prd_markdown, summary, confidence, tags_json, created_at, updated_at)
+    VALUES (@id, @slug, @title, @status, @domain, @goal, @mode, @prd_markdown, @summary, @confidence, @tags_json, @created_at, @updated_at)
+  `).run({
+    id, slug,
+    title: options.title || 'Nova ideia',
+    status: 'draft',
+    domain: options.domain || null,
+    goal: options.goal || null,
+    mode: options.mode || 'content',
+    prd_markdown: options.prdMarkdown || null,
+    summary: options.summary || null,
+    confidence: options.confidence || 0,
+    tags_json: JSON.stringify(options.tags || []),
+    created_at: now, updated_at: now
+  });
+  return id;
+}
+
+function updateArtisanSquad(db, id, updates) {
+  const now = nowIso();
+  const existing = db.prepare('SELECT id FROM artisan_squads WHERE id = ?').get(id);
+  if (!existing) throw new Error(`Artisan squad not found: ${id}`);
+  const fields = [];
+  const values = { id, updated_at: now };
+  const allowed = ['title', 'status', 'domain', 'goal', 'mode', 'prd_markdown', 'summary', 'confidence', 'tags_json'];
+  for (const key of allowed) {
+    if (Object.prototype.hasOwnProperty.call(updates, key)) {
+      fields.push(`${key} = @${key}`);
+      values[key] = updates[key];
+    }
+  }
+  if (fields.length === 0) return;
+  db.prepare(`UPDATE artisan_squads SET ${fields.join(', ')}, updated_at = @updated_at WHERE id = @id`).run(values);
+}
+
+function getArtisanSquad(db, id) {
+  return db.prepare('SELECT * FROM artisan_squads WHERE id = ?').get(id) || null;
+}
+
+function listArtisanSquads(db) {
+  return db.prepare('SELECT * FROM artisan_squads ORDER BY updated_at DESC').all();
+}
+
+function deleteArtisanSquad(db, id) {
+  db.prepare('DELETE FROM artisan_messages WHERE artisan_id = ?').run(id);
+  db.prepare('DELETE FROM artisan_squads WHERE id = ?').run(id);
+}
+
+function addArtisanMessage(db, artisanId, role, content) {
+  const now = nowIso();
+  db.prepare(`
+    INSERT INTO artisan_messages (artisan_id, role, content, created_at)
+    VALUES (@artisan_id, @role, @content, @created_at)
+  `).run({ artisan_id: artisanId, role, content, created_at: now });
+}
+
+function getArtisanMessages(db, artisanId) {
+  return db.prepare('SELECT * FROM artisan_messages WHERE artisan_id = ? ORDER BY created_at ASC').all(artisanId);
 }
 
 function insertSquadAnalysis(db, options) {
@@ -1025,5 +1321,23 @@ module.exports = {
   createTaskKey,
   logAgentEvent,
   readAgentSession,
-  clearAgentSession
+  clearAgentSession,
+  // Pipeline CRUD
+  upsertPipeline,
+  addPipelineNode,
+  updateNodePosition,
+  addPipelineEdge,
+  removePipelineEdge,
+  getPipelineDAG,
+  listPipelines,
+  upsertSquadPorts,
+  getTopologicalOrder,
+  // Artisan CRUD
+  createArtisanSquad,
+  updateArtisanSquad,
+  getArtisanSquad,
+  listArtisanSquads,
+  deleteArtisanSquad,
+  addArtisanMessage,
+  getArtisanMessages
 };

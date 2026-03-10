@@ -110,7 +110,8 @@ const MANAGED_FILES = [
   '.aios-lite/tasks/squad-analyze.md',
   '.aios-lite/tasks/squad-extend.md',
   '.aios-lite/tasks/squad-export.md',
-  '.aios-lite/tasks/squad-repair.md'
+  '.aios-lite/tasks/squad-repair.md',
+  '.aios-lite/tasks/squad-pipeline.md'
 ];
 
 const REQUIRED_FILES = [
