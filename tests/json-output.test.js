@@ -246,6 +246,89 @@ test('cloud:publish:genome --dry-run --json returns structured payload without h
   assert.equal(parsed.dryRun, true);
 });
 
+test('genome:doctor --json returns compatible genome diagnosis', async () => {
+  const dir = await makeTempDir();
+  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  await fs.mkdir(genomeDir, { recursive: true });
+  await fs.writeFile(
+    path.join(genomeDir, 'legacy-copy.md'),
+    '---\ngenome: legacy-copy\ntype: domain\n---\n\n# Genome: Legacy Copy\n\n## O que saber\n\n- Oferta\n',
+    'utf8'
+  );
+
+  const cli = await runCli([
+    'genome:doctor',
+    path.join(genomeDir, 'legacy-copy.md'),
+    '--json'
+  ]);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.detectedFormat, 'legacy-markdown');
+  assert.equal(parsed.migrated, true);
+  assert.equal(parsed.slug, 'legacy-copy');
+});
+
+test('genome:migrate --json returns dry-run payload without mutating files', async () => {
+  const dir = await makeTempDir();
+  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const target = path.join(genomeDir, 'legacy-copy.md');
+  await fs.mkdir(genomeDir, { recursive: true });
+  const original = '---\ngenome: legacy-copy\ntype: domain\n---\n\n# Genome: Legacy Copy\n\n## O que saber\n\n- Oferta\n';
+  await fs.writeFile(target, original, 'utf8');
+
+  const cli = await runCli([
+    'genome:migrate',
+    target,
+    '--json'
+  ]);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.kind, 'file');
+  assert.equal(parsed.dryRun, true);
+  assert.equal(parsed.changed, true);
+  const after = await fs.readFile(target, 'utf8');
+  assert.equal(after, original);
+});
+
+test('squad:repair-genomes --json returns dry-run payload without mutating manifest', async () => {
+  const dir = await makeTempDir();
+  const manifestPath = path.join(dir, 'legacy.manifest.json');
+  const original = JSON.stringify(
+    {
+      slug: 'legacy-squad',
+      genomes: ['growth-marketing'],
+      executors: [
+        {
+          slug: 'writer',
+          genomes: ['copywriter-direct-response']
+        }
+      ]
+    },
+    null,
+    2
+  );
+  await fs.writeFile(manifestPath, original, 'utf8');
+
+  const cli = await runCli([
+    'squad:repair-genomes',
+    manifestPath,
+    '--json'
+  ]);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.dryRun, true);
+  assert.equal(parsed.changed, true);
+  assert.equal(typeof parsed.after.genomeBindings, 'object');
+  const after = await fs.readFile(manifestPath, 'utf8');
+  assert.equal(after, original);
+});
+
 test('cloud:publish:squad --dry-run --json returns structured payload without human logs', async () => {
   const dir = await makeTempDir();
   await fs.mkdir(path.join(dir, '.aios-lite', 'squads'), { recursive: true });

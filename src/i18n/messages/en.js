@@ -55,6 +55,10 @@ module.exports = {
       'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=en]',
     help_config:
       'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=en]',
+    help_genome_doctor:
+      'aios-lite genome:doctor <file> [--json] [--locale=en]',
+    help_genome_migrate:
+      'aios-lite genome:migrate <file-or-dir> [--write] [--no-backup] [--json] [--locale=en]',
     help_dashboard_init:
       'aios-lite dashboard:init [path] [--dir=<path>] [--repo=<git-url>] [--project-name=<name>] [--skip-install] [--dry-run] [--json] [--locale=en]',
     help_dashboard_dev:
@@ -65,6 +69,8 @@ module.exports = {
       'aios-lite squad:status [path] [--json] [--locale=en]',
     help_squad_doctor:
       'aios-lite squad:doctor [path] [--squad=<slug>] [--stale-minutes=5] [--json] [--locale=en]',
+    help_squad_repair_genomes:
+      'aios-lite squad:repair-genomes <manifest.json> [--write] [--no-backup] [--json] [--locale=en]',
     help_squad_validate:
       'aios-lite squad:validate [path] --squad=<slug> [--locale=en]',
     help_squad_export:

@@ -1,0 +1,17 @@
+{
+  "slug": "content-growth-squad",
+  "name": "Content Growth Squad",
+  "genomes": [
+    "growth-marketing",
+    "copywriter-direct-response"
+  ],
+  "executors": [
+    {
+      "slug": "lead-copy",
+      "title": "Lead Copy",
+      "genomes": [
+        "copywriter-direct-response"
+      ]
+    }
+  ]
+}

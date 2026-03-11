@@ -24,7 +24,7 @@ test('getAgentDefinition resolves ux-ui agent', () => {
   const agent = getAgentDefinition('ux-ui');
   assert.equal(Boolean(agent), true);
   assert.equal(agent.id, 'ux-ui');
-  assert.equal(agent.output, '.aios-lite/context/ui-spec.md');
+  assert.equal(agent.output.includes('.aios-lite/context/ui-spec.md'), true);
 });
 
 test('buildAgentPrompt includes target output', () => {

@@ -31,8 +31,11 @@ const { runQaScan } = require('./commands/qa-scan');
 const { runQaReport } = require('./commands/qa-report');
 const { runScanProject } = require('./commands/scan-project');
 const { runConfig } = require('./commands/config');
+const { runGenomeDoctor } = require('./commands/genome-doctor');
+const { runGenomeMigrate } = require('./commands/genome-migrate');
 const { runSquadStatus } = require('./commands/squad-status');
 const { runSquadDoctor } = require('./commands/squad-doctor');
+const { runSquadRepairGenomes } = require('./commands/squad-repair-genomes');
 const { runSquadValidate } = require('./commands/squad-validate');
 const { runSquadExport } = require('./commands/squad-export');
 const { runSquadPipeline } = require('./commands/squad-pipeline');
@@ -121,6 +124,10 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'scan:project',
   'scan-project',
   'config',
+  'genome:doctor',
+  'genome-doctor',
+  'genome:migrate',
+  'genome-migrate',
   'dashboard:init',
   'dashboard-init',
   'dashboard:dev',
@@ -131,6 +138,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'squad-status',
   'squad:doctor',
   'squad-doctor',
+  'squad:repair-genomes',
+  'squad-repair-genomes',
   'squad:validate',
   'squad-validate',
   'squad:export',
@@ -231,11 +240,14 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_qa_report');
   logHelpLine(t, logger, 'cli.help_scan_project');
   logHelpLine(t, logger, 'cli.help_config');
+  logHelpLine(t, logger, 'cli.help_genome_doctor');
+  logHelpLine(t, logger, 'cli.help_genome_migrate');
   logHelpLine(t, logger, 'cli.help_dashboard_init');
   logHelpLine(t, logger, 'cli.help_dashboard_dev');
   logHelpLine(t, logger, 'cli.help_dashboard_open');
   logHelpLine(t, logger, 'cli.help_squad_status');
   logHelpLine(t, logger, 'cli.help_squad_doctor');
+  logHelpLine(t, logger, 'cli.help_squad_repair_genomes');
   logHelpLine(t, logger, 'cli.help_squad_validate');
   logHelpLine(t, logger, 'cli.help_squad_export');
   logHelpLine(t, logger, 'cli.help_squad_pipeline');
@@ -368,6 +380,10 @@ async function main() {
       result = await runScanProject({ args, options, logger: commandLogger, t });
     } else if (command === 'config') {
       result = await runConfig({ args, options, logger: commandLogger, t });
+    } else if (command === 'genome:doctor' || command === 'genome-doctor') {
+      result = await runGenomeDoctor({ args, options, logger: commandLogger, t });
+    } else if (command === 'genome:migrate' || command === 'genome-migrate') {
+      result = await runGenomeMigrate({ args, options, logger: commandLogger, t });
     } else if (command === 'dashboard:init' || command === 'dashboard-init') {
       result = await runDashboardInit({ args, options, logger: commandLogger, t });
     } else if (command === 'dashboard:dev' || command === 'dashboard-dev') {
@@ -378,6 +394,8 @@ async function main() {
       result = await runSquadStatus({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:doctor' || command === 'squad-doctor') {
       result = await runSquadDoctor({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:repair-genomes' || command === 'squad-repair-genomes') {
+      result = await runSquadRepairGenomes({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:validate' || command === 'squad-validate') {
       result = await runSquadValidate({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:export' || command === 'squad-export') {

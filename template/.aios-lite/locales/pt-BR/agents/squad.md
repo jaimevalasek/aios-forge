@@ -147,6 +147,15 @@ Em vez disso:
 - oriente explicitamente o usuário a chamar `@genoma`
 - depois aplique o genoma ao squad ou a agentes específicos
 
+## Compatibilidade de genomas em squads existentes
+
+- Ao inspecionar ou modificar uma squad existente, aceite tanto `genomes` legados quanto `genomeBindings` normalizados.
+- Quando encontrar apenas `genomes`, interprete isso como vínculos persistentes no nível do squad.
+- Quando encontrar `genomeBindings`, priorize essa estrutura como fonte principal.
+- Nesta fase de migração, não apague automaticamente `genomes` legados do manifesto.
+- Se o usuário pedir repair ou normalize, materialize `genomeBindings` preservando os dados anteriores.
+- Ao aplicar novos genomas, escreva na estrutura normalizada mais nova, mantendo leitura compatível com a estrutura antiga.
+
 ## Geracao de agentes
 
 Após coletar as informações, determine **3–5 papéis especializados** que o domínio requer.

@@ -27,34 +27,51 @@ function createCollectLogger() {
 }
 
 async function createSquadSkeleton(dir, slug) {
-  await fs.mkdir(path.join(dir, '.aios-lite', 'squads'), { recursive: true });
-  await fs.mkdir(path.join(dir, 'agents', slug), { recursive: true });
+  const squadDir = path.join(dir, '.aios-lite', 'squads', slug);
+  await fs.mkdir(path.join(squadDir, 'agents'), { recursive: true });
+  await fs.mkdir(path.join(squadDir, 'docs'), { recursive: true });
   await fs.mkdir(path.join(dir, 'output', slug), { recursive: true });
   await fs.mkdir(path.join(dir, 'media', slug), { recursive: true });
+  await fs.writeFile(path.join(dir, 'CLAUDE.md'), `# Workspace\n\n${slug}\n`, 'utf8');
+  await fs.writeFile(path.join(dir, 'AGENTS.md'), `# Workspace\n\n${slug}\n`, 'utf8');
 
   await fs.writeFile(
-    path.join(dir, '.aios-lite', 'squads', `${slug}.md`),
-    `Squad: ${slug}\nMode: Squad\nGoal: Gerar conteudos\nAgents: agents/${slug}/\nOutput: output/${slug}/\nLogs: aios-logs/${slug}/\n`,
+    path.join(squadDir, 'squad.md'),
+    `Squad: ${slug}\nMode: Squad\nGoal: Gerar conteudos\nAgents: .aios-lite/squads/${slug}/agents/\nOutput: output/${slug}/\nLogs: aios-logs/${slug}/\n`,
     'utf8'
   );
-  await fs.writeFile(path.join(dir, 'agents', slug, 'agents.md'), '# Rules\n', 'utf8');
-  await fs.writeFile(path.join(dir, 'agents', slug, 'design-doc.md'), '# Design doc\n', 'utf8');
-  await fs.writeFile(path.join(dir, 'agents', slug, 'readiness.md'), '# Readiness\n', 'utf8');
-  await fs.writeFile(path.join(dir, 'agents', slug, 'orquestrador.md'), '# Orquestrador\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'agents', 'agents.md'), '# Rules\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'docs', 'design-doc.md'), '# Design doc\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'docs', 'readiness.md'), '# Readiness\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'agents', 'orquestrador.md'), '# Orquestrador\n', 'utf8');
   await fs.writeFile(
-    path.join(dir, 'agents', slug, 'squad.manifest.json'),
+    path.join(squadDir, 'squad.manifest.json'),
     JSON.stringify(
       {
+        schemaVersion: '1.0.0',
         slug,
+        name: 'Composicao Gospel',
+        mode: 'content',
+        mission: 'Gerar conteudos musicais',
+        goal: 'Publicar letras e estruturas',
         rules: {
           outputsDir: `output/${slug}`,
+          logsDir: `aios-logs/${slug}`,
           mediaDir: `media/${slug}`
         },
+        skills: [
+          {
+            slug: 'coord',
+            title: 'Coordenação'
+          }
+        ],
         executors: [
           {
             slug: 'orquestrador',
             title: 'Orquestrador',
-            file: `agents/${slug}/orquestrador.md`
+            role: 'Coordena a squad',
+            file: `.aios-lite/squads/${slug}/agents/orquestrador.md`,
+            skills: ['coord']
           }
         ]
       },
