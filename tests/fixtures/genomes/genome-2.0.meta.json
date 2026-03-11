@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "slug": "genome-2-0",
+  "domain": "Revenue Operations",
+  "type": "hybrid",
+  "language": "pt-BR",
+  "depth": "deep",
+  "sourceCount": 3,
+  "generatedAt": "2026-03-11T00:00:00.000Z",
+  "createdAt": "2026-03-11T00:00:00.000Z",
+  "updatedAt": "2026-03-11T00:00:00.000Z",
+  "counts": {
+    "knowledgeNodes": 1,
+    "philosophies": 1,
+    "mentalModels": 1,
+    "heuristics": 1,
+    "frameworks": 1,
+    "methodologies": 1,
+    "mentes": 1,
+    "skills": 2,
+    "evidence": 1,
+    "applicationNotes": 1
+  },
+  "compat": {
+    "legacyMarkdownCompatible": true,
+    "synthesizedFromLegacy": false
+  },
+  "origin": {
+    "mode": "local"
+  }
+}

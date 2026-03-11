@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "packageVersion": "1.0.0",
+  "slug": "squad-without-genome",
+  "name": "Squad Without Genome",
+  "mode": "content",
+  "mission": "Transform discovery into clear briefs.",
+  "goal": "Ship content plans faster.",
+  "visibility": "private",
+  "executors": [
+    {
+      "slug": "writer",
+      "role": "Writes the first draft",
+      "file": ".aios-lite/squads/squad-without-genome/agents/writer.md"
+    },
+    {
+      "slug": "reviewer",
+      "role": "Reviews quality gates",
+      "file": ".aios-lite/squads/squad-without-genome/agents/reviewer.md"
+    }
+  ]
+}

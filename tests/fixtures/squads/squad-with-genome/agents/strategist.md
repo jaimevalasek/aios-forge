@@ -1,0 +1,3 @@
+# Strategist
+
+Defines strategic direction.

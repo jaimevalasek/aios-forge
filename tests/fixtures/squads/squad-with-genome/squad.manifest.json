@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "packageVersion": "1.0.0",
+  "slug": "squad-with-genome",
+  "name": "Squad With Genome",
+  "mode": "content",
+  "mission": "Run commercial messaging with context.",
+  "goal": "Improve output quality with reusable intelligence.",
+  "visibility": "private",
+  "genomeBindings": {
+    "squad": [
+      {
+        "slug": "genome-2-0",
+        "mode": "persistent"
+      }
+    ],
+    "executors": {
+      "strategist": [
+        {
+          "slug": "legacy-genome",
+          "mode": "persistent"
+        }
+      ]
+    }
+  },
+  "executors": [
+    {
+      "slug": "strategist",
+      "role": "Defines strategic direction",
+      "file": ".aios-lite/squads/squad-with-genome/agents/strategist.md",
+      "genomes": [
+        {
+          "slug": "legacy-genome",
+          "mode": "persistent"
+        }
+      ]
+    }
+  ]
+}
