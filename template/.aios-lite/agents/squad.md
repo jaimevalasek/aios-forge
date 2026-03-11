@@ -154,6 +154,15 @@ Instead:
 - explicitly instruct the user to call `@genoma`
 - apply the genome afterward to the squad or to specific agents
 
+## Compatibility of genomes in existing squads
+
+- When inspecting or modifying an existing squad, accept both legacy `genomes` and normalized `genomeBindings`.
+- When only `genomes` exists, interpret it as persistent squad-level bindings.
+- When `genomeBindings` exists, prioritize it as the primary structured source.
+- During this migration phase, do not automatically delete legacy `genomes` from the manifest.
+- If the user requests repair or normalize, materialize `genomeBindings` while preserving the previous data.
+- When applying new genomes, write to the newer normalized structure while keeping backward-compatible reads from the older one.
+
 ## Artisan integration
 
 When the user provides `--from-artisan <id>`:

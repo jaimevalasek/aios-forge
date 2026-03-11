@@ -409,14 +409,7 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
       'Agents: .aios-lite/squads/youtube-creator/agents/',
       'Output: output/youtube-creator/',
       'Logs: aios-logs/youtube-creator/',
-      'Media: media/youtube-creator/',
-      '',
-      'Genomes:',
-      '- .aios-lite/genomas/storytelling-retencao.md',
-      '',
-      'AgentGenomes:',
-      '- roteirista-viral: .aios-lite/genomas/copy-ctr.md',
-      ''
+      'Media: media/youtube-creator/'
     ].join('\n'),
     'utf8'
   );
@@ -531,21 +524,27 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
             role: 'Cria roteiros fortes.',
             file: '.aios-lite/squads/youtube-creator/agents/roteirista-viral.md',
             skills: ['roteiro-short-form'],
-            genomes: ['copy-ctr']
+            genomes: [{ slug: 'copy-ctr', type: 'function', priority: 120 }]
           }
         ],
-        genomes: [
-          {
-            slug: 'storytelling-retencao',
-            scope: 'squad',
-            agentSlug: null
-          },
-          {
-            slug: 'copy-ctr',
-            scope: 'agent',
-            agentSlug: 'roteirista-viral'
+        genomes: {
+          squad: [
+            {
+              slug: 'storytelling-retencao',
+              type: 'domain',
+              priority: 100
+            }
+          ],
+          executors: {
+            'roteirista-viral': [
+              {
+                slug: 'copy-ctr',
+                type: 'function',
+                priority: 120
+              }
+            ]
           }
-        ]
+        }
       },
       null,
       2
@@ -611,8 +610,115 @@ test('cloud:publish:squad posts local squad snapshot to cloud endpoint', async (
   assert.equal(result.response.received.version.manifestJson.contentBlueprints[0].sections[0].key, 'roteiro');
   assert.deepEqual(result.response.received.version.manifestJson.contentBlueprints[0].sections[1].blockTypes, ['bullet-list', 'tags', 'accordion']);
   assert.equal(result.response.received.version.manifestJson.context.designDocPath, '.aios-lite/squads/youtube-creator/docs/design-doc.md');
+  assert.equal(result.response.received.version.manifestJson.executors[1].genomes[0].slug, 'copy-ctr');
   assert.match(result.response.received.version.designDocMarkdown, /Design Doc - YouTube Creator/);
   assert.match(result.response.received.version.readinessMarkdown, /Readiness score total: 20/);
-  assert.equal(result.response.received.version.genomesManifestJson.genomes.length, 2);
+  assert.equal(result.response.received.version.genomesManifestJson.genomes.squad.length, 1);
+  assert.equal(result.response.received.version.genomesManifestJson.genomes.executors['roteirista-viral'].length, 1);
   assert.equal(result.response.received.appliedGenomes.length, 2);
+});
+
+test('cloud:publish:squad falls back to textual genome sections when manifest bindings are absent', async () => {
+  const projectDir = await makeTempDir();
+  const logger = createLogger();
+  const { t } = createTranslator('pt-BR');
+
+  await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'agents'), { recursive: true });
+  await fs.mkdir(path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'docs'), { recursive: true });
+  await fs.mkdir(path.join(projectDir, '.aios-lite', 'genomas'), { recursive: true });
+
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'squad.md'),
+    [
+      'Squad: Legacy Creator',
+      'Goal: Criar roteiros legados',
+      'Agents: .aios-lite/squads/legacy-creator/agents/',
+      '',
+      'Genomes:',
+      '- .aios-lite/genomas/storytelling-retencao.md',
+      '',
+      'AgentGenomes:',
+      '- roteirista-viral: .aios-lite/genomas/copy-ctr.md',
+      ''
+    ].join('\n'),
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'squad.manifest.json'),
+    JSON.stringify(
+      {
+        schemaVersion: '1.0.0',
+        packageVersion: '1.0.0',
+        slug: 'legacy-creator',
+        name: 'Legacy Creator',
+        mode: 'content',
+        mission: 'Criar roteiros legados.',
+        goal: 'Criar roteiros legados',
+        executors: [
+          {
+            slug: 'roteirista-viral',
+            title: 'Roteirista Viral',
+            role: 'Cria roteiros',
+            file: '.aios-lite/squads/legacy-creator/agents/roteirista-viral.md'
+          }
+        ]
+      },
+      null,
+      2
+    ),
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'docs', 'design-doc.md'),
+    '# Design Doc - Legacy Creator\n',
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'docs', 'readiness.md'),
+    '# Readiness - Legacy Creator\n',
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'squads', 'legacy-creator', 'agents', 'roteirista-viral.md'),
+    '# Roteirista Viral\n\nCria roteiros.\n',
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'genomas', 'storytelling-retencao.md'),
+    '# Storytelling Retencao\n\nGancho e retencao.\n',
+    'utf8'
+  );
+  await fs.writeFile(
+    path.join(projectDir, '.aios-lite', 'genomas', 'copy-ctr.md'),
+    '# Copy CTR\n\nTitulos com CTR.\n',
+    'utf8'
+  );
+
+  const result = await runCloudPublishSquad({
+    args: [projectDir],
+    options: {
+      slug: 'legacy-creator',
+      'resource-version': '1.0.0',
+      url: 'https://example.com/api/publish/squads'
+    },
+    logger,
+    t,
+    dependencies: {
+      fetchImpl: async (_url, request) => ({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            ok: true,
+            resource: 'squad',
+            received: JSON.parse(request.body)
+          })
+      })
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.response.received.version.genomesManifestJson.genomes.squad.length, 0);
+  assert.equal(result.response.received.appliedGenomes.length, 2);
+  assert.equal(result.response.received.appliedGenomes[0].scopeType, 'SQUAD');
+  assert.equal(result.response.received.appliedGenomes[1].scopeType, 'AGENT');
 });

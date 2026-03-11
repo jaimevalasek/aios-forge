@@ -4,6 +4,11 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const Database = require('better-sqlite3');
 const { ensureDir, exists } = require('./utils');
+const {
+  attachBindingsToExecutors,
+  flattenGenomeBindings,
+  mergeGenomeBindings
+} = require('./genomes/bindings');
 
 const RUNTIME_DIR = path.join('.aios-lite', 'runtime');
 const DB_FILE = 'aios.sqlite';
@@ -569,7 +574,13 @@ function upsertSquadManifest(db, options) {
   const skills = normalizeArray(manifest.skills);
   const mcps = normalizeArray(manifest.mcps);
   const executors = normalizeArray(manifest.executors);
-  const genomes = normalizeArray(manifest.genomes);
+  const genomeBindings = mergeGenomeBindings({
+    blueprintBindings: manifest.genomeBindings,
+    manifestBindings: manifest.genomeBindings || manifest.genomes,
+    legacyExecutors: executors
+  });
+  const resolvedExecutors = attachBindingsToExecutors(executors, genomeBindings);
+  const genomes = flattenGenomeBindings(genomeBindings);
 
   db.prepare(`
     INSERT INTO squads (
@@ -634,7 +645,7 @@ function upsertSquadManifest(db, options) {
     )
   `);
 
-  for (const executor of executors) {
+  for (const executor of resolvedExecutors) {
     insertExecutor.run({
       squad_slug: slug,
       executor_slug: String(executor.slug || '').trim(),

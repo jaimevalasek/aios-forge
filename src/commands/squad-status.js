@@ -2,6 +2,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { flattenGenomeBindings, mergeGenomeBindings } = require('../genomes/bindings');
 
 const SQUADS_DIR = '.aios-lite/squads';
 const AGENTS_ROOT = 'agents';
@@ -217,16 +218,21 @@ async function buildSquadRecordFromPackageDir(targetDir, slug) {
     extractField(summaryContent || '', 'LatestSession', 'Latest Session', 'UltimaSessao', 'DerniereSession') ||
       `${OUTPUT_ROOT}/${slug}/latest.html`
   );
-  const genomes = Array.isArray(manifest.genomes)
-    ? manifest.genomes
-        .map((item) => item?.slug)
-        .filter(Boolean)
-    : [];
-  const agentGenomes = Array.isArray(manifest.genomes)
-    ? manifest.genomes
-        .filter((item) => item?.agentSlug)
-        .map((item) => `${item.agentSlug}: ${item.slug}`)
-    : [];
+  const genomeBindings = mergeGenomeBindings({
+    blueprintBindings: manifest.genomeBindings,
+    manifestBindings: manifest.genomeBindings || manifest.genomes,
+    legacyExecutors: manifest.executors
+  });
+  const flattenedBindings = flattenGenomeBindings(genomeBindings);
+  const genomes = flattenedBindings
+    .filter((item) => item.scope === 'squad')
+    .map((item) => item.slug);
+  const agentGenomes = flattenedBindings
+    .filter((item) => item.scope !== 'squad' && item.agentSlug)
+    .map((item) => `${item.agentSlug}: ${item.slug}`);
+  const fallbackGenomes = genomes.length > 0 ? genomes : parseListSection(summaryContent || '', 'Genomes');
+  const fallbackAgentGenomes =
+    agentGenomes.length > 0 ? agentGenomes : parseListSection(summaryContent || '', 'AgentGenomes');
 
   const agents = await collectDirStats(targetDir, agentsDir, {
     filter: (entry, stat) => stat.isFile() && entry.endsWith('.md')
@@ -260,8 +266,8 @@ async function buildSquadRecordFromPackageDir(targetDir, slug) {
     agentsDir,
     outputDir,
     logsDir,
-    genomes,
-    agentGenomes,
+    genomes: fallbackGenomes,
+    agentGenomes: fallbackAgentGenomes,
     latestSession,
     agentCount: agents.entries.length,
     specialistCount: specialists.length,

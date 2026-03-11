@@ -360,13 +360,45 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const genomaTokens = [
     '[4] Apply this genome to an existing squad/agent',
     'AgentGenomes:',
-    'Do not modify official `.aios-lite/agents/` files with user custom genomes'
+    'Do not modify official `.aios-lite/agents/` files with user custom genomes',
+    'domain',
+    'function',
+    'persona',
+    'hybrid',
+    'evidence_mode',
+    'sources_count',
+    '## Filosofias',
+    '## Modelos mentais',
+    '## Heurísticas',
+    '## Frameworks',
+    '## Metodologias',
+    '## Evidence',
+    '## Application notes',
+    '.meta.json',
+    'depth controls density, not only size',
+    'The Genome 2.0 should not become verbose by default'
   ];
 
   const genomaPtTokens = [
     '[4] Aplicar este genoma a um squad/agente já existente',
     'AgentGenomes:',
-    'Não modifique agentes oficiais de `.aios-lite/agents/` com genomas customizados do usuário'
+    'Não modifique agentes oficiais de `.aios-lite/agents/` com genomas customizados do usuário',
+    'domain',
+    'function',
+    'persona',
+    'hybrid',
+    'evidence_mode',
+    'sources_count',
+    '## Filosofias',
+    '## Modelos mentais',
+    '## Heurísticas',
+    '## Frameworks',
+    '## Metodologias',
+    '## Evidence',
+    '## Application notes',
+    '.meta.json',
+    'profundidade controla densidade, não só tamanho',
+    'o Genoma 2.0 não deve ficar verborrágico por padrão'
   ];
 
   for (const token of squadTokens) assert.equal(squadBase.includes(token), true, `missing squad base token: ${token}`);

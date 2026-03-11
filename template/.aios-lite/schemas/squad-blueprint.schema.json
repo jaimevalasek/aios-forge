@@ -42,7 +42,28 @@
           "role": { "type": "string" },
           "focus": { "type": "array", "items": { "type": "string" } },
           "skills": { "type": "array", "items": { "type": "string" } },
-          "genomes": { "type": "array", "items": { "type": "string" } }
+          "genomes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["slug"],
+                  "properties": {
+                    "slug": { "type": "string" },
+                    "type": { "type": "string" },
+                    "mode": { "type": "string" },
+                    "source": { "type": "string" },
+                    "priority": { "type": "integer" },
+                    "version": { "type": "string" },
+                    "evidenceMode": { "type": "string" },
+                    "notes": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          }
         }
       }
     },
@@ -60,6 +81,58 @@
     },
     "mcps": { "type": "array", "items": { "type": "object" } },
     "genomes": { "type": "array", "items": { "type": "object" } },
+    "genomeBindings": {
+      "type": "object",
+      "properties": {
+        "squad": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "required": ["slug"],
+                "properties": {
+                  "slug": { "type": "string" },
+                  "type": { "type": "string" },
+                  "mode": { "type": "string" },
+                  "source": { "type": "string" },
+                  "priority": { "type": "integer" },
+                  "version": { "type": "string" },
+                  "evidenceMode": { "type": "string" },
+                  "notes": { "type": "string" }
+                }
+              }
+            ]
+          }
+        },
+        "executors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["slug"],
+                  "properties": {
+                    "slug": { "type": "string" },
+                    "type": { "type": "string" },
+                    "mode": { "type": "string" },
+                    "source": { "type": "string" },
+                    "priority": { "type": "integer" },
+                    "version": { "type": "string" },
+                    "evidenceMode": { "type": "string" },
+                    "notes": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "contentBlueprints": { "type": "array", "items": { "type": "object" } },
     "assumptions": {
       "type": "array",

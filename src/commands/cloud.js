@@ -4,6 +4,14 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { ensureDir, exists, nowStamp, toRelativeSafe } = require('../utils');
 const { openRuntimeDb, upsertSquadManifest } = require('../runtime-store');
+const {
+  attachBindingsToExecutors,
+  flattenGenomeBindings,
+  mergeGenomeBindings,
+  normalizeBinding,
+  normalizeGenomeBindings,
+  resolveExecutorGenomes
+} = require('../genomes/bindings');
 
 function sanitizeSegment(value, fallback) {
   const normalized = String(value || fallback || '')
@@ -339,6 +347,40 @@ function normalizeContentBlueprints(value) {
     .filter(Boolean);
 }
 
+function buildBindingsFromAppliedGenomes(appliedGenomes = []) {
+  const draft = {
+    squad: [],
+    executors: {}
+  };
+
+  for (const item of appliedGenomes) {
+    const binding = normalizeBinding({
+      slug: item?.genome?.slug,
+      type: item?.genome?.type || item?.version?.manifestJson?.type,
+      source: item?.genome?.sourceKind ? String(item.genome.sourceKind).toLowerCase() : 'cloud',
+      priority: item?.priority,
+      version: item?.version?.versionNumber,
+      evidenceMode:
+        item?.version?.manifestJson?.evidenceMode ||
+        item?.version?.manifestJson?.evidence_mode ||
+        item?.genome?.evidenceMode
+    });
+    if (!binding) continue;
+
+    if (String(item?.scopeType || 'SQUAD').toUpperCase() === 'SQUAD') {
+      draft.squad.push(binding);
+      continue;
+    }
+
+    const executorSlug = normalizeAgentSlug(item?.agentSlug);
+    if (!executorSlug) continue;
+    draft.executors[executorSlug] = draft.executors[executorSlug] || [];
+    draft.executors[executorSlug].push(binding);
+  }
+
+  return normalizeGenomeBindings(draft);
+}
+
 function buildLocalSquadManifest(snapshot, agents) {
   const source = snapshot?.version?.manifestJson && typeof snapshot.version.manifestJson === 'object'
     ? snapshot.version.manifestJson
@@ -348,22 +390,27 @@ function buildLocalSquadManifest(snapshot, agents) {
   const mode = String(explicitMode || (source.storagePolicy?.primary === 'files' ? 'builder' : 'content')).trim();
   const sourceContext = source.context && typeof source.context === 'object' ? source.context : {};
   const packageRoot = `.aios-lite/squads/${slug}`;
-  const executors = agents.map((agent) => ({
-    slug: agent.slug,
-    title: agent.title,
-    role: agent.description || (agent.slug === 'orquestrador' ? 'Coordinates the squad and publishes the final HTML.' : null),
-    file: `${packageRoot}/agents/${agent.slug}.md`,
-    skills: agent.slug === 'orquestrador' ? [] : ['structured-domain-output'],
-    genomes: (snapshot.appliedGenomes || [])
-      .filter((item) => item.scopeType === 'SQUAD' || normalizeAgentSlug(item.agentSlug) === agent.slug)
-      .map((item) => sanitizeSegment(item.genome.slug, 'genoma'))
-  }));
-
-  const genomes = (snapshot.appliedGenomes || []).map((item) => ({
-    slug: sanitizeSegment(item.genome.slug, 'genoma'),
-    scope: String(item.scopeType || 'SQUAD').toLowerCase(),
-    agentSlug: item.agentSlug ? normalizeAgentSlug(item.agentSlug) : null
-  }));
+  const sourceBindings = mergeGenomeBindings({
+    blueprintBindings: source.genomeBindings,
+    manifestBindings: source.genomeBindings || source.genomes,
+    legacyExecutors: source.executors
+  });
+  const importedBindings = buildBindingsFromAppliedGenomes(snapshot.appliedGenomes || []);
+  const genomeBindings = mergeGenomeBindings({
+    blueprintBindings: sourceBindings,
+    manifestBindings: importedBindings
+  });
+  const executorSource = Array.isArray(source.executors) && source.executors.length > 0
+    ? source.executors
+    : agents.map((agent) => ({
+        slug: agent.slug,
+        title: agent.title,
+        role: agent.description || (agent.slug === 'orquestrador' ? 'Coordinates the squad and publishes the final HTML.' : null),
+        file: `${packageRoot}/agents/${agent.slug}.md`,
+        skills: agent.slug === 'orquestrador' ? [] : ['structured-domain-output'],
+        genomes: resolveExecutorGenomes(agent.slug, genomeBindings)
+      }));
+  const executors = attachBindingsToExecutors(executorSource, genomeBindings);
 
   return {
     schemaVersion: String(source.schemaVersion || snapshot?.version?.schemaVersion || '1.0.0'),
@@ -437,8 +484,9 @@ function buildLocalSquadManifest(snapshot, agents) {
         ? sourceContext.readiness
         : null
     },
-    executors: Array.isArray(source.executors) && source.executors.length > 0 ? source.executors : executors,
-    genomes
+    executors,
+    genomes: genomeBindings,
+    genomeBindings
   };
 }
 
@@ -550,15 +598,18 @@ function buildSquadMetadata(snapshot, options = {}) {
     'Genomes:'
   ];
 
-  if (Array.isArray(snapshot.appliedGenomes) && snapshot.appliedGenomes.length > 0) {
-    for (const genome of snapshot.appliedGenomes) {
-      lines.push(`- .aios-lite/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`);
-    }
+  const shared = Array.isArray(snapshot.appliedGenomes)
+    ? snapshot.appliedGenomes.filter((item) => String(item.scopeType || 'SQUAD').toUpperCase() === 'SQUAD')
+    : [];
+  for (const genome of shared) {
+    lines.push(`- .aios-lite/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`);
   }
 
   lines.push('', 'AgentGenomes:');
   const scoped = Array.isArray(snapshot.appliedGenomes)
-    ? snapshot.appliedGenomes.filter((item) => item.scopeType === 'AGENT' && item.agentSlug)
+    ? snapshot.appliedGenomes.filter(
+        (item) => String(item.scopeType || 'SQUAD').toUpperCase() !== 'SQUAD' && item.agentSlug
+      )
     : [];
 
   for (const genome of scoped) {
@@ -1284,6 +1335,15 @@ async function listAgentFiles(agentsDir) {
 }
 
 async function buildAppliedGenomesFromMetadata(projectDir, metadataContent, options = {}) {
+  const structured = await buildAppliedGenomesFromBindings(
+    projectDir,
+    options.genomeBindings || options.manifestBindings || options.manifest?.genomes,
+    options
+  );
+  if (structured.length > 0) {
+    return structured;
+  }
+
   const linkedVersion = String(options['linked-genome-version'] || options['resource-version'] || '1.0.0').trim();
   const shared = parseListSection(metadataContent, 'Genomes');
   const scoped = parseListSection(metadataContent, 'AgentGenomes').map(parseAgentGenomeEntry).filter(Boolean);
@@ -1354,6 +1414,49 @@ async function buildAppliedGenomesFromMetadata(projectDir, metadataContent, opti
   return items;
 }
 
+async function buildAppliedGenomesFromBindings(projectDir, genomeBindings, options = {}) {
+  const linkedVersion = String(options['linked-genome-version'] || options['resource-version'] || '1.0.0').trim();
+  const flattened = flattenGenomeBindings(genomeBindings);
+  const items = [];
+
+  for (const binding of flattened) {
+    const genomeAbsPath = path.join(projectDir, '.aios-lite', 'genomas', `${binding.slug}.md`);
+    const markdown = await fs.readFile(genomeAbsPath, 'utf8').catch(() => null);
+    if (!markdown) continue;
+
+    items.push({
+      scopeType: binding.scope === 'squad' ? 'SQUAD' : 'AGENT',
+      agentSlug: binding.agentSlug || null,
+      priority: Number.isFinite(binding.priority) ? binding.priority : 0,
+      genome: {
+        id: null,
+        name: findPrimaryHeading(markdown, binding.slug),
+        slug: binding.slug,
+        type: binding.type || null,
+        visibility: String(options.visibility || 'PRIVATE').toUpperCase(),
+        status: 'PUBLISHED',
+        sourceKind: String(binding.source || 'LOCAL').toUpperCase()
+      },
+      version: {
+        id: null,
+        versionNumber: binding.version || linkedVersion,
+        versionCode: 1,
+        title: findPrimaryHeading(markdown, binding.slug),
+        summary: firstParagraph(markdown),
+        schemaVersion: '1',
+        contentMarkdown: markdown,
+        manifestJson: {
+          type: binding.type,
+          evidenceMode: binding.evidenceMode
+        },
+        createdAt: new Date().toISOString()
+      }
+    });
+  }
+
+  return items;
+}
+
 async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
   const packageSummaryPath = localSquadSummaryPath(projectDir, slug);
   const metadataPath = (await exists(packageSummaryPath))
@@ -1412,6 +1515,11 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
     });
   }
 
+  const manifestBindings = mergeGenomeBindings({
+    blueprintBindings: localManifest?.genomeBindings,
+    manifestBindings: localManifest?.genomeBindings || localManifest?.genomes,
+    legacyExecutors: localManifest?.executors
+  });
   const normalizedManifest =
     localManifest && typeof localManifest === 'object'
       ? {
@@ -1483,7 +1591,7 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
                   docsPackage: ['project.context.md', 'design-doc.md', 'readiness.md']
                 },
           executors: Array.isArray(localManifest.executors)
-            ? localManifest.executors
+            ? attachBindingsToExecutors(localManifest.executors, manifestBindings)
             : agentsManifestJson.map((agent) => ({
                 slug: agent.slug,
                 title: agent.name,
@@ -1492,7 +1600,8 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
                 skills: [],
                 genomes: []
               })),
-          genomes: Array.isArray(localManifest.genomes) ? localManifest.genomes : []
+          genomes: manifestBindings,
+          genomeBindings: manifestBindings
         }
       : null;
 
@@ -1559,10 +1668,13 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
         textManifestPath: textManifest
           ? normalizeRel(path.relative(projectDir, textManifestPath))
           : null,
-        genomes: normalizedManifest?.genomes || []
+        genomes: normalizedManifest?.genomes || { squad: [], executors: {} }
       }
     },
-    appliedGenomes: await buildAppliedGenomesFromMetadata(projectDir, content, options)
+    appliedGenomes: await buildAppliedGenomesFromMetadata(projectDir, content, {
+      ...options,
+      genomeBindings: normalizedManifest?.genomes
+    })
   };
 }
 

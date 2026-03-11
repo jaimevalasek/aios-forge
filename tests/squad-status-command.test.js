@@ -124,3 +124,76 @@ test('squad:status falls back to agents directory when metadata is missing', asy
   );
   assert.equal(logger.lines.some((line) => line.includes('Agents      : 1 specialists / 2 total')), true);
 });
+
+test('squad:status reads normalized genome bindings from squad.manifest.json', async () => {
+  const dir = await makeTempDir();
+  const { t } = createTranslator('pt-BR');
+  const logger = createCollectLogger();
+  const slug = 'insights-lab';
+  const squadDir = path.join(dir, '.aios-lite', 'squads', slug);
+
+  await fs.mkdir(path.join(squadDir, 'agents'), { recursive: true });
+  await fs.mkdir(path.join(dir, 'output', slug), { recursive: true });
+  await fs.mkdir(path.join(dir, 'aios-logs', slug), { recursive: true });
+
+  await fs.writeFile(
+    path.join(squadDir, 'squad.manifest.json'),
+    JSON.stringify(
+      {
+        schemaVersion: '1.0.0',
+        packageVersion: '1.0.0',
+        slug,
+        name: 'Insights Lab',
+        mode: 'content',
+        mission: 'Generate structured insights.',
+        goal: 'Analyze content opportunities.',
+        rules: {
+          outputsDir: `output/${slug}`,
+          logsDir: `aios-logs/${slug}`
+        },
+        package: {
+          agentsDir: `.aios-lite/squads/${slug}/agents`
+        },
+        executors: [
+          {
+            slug: 'orquestrador',
+            role: 'Coordinates',
+            file: `.aios-lite/squads/${slug}/agents/orquestrador.md`
+          },
+          {
+            slug: 'researcher',
+            role: 'Researches',
+            file: `.aios-lite/squads/${slug}/agents/researcher.md`
+          }
+        ],
+        genomes: {
+          squad: [{ slug: 'audience-research', priority: 110 }],
+          executors: {
+            researcher: [{ slug: 'trend-scan', priority: 120 }]
+          }
+        }
+      },
+      null,
+      2
+    ),
+    'utf8'
+  );
+  await fs.writeFile(path.join(squadDir, 'squad.md'), 'Squad: Insights Lab\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'agents', 'orquestrador.md'), '# Agent @orquestrador\n', 'utf8');
+  await fs.writeFile(path.join(squadDir, 'agents', 'researcher.md'), '# Agent @researcher\n', 'utf8');
+  await fs.writeFile(path.join(dir, 'output', slug, 'latest.html'), '<html></html>', 'utf8');
+  await fs.writeFile(path.join(dir, 'aios-logs', slug, 'run-1.md'), 'log\n', 'utf8');
+
+  const result = await runSquadStatus({
+    args: [dir],
+    options: {},
+    logger,
+    t
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.count, 1);
+  assert.deepEqual(result.squads[0].genomes, ['audience-research']);
+  assert.deepEqual(result.squads[0].agentGenomes, ['researcher: trend-scan']);
+  assert.equal(logger.lines.some((line) => line.includes('Genomas     : 1 no squad / 1 vinculos por agente')), true);
+});
