@@ -8,12 +8,12 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-json-cli-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-json-cli-'));
 }
 
 function runCli(args, cwd = process.cwd()) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-lite.js'), ...args], {
+    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-forge.js'), ...args], {
       cwd,
       env: process.env
     });
@@ -33,7 +33,7 @@ function runCli(args, cwd = process.cwd()) {
 
 function createSquadSnapshot() {
   return {
-    kind: 'aioslite.squad',
+    kind: 'aiosforge.squad',
     exportVersion: 1,
     squad: {
       id: 'sq_123',
@@ -69,7 +69,7 @@ function createSquadSnapshot() {
 
 function createGenomeSnapshot() {
   return {
-    kind: 'aioslite.genome',
+    kind: 'aiosforge.genome',
     exportVersion: 1,
     genome: {
       id: 'gn_cloud_1',
@@ -178,7 +178,7 @@ test('dashboard:init --dry-run --json returns structured payload without human l
     'dashboard:init',
     dir,
     `--dir=${dashboardDir}`,
-    '--repo=https://example.com/aios-lite-dashboard.git',
+    '--repo=https://example.com/aios-dashboard.git',
     '--dry-run',
     '--json'
   ]);
@@ -188,7 +188,7 @@ test('dashboard:init --dry-run --json returns structured payload without human l
   assert.equal(parsed.ok, true);
   assert.equal(parsed.dryRun, true);
   assert.equal(parsed.dashboardDir, path.resolve(dashboardDir));
-  assert.equal(parsed.repo, 'https://example.com/aios-lite-dashboard.git');
+  assert.equal(parsed.repo, 'https://example.com/aios-dashboard.git');
 });
 
 test('cloud:import:squad --dry-run --json returns structured payload without human logs', async () => {
@@ -223,7 +223,7 @@ test('cloud:import:genome --dry-run --json returns structured payload without hu
 
 test('cloud:publish:genome --dry-run --json returns structured payload without human logs', async () => {
   const dir = await makeTempDir();
-  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const genomeDir = path.join(dir, '.aios-forge', 'genomas');
   await fs.mkdir(genomeDir, { recursive: true });
   await fs.writeFile(path.join(genomeDir, 'storytelling-br.md'), '# Storytelling BR\n\nHeuristicas.\n', 'utf8');
 
@@ -232,7 +232,7 @@ test('cloud:publish:genome --dry-run --json returns structured payload without h
     dir,
     '--slug=storytelling-br',
     '--resource-version=2.0.0',
-    '--base-url=https://aioslite.com',
+    '--base-url=https://aiosforge.com',
     '--dry-run',
     '--json'
   ]);
@@ -248,7 +248,7 @@ test('cloud:publish:genome --dry-run --json returns structured payload without h
 
 test('genome:doctor --json returns compatible genome diagnosis', async () => {
   const dir = await makeTempDir();
-  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const genomeDir = path.join(dir, '.aios-forge', 'genomas');
   await fs.mkdir(genomeDir, { recursive: true });
   await fs.writeFile(
     path.join(genomeDir, 'legacy-copy.md'),
@@ -272,7 +272,7 @@ test('genome:doctor --json returns compatible genome diagnosis', async () => {
 
 test('genome:migrate --json returns dry-run payload without mutating files', async () => {
   const dir = await makeTempDir();
-  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const genomeDir = path.join(dir, '.aios-forge', 'genomas');
   const target = path.join(genomeDir, 'legacy-copy.md');
   await fs.mkdir(genomeDir, { recursive: true });
   const original = '---\ngenome: legacy-copy\ntype: domain\n---\n\n# Genome: Legacy Copy\n\n## O que saber\n\n- Oferta\n';
@@ -331,19 +331,19 @@ test('squad:repair-genomes --json returns dry-run payload without mutating manif
 
 test('cloud:publish:squad --dry-run --json returns structured payload without human logs', async () => {
   const dir = await makeTempDir();
-  await fs.mkdir(path.join(dir, '.aios-lite', 'squads'), { recursive: true });
-  await fs.mkdir(path.join(dir, '.aios-lite', 'genomas'), { recursive: true });
+  await fs.mkdir(path.join(dir, '.aios-forge', 'squads'), { recursive: true });
+  await fs.mkdir(path.join(dir, '.aios-forge', 'genomas'), { recursive: true });
   await fs.mkdir(path.join(dir, 'agents', 'youtube-creator'), { recursive: true });
 
   await fs.writeFile(
-    path.join(dir, '.aios-lite', 'squads', 'youtube-creator.md'),
+    path.join(dir, '.aios-forge', 'squads', 'youtube-creator.md'),
     [
       'Squad: YouTube Creator',
       'Goal: Criar roteiros e assets',
       'Agents: agents/youtube-creator/',
       '',
       'Genomes:',
-      '- .aios-lite/genomas/storytelling-retencao.md',
+      '- .aios-forge/genomas/storytelling-retencao.md',
       ''
     ].join('\n'),
     'utf8'
@@ -354,7 +354,7 @@ test('cloud:publish:squad --dry-run --json returns structured payload without hu
     'utf8'
   );
   await fs.writeFile(
-    path.join(dir, '.aios-lite', 'genomas', 'storytelling-retencao.md'),
+    path.join(dir, '.aios-forge', 'genomas', 'storytelling-retencao.md'),
     '# Storytelling Retencao\n\nGancho e retencao.\n',
     'utf8'
   );
@@ -364,7 +364,7 @@ test('cloud:publish:squad --dry-run --json returns structured payload without hu
     dir,
     '--slug=youtube-creator',
     '--resource-version=1.0.0',
-    '--base-url=https://aioslite.com',
+    '--base-url=https://aiosforge.com',
     '--dry-run',
     '--json'
   ]);
@@ -404,6 +404,7 @@ test('setup:context --defaults --json returns structured payload', async () => {
   assert.equal(typeof parsed.classificationScore, 'number');
   assert.equal(typeof parsed.data, 'object');
   assert.equal(typeof parsed.data.projectName, 'string');
+  assert.equal(typeof parsed.data.aiosForgeVersion, 'string');
 });
 
 test('i18n:add --dry-run --json returns scaffold plan payload', async () => {
@@ -527,11 +528,11 @@ test('workflow:plan --json returns workflow payload', async () => {
 
 test('parallel:init --json returns structured parallel workspace payload', async () => {
   const dir = await makeTempDir();
-  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(dir, '.aios-forge/context/project.context.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
   await fs.writeFile(
     contextPath,
-    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n`,
+    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_forge_version: \"0.1.9\"\n---\n\n# Project Context\n`,
     'utf8'
   );
 
@@ -548,11 +549,11 @@ test('parallel:init --json returns structured parallel workspace payload', async
 
 test('parallel:doctor --json returns structured diagnosis payload', async () => {
   const dir = await makeTempDir();
-  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(dir, '.aios-forge/context/project.context.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
   await fs.writeFile(
     contextPath,
-    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n`,
+    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_forge_version: \"0.1.9\"\n---\n\n# Project Context\n`,
     'utf8'
   );
 
@@ -572,12 +573,12 @@ test('parallel:doctor --json returns structured diagnosis payload', async () => 
 
 test('parallel:assign --json returns structured assignment payload', async () => {
   const dir = await makeTempDir();
-  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
-  const architecturePath = path.join(dir, '.aios-lite/context/architecture.md');
+  const contextPath = path.join(dir, '.aios-forge/context/project.context.md');
+  const architecturePath = path.join(dir, '.aios-forge/context/architecture.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
   await fs.writeFile(
     contextPath,
-    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n`,
+    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_forge_version: \"0.1.9\"\n---\n\n# Project Context\n`,
     'utf8'
   );
   await fs.writeFile(
@@ -608,11 +609,11 @@ test('parallel:assign --json returns structured assignment payload', async () =>
 
 test('parallel:status --json returns consolidated lane report payload', async () => {
   const dir = await makeTempDir();
-  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(dir, '.aios-forge/context/project.context.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
   await fs.writeFile(
     contextPath,
-    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_lite_version: \"0.1.9\"\n---\n\n# Project Context\n`,
+    `---\nproject_name: \"demo\"\nproject_type: \"web_app\"\nprofile: \"developer\"\nframework: \"Node\"\nframework_installed: true\nclassification: \"MEDIUM\"\nconversation_language: \"en\"\naios_forge_version: \"0.1.9\"\n---\n\n# Project Context\n`,
     'utf8'
   );
 

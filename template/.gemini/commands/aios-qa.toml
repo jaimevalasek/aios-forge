@@ -1,6 +1,6 @@
 name = "aios-qa"
 description = "Quality review"
-instruction_file = ".aios-lite/agents/qa.md"
+instruction_file = ".aios-forge/agents/qa.md"
 requires_context = [
-  ".aios-lite/context/discovery.md"
+  ".aios-forge/context/discovery.md"
 ]

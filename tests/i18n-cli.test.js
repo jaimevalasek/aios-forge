@@ -9,7 +9,7 @@ function runCli(args, options = {}) {
   const cwd = options.cwd || process.cwd();
   const env = { ...process.env, ...(options.env || {}) };
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-lite.js'), ...args], {
+    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-forge.js'), ...args], {
       cwd,
       env
     });
@@ -30,7 +30,7 @@ function runCli(args, options = {}) {
 test('help output is localized with --locale=pt-BR', async () => {
   const cli = await runCli(['help', '--locale=pt-BR']);
   assert.equal(cli.code, 0);
-  assert.equal(cli.stdout.includes('CLI do AIOS Lite'), true);
+  assert.equal(cli.stdout.includes('CLI do AIOS Forge'), true);
   assert.equal(cli.stdout.includes('Uso:'), true);
 });
 
@@ -44,19 +44,19 @@ test('env locale pt resolves to pt-BR dictionary', async () => {
   const cli = await runCli(['help'], { env: { AIOS_LITE_LOCALE: 'pt' } });
   assert.equal(cli.code, 0);
   assert.equal(cli.stdout.includes('Uso:'), true);
-  assert.equal(cli.stdout.includes('CLI do AIOS Lite'), true);
+  assert.equal(cli.stdout.includes('CLI do AIOS Forge'), true);
 });
 
 test('regional locale es-MX resolves to es dictionary', async () => {
   const cli = await runCli(['help', '--locale=es-MX']);
   assert.equal(cli.code, 0);
   assert.equal(cli.stdout.includes('Uso:'), true);
-  assert.equal(cli.stdout.includes('AIOS Lite CLI'), true);
+  assert.equal(cli.stdout.includes('AIOS Forge CLI'), true);
 });
 
 test('regional locale fr_CA resolves to fr dictionary', async () => {
   const cli = await runCli(['help'], { env: { AIOS_LITE_LOCALE: 'fr_CA' } });
   assert.equal(cli.code, 0);
   assert.equal(cli.stdout.includes('Utilisation :'), true);
-  assert.equal(cli.stdout.includes('AIOS Lite CLI'), true);
+  assert.equal(cli.stdout.includes('AIOS Forge CLI'), true);
 });

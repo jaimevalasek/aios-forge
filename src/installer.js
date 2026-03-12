@@ -10,7 +10,7 @@ const ROOT_DIR = path.join(__dirname, '..');
 const TEMPLATE_DIR = path.join(ROOT_DIR, 'template');
 
 async function detectExistingInstall(targetDir) {
-  return exists(path.join(targetDir, '.aios-lite/config.md'));
+  return exists(path.join(targetDir, '.aios-forge/config.md'));
 }
 
 async function ensureGitignoreEntry(targetDir, entry) {
@@ -26,7 +26,7 @@ async function ensureGitignoreEntry(targetDir, entry) {
 }
 
 async function countProjectFiles(targetDir) {
-  const SKIP = new Set(['.git', 'node_modules', 'vendor', '.aios-lite', 'dist', 'build', '__pycache__']);
+  const SKIP = new Set(['.git', 'node_modules', 'vendor', '.aios-forge', 'dist', 'build', '__pycache__']);
   let count = 0;
   async function walk(dir) {
     let entries;
@@ -61,20 +61,20 @@ async function listFilesRecursive(dir) {
 }
 
 function shouldSkipTemplatePath(rel) {
-  if (rel.startsWith('.aios-lite/context/')) return true;
-  if (rel === '.aios-lite/context/.gitkeep') return false;
+  if (rel.startsWith('.aios-forge/context/')) return true;
+  if (rel === '.aios-forge/context/.gitkeep') return false;
   return false;
 }
 
 async function writeInstallMetadata(targetDir, action, frameworkDetection) {
-  const metaPath = path.join(targetDir, '.aios-lite/install.json');
+  const metaPath = path.join(targetDir, '.aios-forge/install.json');
   await ensureDir(path.dirname(metaPath));
   const existing = (await exists(metaPath)) ? JSON.parse(await fs.readFile(metaPath, 'utf8')) : {};
 
   const version = await getCliVersion();
   const data = {
     ...existing,
-    managed_by: 'aios-lite',
+    managed_by: 'aios-forge',
     template_version: version,
     last_action: action,
     last_action_at: new Date().toISOString(),
@@ -112,7 +112,7 @@ async function installTemplate(targetDir, options = {}) {
 
   let backupRoot = null;
   if (backupOnOverwrite) {
-    backupRoot = path.join(targetDir, '.aios-lite/backups', nowStamp());
+    backupRoot = path.join(targetDir, '.aios-forge/backups', nowStamp());
   }
 
   for (const absPath of templateFiles) {
@@ -147,9 +147,9 @@ async function installTemplate(targetDir, options = {}) {
   }
 
   if (!dryRun) {
-    await ensureDir(path.join(targetDir, '.aios-lite/context/parallel'));
-    await ensureDir(path.join(targetDir, '.aios-lite/context'));
-    const gitkeep = path.join(targetDir, '.aios-lite/context/.gitkeep');
+    await ensureDir(path.join(targetDir, '.aios-forge/context/parallel'));
+    await ensureDir(path.join(targetDir, '.aios-forge/context'));
+    const gitkeep = path.join(targetDir, '.aios-forge/context/.gitkeep');
     if (!(await exists(gitkeep))) {
       await fs.writeFile(gitkeep, '', 'utf8');
     }
@@ -157,7 +157,7 @@ async function installTemplate(targetDir, options = {}) {
     await writeInstallMetadata(targetDir, mode, frameworkDetection);
 
     // Always gitignore the models config (contains API keys)
-    await ensureGitignoreEntry(targetDir, 'aios-lite-models.json');
+    await ensureGitignoreEntry(targetDir, 'aios-forge-models.json');
   }
 
   // Detect if this is an existing project with many files

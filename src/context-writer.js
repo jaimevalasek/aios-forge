@@ -85,7 +85,7 @@ contract_framework: "${contractFramework}"
 wallet_provider: "${walletProvider}"
 indexer: "${indexer}"
 rpc_provider: "${rpcProvider}"
-aios_lite_version: "${data.aiosLiteVersion}"
+aios_forge_version: "${data.aiosForgeVersion}"
 generated_at: "${generatedAt}"
 ---
 
@@ -130,7 +130,7 @@ ${notes.length > 0 ? notes.map((note) => `- ${note}`).join('\n') : '- [none]'}
 }
 
 async function writeProjectContext(targetDir, content) {
-  const contextDir = path.join(targetDir, '.aios-lite/context');
+  const contextDir = path.join(targetDir, '.aios-forge/context');
   await ensureDir(contextDir);
   const filePath = path.join(contextDir, 'project.context.md');
   await fs.writeFile(filePath, content, 'utf8');

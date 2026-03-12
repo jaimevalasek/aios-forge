@@ -1,18 +1,18 @@
 # CLI Reference
 
-Complete reference for all `aios-lite` commands.
+Complete reference for all `aios-forge` commands.
 
 ---
 
 ## init
 
-Create a new project directory and install AIOS Lite inside it.
+Create a new project directory and install AIOS Forge inside it.
 
 ```bash
-aios-lite init <project-name>
-aios-lite init my-app --lang=pt-BR
-aios-lite init my-app --tool=codex
-aios-lite init my-app --lang=es --tool=gemini --json
+aios-forge init <project-name>
+aios-forge init my-app --lang=pt-BR
+aios-forge init my-app --tool=codex
+aios-forge init my-app --lang=es --tool=gemini --json
 ```
 
 **Options:**
@@ -30,19 +30,19 @@ aios-lite init my-app --lang=es --tool=gemini --json
 
 ## install
 
-Install AIOS Lite in an existing directory (or the current directory).
+Install AIOS Forge in an existing directory (or the current directory).
 
 ```bash
-aios-lite install
-aios-lite install ./my-project
-aios-lite install --lang=pt-BR --tool=claude
+aios-forge install
+aios-forge install ./my-project
+aios-forge install --lang=pt-BR --tool=claude
 ```
 
 **Options:** same as `init`.
 
 **Use this when:**
 - The project already exists (legacy codebase, existing repo).
-- You want to add AIOS Lite to a monorepo package.
+- You want to add AIOS Forge to a monorepo package.
 
 ---
 
@@ -51,9 +51,9 @@ aios-lite install --lang=pt-BR --tool=claude
 Update managed files to the latest template version. Preserves context files and anything not in the managed file list.
 
 ```bash
-aios-lite update
-aios-lite update ./my-project
-aios-lite update --lang=pt-BR
+aios-forge update
+aios-forge update ./my-project
+aios-forge update --lang=pt-BR
 ```
 
 **Options:**
@@ -69,14 +69,14 @@ aios-lite update --lang=pt-BR
 Show CLI version, installation status, and detected framework for a directory.
 
 ```bash
-aios-lite info
-aios-lite info ./my-project
-aios-lite info --json
+aios-forge info
+aios-forge info ./my-project
+aios-forge info --json
 ```
 
 **Output:**
 ```
-aios-lite v0.1.25
+aios-forge v0.1.25
 Directory: /path/to/my-project
 Installed here: yes
 Framework detected: Laravel
@@ -104,11 +104,11 @@ Evidence: composer.json, artisan
 Verify that all managed files are present and valid. Use `--fix` to restore any missing files.
 
 ```bash
-aios-lite doctor
-aios-lite doctor ./my-project
-aios-lite doctor --fix
-aios-lite doctor --fix --dry-run
-aios-lite doctor --json
+aios-forge doctor
+aios-forge doctor ./my-project
+aios-forge doctor --fix
+aios-forge doctor --fix --dry-run
+aios-forge doctor --json
 ```
 
 **Options:**
@@ -119,29 +119,29 @@ aios-lite doctor --json
 **Checks performed:**
 - All files in `MANAGED_FILES` exist.
 - Gateway files (`CLAUDE.md`, `AGENTS.md`, `OPENCODE.md`, `.gemini/GEMINI.md`) are present.
-- `.aios-lite/agents/` directory is populated.
-- `.aios-lite/context/` directory exists.
+- `.aios-forge/agents/` directory is populated.
+- `.aios-forge/context/` directory exists.
 
 **Typical workflow after an update:**
 ```bash
-aios-lite update
-aios-lite doctor --fix
+aios-forge update
+aios-forge doctor --fix
 ```
 
 ---
 
 ## setup:context
 
-Interactive wizard that creates `.aios-lite/context/project.context.md`. This is the main context file that all agents read.
+Interactive wizard that creates `.aios-forge/context/project.context.md`. This is the main context file that all agents read.
 
 ```bash
 # Interactive mode
-aios-lite setup:context
+aios-forge setup:context
 
 # Non-interactive (CI / scripted)
-aios-lite setup:context --defaults
-aios-lite setup:context --defaults --framework="Laravel" --backend="PHP" --database="MySQL"
-aios-lite setup:context --defaults --framework="Next.js" --frontend="React" --lang=pt-BR
+aios-forge setup:context --defaults
+aios-forge setup:context --defaults --framework="Laravel" --backend="PHP" --database="MySQL"
+aios-forge setup:context --defaults --framework="Next.js" --frontend="React" --lang=pt-BR
 ```
 
 **Non-interactive flags:**
@@ -167,8 +167,8 @@ aios-lite setup:context --defaults --framework="Next.js" --frontend="React" --la
 
 **Brownfield / legacy project example:**
 ```bash
-aios-lite install .
-aios-lite setup:context --defaults --framework="CodeIgniter 3" --backend="PHP" --database="MySQL"
+aios-forge install .
+aios-forge setup:context --defaults --framework="CodeIgniter 3" --backend="PHP" --database="MySQL"
 ```
 
 ---
@@ -178,15 +178,15 @@ aios-lite setup:context --defaults --framework="CodeIgniter 3" --backend="PHP" -
 Validate the existing `project.context.md` file — checks YAML frontmatter structure, required fields, and allowed values.
 
 ```bash
-aios-lite context:validate
-aios-lite context:validate ./my-project
-aios-lite context:validate --json
+aios-forge context:validate
+aios-forge context:validate ./my-project
+aios-forge context:validate --json
 ```
 
 **What it validates:**
-- File exists at `.aios-lite/context/project.context.md`.
+- File exists at `.aios-forge/context/project.context.md`.
 - YAML frontmatter is parseable.
-- All required fields are present: `project_name`, `project_type`, `profile`, `framework`, `framework_installed`, `classification`, `conversation_language`, `aios_lite_version`.
+- All required fields are present: `project_name`, `project_type`, `profile`, `framework`, `framework_installed`, `classification`, `conversation_language`, `aios_forge_version`.
 - `project_type` is one of: `web_app`, `api`, `site`, `script`, `dapp`.
 - `classification` is one of: `MICRO`, `SMALL`, `MEDIUM`.
 - `profile` is one of: `developer`, `beginner`, `team`.
@@ -195,7 +195,7 @@ aios-lite context:validate --json
 
 ```bash
 # edit project.context.md
-aios-lite context:validate
+aios-forge context:validate
 # ✓ project.context.md is valid
 ```
 
@@ -206,25 +206,25 @@ aios-lite context:validate
 List all registered agents with their paths, dependencies, and outputs.
 
 ```bash
-aios-lite agents
-aios-lite agents ./my-project
-aios-lite agents --json
+aios-forge agents
+aios-forge agents ./my-project
+aios-forge agents --json
 ```
 
 **Output example:**
 ```
 Agents (locale: en):
 @setup (setup)
-  Path: .aios-lite/locales/en/agents/setup.md
-  Active: .aios-lite/agents/setup.md
+  Path: .aios-forge/locales/en/agents/setup.md
+  Active: .aios-forge/agents/setup.md
   Depends on: none
-  Output: .aios-lite/context/project.context.md
+  Output: .aios-forge/context/project.context.md
 
 @product (product)
-  Path: .aios-lite/locales/en/agents/product.md
-  Active: .aios-lite/agents/product.md
+  Path: .aios-forge/locales/en/agents/product.md
+  Active: .aios-forge/agents/product.md
   Depends on: none
-  Output: .aios-lite/context/prd.md
+  Output: .aios-forge/context/prd.md
 ...
 ```
 
@@ -237,10 +237,10 @@ The locale shown reflects the active agent locale pack (from `project.context.md
 Print the activation prompt for a specific agent, ready to paste into any AI CLI that does not support slash commands.
 
 ```bash
-aios-lite agent:prompt setup
-aios-lite agent:prompt setup --tool=codex
-aios-lite agent:prompt ux-ui --tool=claude
-aios-lite agent:prompt dev --tool=gemini --json
+aios-forge agent:prompt setup
+aios-forge agent:prompt setup --tool=codex
+aios-forge agent:prompt ux-ui --tool=claude
+aios-forge agent:prompt dev --tool=gemini --json
 ```
 
 **Arguments:**
@@ -254,7 +254,7 @@ aios-lite agent:prompt dev --tool=gemini --json
 
 ```bash
 # Copy the prompt for @analyst in Gemini
-aios-lite agent:prompt analyst --tool=gemini
+aios-forge agent:prompt analyst --tool=gemini
 # → paste the output into Gemini CLI
 ```
 
@@ -265,10 +265,10 @@ aios-lite agent:prompt analyst --tool=gemini
 Show the recommended agent sequence for the current project based on its `classification`.
 
 ```bash
-aios-lite workflow:plan
-aios-lite workflow:plan ./my-project
-aios-lite workflow:plan --classification=SMALL
-aios-lite workflow:plan --json
+aios-forge workflow:plan
+aios-forge workflow:plan ./my-project
+aios-forge workflow:plan --classification=SMALL
+aios-forge workflow:plan --json
 ```
 
 **Options:**
@@ -310,18 +310,18 @@ The `SMALL` and MEDIUM outputs include a note reminding you of this sequence.
 
 ## test:smoke
 
-End-to-end integration test that installs AIOS Lite in a temporary directory, runs all major commands, and verifies the output. Used for CI and release validation.
+End-to-end integration test that installs AIOS Forge in a temporary directory, runs all major commands, and verifies the output. Used for CI and release validation.
 
 ```bash
-aios-lite test:smoke
-aios-lite test:smoke --lang=pt-BR
-aios-lite test:smoke --web3=ethereum
-aios-lite test:smoke --web3=solana
-aios-lite test:smoke --web3=cardano
-aios-lite test:smoke --profile=mixed
-aios-lite test:smoke --profile=parallel
-aios-lite test:smoke --keep
-aios-lite test:smoke --json
+aios-forge test:smoke
+aios-forge test:smoke --lang=pt-BR
+aios-forge test:smoke --web3=ethereum
+aios-forge test:smoke --web3=solana
+aios-forge test:smoke --web3=cardano
+aios-forge test:smoke --profile=mixed
+aios-forge test:smoke --profile=parallel
+aios-forge test:smoke --keep
+aios-forge test:smoke --json
 ```
 
 **Options:**
@@ -351,11 +351,11 @@ aios-lite test:smoke --json
 Simulate `npm pack` in a temporary directory to verify what would be published and that the package installs correctly.
 
 ```bash
-aios-lite test:package
-aios-lite test:package ./path/to/source
-aios-lite test:package --keep
-aios-lite test:package --dry-run
-aios-lite test:package --json
+aios-forge test:package
+aios-forge test:package ./path/to/source
+aios-forge test:package --keep
+aios-forge test:package --dry-run
+aios-forge test:package --json
 ```
 
 **Options:**

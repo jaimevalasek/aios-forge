@@ -26,9 +26,10 @@ test('parseArgs accepts dashboard root and dry-run flags', () => {
 
 test('buildRolloutPlan returns all blocks by default', () => {
   const plan = buildRolloutPlan({});
+  const coreRoot = path.resolve(__dirname, '..');
 
   assert.deepEqual(plan.map((item) => item.key), ['A', 'B', 'C', 'D']);
-  assert.equal(plan[0].cwd.endsWith(path.join('aios-lite')), true);
+  assert.equal(plan[0].cwd, coreRoot);
   assert.equal(plan[1].cwd, DEFAULT_DASHBOARD_ROOT);
 });
 

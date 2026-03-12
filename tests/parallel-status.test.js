@@ -10,7 +10,7 @@ const { runParallelInit } = require('../src/commands/parallel-init');
 const { runParallelStatus } = require('../src/commands/parallel-status');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-parallel-status-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-parallel-status-'));
 }
 
 function createQuietLogger() {
@@ -34,7 +34,7 @@ function createCollectLogger() {
 }
 
 async function writeContext(dir, classification = 'MEDIUM') {
-  const contextPath = path.join(dir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(dir, '.aios-forge/context/project.context.md');
   await fs.mkdir(path.dirname(contextPath), { recursive: true });
   await fs.writeFile(
     contextPath,
@@ -46,7 +46,7 @@ framework: "Node"
 framework_installed: true
 classification: "${classification}"
 conversation_language: "en"
-aios_lite_version: "0.1.9"
+aios_forge_version: "0.1.9"
 ---
 
 # Project Context
@@ -95,7 +95,7 @@ test('parallel:status reflects lane progress and blockers', async () => {
     t
   });
 
-  const lanePath = path.join(dir, '.aios-lite/context/parallel/agent-1.status.md');
+  const lanePath = path.join(dir, '.aios-forge/context/parallel/agent-1.status.md');
   let laneContent = await fs.readFile(lanePath, 'utf8');
   laneContent = laneContent.replace('- status: pending', '- status: in_progress');
   laneContent = laneContent.replace(

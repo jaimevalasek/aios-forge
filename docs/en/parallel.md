@@ -5,41 +5,41 @@ Use `parallel:init` to bootstrap the parallel context files used by `@orchestrat
 ## Command
 
 ```bash
-aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]
+aios-forge parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json]
 ```
 
 Aliases:
-- `aios-lite orchestrator:init`
-- `aios-lite parallel-init`
+- `aios-forge orchestrator:init`
+- `aios-forge parallel-init`
 
 ## Behavior
-- Requires parseable `.aios-lite/context/project.context.md`.
+- Requires parseable `.aios-forge/context/project.context.md`.
 - Only allows `classification=MEDIUM` by default.
 - Use `--force` to initialize for other classifications.
 - Generates:
-  - `.aios-lite/context/parallel/shared-decisions.md`
-  - `.aios-lite/context/parallel/agent-N.status.md`
+  - `.aios-forge/context/parallel/shared-decisions.md`
+  - `.aios-forge/context/parallel/agent-N.status.md`
 
 ## Prerequisite checks
 The command reports whether these files are present:
-- `.aios-lite/context/discovery.md`
-- `.aios-lite/context/architecture.md`
-- `.aios-lite/context/prd.md`
+- `.aios-forge/context/discovery.md`
+- `.aios-forge/context/architecture.md`
+- `.aios-forge/context/prd.md`
 
 Missing prerequisites are reported but do not block file generation.
 
 ## Scope assignment
 
 ```bash
-aios-lite parallel:assign
-aios-lite parallel:assign --source=architecture --workers=3
-aios-lite parallel:assign --source=prd
-aios-lite parallel:assign --dry-run
+aios-forge parallel:assign
+aios-forge parallel:assign --source=architecture --workers=3
+aios-forge parallel:assign --source=prd
+aios-forge parallel:assign --dry-run
 ```
 
 Aliases:
-- `aios-lite orchestrator:assign`
-- `aios-lite parallel-assign`
+- `aios-forge orchestrator:assign`
+- `aios-forge parallel-assign`
 
 Behavior:
 - Reads scope candidates from `prd`, `architecture`, or `discovery` context docs.
@@ -50,16 +50,16 @@ Behavior:
 ## Status overview
 
 ```bash
-aios-lite parallel:status
-aios-lite parallel:status --json
+aios-forge parallel:status
+aios-forge parallel:status --json
 ```
 
 Aliases:
-- `aios-lite orchestrator:status`
-- `aios-lite parallel-status`
+- `aios-forge orchestrator:status`
+- `aios-forge parallel-status`
 
 Behavior:
-- Reads all `agent-N.status.md` lane files under `.aios-lite/context/parallel`.
+- Reads all `agent-N.status.md` lane files under `.aios-forge/context/parallel`.
 - Aggregates lane status counts, scope counts, blocker counts, and deliverable progress.
 - Includes shared decision log entry count from `shared-decisions.md` when present.
 - Returns a structured machine-readable report with `--json`.
@@ -67,15 +67,15 @@ Behavior:
 ## Diagnose and repair
 
 ```bash
-aios-lite parallel:doctor
-aios-lite parallel:doctor --workers=3
-aios-lite parallel:doctor --fix
-aios-lite parallel:doctor --fix --dry-run
+aios-forge parallel:doctor
+aios-forge parallel:doctor --workers=3
+aios-forge parallel:doctor --fix
+aios-forge parallel:doctor --fix --dry-run
 ```
 
 Aliases:
-- `aios-lite orchestrator:doctor`
-- `aios-lite parallel-doctor`
+- `aios-forge orchestrator:doctor`
+- `aios-forge parallel-doctor`
 
 Notes:
 - `--fix` can recreate missing `shared-decisions.md` and missing lane files.

@@ -7,9 +7,9 @@ const { exists, toRelativeSafe } = require('../utils');
 const { parseWorkers, normalizeClassification } = require('./parallel-init');
 
 const SOURCE_ALIAS = {
-  prd: '.aios-lite/context/prd.md',
-  architecture: '.aios-lite/context/architecture.md',
-  discovery: '.aios-lite/context/discovery.md'
+  prd: '.aios-forge/context/prd.md',
+  architecture: '.aios-forge/context/architecture.md',
+  discovery: '.aios-forge/context/discovery.md'
 };
 
 const AUTO_SOURCE_ORDER = ['prd', 'architecture', 'discovery'];
@@ -227,7 +227,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
   }
 
   const context = await validateProjectContextFile(targetDir);
-  const contextPath = path.join(targetDir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(targetDir, '.aios-forge/context/project.context.md');
   if (!context.exists) {
     throw new Error(t('parallel_assign.context_missing', { path: contextPath }));
   }
@@ -244,7 +244,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
     );
   }
 
-  const parallelDir = path.join(targetDir, '.aios-lite/context/parallel');
+  const parallelDir = path.join(targetDir, '.aios-forge/context/parallel');
   if (!(await exists(parallelDir))) {
     throw new Error(
       t('parallel_assign.parallel_missing', {
@@ -291,7 +291,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
   const filesUpdated = [];
 
   for (const lane of assignments) {
-    const rel = `.aios-lite/context/parallel/agent-${lane.lane}.status.md`;
+    const rel = `.aios-forge/context/parallel/agent-${lane.lane}.status.md`;
     const lanePath = path.join(targetDir, rel);
     const current = await fs.readFile(lanePath, 'utf8');
     let next = replaceScopeSection(current, lane.items);
@@ -315,7 +315,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
     if (!dryRun) {
       await fs.writeFile(sharedPath, nextShared, 'utf8');
     }
-    filesUpdated.push('.aios-lite/context/parallel/shared-decisions.md');
+    filesUpdated.push('.aios-forge/context/parallel/shared-decisions.md');
   }
 
   const output = {
@@ -333,7 +333,7 @@ async function runParallelAssign({ args, options = {}, logger, t }) {
     scopeCount: extracted.scopes.length,
     assignments: assignments.map((item) => ({
       lane: item.lane,
-      file: `.aios-lite/context/parallel/agent-${item.lane}.status.md`,
+      file: `.aios-forge/context/parallel/agent-${item.lane}.status.md`,
       items: item.items
     })),
     filesUpdated

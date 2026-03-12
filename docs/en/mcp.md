@@ -1,6 +1,6 @@
 # MCP Guide
 
-AIOS Lite provides lightweight MCP planning and validation for multi-tool usage.
+AIOS Forge provides lightweight MCP planning and validation for multi-tool usage.
 
 ## Commands
 
@@ -8,14 +8,14 @@ AIOS Lite provides lightweight MCP planning and validation for multi-tool usage.
 Generate a local MCP plan and tool presets:
 
 ```bash
-aios-lite mcp:init
-aios-lite mcp:init --dry-run
-aios-lite mcp:init --tool=codex
+aios-forge mcp:init
+aios-forge mcp:init --dry-run
+aios-forge mcp:init --tool=codex
 ```
 
 Outputs:
-- `.aios-lite/mcp/servers.local.json`
-- `.aios-lite/mcp/presets/<tool>.json`
+- `.aios-forge/mcp/servers.local.json`
+- `.aios-forge/mcp/presets/<tool>.json`
 
 Preset strategy:
 - Context7 and Database presets are generated in a remote-endpoint mode using `mcp-remote`.
@@ -25,9 +25,9 @@ Preset strategy:
 Validate MCP readiness:
 
 ```bash
-aios-lite mcp:doctor
-aios-lite mcp:doctor --strict-env
-aios-lite mcp:doctor --json
+aios-forge mcp:doctor
+aios-forge mcp:doctor --strict-env
+aios-forge mcp:doctor --json
 ```
 
 Checks include:

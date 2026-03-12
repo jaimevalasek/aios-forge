@@ -1,6 +1,6 @@
-# Usando AIOS Lite com diferentes CLIs de IA
+# Usando AIOS Forge com diferentes CLIs de IA
 
-O AIOS Lite funciona com **Claude Code**, **Codex CLI** e **Gemini CLI**. Cada um tem uma forma diferente de ativar agentes — este guia explica como usar cada um sem confusão.
+O AIOS Forge funciona com **Claude Code**, **Codex CLI** e **Gemini CLI**. Cada um tem uma forma diferente de ativar agentes — este guia explica como usar cada um sem confusão.
 
 ---
 
@@ -10,8 +10,8 @@ O AIOS Lite funciona com **Claude Code**, **Codex CLI** e **Gemini CLI**. Cada u
 |---|---|---|---|
 | Arquivo de config | `CLAUDE.md` | `AGENTS.md` | `.gemini/GEMINI.md` |
 | Comandos personalizados | `.claude/commands/` | ❌ não suporta | `.gemini/commands/*.toml` |
-| Autocomplete de agentes | `/aios-lite/` + Tab | ❌ não suporta | `/aios-` + Tab |
-| Como ativar agente | `/aios-lite/setup` | linguagem natural | `/aios-setup` |
+| Autocomplete de agentes | `/aios-forge/` + Tab | ❌ não suporta | `/aios-` + Tab |
+| Como ativar agente | `/aios-forge/setup` | linguagem natural | `/aios-setup` |
 | Lê contexto automático | Sim (CLAUDE.md injeta) | Sim (AGENTS.md injeta) | Sim (GEMINI.md injeta) |
 
 ---
@@ -20,43 +20,43 @@ O AIOS Lite funciona com **Claude Code**, **Codex CLI** e **Gemini CLI**. Cada u
 
 ### Como funciona
 
-O Claude Code lê `CLAUDE.md` automaticamente ao iniciar. Os agentes do AIOS Lite ficam em `.claude/commands/aios-lite/` — isso cria o namespace `/aios-lite/*` no autocomplete.
+O Claude Code lê `CLAUDE.md` automaticamente ao iniciar. Os agentes do AIOS Forge ficam em `.claude/commands/aios-forge/` — isso cria o namespace `/aios-forge/*` no autocomplete.
 
 ### Ativando agentes
 
-Digite `/` para abrir o autocomplete e depois `aios-lite/`:
+Digite `/` para abrir o autocomplete e depois `aios-forge/`:
 
 ```
-/aios-lite/setup
-/aios-lite/analyst
-/aios-lite/architect
-/aios-lite/ux-ui
-/aios-lite/pm
-/aios-lite/dev
-/aios-lite/qa
-/aios-lite/orchestrator
+/aios-forge/setup
+/aios-forge/analyst
+/aios-forge/architect
+/aios-forge/ux-ui
+/aios-forge/pm
+/aios-forge/dev
+/aios-forge/qa
+/aios-forge/orchestrator
 ```
 
 ### Exemplos de uso
 
 ```
-/aios-lite/setup
+/aios-forge/setup
 ```
 > O agente @setup detecta o framework, faz as perguntas de onboarding e gera o `project.context.md`.
 
 ```
-/aios-lite/dev implementar autenticação JWT com refresh token
+/aios-forge/dev implementar autenticação JWT com refresh token
 ```
 > O agente @dev recebe o argumento como contexto extra e começa a implementação em steps atômicos.
 
 ```
-/aios-lite/qa
+/aios-forge/qa
 ```
 > O agente @qa lê o contexto e sugere um plano de testes para as features implementadas.
 
 ### Primeira vez no projeto
 
-Se `project.context.md` não existir, o CLAUDE.md instrui o Claude a rodar `/aios-lite/setup` automaticamente antes de qualquer outra ação.
+Se `project.context.md` não existir, o CLAUDE.md instrui o Claude a rodar `/aios-forge/setup` automaticamente antes de qualquer outra ação.
 
 ---
 
@@ -64,7 +64,7 @@ Se `project.context.md` não existir, o CLAUDE.md instrui o Claude a rodar `/aio
 
 ### Como funciona
 
-O Codex não suporta slash commands personalizados nem autocomplete de comandos. Em vez disso, o AIOS Lite usa o `AGENTS.md` para injetar contexto — o Codex lê esse arquivo automaticamente e entende quais agentes existem.
+O Codex não suporta slash commands personalizados nem autocomplete de comandos. Em vez disso, o AIOS Forge usa o `AGENTS.md` para injetar contexto — o Codex lê esse arquivo automaticamente e entende quais agentes existem.
 
 **Não espere `/` para aparecer agentes AIOS no Codex** — isso não acontece. Os agentes são invocados via linguagem natural.
 
@@ -115,8 +115,8 @@ activate @orchestrator to plan this session — I want to implement the checkout
 O `AGENTS.md` na raiz do projeto mapeia cada `@agente` para o caminho do arquivo:
 
 ```markdown
-- @setup → `.aios-lite/agents/setup.md`
-- @dev → `.aios-lite/agents/dev.md`
+- @setup → `.aios-forge/agents/setup.md`
+- @dev → `.aios-forge/agents/dev.md`
 ...
 ```
 
@@ -135,7 +135,7 @@ Quando você menciona `@setup`, o Codex lê o arquivo correspondente e segue tod
 
 ### Como funciona
 
-O Gemini CLI lê `.gemini/GEMINI.md` ao iniciar e reconhece comandos definidos em `.gemini/commands/*.toml`. Os agentes do AIOS Lite são registrados com o prefixo `aios-`.
+O Gemini CLI lê `.gemini/GEMINI.md` ao iniciar e reconhece comandos definidos em `.gemini/commands/*.toml`. Os agentes do AIOS Forge são registrados com o prefixo `aios-`.
 
 ### Ativando agentes
 
@@ -176,7 +176,7 @@ Cada arquivo `.gemini/commands/aios-*.toml` aponta para o agente correspondente:
 ```toml
 name = "aios-setup"
 description = "Project onboarding"
-instruction_file = ".aios-lite/agents/setup.md"
+instruction_file = ".aios-forge/agents/setup.md"
 ```
 
 ---
@@ -187,17 +187,17 @@ Não há uma resposta única — depende do seu fluxo de trabalho. Algumas consi
 
 | Cenário | Recomendação |
 |---|---|
-| Quer autocomplete preciso com namespace isolado | Claude Code — `/aios-lite/*` |
+| Quer autocomplete preciso com namespace isolado | Claude Code — `/aios-forge/*` |
 | Prefere conversa natural sem memória de comandos | Codex — `use @dev to...` |
 | Já usa Gemini CLI como ferramenta principal | Gemini — `/aios-*` |
-| Projeto em equipe com múltiplos CLIs | Todos funcionam — o contexto em `.aios-lite/` é compartilhado |
+| Projeto em equipe com múltiplos CLIs | Todos funcionam — o contexto em `.aios-forge/` é compartilhado |
 
 ### O contexto é o mesmo independente do CLI
 
 Independente de qual CLI você usa, todos leem os mesmos arquivos:
 
 ```
-.aios-lite/
+.aios-forge/
   config.md              ← configuração global
   agents/                ← agentes (lidos por qualquer CLI)
   context/
@@ -211,14 +211,14 @@ Você pode começar um projeto com Claude Code, continuar com Codex no dia segui
 
 ## Atualizar para nova versão
 
-Após `npx aios-lite@latest update` no projeto, os arquivos de configuração de todos os CLIs são atualizados:
+Após `npx aios-forge@latest update` no projeto, os arquivos de configuração de todos os CLIs são atualizados:
 
 ```bash
-npx aios-lite@latest update
+npx aios-forge@latest update
 ```
 
 Isso atualiza:
-- `CLAUDE.md` e `.claude/commands/aios-lite/`
+- `CLAUDE.md` e `.claude/commands/aios-forge/`
 - `AGENTS.md`
 - `.gemini/GEMINI.md` e `.gemini/commands/`
-- Todos os agentes em `.aios-lite/agents/`
+- Todos os agentes em `.aios-forge/agents/`

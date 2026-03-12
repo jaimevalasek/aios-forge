@@ -12,8 +12,8 @@ const FIXTURES_ROOT = path.join(__dirname, '..', '..', 'tests', 'fixtures');
 
 async function ensureFixtureWorkspace(workspaceRoot) {
   const projectRoot = path.join(workspaceRoot, 'project');
-  const genomeDir = path.join(projectRoot, '.aios-lite', 'genomas');
-  const squadsDir = path.join(projectRoot, '.aios-lite', 'squads');
+  const genomeDir = path.join(projectRoot, '.aios-forge', 'genomas');
+  const squadsDir = path.join(projectRoot, '.aios-forge', 'squads');
 
   await fs.mkdir(genomeDir, { recursive: true });
   await fs.mkdir(squadsDir, { recursive: true });
@@ -40,7 +40,7 @@ async function ensureFixtureWorkspace(workspaceRoot) {
 async function runGenome20SmokeTest(options = {}) {
   const workspaceRoot = options.workspaceRoot
     ? path.resolve(options.workspaceRoot)
-    : await fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-genome-2-smoke-'));
+    : await fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-genome-2-smoke-'));
   const projectRoot = await ensureFixtureWorkspace(workspaceRoot);
   const steps = [];
 
@@ -77,8 +77,8 @@ async function runGenome20SmokeTest(options = {}) {
       writer: [{ slug: 'legacy-genome', priority: 130 }]
     }
   });
-  const manifestPath = path.join(projectRoot, '.aios-lite', 'squads', 'squad-without-genome', 'squad.manifest.json');
-  const readinessPath = path.join(projectRoot, '.aios-lite', 'squads', 'squad-without-genome', 'docs', 'readiness.md');
+  const manifestPath = path.join(projectRoot, '.aios-forge', 'squads', 'squad-without-genome', 'squad.manifest.json');
+  const readinessPath = path.join(projectRoot, '.aios-forge', 'squads', 'squad-without-genome', 'docs', 'readiness.md');
   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
   const readiness = await fs.readFile(readinessPath, 'utf8');
   assert.deepEqual(applied.genomeBindings.squad.map((item) => item.slug), ['genome-2-0']);

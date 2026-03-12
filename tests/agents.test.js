@@ -24,7 +24,7 @@ test('getAgentDefinition resolves ux-ui agent', () => {
   const agent = getAgentDefinition('ux-ui');
   assert.equal(Boolean(agent), true);
   assert.equal(agent.id, 'ux-ui');
-  assert.equal(agent.output.includes('.aios-lite/context/ui-spec.md'), true);
+  assert.equal(agent.output.includes('.aios-forge/context/ui-spec.md'), true);
 });
 
 test('buildAgentPrompt includes target output', () => {
@@ -33,7 +33,7 @@ test('buildAgentPrompt includes target output', () => {
     instructionPath: resolveInstructionPath(agent, 'pt-BR')
   });
   assert.equal(prompt.includes(agent.output), true);
-  assert.equal(prompt.includes('.aios-lite/locales/pt-BR/agents/analyst.md'), true);
+  assert.equal(prompt.includes('.aios-forge/locales/pt-BR/agents/analyst.md'), true);
 });
 
 test('listAgentDefinitions returns non-empty list', () => {

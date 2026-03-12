@@ -2,113 +2,113 @@
 
 module.exports = {
   cli: {
-    title: 'CLI do AIOS Lite',
+    title: 'CLI do AIOS Forge',
     title_line: '{title}\n',
     usage: 'Uso:',
     help_item_line: '  {text}',
     help_init:
-      'aios-lite init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
+      'aios-forge init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
     help_install:
-      'aios-lite install [path] [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
+      'aios-forge install [path] [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
     help_update:
-      'aios-lite update [path] [--dry-run] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
-    help_info: 'aios-lite info [path] [--json] [--locale=pt-BR]',
-    help_doctor: 'aios-lite doctor [path] [--fix] [--dry-run] [--json] [--locale=pt-BR]',
-    help_i18n_add: 'aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=pt-BR]',
-    help_agents: 'aios-lite agents [path] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
+      'aios-forge update [path] [--dry-run] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
+    help_info: 'aios-forge info [path] [--json] [--locale=pt-BR]',
+    help_doctor: 'aios-forge doctor [path] [--fix] [--dry-run] [--json] [--locale=pt-BR]',
+    help_i18n_add: 'aios-forge i18n:add <locale> [--force] [--dry-run] [--locale=pt-BR]',
+    help_agents: 'aios-forge agents [path] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
     help_agent_prompt:
-      'aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
-    help_context_validate: 'aios-lite context:validate [path] [--json] [--locale=pt-BR]',
+      'aios-forge agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
+    help_context_validate: 'aios-forge context:validate [path] [--json] [--locale=pt-BR]',
     help_setup_context:
-      'aios-lite setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--framework=<name>] [--backend=<name>] [--frontend=<name>] [--database=<name>] [--auth=<name>] [--uiux=<name>] [--language=pt-BR] [--web3-enabled=true|false] [--locale=pt-BR]',
+      'aios-forge setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--framework=<name>] [--backend=<name>] [--frontend=<name>] [--database=<name>] [--auth=<name>] [--uiux=<name>] [--language=pt-BR] [--web3-enabled=true|false] [--locale=pt-BR]',
     help_locale_apply:
-      'aios-lite locale:apply [path] [--lang=en|pt-BR|es|fr] [--dry-run] [--locale=pt-BR]',
-    help_locale_diff: 'aios-lite locale:diff [agent] [--lang=en|pt-BR|es|fr] [--json] [--locale=en]',
-    help_test_agents: 'aios-lite test:agents [--json] [--locale=en]',
+      'aios-forge locale:apply [path] [--lang=en|pt-BR|es|fr] [--dry-run] [--locale=pt-BR]',
+    help_locale_diff: 'aios-forge locale:diff [agent] [--lang=en|pt-BR|es|fr] [--json] [--locale=en]',
+    help_test_agents: 'aios-forge test:agents [--json] [--locale=en]',
     help_test_smoke:
-      'aios-lite test:smoke [workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json] [--locale=pt-BR]',
+      'aios-forge test:smoke [workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json] [--locale=pt-BR]',
     help_test_package:
-      'aios-lite test:package [source-path] [--keep] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge test:package [source-path] [--keep] [--dry-run] [--json] [--locale=pt-BR]',
     help_workflow_plan:
-      'aios-lite workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=pt-BR]',
+      'aios-forge workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=pt-BR]',
     help_parallel_init:
-      'aios-lite parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=pt-BR]',
     help_parallel_doctor:
-      'aios-lite parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge parallel:doctor [path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json] [--locale=pt-BR]',
     help_parallel_assign:
-      'aios-lite parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge parallel:assign [path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=pt-BR]',
     help_parallel_status:
-      'aios-lite parallel:status [path] [--json] [--locale=pt-BR]',
+      'aios-forge parallel:status [path] [--json] [--locale=pt-BR]',
     help_mcp_init:
-      'aios-lite mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge mcp:init [path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json] [--locale=pt-BR]',
     help_mcp_doctor:
-      'aios-lite mcp:doctor [path] [--strict-env] [--json] [--locale=pt-BR]',
+      'aios-forge mcp:doctor [path] [--strict-env] [--json] [--locale=pt-BR]',
     help_qa_doctor:
-      'aios-lite qa:doctor [path] [--json] [--locale=pt-BR]',
+      'aios-forge qa:doctor [path] [--json] [--locale=pt-BR]',
     help_qa_init:
-      'aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge qa:init [path] [--url=<app-url>] [--dry-run] [--json] [--locale=pt-BR]',
     help_qa_run:
-      'aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json] [--locale=pt-BR]',
+      'aios-forge qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json] [--locale=pt-BR]',
     help_qa_scan:
-      'aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=pt-BR]',
+      'aios-forge qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=pt-BR]',
     help_qa_report:
-      'aios-lite qa:report [path] [--html] [--json] [--locale=pt-BR]',
+      'aios-forge qa:report [path] [--html] [--json] [--locale=pt-BR]',
     help_scan_project:
-      'aios-lite scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge scan:project [path] [--provider=<name>] [--dry-run] [--json] [--locale=pt-BR]',
     help_config:
-      'aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
+      'aios-forge config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
     help_genome_doctor:
-      'aios-lite genome:doctor <arquivo> [--json] [--locale=pt-BR]',
+      'aios-forge genome:doctor <arquivo> [--json] [--locale=pt-BR]',
     help_genome_migrate:
-      'aios-lite genome:migrate <arquivo-ou-diretorio> [--write] [--no-backup] [--json] [--locale=pt-BR]',
+      'aios-forge genome:migrate <arquivo-ou-diretorio> [--write] [--no-backup] [--json] [--locale=pt-BR]',
     help_dashboard_init:
-      'aios-lite dashboard:init [path] [--dir=<path>] [--repo=<git-url>] [--project-name=<nome>] [--skip-install] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge dashboard:init [path] [--dir=<path>] [--repo=<git-url>] [--project-name=<nome>] [--skip-install] [--dry-run] [--json] [--locale=pt-BR]',
     help_dashboard_dev:
-      'aios-lite dashboard:dev [path] [--dir=<path>] [--host=127.0.0.1] [--port=3000] [--project-name=<nome>] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge dashboard:dev [path] [--dir=<path>] [--host=127.0.0.1] [--port=3000] [--project-name=<nome>] [--dry-run] [--json] [--locale=pt-BR]',
     help_dashboard_open:
-      'aios-lite dashboard:open [path] [--host=127.0.0.1] [--port=3000] [--url=<url>] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge dashboard:open [path] [--host=127.0.0.1] [--port=3000] [--url=<url>] [--dry-run] [--json] [--locale=pt-BR]',
     help_squad_status:
-      'aios-lite squad:status [path] [--json] [--locale=pt-BR]',
+      'aios-forge squad:status [path] [--json] [--locale=pt-BR]',
     help_squad_doctor:
-      'aios-lite squad:doctor [path] [--squad=<slug>] [--stale-minutes=5] [--json] [--locale=pt-BR]',
+      'aios-forge squad:doctor [path] [--squad=<slug>] [--stale-minutes=5] [--json] [--locale=pt-BR]',
     help_squad_repair_genomes:
-      'aios-lite squad:repair-genomes <manifest.json> [--write] [--no-backup] [--json] [--locale=pt-BR]',
+      'aios-forge squad:repair-genomes <manifest.json> [--write] [--no-backup] [--json] [--locale=pt-BR]',
     help_squad_validate:
-      'aios-lite squad:validate [path] --squad=<slug> [--locale=pt-BR]',
+      'aios-forge squad:validate [path] --squad=<slug> [--locale=pt-BR]',
     help_squad_export:
-      'aios-lite squad:export [path] --squad=<slug> [--locale=pt-BR]',
+      'aios-forge squad:export [path] --squad=<slug> [--locale=pt-BR]',
     help_squad_pipeline:
-      'aios-lite squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=pt-BR]',
+      'aios-forge squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=pt-BR]',
     help_runtime_init:
-      'aios-lite runtime:init [path] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:init [path] [--json] [--locale=pt-BR]',
     help_runtime_ingest:
-      'aios-lite runtime:ingest [path] [--squad=<slug>] [--agent=<nome>] [--session=<chave>] [--task=<chave>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:ingest [path] [--squad=<slug>] [--agent=<nome>] [--session=<chave>] [--task=<chave>] [--json] [--locale=pt-BR]',
     help_runtime_task_start:
-      'aios-lite runtime:task:start [path] --title=<texto> [--squad=<slug>] [--session=<chave>] [--goal=<texto>] [--by=<agente>] [--task=<chave>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:task:start [path] --title=<texto> [--squad=<slug>] [--session=<chave>] [--goal=<texto>] [--by=<agente>] [--task=<chave>] [--json] [--locale=pt-BR]',
     help_runtime_start:
-      'aios-lite runtime:start [path] --agent=<nome> [--squad=<slug>] [--session=<chave>] [--title=<texto>] [--run=<chave>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:start [path] --agent=<nome> [--squad=<slug>] [--session=<chave>] [--title=<texto>] [--run=<chave>] [--json] [--locale=pt-BR]',
     help_runtime_update:
-      'aios-lite runtime:update [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:update [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
     help_runtime_task_finish:
-      'aios-lite runtime:task:finish [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:task:finish [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
     help_runtime_finish:
-      'aios-lite runtime:finish [path] --run=<chave> [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:finish [path] --run=<chave> [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
     help_runtime_task_fail:
-      'aios-lite runtime:task:fail [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:task:fail [path] --task=<chave> [--goal=<texto>] [--json] [--locale=pt-BR]',
     help_runtime_fail:
-      'aios-lite runtime:fail [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:fail [path] --run=<chave> [--message=<texto>] [--summary=<texto>] [--output=<path>] [--json] [--locale=pt-BR]',
     help_runtime_status:
-      'aios-lite runtime:status [path] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:status [path] [--json] [--locale=pt-BR]',
     help_runtime_log:
-      'aios-lite runtime:log [path] --agent=<nome> --message=<texto> [--type=<evento>] [--finish] [--status=completed|failed] [--summary=<texto>] [--title=<titulo-task>] [--json] [--locale=pt-BR]',
+      'aios-forge runtime:log [path] --agent=<nome> --message=<texto> [--type=<evento>] [--finish] [--status=completed|failed] [--summary=<texto>] [--title=<titulo-task>] [--json] [--locale=pt-BR]',
     help_cloud_import_squad:
-      'aios-lite cloud:import:squad [path] --url=<snapshot-url> [--force] [--snapshots-only] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge cloud:import:squad [path] --url=<snapshot-url> [--force] [--snapshots-only] [--dry-run] [--json] [--locale=pt-BR]',
     help_cloud_import_genome:
-      'aios-lite cloud:import:genome [path] --url=<snapshot-url> [--force] [--snapshots-only] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge cloud:import:genome [path] --url=<snapshot-url> [--force] [--snapshots-only] [--dry-run] [--json] [--locale=pt-BR]',
     help_cloud_publish_squad:
-      'aios-lite cloud:publish:squad [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--compatibility-min=<versao>] [--compatibility-max=<versao>] [--linked-genome-version=<versao>] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge cloud:publish:squad [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--compatibility-min=<versao>] [--compatibility-max=<versao>] [--linked-genome-version=<versao>] [--dry-run] [--json] [--locale=pt-BR]',
     help_cloud_publish_genome:
-      'aios-lite cloud:publish:genome [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--source-kind=LOCAL|AIOSLITE|IMPORTED|REMOTE_PROVIDER] [--dry-run] [--json] [--locale=pt-BR]',
+      'aios-forge cloud:publish:genome [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--source-kind=LOCAL|AIOSLITE|IMPORTED|REMOTE_PROVIDER] [--dry-run] [--json] [--locale=pt-BR]',
     unknown_command: 'Comando desconhecido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erro: {message}'
@@ -127,7 +127,7 @@ module.exports = {
   },
   init: {
     usage_error:
-      'Uso: aios-lite init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
+      'Uso: aios-forge init <project-name> [--force] [--dry-run] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode] [--locale=pt-BR]',
     non_empty_dir: 'Diretorio nao esta vazio: {targetDir}. Use --force para continuar.',
     created_at: 'Projeto criado em: {targetDir}',
     files_copied: 'Arquivos copiados: {count}',
@@ -135,9 +135,9 @@ module.exports = {
     next_steps: 'Proximos passos:',
     step_cd: '1. cd {projectName}',
     step_setup: '2. Abra na sua AI CLI e execute @setup',
-    step_agents: '3. Se nao aparecer seletor visual, execute: aios-lite agents',
+    step_agents: '3. Se nao aparecer seletor visual, execute: aios-forge agents',
     step_agent_prompt:
-      '4. Gere o prompt de setup para sua ferramenta: aios-lite agent:prompt setup --tool={tool}'
+      '4. Gere o prompt de setup para sua ferramenta: aios-forge agent:prompt setup --tool={tool}'
   },
   install: {
     framework_detected: 'Framework detectado: {framework} ({evidence})',
@@ -146,23 +146,23 @@ module.exports = {
     files_copied: 'Arquivos copiados: {count}',
     files_skipped: 'Arquivos ignorados: {count}',
     next_steps: 'Proximos passos:',
-    step_setup_context: '1. Gere/atualize o contexto do projeto: aios-lite setup:context --defaults',
-    step_agents: '2. Se nao aparecer seletor visual, execute: aios-lite agents',
+    step_setup_context: '1. Gere/atualize o contexto do projeto: aios-forge setup:context --defaults',
+    step_agents: '2. Se nao aparecer seletor visual, execute: aios-forge agents',
     step_agent_prompt:
-      '3. Gere o prompt de setup para sua ferramenta: aios-lite agent:prompt setup --tool={tool}',
+      '3. Gere o prompt de setup para sua ferramenta: aios-forge agent:prompt setup --tool={tool}',
     existing_project_detected:
       '⚠ Projeto existente detectado ({count} arquivos). Rode o scanner antes de comecar:',
     existing_project_scan_hint:
-      '  aios-lite scan:project   (usa modelo barato, economiza tokens na sua sessao de IA)'
+      '  aios-forge scan:project   (usa modelo barato, economiza tokens na sua sessao de IA)'
   },
   update: {
-    not_installed: 'Nenhuma instalacao do AIOS Lite encontrada em {targetDir}.',
+    not_installed: 'Nenhuma instalacao do AIOS Forge encontrada em {targetDir}.',
     done_at: 'Atualizacao concluida em: {targetDir}',
     files_updated: 'Arquivos atualizados: {count}',
     backups_created: 'Backups criados: {count}'
   },
   info: {
-    cli_version: 'AIOS Lite CLI: v{version}',
+    cli_version: 'AIOS Forge CLI: v{version}',
     directory: 'Diretorio: {targetDir}',
     installed_here: 'Instalado neste diretorio: {value}',
     framework_detected: 'Framework detectado: {framework}',
@@ -183,7 +183,7 @@ module.exports = {
     detail_line: '  Detalhe: {text}',
     required_file: 'Arquivo obrigatorio: {rel}',
     context_generated: 'Contexto principal gerado',
-    context_hint: 'Execute @setup para gerar .aios-lite/context/project.context.md',
+    context_hint: 'Execute @setup para gerar .aios-forge/context/project.context.md',
     context_frontmatter_valid: 'Frontmatter do contexto do projeto esta valido',
     context_frontmatter_valid_hint:
       'Garanta que project.context.md comeca com frontmatter YAML delimitado por ---',
@@ -206,22 +206,22 @@ module.exports = {
       '`conversation_language` nao e uma tag BCP-47 valida',
     context_conversation_language_format_hint: 'Use valores como en, en-US, pt-BR.',
     node_version: 'Node.js >= 18 (atual: {version})',
-    gateway_claude_pointer: 'Gateway do CLAUDE referencia arquivos compartilhados do AIOS Lite',
+    gateway_claude_pointer: 'Gateway do CLAUDE referencia arquivos compartilhados do AIOS Forge',
     gateway_claude_pointer_hint:
-      'Garanta que CLAUDE.md referencie .aios-lite/config.md e .aios-lite/agents/setup.md.',
-    gateway_codex_pointer: 'Gateway do Codex referencia arquivos compartilhados do AIOS Lite',
+      'Garanta que CLAUDE.md referencie .aios-forge/config.md e .aios-forge/agents/setup.md.',
+    gateway_codex_pointer: 'Gateway do Codex referencia arquivos compartilhados do AIOS Forge',
     gateway_codex_pointer_hint:
-      'Garanta que AGENTS.md referencie .aios-lite/config.md e .aios-lite/agents/.',
+      'Garanta que AGENTS.md referencie .aios-forge/config.md e .aios-forge/agents/.',
     gateway_gemini_pointer: 'Gateway do Gemini referencia caminhos compartilhados de comandos e agentes',
     gateway_gemini_pointer_hint:
-      'Garanta que .gemini/GEMINI.md referencie .gemini/commands/ e .aios-lite/agents/.',
+      'Garanta que .gemini/GEMINI.md referencie .gemini/commands/ e .aios-forge/agents/.',
     gateway_gemini_command_pointer:
       'Arquivo de comando Gemini mapeia para agente compartilhado: {file}',
     gateway_gemini_command_pointer_hint:
-      'Garanta que {file} inclua instruction_file = ".aios-lite/agents/{agent}.md".',
-    gateway_opencode_pointer: 'Gateway do OpenCode referencia arquivos compartilhados do AIOS Lite',
+      'Garanta que {file} inclua instruction_file = ".aios-forge/agents/{agent}.md".',
+    gateway_opencode_pointer: 'Gateway do OpenCode referencia arquivos compartilhados do AIOS Forge',
     gateway_opencode_pointer_hint:
-      'Garanta que OPENCODE.md referencie .aios-lite/config.md e .aios-lite/agents/.',
+      'Garanta que OPENCODE.md referencie .aios-forge/config.md e .aios-forge/agents/.',
     fix_start: 'Modo de correcao segura habilitado.',
     fix_start_dry_run: 'Modo de correcao segura habilitado (dry-run).',
     fix_action_required_files: 'Restaurar arquivos gerenciados ausentes a partir do template',
@@ -237,7 +237,7 @@ module.exports = {
     fix_summary_dry_run: '[dry-run] Mudancas de correcao segura planejadas: {count}'
   },
   i18n_add: {
-    usage_error: 'Uso: aios-lite i18n:add <locale> [--force] [--dry-run] [--locale=pt-BR]',
+    usage_error: 'Uso: aios-forge i18n:add <locale> [--force] [--dry-run] [--locale=pt-BR]',
     invalid_locale: 'Codigo de locale invalido: {locale}. Formatos esperados como en, fr, pt-br.',
     base_locale: 'O locale "en" e o dicionario base e nao pode ser gerado.',
     locale_exists: 'Arquivo de locale ja existe: {path}. Use --force para sobrescrever.',
@@ -263,7 +263,7 @@ module.exports = {
     output_line: '  Saida: {value}',
     none: 'nenhum',
     prompt_usage_error:
-      'Uso: aios-lite agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
+      'Uso: aios-forge agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=pt-BR]',
     prompt_unknown_agent: 'Agente desconhecido: {agent}',
     prompt_title: 'Prompt para o agente "{agent}" na ferramenta "{tool}" (locale: {locale}):'
   },
@@ -491,8 +491,8 @@ module.exports = {
     check_context_classification_invalid:
       'Modo paralelo requer classificacao MEDIUM (atual: {classification}).',
     check_context_classification_hint: 'Use --force para sobrescrever a regra de classificacao.',
-    check_parallel_dir_ok: 'Diretorio .aios-lite/context/parallel existe.',
-    check_parallel_dir_missing: 'Diretorio .aios-lite/context/parallel esta ausente.',
+    check_parallel_dir_ok: 'Diretorio .aios-forge/context/parallel existe.',
+    check_parallel_dir_missing: 'Diretorio .aios-forge/context/parallel esta ausente.',
     check_parallel_dir_hint: 'Execute parallel:init ou parallel:doctor --fix.',
     check_parallel_shared_ok: 'shared-decisions.md esta presente.',
     check_parallel_shared_missing: 'shared-decisions.md esta ausente.',
@@ -521,7 +521,7 @@ module.exports = {
       'A atribuicao paralela requer classificacao MEDIUM (atual: {classification}). Use --force para sobrescrever.',
     parallel_missing:
       'Diretorio paralelo nao encontrado: {path}. Execute parallel:init primeiro.',
-    no_lanes: 'Nenhum arquivo de lane foi encontrado em .aios-lite/context/parallel.',
+    no_lanes: 'Nenhum arquivo de lane foi encontrado em .aios-forge/context/parallel.',
     missing_lanes: 'Arquivos de lane ausentes para os workers solicitados: {lanes}.',
     source_missing: 'Nao foi possivel resolver o documento de origem com --source={source}.',
     applied: 'Atribuicao de escopo paralelo aplicada ({count} item(ns) de escopo).',
@@ -535,7 +535,7 @@ module.exports = {
   parallel_status: {
     parallel_missing:
       'Diretorio paralelo nao encontrado: {path}. Execute parallel:init primeiro.',
-    no_lanes: 'Nenhum arquivo de lane foi encontrado em .aios-lite/context/parallel.',
+    no_lanes: 'Nenhum arquivo de lane foi encontrado em .aios-forge/context/parallel.',
     title: 'Relatorio de status paralelo: {path}',
     lanes_count: 'Lanes: {count}',
     statuses_title: 'Status:',
@@ -564,7 +564,7 @@ module.exports = {
     reason_chain_rpc_disabled: 'Web3 esta desabilitado para este projeto.',
     reason_chain_rpc_enabled: 'Contexto dApp detectado; acesso RPC de chain e necessario.',
     reason_makopy: 'Integracao opcional de pipeline de conteudo.',
-    note_workspace_local: 'Este e um preset local de workspace gerado pelo AIOS Lite.',
+    note_workspace_local: 'Este e um preset local de workspace gerado pelo AIOS Forge.',
     note_replace_placeholders:
       'Substitua comandos placeholder pelos servidores MCP que voce realmente usa.',
     note_keep_secrets_env:
@@ -588,23 +588,23 @@ module.exports = {
     context_parse_invalid_hint:
       'Corrija a formatacao do contexto para habilitar validacao MCP por stack.',
     context_ok: 'project.context.md esta disponivel e parseavel.',
-    plan_missing: 'Arquivo do plano MCP nao encontrado (.aios-lite/mcp/servers.local.json).',
-    plan_missing_hint: 'Execute: aios-lite mcp:init',
+    plan_missing: 'Arquivo do plano MCP nao encontrado (.aios-forge/mcp/servers.local.json).',
+    plan_missing_hint: 'Execute: aios-forge mcp:init',
     plan_invalid: 'JSON do plano MCP invalido: {error}',
-    plan_invalid_hint: 'Regenere o plano com: aios-lite mcp:init',
+    plan_invalid_hint: 'Regenere o plano com: aios-forge mcp:init',
     plan_ok: 'Arquivo do plano MCP presente e com JSON valido.',
     plan_servers_ok: 'Plano MCP declara {count} definicao(oes) de servidor.',
     plan_servers_missing: 'Plano MCP nao possui definicoes de servidor.',
-    plan_servers_hint: 'Regenere com: aios-lite mcp:init',
+    plan_servers_hint: 'Regenere com: aios-forge mcp:init',
     core_enabled: 'Servidor MCP core "{server}" esta habilitado.',
     core_missing: 'Servidor MCP core "{server}" esta ausente ou desabilitado.',
     core_missing_hint: 'Regenere e mantenha os servidores core basicos habilitados.',
     presets_any_ok: '{count} arquivo(s) de preset MCP encontrado(s).',
     presets_any_missing: 'Nenhum arquivo de preset MCP foi encontrado.',
-    presets_any_hint: 'Execute: aios-lite mcp:init',
+    presets_any_hint: 'Execute: aios-forge mcp:init',
     presets_coverage_partial: 'Apenas {existing}/{total} presets de ferramentas estao presentes.',
     presets_coverage_partial_hint:
-      'Execute: aios-lite mcp:init (sem --tool) para gerar todos os presets.',
+      'Execute: aios-forge mcp:init (sem --tool) para gerar todos os presets.',
     presets_coverage_full:
       'Todos os presets de ferramentas estao presentes (claude, codex, gemini, opencode).',
     env_none_required: 'Nenhuma variavel de ambiente obrigatoria nos servidores MCP habilitados.',
@@ -617,10 +617,10 @@ module.exports = {
     compat_database_mismatch:
       'Database MCP nao corresponde completamente a stack de contexto ({engine}).',
     compat_database_hint:
-      'Regenere com: aios-lite mcp:init, ou ajuste manualmente o servidor de database.',
+      'Regenere com: aios-forge mcp:init, ou ajuste manualmente o servidor de database.',
     compat_web3_ok: 'MCP chain-rpc esta habilitado para contexto Web3.',
     compat_web3_missing: 'Contexto Web3 detectado, mas chain-rpc MCP esta ausente ou desabilitado.',
-    compat_web3_missing_hint: 'Regenere com: aios-lite mcp:init',
+    compat_web3_missing_hint: 'Regenere com: aios-forge mcp:init',
     compat_web3_unneeded: 'chain-rpc MCP esta habilitado, mas o contexto nao e Web3.',
     compat_web3_unneeded_hint: 'Desabilite chain-rpc se nao for necessario.',
     report_title: 'Relatorio MCP doctor: {path}',
@@ -642,11 +642,11 @@ module.exports = {
     chromium_missing_hint: 'Execute: npx playwright install chromium',
     config_ok: 'aios-qa.config.json encontrado e valido.',
     config_missing: 'aios-qa.config.json nao encontrado.',
-    config_missing_hint: 'Execute: aios-lite qa:init --url=<url-da-sua-app>',
+    config_missing_hint: 'Execute: aios-forge qa:init --url=<url-da-sua-app>',
     config_invalid: 'aios-qa.config.json nao e um JSON valido: {error}',
     url_ok: 'URL de destino acessivel ({url}).',
     url_missing: 'Nenhuma URL configurada em aios-qa.config.json.',
-    url_missing_hint: 'Execute: aios-lite qa:init --url=<url-da-sua-app>',
+    url_missing_hint: 'Execute: aios-forge qa:init --url=<url-da-sua-app>',
     url_unreachable: 'URL de destino inacessivel ({url}): {error}',
     url_unreachable_hint: 'Inicie sua aplicacao antes de executar qa:run ou qa:scan.',
     context_ok: 'project.context.md encontrado — testes serao enriquecidos com o contexto do projeto.',
@@ -664,12 +664,12 @@ module.exports = {
     personas_count: 'Personas habilitadas: {count} (naive, hacker, power, mobile)',
     probes_count: 'Sondas de seguranca habilitadas: {count}',
     next_steps: 'Proximos passos:',
-    step_doctor: '1. Verificar pre-requisitos: aios-lite qa:doctor',
-    step_run: '2. Executar testes no browser: aios-lite qa:run'
+    step_doctor: '1. Verificar pre-requisitos: aios-forge qa:doctor',
+    step_run: '2. Executar testes no browser: aios-forge qa:run'
   },
   qa_run: {
     playwright_missing: 'Playwright nao instalado. Execute: npm install -g playwright && npx playwright install chromium',
-    config_missing: 'aios-qa.config.json nao encontrado. Execute: aios-lite qa:init --url=<url-da-sua-app>',
+    config_missing: 'aios-qa.config.json nao encontrado. Execute: aios-forge qa:init --url=<url-da-sua-app>',
     url_missing: 'Nenhuma URL configurada. Adicione url ao aios-qa.config.json ou use --url=<app-url>.',
     starting: 'Iniciando sessao de QA no browser: {url}',
     persona_start: 'Executando persona: {persona}',
@@ -686,7 +686,7 @@ module.exports = {
   },
   qa_scan: {
     playwright_missing: 'Playwright nao instalado. Execute: npm install -g playwright && npx playwright install chromium',
-    config_missing: 'aios-qa.config.json nao encontrado. Execute: aios-lite qa:init --url=<url-da-sua-app>',
+    config_missing: 'aios-qa.config.json nao encontrado. Execute: aios-forge qa:init --url=<url-da-sua-app>',
     url_missing: 'Nenhuma URL configurada. Adicione url ao aios-qa.config.json ou use --url=<app-url>.',
     starting: 'Iniciando scan autonomo: {url}',
     crawling: 'Rastreando rotas (profundidade max {depth}, max {pages} paginas)...',
@@ -698,12 +698,12 @@ module.exports = {
     html_report_written: 'Relatorio HTML escrito: {path}'
   },
   qa_report: {
-    not_found: 'Nenhum relatorio QA encontrado. Execute: aios-lite qa:run ou aios-lite qa:scan',
+    not_found: 'Nenhum relatorio QA encontrado. Execute: aios-forge qa:run ou aios-forge qa:scan',
     html_report_written: 'Relatorio HTML escrito: {path}'
   },
   config: {
     usage_error:
-      'Uso: aios-lite config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
+      'Uso: aios-forge config <set KEY=value|show|get KEY> [--json] [--locale=pt-BR]',
     set_ok: 'Chave configurada: {key} (salva em {path})',
     show_header: 'Config global: {path}',
     show_empty: '  (nenhuma chave configurada)',
@@ -716,7 +716,7 @@ module.exports = {
     init_dir_not_empty:
       'O diretorio do dashboard ja existe e nao esta vazio: {path}. Use --dir com um caminho vazio ou reutilize a instalacao existente.',
     not_initialized:
-      'O dashboard nao esta inicializado em: {path}. Execute `aios-lite dashboard:init` primeiro.',
+      'O dashboard nao esta inicializado em: {path}. Execute `aios-forge dashboard:init` primeiro.',
     clone_start: 'Clonando dashboard de {repo} para {path}...',
     clone_failed: 'Falha ao clonar o dashboard: {detail}',
     install_start: 'Instalando dependencias do dashboard em {path}...',
@@ -724,9 +724,9 @@ module.exports = {
     init_ok: 'Dashboard pronto em: {path}',
     project_registered: 'Projeto registrado no dashboard: {name} ({path})',
     next_steps: 'Proximos passos:',
-    step_dev: '1. Inicie o dashboard: aios-lite dashboard:dev {path}',
+    step_dev: '1. Inicie o dashboard: aios-forge dashboard:dev {path}',
     step_open:
-      '2. Abra o dashboard no navegador: aios-lite dashboard:open --host={host} --port={port}',
+      '2. Abra o dashboard no navegador: aios-forge dashboard:open --host={host} --port={port}',
     dry_run_summary: '[dry-run] Comando do dashboard preparado para: {path}',
     dev_start: 'Iniciando servidor dev do dashboard em {path} na URL http://{host}:{port} ...',
     open_ready: 'URL do dashboard pronta: {url}',
@@ -736,7 +736,7 @@ module.exports = {
   runtime: {
     option_required: 'Opcao obrigatoria ausente: {option}',
     store_missing:
-      'Runtime store nao encontrado: {path}. Execute: aios-lite runtime:init',
+      'Runtime store nao encontrado: {path}. Execute: aios-forge runtime:init',
     init_ok: 'Runtime store inicializado: {path}',
     ingest_ok: 'Conteudos indexados no runtime: {indexed} | ignorados: {skipped} ({path})',
     task_start_ok: 'Task iniciada: {task} ({path})',
@@ -791,20 +791,20 @@ module.exports = {
     check_executors: 'Executores declarados: {count} | arquivos ausentes: {missing}',
     check_output_dir: 'Diretorio de output da squad: {path}',
     check_media_dir: 'Diretorio de media da squad: {path}',
-    check_runtime_missing: 'Runtime store ausente. Execute aios-lite runtime:init.',
+    check_runtime_missing: 'Runtime store ausente. Execute aios-forge runtime:init.',
     check_active_runs: 'Runs ativas: {count} | possivelmente travadas (> {minutes} min): {stale}',
     check_content_indexing: 'Conteudos indexados: {indexed} | arquivos pendentes de indexacao: {pending}',
     summary: 'Resumo -> checks OK: {passed} | avisos: {warned} | falhas: {failed}'
   },
   scan_project: {
-    scanning: 'aios-lite scan:project — escaneando {dir}',
-    config_missing: '{file} nao encontrado. Copie aios-lite-models.json e preencha suas chaves de API.',
-    config_invalid: 'JSON invalido em aios-lite-models.json: {error}',
-    provider_missing: 'Provider "{provider}" nao encontrado em aios-lite-models.json. Disponiveis: {available}',
+    scanning: 'aios-forge scan:project — escaneando {dir}',
+    config_missing: '{file} nao encontrado. Copie aios-forge-models.json e preencha suas chaves de API.',
+    config_invalid: 'JSON invalido em aios-forge-models.json: {error}',
+    provider_missing: 'Provider "{provider}" nao encontrado em aios-forge-models.json. Disponiveis: {available}',
     provider_info: '  Provider : {provider}',
     model_info: '  Modelo   : {model}',
     context_found: '  Contexto : project.context.md encontrado',
-    context_missing: '  Contexto : project.context.md nao encontrado (execute aios-lite setup:context primeiro)',
+    context_missing: '  Contexto : project.context.md nao encontrado (execute aios-forge setup:context primeiro)',
     spec_found: '  Spec     : spec.md encontrado — memoria de desenvolvimento incluida',
     walking: '  Escaneando estrutura do projeto...',
     walk_done: '  Arquivos : {files} entradas mapeadas | Arquivos chave: {keys} lidos',

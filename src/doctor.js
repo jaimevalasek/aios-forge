@@ -85,28 +85,28 @@ async function runDoctor(targetDir) {
       rel: 'CLAUDE.md',
       key: 'doctor.gateway_claude_pointer',
       hintKey: 'doctor.gateway_claude_pointer_hint',
-      patterns: ['.aios-lite/config.md', '.aios-lite/agents/setup.md']
+      patterns: ['.aios-forge/config.md', '.aios-forge/agents/setup.md']
     },
     {
       id: 'gateway:codex:contract',
       rel: 'AGENTS.md',
       key: 'doctor.gateway_codex_pointer',
       hintKey: 'doctor.gateway_codex_pointer_hint',
-      patterns: ['.aios-lite/config.md', '.aios-lite/agents/']
+      patterns: ['.aios-forge/config.md', '.aios-forge/agents/']
     },
     {
       id: 'gateway:gemini:contract',
       rel: '.gemini/GEMINI.md',
       key: 'doctor.gateway_gemini_pointer',
       hintKey: 'doctor.gateway_gemini_pointer_hint',
-      patterns: ['.gemini/commands/', '.aios-lite/agents/']
+      patterns: ['.gemini/commands/', '.aios-forge/agents/']
     },
     {
       id: 'gateway:opencode:contract',
       rel: 'OPENCODE.md',
       key: 'doctor.gateway_opencode_pointer',
       hintKey: 'doctor.gateway_opencode_pointer_hint',
-      patterns: ['.aios-lite/config.md', '.aios-lite/agents/']
+      patterns: ['.aios-forge/config.md', '.aios-forge/agents/']
     }
   ];
 
@@ -130,7 +130,7 @@ async function runDoctor(targetDir) {
       key: 'doctor.gateway_gemini_command_pointer',
       params: { file: expectation.file },
       ok: await fileContainsAll(commandPath, [
-        `instruction_file = ".aios-lite/agents/${expectation.agent}.md"`
+        `instruction_file = ".aios-forge/agents/${expectation.agent}.md"`
       ]),
       hintKey: 'doctor.gateway_gemini_command_pointer_hint',
       hintParams: {
@@ -140,7 +140,7 @@ async function runDoctor(targetDir) {
     });
   }
 
-  const contextPath = path.join(targetDir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(targetDir, '.aios-forge/context/project.context.md');
   checks.push({
     id: 'context:project',
     key: 'doctor.context_generated',

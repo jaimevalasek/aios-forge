@@ -1,5 +1,5 @@
 {
-  "name": "aios-lite",
+  "name": "aios-forge",
   "version": "1.2.0",
   "description": "Lightweight AI agent framework for software projects.",
   "keywords": [
@@ -15,7 +15,8 @@
   "license": "MIT",
   "main": "src/cli.js",
   "bin": {
-    "aios-lite": "bin/aios-lite.js"
+    "aios": "bin/aios-forge.js",
+    "aios-forge": "bin/aios-forge.js"
   },
   "publishConfig": {
     "access": "public"

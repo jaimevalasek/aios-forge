@@ -9,7 +9,7 @@ const { createTranslator } = require('../src/i18n');
 const { runSetupContext } = require('../src/commands/setup-context');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-setup-context-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-setup-context-'));
 }
 
 function createQuietLogger() {
@@ -170,4 +170,25 @@ test('setup:context defaults supports legacy custom stack values', async () => {
   assert.equal(result.data.backend, 'CodeIgniter 3');
   assert.equal(result.data.frontend, 'Bootstrap + jQuery');
   assert.equal(result.data.database, 'MySQL');
+});
+
+test('setup:context preserves the Forge version contract in output data and frontmatter', async () => {
+  const projectDir = await makeTempDir();
+  const logger = createQuietLogger();
+  const { t } = createTranslator('en');
+
+  const result = await runSetupContext({
+    args: [projectDir],
+    options: {
+      defaults: true,
+      'aios-forge-version': '9.9.9'
+    },
+    logger,
+    t
+  });
+
+  const content = await fs.readFile(result.filePath, 'utf8');
+
+  assert.equal(result.data.aiosForgeVersion, '9.9.9');
+  assert.equal(content.includes('aios_forge_version: "9.9.9"'), true);
 });

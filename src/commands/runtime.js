@@ -882,9 +882,9 @@ async function runRuntimeStatus({ args, options = {}, logger, t }) {
 }
 
 /**
- * aios-lite runtime-log --agent=<name> --message=<text> [--type=<event>] [--finish] [--status=completed|failed] [--summary=<text>] [--title=<task-title>]
+ * aios-forge runtime-log --agent=<name> --message=<text> [--type=<event>] [--finish] [--status=completed|failed] [--summary=<text>] [--title=<task-title>]
  *
- * Stateful single-command logger for official AIOS Lite agents.
+ * Stateful single-command logger for official AIOS Forge agents.
  * First call creates task + run in SQLite; subsequent calls add events.
  * --finish closes the run and clears the session.
  */

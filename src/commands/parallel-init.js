@@ -9,9 +9,9 @@ const MIN_WORKERS = 2;
 const MAX_WORKERS = 6;
 const DEFAULT_WORKERS = 3;
 const PREREQUISITE_FILES = [
-  '.aios-lite/context/discovery.md',
-  '.aios-lite/context/architecture.md',
-  '.aios-lite/context/prd.md'
+  '.aios-forge/context/discovery.md',
+  '.aios-forge/context/architecture.md',
+  '.aios-forge/context/prd.md'
 ];
 
 function normalizeClassification(value) {
@@ -75,7 +75,7 @@ function renderAgentStatus(input) {
 - [none]
 
 ## Notes
-- Created by \`aios-lite parallel:init\`.
+- Created by \`aios-forge parallel:init\`.
 `;
 }
 
@@ -92,7 +92,7 @@ async function collectPrerequisites(targetDir) {
 }
 
 function buildTargetFiles(targetDir, workers) {
-  const parallelDir = path.join(targetDir, '.aios-lite/context/parallel');
+  const parallelDir = path.join(targetDir, '.aios-forge/context/parallel');
   const files = [path.join(parallelDir, 'shared-decisions.md')];
   for (let i = 1; i <= workers; i += 1) {
     files.push(path.join(parallelDir, `agent-${i}.status.md`));
@@ -116,7 +116,7 @@ async function runParallelInit({ args, options = {}, logger, t }) {
   }
 
   const context = await validateProjectContextFile(targetDir);
-  const contextPath = path.join(targetDir, '.aios-lite/context/project.context.md');
+  const contextPath = path.join(targetDir, '.aios-forge/context/project.context.md');
   if (!context.exists) {
     throw new Error(t('parallel_init.context_missing', { path: contextPath }));
   }
@@ -160,7 +160,7 @@ async function runParallelInit({ args, options = {}, logger, t }) {
   }
 
   if (!dryRun) {
-    const parallelDir = path.join(targetDir, '.aios-lite/context/parallel');
+    const parallelDir = path.join(targetDir, '.aios-forge/context/parallel');
     await ensureDir(parallelDir);
 
     const sharedContent = renderSharedDecisions({
@@ -197,8 +197,8 @@ async function runParallelInit({ args, options = {}, logger, t }) {
 
   logger.log(
     dryRun
-      ? t('parallel_init.dry_run_prepared', { path: path.join(targetDir, '.aios-lite/context/parallel') })
-      : t('parallel_init.prepared', { path: path.join(targetDir, '.aios-lite/context/parallel') })
+      ? t('parallel_init.dry_run_prepared', { path: path.join(targetDir, '.aios-forge/context/parallel') })
+      : t('parallel_init.prepared', { path: path.join(targetDir, '.aios-forge/context/parallel') })
   );
   logger.log(t('parallel_init.workers_count', { count: workers }));
   logger.log(t('parallel_init.files_count', { count: output.files.length }));

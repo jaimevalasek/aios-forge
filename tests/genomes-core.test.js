@@ -22,7 +22,7 @@ const {
 } = require('../src/genome-files');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-genomes-core-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-genomes-core-'));
 }
 
 function createGenomeFixture() {
@@ -89,8 +89,8 @@ test('writeGenome persists markdown and meta files together', async () => {
   const genome = createGenomeFixture();
   const result = await writeGenome(dir, genome);
 
-  const markdownPath = path.join(dir, '.aios-lite', 'genomas', 'growth-marketing.md');
-  const metaPath = path.join(dir, '.aios-lite', 'genomas', 'growth-marketing.meta.json');
+  const markdownPath = path.join(dir, '.aios-forge', 'genomas', 'growth-marketing.md');
+  const metaPath = path.join(dir, '.aios-forge', 'genomas', 'growth-marketing.meta.json');
   const markdown = await fs.readFile(markdownPath, 'utf8');
   const meta = JSON.parse(await fs.readFile(metaPath, 'utf8'));
 
@@ -103,6 +103,6 @@ test('writeGenome persists markdown and meta files together', async () => {
 });
 
 test('managed files include genome schemas', () => {
-  assert.equal(MANAGED_FILES.includes('.aios-lite/schemas/genome.schema.json'), true);
-  assert.equal(MANAGED_FILES.includes('.aios-lite/schemas/genome-meta.schema.json'), true);
+  assert.equal(MANAGED_FILES.includes('.aios-forge/schemas/genome.schema.json'), true);
+  assert.equal(MANAGED_FILES.includes('.aios-forge/schemas/genome-meta.schema.json'), true);
 });

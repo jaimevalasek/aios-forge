@@ -49,8 +49,8 @@ async function runLocaleDiff({ args, options, logger }) {
   const filterAgent = args[0] || null; // optional: check only one agent
   const filterLocale = options.lang || options.language || null;
 
-  const baseAgentsDir = path.join(TEMPLATE_DIR, '.aios-lite', 'agents');
-  const localesDir    = path.join(TEMPLATE_DIR, '.aios-lite', 'locales');
+  const baseAgentsDir = path.join(TEMPLATE_DIR, '.aios-forge', 'agents');
+  const localesDir    = path.join(TEMPLATE_DIR, '.aios-forge', 'locales');
 
   const agentsToCheck = filterAgent
     ? AGENTS.filter(a => a === filterAgent)

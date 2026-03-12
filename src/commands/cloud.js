@@ -25,7 +25,7 @@ function sanitizeSegment(value, fallback) {
 }
 
 function cloudImportsRoot(projectDir) {
-  return path.join(projectDir, '.aios-lite', 'cloud-imports');
+  return path.join(projectDir, '.aios-forge', 'cloud-imports');
 }
 
 function squadImportFilePath(projectDir, slug, versionNumber) {
@@ -77,7 +77,7 @@ function installedGenomeManifestPath(projectDir, slug) {
 }
 
 function localSquadPackageDir(projectDir, slug) {
-  return path.join(projectDir, '.aios-lite', 'squads', sanitizeSegment(slug, 'squad'));
+  return path.join(projectDir, '.aios-forge', 'squads', sanitizeSegment(slug, 'squad'));
 }
 
 function localSquadSummaryPath(projectDir, slug) {
@@ -85,7 +85,7 @@ function localSquadSummaryPath(projectDir, slug) {
 }
 
 function localLegacySquadMetadataPath(projectDir, slug) {
-  return path.join(projectDir, '.aios-lite', 'squads', `${sanitizeSegment(slug, 'squad')}.md`);
+  return path.join(projectDir, '.aios-forge', 'squads', `${sanitizeSegment(slug, 'squad')}.md`);
 }
 
 function localSquadAgentsDir(projectDir, slug) {
@@ -161,7 +161,7 @@ function localLegacySquadReadinessPath(projectDir, slug) {
 }
 
 function localGenomeFilePath(projectDir, slug) {
-  return path.join(projectDir, '.aios-lite', 'genomas', `${sanitizeSegment(slug, 'genoma')}.md`);
+  return path.join(projectDir, '.aios-forge', 'genomas', `${sanitizeSegment(slug, 'genoma')}.md`);
 }
 
 function findPrimaryHeading(markdown, fallback) {
@@ -389,7 +389,7 @@ function buildLocalSquadManifest(snapshot, agents) {
   const explicitMode = typeof source.mode === 'string' ? source.mode : null;
   const mode = String(explicitMode || (source.storagePolicy?.primary === 'files' ? 'builder' : 'content')).trim();
   const sourceContext = source.context && typeof source.context === 'object' ? source.context : {};
-  const packageRoot = `.aios-lite/squads/${slug}`;
+  const packageRoot = `.aios-forge/squads/${slug}`;
   const sourceBindings = mergeGenomeBindings({
     blueprintBindings: source.genomeBindings,
     manifestBindings: source.genomeBindings || source.genomes,
@@ -419,7 +419,7 @@ function buildLocalSquadManifest(snapshot, agents) {
     name: String(source.name || snapshot.squad.name),
     mode,
     mission: String(source.mission || snapshot.squad.description || `Operate the ${snapshot.squad.name} squad.`),
-    goal: String(source.goal || snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Lite Cloud'),
+    goal: String(source.goal || snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Forge Cloud'),
     visibility: String(source.visibility || String(snapshot.squad.visibility || 'PRIVATE').toLowerCase()),
     aiosLiteCompatibility: String(
       source.aiosLiteCompatibility ||
@@ -503,7 +503,7 @@ function buildSquadTextManifest(snapshot, manifest) {
     '- Coordinate specialists through the local orchestrator',
     '',
     '## Does not do',
-    '- Replace the AIOS Lite official agents',
+    '- Replace the AIOS Forge official agents',
     '- Use subagents as a substitute for permanent executors or skills',
     '',
     '## Permanent executors'
@@ -534,9 +534,9 @@ function buildSquadTextManifest(snapshot, manifest) {
     `- Final HTML: \`output/${manifest.slug}/{session-id}.html\``,
     `- Logs: \`aios-logs/${manifest.slug}/\``,
     `- Media: \`media/${manifest.slug}/\``,
-    `- Package root: \`.aios-lite/squads/${manifest.slug}/\``,
-    `- Design doc: \`.aios-lite/squads/${manifest.slug}/docs/design-doc.md\``,
-    `- Readiness: \`.aios-lite/squads/${manifest.slug}/docs/readiness.md\``,
+    `- Package root: \`.aios-forge/squads/${manifest.slug}/\``,
+    `- Design doc: \`.aios-forge/squads/${manifest.slug}/docs/design-doc.md\``,
+    `- Readiness: \`.aios-forge/squads/${manifest.slug}/docs/readiness.md\``,
     '- Final outputs should include recommendation, reasoning, tradeoff, and next step.'
   );
 
@@ -547,7 +547,7 @@ function buildAgentStub(snapshot, agent) {
   const lines = [
     `# ${agent.title}`,
     '',
-    '> Imported from AIOS Lite Cloud.',
+    '> Imported from AIOS Forge Cloud.',
     '',
     '## Origin',
     '',
@@ -575,11 +575,11 @@ function buildAgentStub(snapshot, agent) {
 function buildSquadMetadata(snapshot, options = {}) {
   const slug = sanitizeSegment(snapshot.squad.slug, 'squad');
   const installedAt = new Date().toISOString();
-  const packageRoot = `.aios-lite/squads/${slug}`;
+  const packageRoot = `.aios-forge/squads/${slug}`;
   const lines = [
     `Squad: ${snapshot.squad.name}`,
     `Mode: ${snapshot?.version?.manifestJson?.mode || 'CloudImport'}`,
-    `Goal: ${snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Lite Cloud'}`,
+    `Goal: ${snapshot.squad.goal || snapshot.squad.description || 'Imported from AIOS Forge Cloud'}`,
     `Package: ${packageRoot}/`,
     `Agents: ${packageRoot}/agents/`,
     `Skills: ${packageRoot}/skills/`,
@@ -602,7 +602,7 @@ function buildSquadMetadata(snapshot, options = {}) {
     ? snapshot.appliedGenomes.filter((item) => String(item.scopeType || 'SQUAD').toUpperCase() === 'SQUAD')
     : [];
   for (const genome of shared) {
-    lines.push(`- .aios-lite/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`);
+    lines.push(`- .aios-forge/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`);
   }
 
   lines.push('', 'AgentGenomes:');
@@ -614,7 +614,7 @@ function buildSquadMetadata(snapshot, options = {}) {
 
   for (const genome of scoped) {
     lines.push(
-      `- ${normalizeAgentSlug(genome.agentSlug)}: .aios-lite/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`
+      `- ${normalizeAgentSlug(genome.agentSlug)}: .aios-forge/genomas/${sanitizeSegment(genome.genome.slug, 'genoma')}.md`
     );
   }
 
@@ -623,7 +623,7 @@ function buildSquadMetadata(snapshot, options = {}) {
 
 function buildInstalledManifest(snapshot, sourceUrl, agents) {
   return {
-    kind: 'aioslite.local-installed-squad',
+    kind: 'aiosforge.local-installed-squad',
     installVersion: 1,
     installedAt: new Date().toISOString(),
     sourceUrl,
@@ -634,7 +634,7 @@ function buildInstalledManifest(snapshot, sourceUrl, agents) {
       compatibilityMax: snapshot.version.compatibilityMax,
       schemaVersion: snapshot.version.schemaVersion
     },
-    packageRoot: `.aios-lite/squads/${sanitizeSegment(snapshot.squad.slug, 'squad')}`,
+    packageRoot: `.aios-forge/squads/${sanitizeSegment(snapshot.squad.slug, 'squad')}`,
     agents: agents.map((agent) => ({
       slug: agent.slug,
       title: agent.title,
@@ -871,7 +871,7 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
       : [
           `# ${genome.genome.name}`,
           '',
-          '> Imported from AIOS Lite Cloud.',
+          '> Imported from AIOS Forge Cloud.',
           '',
           `Version: ${genome.version.versionNumber}`,
           `Scope: ${genome.scopeType}`,
@@ -895,8 +895,8 @@ async function materializeImportedSquad(projectDir, payload, sourceUrl, force) {
       status: 'active',
       manifest: squadManifest,
       context: squadManifest.context,
-      packageDir: `.aios-lite/squads/${slug}`,
-      agentsDir: `.aios-lite/squads/${slug}/agents`,
+      packageDir: `.aios-forge/squads/${slug}`,
+      agentsDir: `.aios-forge/squads/${slug}/agents`,
       outputDir: `output/${slug}`,
       logsDir: `aios-logs/${slug}`,
       mediaDir: `media/${slug}`,
@@ -1005,7 +1005,7 @@ function validateSquadSnapshot(payload) {
     throw new Error('Invalid squad snapshot payload.');
   }
 
-  if (payload.kind !== 'aioslite.squad') {
+  if (payload.kind !== 'aiosforge.squad') {
     throw new Error('Unsupported snapshot kind.');
   }
 
@@ -1032,7 +1032,7 @@ function validateGenomeSnapshot(payload) {
     throw new Error('Invalid genome snapshot payload.');
   }
 
-  if (payload.kind !== 'aioslite.genome') {
+  if (payload.kind !== 'aiosforge.genome') {
     throw new Error('Unsupported genome snapshot kind.');
   }
 
@@ -1096,7 +1096,7 @@ async function writeGenomeImportSnapshot(projectDir, payload, slug, versionNumbe
 
 function buildInstalledGenomeManifest(snapshot, sourceUrl) {
   return {
-    kind: 'aioslite.local-installed-genome',
+    kind: 'aiosforge.local-installed-genome',
     installVersion: 1,
     installedAt: new Date().toISOString(),
     sourceUrl,
@@ -1125,7 +1125,7 @@ async function materializeImportedGenome(projectDir, payload, sourceUrl, force) 
     : [
         `# ${payload.genome.name}`,
         '',
-        '> Imported from AIOS Lite Cloud.',
+        '> Imported from AIOS Forge Cloud.',
         '',
         `Version: ${payload.version.versionNumber}`,
         payload.version.summary ? '' : null,
@@ -1293,7 +1293,7 @@ async function loadLocalGenomeSnapshot(projectDir, slug, options = {}) {
 
   const genomeName = findPrimaryHeading(markdown, slug);
   return {
-    kind: 'aioslite.genome',
+    kind: 'aiosforge.genome',
     exportVersion: 1,
     genome: {
       id: null,
@@ -1420,7 +1420,7 @@ async function buildAppliedGenomesFromBindings(projectDir, genomeBindings, optio
   const items = [];
 
   for (const binding of flattened) {
-    const genomeAbsPath = path.join(projectDir, '.aios-lite', 'genomas', `${binding.slug}.md`);
+    const genomeAbsPath = path.join(projectDir, '.aios-forge', 'genomas', `${binding.slug}.md`);
     const markdown = await fs.readFile(genomeAbsPath, 'utf8').catch(() => null);
     if (!markdown) continue;
 
@@ -1474,7 +1474,7 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
 
   const squadName = extractField(content, 'Squad') || slug;
   const goal = extractField(content, 'Goal', 'Objetivo') || firstParagraph(content) || null;
-  const packageRootRel = `.aios-lite/squads/${slug}`;
+  const packageRootRel = `.aios-forge/squads/${slug}`;
   const agentsDirRel = normalizeRel(extractField(content, 'Agents') || `${packageRootRel}/agents`);
   const outputDirRel = normalizeRel(extractField(content, 'Output') || `output/${slug}`);
   const logsDirRel = normalizeRel(extractField(content, 'Logs') || `aios-logs/${slug}`);
@@ -1606,7 +1606,7 @@ async function loadLocalSquadSnapshot(projectDir, slug, options = {}) {
       : null;
 
   return {
-    kind: 'aioslite.squad',
+    kind: 'aiosforge.squad',
     exportVersion: 1,
     squad: {
       id: null,

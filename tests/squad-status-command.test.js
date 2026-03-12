@@ -9,7 +9,7 @@ const { createTranslator } = require('../src/i18n');
 const { runSquadStatus } = require('../src/commands/squad-status');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-squad-status-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-squad-status-'));
 }
 
 function createCollectLogger() {
@@ -30,13 +30,13 @@ test('squad:status reads metadata, sessions, latest html and logs', async () => 
   const { t } = createTranslator('pt-BR');
   const logger = createCollectLogger();
 
-  await fs.mkdir(path.join(dir, '.aios-lite', 'squads'), { recursive: true });
+  await fs.mkdir(path.join(dir, '.aios-forge', 'squads'), { recursive: true });
   await fs.mkdir(path.join(dir, 'agents', 'youtube-viral'), { recursive: true });
   await fs.mkdir(path.join(dir, 'output', 'youtube-viral'), { recursive: true });
   await fs.mkdir(path.join(dir, 'aios-logs', 'youtube-viral'), { recursive: true });
 
   await fs.writeFile(
-    path.join(dir, '.aios-lite', 'squads', 'youtube-viral.md'),
+    path.join(dir, '.aios-forge', 'squads', 'youtube-viral.md'),
     [
       'Squad: YouTube Viral',
       'Mode: Squad',
@@ -46,10 +46,10 @@ test('squad:status reads metadata, sessions, latest html and logs', async () => 
       'Logs: aios-logs/youtube-viral/',
       'LatestSession: output/youtube-viral/latest.html',
       'Genomes:',
-      '- .aios-lite/genomas/storytelling-retencao.md',
+      '- .aios-forge/genomas/storytelling-retencao.md',
       '',
       'AgentGenomes:',
-      '- roteirista-viral: .aios-lite/genomas/copy-youtube.md',
+      '- roteirista-viral: .aios-forge/genomas/copy-youtube.md',
       ''
     ].join('\n'),
     'utf8'
@@ -130,7 +130,7 @@ test('squad:status reads normalized genome bindings from squad.manifest.json', a
   const { t } = createTranslator('pt-BR');
   const logger = createCollectLogger();
   const slug = 'insights-lab';
-  const squadDir = path.join(dir, '.aios-lite', 'squads', slug);
+  const squadDir = path.join(dir, '.aios-forge', 'squads', slug);
 
   await fs.mkdir(path.join(squadDir, 'agents'), { recursive: true });
   await fs.mkdir(path.join(dir, 'output', slug), { recursive: true });
@@ -152,18 +152,18 @@ test('squad:status reads normalized genome bindings from squad.manifest.json', a
           logsDir: `aios-logs/${slug}`
         },
         package: {
-          agentsDir: `.aios-lite/squads/${slug}/agents`
+          agentsDir: `.aios-forge/squads/${slug}/agents`
         },
         executors: [
           {
             slug: 'orquestrador',
             role: 'Coordinates',
-            file: `.aios-lite/squads/${slug}/agents/orquestrador.md`
+            file: `.aios-forge/squads/${slug}/agents/orquestrador.md`
           },
           {
             slug: 'researcher',
             role: 'Researches',
-            file: `.aios-lite/squads/${slug}/agents/researcher.md`
+            file: `.aios-forge/squads/${slug}/agents/researcher.md`
           }
         ],
         genomes: {

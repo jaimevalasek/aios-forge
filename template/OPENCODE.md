@@ -1,19 +1,19 @@
-# AIOS Lite - OpenCode
+# AIOS Forge - OpenCode
 
 ## Boot
-1. Read `.aios-lite/config.md`
-2. Check `.aios-lite/context/project.context.md`
+1. Read `.aios-forge/config.md`
+2. Check `.aios-forge/context/project.context.md`
 3. If missing, start with `setup`
 
 ## Available agents
-- setup -> `.aios-lite/agents/setup.md`
-- analyst -> `.aios-lite/agents/analyst.md`
-- architect -> `.aios-lite/agents/architect.md`
-- ux-ui -> `.aios-lite/agents/ux-ui.md`
-- pm -> `.aios-lite/agents/pm.md`
-- dev -> `.aios-lite/agents/dev.md`
-- qa -> `.aios-lite/agents/qa.md`
-- orchestrator -> `.aios-lite/agents/orchestrator.md`
+- setup -> `.aios-forge/agents/setup.md`
+- analyst -> `.aios-forge/agents/analyst.md`
+- architect -> `.aios-forge/agents/architect.md`
+- ux-ui -> `.aios-forge/agents/ux-ui.md`
+- pm -> `.aios-forge/agents/pm.md`
+- dev -> `.aios-forge/agents/dev.md`
+- qa -> `.aios-forge/agents/qa.md`
+- orchestrator -> `.aios-forge/agents/orchestrator.md`
 
 ## Rule
-Do not duplicate rules outside `.aios-lite/`.
+Do not duplicate rules outside `.aios-forge/`.

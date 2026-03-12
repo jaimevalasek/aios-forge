@@ -9,7 +9,7 @@ const { createTranslator } = require('../src/i18n');
 const { runAgentsList } = require('../src/commands/agents');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-agents-cmd-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-agents-cmd-'));
 }
 
 function createCollectLogger() {

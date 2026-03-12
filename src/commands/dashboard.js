@@ -6,7 +6,7 @@ const { spawn } = require('node:child_process');
 const { ensureDir, exists } = require('../utils');
 const { readConfig, writeConfig } = require('./config');
 
-const DEFAULT_DASHBOARD_REPO = 'https://github.com/jaimevalasek/aios-lite-dashboard.git';
+const DEFAULT_DASHBOARD_REPO = 'https://github.com/jaimevalasek/aios-dashboard.git';
 
 function resolveBin(command) {
   if (process.platform === 'win32' && (command === 'npm' || command === 'npx')) {
@@ -123,7 +123,7 @@ async function writeDashboardRegistry(dashboardDir, registry) {
 async function registerProjectInDashboard(dashboardDir, projectDir, explicitName) {
   const registry = await readDashboardRegistry(dashboardDir);
   const normalizedProjectDir = path.resolve(projectDir);
-  const projectName = String(explicitName || path.basename(normalizedProjectDir) || 'AIOS Lite Project').trim();
+  const projectName = String(explicitName || path.basename(normalizedProjectDir) || 'AIOS Forge Project').trim();
   const now = new Date().toISOString();
 
   let project = registry.projects.find((item) => path.resolve(item.rootPath) === normalizedProjectDir) || null;
@@ -168,7 +168,7 @@ function resolveDashboardDir(projectDir, options, config) {
   if (configuredDir) {
     return path.resolve(process.cwd(), String(configuredDir));
   }
-  return path.resolve(projectDir, '..', 'aios-lite-dashboard');
+  return path.resolve(projectDir, '..', 'aios-dashboard');
 }
 
 function resolvePort(options, config) {

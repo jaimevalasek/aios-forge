@@ -1,6 +1,6 @@
 # QA Browser Testing Guide
 
-AIOS Lite includes a built-in browser QA engine powered by [Playwright](https://playwright.dev). It opens a real Chrome browser, runs automated tests across multiple personas, and generates a report in the same format as the `@qa` agent — so both can be used together.
+AIOS Forge includes a built-in browser QA engine powered by [Playwright](https://playwright.dev). It opens a real Chrome browser, runs automated tests across multiple personas, and generates a report in the same format as the `@qa` agent — so both can be used together.
 
 No LLM required. No separate tool to install beyond Playwright itself.
 
@@ -16,7 +16,7 @@ npx playwright install chromium
 Verify everything is ready:
 
 ```bash
-aios-lite qa:doctor
+aios-forge qa:doctor
 ```
 
 ---
@@ -25,13 +25,13 @@ aios-lite qa:doctor
 
 ```bash
 # 1. Generate config (reads prd.md and discovery.md automatically)
-aios-lite qa:init --url=http://localhost:3000
+aios-forge qa:init --url=http://localhost:3000
 
 # 2. Start your application, then run
-aios-lite qa:run
+aios-forge qa:run
 
 # 3. View the report
-aios-lite qa:report
+aios-forge qa:report
 ```
 
 Output files written to the project root:
@@ -48,10 +48,10 @@ Output files written to the project root:
 Generates `aios-qa.config.json` from your project context.
 
 ```bash
-aios-lite qa:init [path] [--url=<app-url>] [--dry-run] [--json]
+aios-forge qa:init [path] [--url=<app-url>] [--dry-run] [--json]
 ```
 
-If `.aios-lite/context/project.context.md` exists, the project name and language are read automatically. If `prd.md` exists, acceptance criteria are extracted and added as test scenarios.
+If `.aios-forge/context/project.context.md` exists, the project name and language are read automatically. If `prd.md` exists, acceptance criteria are extracted and added as test scenarios.
 
 **Flags:**
 
@@ -94,7 +94,7 @@ If `.aios-lite/context/project.context.md` exists, the project name and language
 Checks all prerequisites before running tests.
 
 ```bash
-aios-lite qa:doctor [path] [--json]
+aios-forge qa:doctor [path] [--json]
 ```
 
 **Checks performed:**
@@ -127,7 +127,7 @@ Summary: 5 passed, 0 failed, 1 warnings.
 Runs a full browser QA session: 4 personas, security probes, accessibility audit, performance capture, and AC coverage.
 
 ```bash
-aios-lite qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]
+aios-forge qa:run [path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]
 ```
 
 **Flags:**
@@ -199,7 +199,7 @@ If `prd.md` exists, acceptance criteria are extracted from the table and 🔴 mu
 Autonomous crawl mode. No pre-defined scenarios needed — the tool discovers all routes and probes each one.
 
 ```bash
-aios-lite qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]
+aios-forge qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]
 ```
 
 **Flags:**
@@ -228,7 +228,7 @@ Sensitive files (`/.env`, `/.git/config`, etc.) are probed once per domain at th
 Displays the last generated report.
 
 ```bash
-aios-lite qa:report [path] [--html] [--json]
+aios-forge qa:report [path] [--html] [--json]
 ```
 
 | Flag | Description |
@@ -249,7 +249,7 @@ When the `@qa` agent runs, it automatically checks for `aios-qa-report.md` in th
 3. Adds a **Browser findings (aios-qa)** subsection to its report
 4. Tags ACs that passed in the browser with `[browser-validated]`
 
-This means running `aios-lite qa:run` before `@qa` gives you a richer, more complete QA report with zero extra effort.
+This means running `aios-forge qa:run` before `@qa` gives you a richer, more complete QA report with zero extra effort.
 
 ---
 
@@ -258,12 +258,12 @@ This means running `aios-lite qa:run` before `@qa` gives you a richer, more comp
 Two terminals, running in parallel:
 
 ```bash
-# Terminal 1 — aios-lite agents
+# Terminal 1 — aios-forge agents
 @setup → @product → @analyst → @architect → @dev
 
 # Terminal 2 — browser QA (while app is running)
-aios-lite qa:init --url=http://localhost:3000
-aios-lite qa:run
+aios-forge qa:init --url=http://localhost:3000
+aios-forge qa:run
 
 # Terminal 1 — continues with merged findings
 @qa   # reads aios-qa-report.md automatically
@@ -276,14 +276,14 @@ aios-lite qa:run
 Add `--html` to `qa:run` or `qa:scan` to generate a self-contained visual report alongside the default MD/JSON outputs.
 
 ```bash
-aios-lite qa:run --html
-aios-lite qa:scan --html
+aios-forge qa:run --html
+aios-forge qa:scan --html
 ```
 
 Or generate HTML retroactively from an existing run:
 
 ```bash
-aios-lite qa:report --html
+aios-forge qa:report --html
 ```
 
 **Output structure:**
@@ -318,11 +318,11 @@ The MD and JSON outputs are never modified — `--html` is purely additive.
 `aios-qa-report.json` is written alongside the markdown report and is suitable for CI pipelines:
 
 ```bash
-aios-lite qa:run --json | jq '.summary'
+aios-forge qa:run --json | jq '.summary'
 # { "critical": 0, "high": 1, "medium": 3, "low": 2 }
 
 # Fail CI if any critical findings
-aios-lite qa:run --json | jq 'if .summary.critical > 0 then error else . end'
+aios-forge qa:run --json | jq 'if .summary.critical > 0 then error else . end'
 ```
 
 For headless environments, Playwright runs in headless mode by default (no `--headed` flag needed in CI).

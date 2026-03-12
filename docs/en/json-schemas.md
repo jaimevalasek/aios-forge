@@ -1,32 +1,32 @@
 # JSON Schemas
 
-AIOS Lite exposes machine-readable JSON output on selected commands.
+AIOS Forge exposes machine-readable JSON output on selected commands.
 
 This folder provides formal schemas for automation:
 - `docs/en/schemas/index.json`
 - `docs/en/schemas/*.schema.json`
 
 ## Commands covered
-- `aios-lite init <project-name> --json`
-- `aios-lite install [path] --json`
-- `aios-lite update [path] --json`
-- `aios-lite info --json`
-- `aios-lite agents [path] --json`
-- `aios-lite agent:prompt <agent> [path] --json`
-- `aios-lite locale:apply [path] --json`
-- `aios-lite setup:context [path] --defaults --json`
-- `aios-lite i18n:add <locale> --dry-run --json`
-- `aios-lite doctor --json`
-- `aios-lite context:validate --json`
-- `aios-lite test:smoke --json`
-- `aios-lite mcp:init --json`
-- `aios-lite mcp:doctor --json`
-- `aios-lite test:package --json`
-- `aios-lite workflow:plan --json`
-- `aios-lite parallel:init --json`
-- `aios-lite parallel:assign --json`
-- `aios-lite parallel:status --json`
-- `aios-lite parallel:doctor --json`
+- `aios-forge init <project-name> --json`
+- `aios-forge install [path] --json`
+- `aios-forge update [path] --json`
+- `aios-forge info --json`
+- `aios-forge agents [path] --json`
+- `aios-forge agent:prompt <agent> [path] --json`
+- `aios-forge locale:apply [path] --json`
+- `aios-forge setup:context [path] --defaults --json`
+- `aios-forge i18n:add <locale> --dry-run --json`
+- `aios-forge doctor --json`
+- `aios-forge context:validate --json`
+- `aios-forge test:smoke --json`
+- `aios-forge mcp:init --json`
+- `aios-forge mcp:doctor --json`
+- `aios-forge test:package --json`
+- `aios-forge workflow:plan --json`
+- `aios-forge parallel:init --json`
+- `aios-forge parallel:assign --json`
+- `aios-forge parallel:status --json`
+- `aios-forge parallel:doctor --json`
 - Generic CLI JSON errors (`unknown_command`, `command_error`)
 
 ## Compatibility policy

@@ -98,9 +98,9 @@ function formatCheckPrefix(check, t) {
 async function runMcpDoctor({ args, options = {}, logger, t }) {
   const targetDir = path.resolve(process.cwd(), args[0] || '.');
   const strictEnv = normalizeBoolean(options['strict-env'], false);
-  const planPath = path.join(targetDir, '.aios-lite/mcp/servers.local.json');
-  const presetsDir = path.join(targetDir, '.aios-lite/mcp/presets');
-  const contextPath = path.join(targetDir, '.aios-lite/context/project.context.md');
+  const planPath = path.join(targetDir, '.aios-forge/mcp/servers.local.json');
+  const presetsDir = path.join(targetDir, '.aios-forge/mcp/presets');
+  const contextPath = path.join(targetDir, '.aios-forge/context/project.context.md');
 
   const checks = [];
 

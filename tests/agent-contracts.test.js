@@ -15,11 +15,11 @@ async function read(filePath) {
 
 test('template ships all base and localized agent files', async () => {
   for (const agent of AGENTS) {
-    const basePath = path.join(ROOT, 'template/.aios-lite/agents', `${agent}.md`);
-    const enPath = path.join(ROOT, 'template/.aios-lite/locales/en/agents', `${agent}.md`);
-    const ptPath = path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents', `${agent}.md`);
-    const esPath = path.join(ROOT, 'template/.aios-lite/locales/es/agents', `${agent}.md`);
-    const frPath = path.join(ROOT, 'template/.aios-lite/locales/fr/agents', `${agent}.md`);
+    const basePath = path.join(ROOT, 'template/.aios-forge/agents', `${agent}.md`);
+    const enPath = path.join(ROOT, 'template/.aios-forge/locales/en/agents', `${agent}.md`);
+    const ptPath = path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents', `${agent}.md`);
+    const esPath = path.join(ROOT, 'template/.aios-forge/locales/es/agents', `${agent}.md`);
+    const frPath = path.join(ROOT, 'template/.aios-forge/locales/fr/agents', `${agent}.md`);
 
     await assert.doesNotReject(() => fs.access(basePath));
     await assert.doesNotReject(() => fs.access(enPath));
@@ -30,8 +30,8 @@ test('template ships all base and localized agent files', async () => {
 });
 
 test('setup agent contract includes required context fields and service sections', async () => {
-  const setupBase = await read(path.join(ROOT, 'template/.aios-lite/agents/setup.md'));
-  const setupEn = await read(path.join(ROOT, 'template/.aios-lite/locales/en/agents/setup.md'));
+  const setupBase = await read(path.join(ROOT, 'template/.aios-forge/agents/setup.md'));
+  const setupEn = await read(path.join(ROOT, 'template/.aios-forge/locales/en/agents/setup.md'));
 
   const requiredSnippets = [
     'project_name',
@@ -92,8 +92,8 @@ test('core agent contracts include actionable sections', async () => {
   ];
 
   for (const item of checks) {
-    const baseContent = await read(path.join(ROOT, 'template/.aios-lite/agents', item.file));
-    const enContent = await read(path.join(ROOT, 'template/.aios-lite/locales/en/agents', item.file));
+    const baseContent = await read(path.join(ROOT, 'template/.aios-forge/agents', item.file));
+    const enContent = await read(path.join(ROOT, 'template/.aios-forge/locales/en/agents', item.file));
     for (const token of item.tokens) {
       assert.equal(baseContent.includes(token), true, `missing in base ${item.file}: ${token}`);
       assert.equal(enContent.includes(token), true, `missing in en ${item.file}: ${token}`);
@@ -102,12 +102,12 @@ test('core agent contracts include actionable sections', async () => {
 });
 
 test('discovery-design-doc contract formalizes design doc and readiness outputs', async () => {
-  const baseContent = await read(path.join(ROOT, 'template/.aios-lite/agents/discovery-design-doc.md'));
-  const ptContent = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/discovery-design-doc.md'));
+  const baseContent = await read(path.join(ROOT, 'template/.aios-forge/agents/discovery-design-doc.md'));
+  const ptContent = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/discovery-design-doc.md'));
 
   const baseTokens = [
-    '.aios-lite/context/design-doc.md',
-    '.aios-lite/context/readiness.md',
+    '.aios-forge/context/design-doc.md',
+    '.aios-forge/context/readiness.md',
     'Identify what is already defined and what is still ambiguous',
     'If readiness is low, do not pretend certainty.',
     'ready for planning',
@@ -124,15 +124,15 @@ test('discovery-design-doc contract formalizes design doc and readiness outputs'
     'Project mode',
     'Feature mode',
     '## Skills and docs on demand',
-    '.aios-lite/squads/{squad-slug}/skills/',
+    '.aios-forge/squads/{squad-slug}/skills/',
     'Recommended docs/skills to load next',
     'Readiness total score',
     '0 to 5'
   ];
 
   const ptTokens = [
-    '.aios-lite/context/design-doc.md',
-    '.aios-lite/context/readiness.md',
+    '.aios-forge/context/design-doc.md',
+    '.aios-forge/context/readiness.md',
     'Identificar o que ja esta definido e o que ainda esta ambiguo',
     'Se a prontidao estiver baixa, nao finja certeza.',
     'ready for planning',
@@ -149,7 +149,7 @@ test('discovery-design-doc contract formalizes design doc and readiness outputs'
     'Modo projeto',
     'Modo feature',
     '## Skills e documentos sob demanda',
-    '.aios-lite/squads/{squad-slug}/skills/',
+    '.aios-forge/squads/{squad-slug}/skills/',
     'Docs/skills recomendados para carregar a seguir',
     'Readiness score total',
     '0 a 5'
@@ -165,19 +165,19 @@ test('discovery-design-doc contract formalizes design doc and readiness outputs'
 });
 
 test('analyst, architect, and dev consume design-doc/readiness and use context on demand', async () => {
-  const analystBase = await read(path.join(ROOT, 'template/.aios-lite/agents/analyst.md'));
-  const analystPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/analyst.md'));
-  const architectBase = await read(path.join(ROOT, 'template/.aios-lite/agents/architect.md'));
-  const architectPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/architect.md'));
-  const devBase = await read(path.join(ROOT, 'template/.aios-lite/agents/dev.md'));
-  const devPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/dev.md'));
+  const analystBase = await read(path.join(ROOT, 'template/.aios-forge/agents/analyst.md'));
+  const analystPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/analyst.md'));
+  const architectBase = await read(path.join(ROOT, 'template/.aios-forge/agents/architect.md'));
+  const architectPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/architect.md'));
+  const devBase = await read(path.join(ROOT, 'template/.aios-forge/agents/dev.md'));
+  const devPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/dev.md'));
 
   const analystBaseTokens = ['## Skills and docs on demand', 'design-doc.md', 'readiness.md'];
   const analystPtTokens = ['## Skills e documentos sob demanda', 'design-doc.md', 'readiness.md'];
   const architectBaseTokens = ['design-doc.md', 'readiness.md', 'Load architecture docs and skills on demand'];
   const architectPtTokens = ['design-doc.md', 'readiness.md', 'Carregar documentos e skills de arquitetura sob demanda'];
-  const devBaseTokens = ['design-doc.md', 'readiness.md', 'minimum context package', 'needs more discovery', '.aios-lite/squads/{squad-slug}/skills/'];
-  const devPtTokens = ['design-doc.md', 'readiness.md', 'pacote minimo de contexto', 'needs more discovery', '.aios-lite/squads/{squad-slug}/skills/'];
+  const devBaseTokens = ['design-doc.md', 'readiness.md', 'minimum context package', 'needs more discovery', '.aios-forge/squads/{squad-slug}/skills/'];
+  const devPtTokens = ['design-doc.md', 'readiness.md', 'pacote minimo de contexto', 'needs more discovery', '.aios-forge/squads/{squad-slug}/skills/'];
 
   for (const token of analystBaseTokens) assert.equal(analystBase.includes(token), true, `missing analyst base token: ${token}`);
   for (const token of analystPtTokens) assert.equal(analystPt.includes(token), true, `missing analyst pt token: ${token}`);
@@ -188,8 +188,8 @@ test('analyst, architect, and dev consume design-doc/readiness and use context o
 });
 
 test('ux-ui contract supports autonomous visual decisions', async () => {
-  const uxBase = await read(path.join(ROOT, 'template/.aios-lite/agents/ux-ui.md'));
-  const uxPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/ux-ui.md'));
+  const uxBase = await read(path.join(ROOT, 'template/.aios-forge/agents/ux-ui.md'));
+  const uxPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/ux-ui.md'));
 
   const baseTokens = [
     '## Step 0 — Autonomous visual direction decision',
@@ -215,9 +215,9 @@ test('ux-ui contract supports autonomous visual decisions', async () => {
 });
 
 test('living PRD contracts preserve downstream sections and QA hooks', async () => {
-  const productBase = await read(path.join(ROOT, 'template/.aios-lite/agents/product.md'));
-  const pmBase = await read(path.join(ROOT, 'template/.aios-lite/agents/pm.md'));
-  const uxBase = await read(path.join(ROOT, 'template/.aios-lite/agents/ux-ui.md'));
+  const productBase = await read(path.join(ROOT, 'template/.aios-forge/agents/product.md'));
+  const pmBase = await read(path.join(ROOT, 'template/.aios-forge/agents/pm.md'));
+  const uxBase = await read(path.join(ROOT, 'template/.aios-forge/agents/ux-ui.md'));
 
   const productTokens = [
     'PRD base',
@@ -252,7 +252,7 @@ test('agent definitions expose PRD dependencies for the living PRD flow', () => 
   const ux = AGENT_DEFINITIONS.find((agent) => agent.id === 'ux-ui');
   const pm = AGENT_DEFINITIONS.find((agent) => agent.id === 'pm');
 
-  assert.equal(product.dependsOn.includes('.aios-lite/context/project.context.md'), true);
+  assert.equal(product.dependsOn.includes('.aios-forge/context/project.context.md'), true);
   assert.equal(ux.dependsOn.some((dep) => dep.includes('prd')), true);
   assert.equal(pm.dependsOn.some((dep) => dep.includes('prd')), true);
   assert.equal(String(ux.output).includes('Visual identity enrichment'), true);
@@ -260,15 +260,15 @@ test('agent definitions expose PRD dependencies for the living PRD flow', () => 
 });
 
 test('squad and genoma contracts include genome binding workflow', async () => {
-  const squadBase = await read(path.join(ROOT, 'template/.aios-lite/agents/squad.md'));
-  const squadPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/squad.md'));
-  const genomaBase = await read(path.join(ROOT, 'template/.aios-lite/agents/genoma.md'));
-  const genomaPt = await read(path.join(ROOT, 'template/.aios-lite/locales/pt-BR/agents/genoma.md'));
+  const squadBase = await read(path.join(ROOT, 'template/.aios-forge/agents/squad.md'));
+  const squadPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/squad.md'));
+  const genomaBase = await read(path.join(ROOT, 'template/.aios-forge/agents/genoma.md'));
+  const genomaPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/genoma.md'));
 
   const squadTokens = [
     '## Discovery and design-doc before the squad',
     '## Parallel squads rule',
-    '## AIOS Lite local dashboard',
+    '## AIOS Forge local dashboard',
     '## Genome binding to the squad',
     '## Active genomes',
     '## Response standard',
@@ -277,13 +277,13 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'feature mode',
     'minimum docs/skills package',
     'readiness',
-    'aios-lite dashboard:init .',
-    'aios-lite dashboard:dev . --port=3000',
-    'aios-lite dashboard:open . --port=3000',
+    'aios-forge dashboard:init .',
+    'aios-forge dashboard:dev . --port=3000',
+    'aios-forge dashboard:open . --port=3000',
     '## Squad content items',
     'contentBlueprints',
     'do not freeze the system into fixed fields like `script`, `titles`, or `description`',
-    'AIOS Lite fixes the shell (`content_key`, `contentType`, `layoutType`, `payload_json`), not the domain-specific inner content',
+    'AIOS Forge fixes the shell (`content_key`, `contentType`, `layoutType`, `payload_json`), not the domain-specific inner content',
     'Quick heuristic to choose `layoutType`:',
     'Heuristic to design `contentBlueprints`:',
     'prefer 1 strong primary blueprint before inventing many shallow blueprints',
@@ -293,8 +293,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '- `blocks`',
     'output/{squad-slug}/{content-key}/index.html',
     'output/{squad-slug}/{content-key}/content.json',
-    '.aios-lite/squads/{squad-slug}/agents/agents.md',
-    '.aios-lite/squads/{squad-slug}/squad.manifest.json',
+    '.aios-forge/squads/{squad-slug}/agents/agents.md',
+    '.aios-forge/squads/{squad-slug}/squad.manifest.json',
     '## Squad skills',
     '## Installed squad skills',
     '## Squad MCPs',
@@ -314,7 +314,7 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const squadPtTokens = [
     '## Discovery e design doc antes da squad',
     '## Regra de paralelismo entre squads',
-    '## Dashboard local do AIOS Lite',
+    '## Dashboard local do AIOS Forge',
     '## Vinculo de genomas ao squad',
     '## Genomas ativos',
     '## Padrao de resposta',
@@ -323,13 +323,13 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     'modo feature',
     'pacote minimo de docs/skills',
     'prontidao',
-    'aios-lite dashboard:init .',
-    'aios-lite dashboard:dev . --port=3000',
-    'aios-lite dashboard:open . --port=3000',
+    'aios-forge dashboard:init .',
+    'aios-forge dashboard:dev . --port=3000',
+    'aios-forge dashboard:open . --port=3000',
     '## Conteudos da squad',
     'contentBlueprints',
     'nao congele o sistema em campos fixos como `roteiro`, `titulos` ou `descricao`',
-    'o AIOS Lite fixa a casca (`content_key`, `contentType`, `layoutType`, `payload_json`), nao o conteudo interno do dominio',
+    'o AIOS Forge fixa a casca (`content_key`, `contentType`, `layoutType`, `payload_json`), nao o conteudo interno do dominio',
     'Heuristica rapida para escolher `layoutType`:',
     'Heuristica para desenhar `contentBlueprints`:',
     'prefira 1 blueprint principal bem resolvido antes de inventar varios blueprints superficiais',
@@ -339,8 +339,8 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '- `blocks`',
     'output/{squad-slug}/{content-key}/index.html',
     'output/{squad-slug}/{content-key}/content.json',
-    '.aios-lite/squads/{squad-slug}/agents/agents.md',
-    '.aios-lite/squads/{squad-slug}/squad.manifest.json',
+    '.aios-forge/squads/{squad-slug}/agents/agents.md',
+    '.aios-forge/squads/{squad-slug}/squad.manifest.json',
     '## Skills da squad',
     '## Skills instaladas da squad',
     '## MCPs da squad',
@@ -360,7 +360,7 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const genomaTokens = [
     '[4] Apply this genome to an existing squad/agent',
     'AgentGenomes:',
-    'Do not modify official `.aios-lite/agents/` files with user custom genomes',
+    'Do not modify official `.aios-forge/agents/` files with user custom genomes',
     'domain',
     'function',
     'persona',
@@ -382,7 +382,7 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   const genomaPtTokens = [
     '[4] Aplicar este genoma a um squad/agente já existente',
     'AgentGenomes:',
-    'Não modifique agentes oficiais de `.aios-lite/agents/` com genomas customizados do usuário',
+    'Não modifique agentes oficiais de `.aios-forge/agents/` com genomas customizados do usuário',
     'domain',
     'function',
     'persona',

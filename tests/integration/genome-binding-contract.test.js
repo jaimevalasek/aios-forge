@@ -10,7 +10,7 @@ const { applyGenomeToExistingSquad } = require('../../src/squads/apply-genome');
 const { readGenome } = require('../../src/genome-files');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-genome-contract-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-genome-contract-'));
 }
 
 test('genome binding contract stays readable across legacy and v2 persisted formats', async () => {
@@ -31,7 +31,7 @@ test('genome binding contract stays readable across legacy and v2 persisted form
     }
   });
 
-  const manifestPath = path.join(projectRoot, '.aios-lite', 'squads', 'squad-without-genome', 'squad.manifest.json');
+  const manifestPath = path.join(projectRoot, '.aios-forge', 'squads', 'squad-without-genome', 'squad.manifest.json');
   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
   const writer = manifest.executors.find((item) => item.slug === 'writer');
 

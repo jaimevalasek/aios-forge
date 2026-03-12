@@ -73,9 +73,9 @@ async function runQaInit({ args, options = {}, logger, t }) {
   const configPath = path.join(targetDir, 'aios-qa.config.json');
 
   const contextResult = await validateProjectContextFile(targetDir);
-  const contextMarkdown = await readTextIfExists(path.join(targetDir, '.aios-lite/context/project.context.md'));
-  const prdContent = await readTextIfExists(path.join(targetDir, '.aios-lite/context/prd.md'));
-  const discoveryContent = await readTextIfExists(path.join(targetDir, '.aios-lite/context/discovery.md'));
+  const contextMarkdown = await readTextIfExists(path.join(targetDir, '.aios-forge/context/project.context.md'));
+  const prdContent = await readTextIfExists(path.join(targetDir, '.aios-forge/context/prd.md'));
+  const discoveryContent = await readTextIfExists(path.join(targetDir, '.aios-forge/context/discovery.md'));
 
   const contextData = contextResult.parsed && contextResult.data ? contextResult.data : {};
 
@@ -119,7 +119,7 @@ async function runQaInit({ args, options = {}, logger, t }) {
     scenarios: acItems,
     business_rules: businessRules,
     generated_at: new Date().toISOString(),
-    aios_lite_version: require('../../package.json').version
+    aios_forge_version: require('../../package.json').version
   };
 
   if (!dryRun) {

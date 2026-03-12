@@ -120,7 +120,7 @@ async function seedMixedWorkspace(projectDir) {
 }
 
 async function seedParallelContextDocs(projectDir) {
-  const contextDir = path.join(projectDir, '.aios-lite/context');
+  const contextDir = path.join(projectDir, '.aios-forge/context');
   await ensureDir(contextDir);
 
   const discovery = `# Discovery
@@ -168,7 +168,7 @@ async function runSmokeTest({ args, options, logger, t }) {
   const baseDir = path.resolve(process.cwd(), args[0] || os.tmpdir());
   await ensureDir(baseDir);
 
-  const workspaceRoot = await fs.mkdtemp(path.join(baseDir, 'aios-lite-smoke-'));
+  const workspaceRoot = await fs.mkdtemp(path.join(baseDir, 'aios-forge-smoke-'));
   const projectDir = path.join(workspaceRoot, 'demo');
   await ensureDir(projectDir);
 
@@ -292,7 +292,7 @@ async function runSmokeTest({ args, options, logger, t }) {
       t
     });
     assertStep(
-      promptResult.prompt.includes('.aios-lite'),
+      promptResult.prompt.includes('.aios-forge'),
       t,
       'smoke.assert_prompt_path'
     );

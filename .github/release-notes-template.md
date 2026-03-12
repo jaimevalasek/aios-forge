@@ -1,4 +1,4 @@
-## AIOS Lite vX.Y.Z
+## AIOS Forge vX.Y.Z
 
 ### Highlights
 - 
@@ -13,6 +13,6 @@
 - 
 
 ### Upgrade
-- `npx aios-lite@latest update`
-- `aios-lite doctor`
+- `npx aios-forge@latest update`
+- `aios-forge doctor`
 

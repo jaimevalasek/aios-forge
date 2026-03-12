@@ -35,11 +35,11 @@ function resolveAgentLocale(languageTag) {
 }
 
 function getLocalizedAgentPath(agentId, locale) {
-  return `.aios-lite/locales/${localeForPath(locale)}/agents/${agentId}.md`;
+  return `.aios-forge/locales/${localeForPath(locale)}/agents/${agentId}.md`;
 }
 
 function getActiveAgentPath(agentId) {
-  return `.aios-lite/agents/${agentId}.md`;
+  return `.aios-forge/agents/${agentId}.md`;
 }
 
 async function applyAgentLocale(targetDir, locale, options = {}) {

@@ -5,13 +5,13 @@ const { spawn } = require('node:child_process');
 const { existsSync } = require('node:fs');
 
 const CORE_ROOT = path.resolve(__dirname, '..', '..');
-const DEFAULT_DASHBOARD_ROOT = path.resolve(CORE_ROOT, '..', 'aios-lite-dashboard');
+const DEFAULT_DASHBOARD_ROOT = path.resolve(CORE_ROOT, '..', 'aios-dashboard');
 const BLOCK_ORDER = ['A', 'B', 'C', 'D'];
 
 const BLOCKS = {
   A: {
     key: 'A',
-    label: 'Bloco A — Core do aios-lite',
+    label: 'Bloco A — Core do aios-forge',
     repo: 'core',
     command: ['npm', 'run', 'test:genome-2.0:block-a'],
     gate: [

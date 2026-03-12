@@ -8,12 +8,12 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-runtime-json-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-runtime-json-'));
 }
 
 function runCli(args, cwd = process.cwd()) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-lite.js'), ...args], {
+    const child = spawn(process.execPath, [path.join(process.cwd(), 'bin/aios-forge.js'), ...args], {
       cwd,
       env: process.env
     });

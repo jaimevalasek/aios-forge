@@ -16,24 +16,24 @@
 
 ```bash
 mkdir meu-projeto && cd meu-projeto
-npx aios-lite init
+npx aios-forge init
 ```
 
 ### Projeto existente
 
 ```bash
 cd meu-projeto
-npx aios-lite install
+npx aios-forge install
 ```
 
-Isso cria a pasta `.aios-lite/` com todos os arquivos de configuração, agentes e contexto.
+Isso cria a pasta `.aios-forge/` com todos os arquivos de configuração, agentes e contexto.
 
 ---
 
 ## 2. Configure o contexto do projeto
 
 ```bash
-npx aios-lite setup:context
+npx aios-forge setup:context
 ```
 
 O CLI vai fazer perguntas sobre seu projeto:
@@ -47,7 +47,7 @@ O CLI vai fazer perguntas sobre seu projeto:
 ? Idioma de conversa: pt-BR
 ```
 
-Isso gera `.aios-lite/context/project.context.md` — o arquivo que orienta todos os agentes.
+Isso gera `.aios-forge/context/project.context.md` — o arquivo que orienta todos os agentes.
 
 ---
 
@@ -55,7 +55,7 @@ Isso gera `.aios-lite/context/project.context.md` — o arquivo que orienta todo
 
 No **Claude Code** (CLAUDE.md já configurado):
 ```
-/aios-lite/setup
+/aios-forge/setup
 ```
 
 No **Codex** (AGENTS.md já configurado — sem slash commands):

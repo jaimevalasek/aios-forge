@@ -1,6 +1,6 @@
 # Web3 Support
 
-AIOS Lite includes lightweight Web3 support for small and medium teams using JavaScript/TypeScript workflows.
+AIOS Forge includes lightweight Web3 support for small and medium teams using JavaScript/TypeScript workflows.
 
 ## Supported framework detection
 - Ethereum: `Hardhat`, `Foundry`, `Truffle`
@@ -19,10 +19,10 @@ AIOS Lite includes lightweight Web3 support for small and medium teams using Jav
 ## Setup examples
 ```bash
 # Interactive
-aios-lite setup:context
+aios-forge setup:context
 
 # Defaults with explicit Web3 options
-aios-lite setup:context . \
+aios-forge setup:context . \
   --defaults \
   --project-type=dapp \
   --framework=Hardhat \
@@ -36,9 +36,9 @@ aios-lite setup:context . \
 
 ## Web3 smoke checks
 ```bash
-aios-lite test:smoke --web3=ethereum
-aios-lite test:smoke --web3=solana
-aios-lite test:smoke --web3=cardano
+aios-forge test:smoke --web3=ethereum
+aios-forge test:smoke --web3=solana
+aios-forge test:smoke --web3=cardano
 ```
 
 ## Skills bundled in templates

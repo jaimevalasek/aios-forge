@@ -18,7 +18,7 @@ const {
 } = require('../src/runtime-store');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-pipeline-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-pipeline-'));
 }
 
 async function openDb(dir) {

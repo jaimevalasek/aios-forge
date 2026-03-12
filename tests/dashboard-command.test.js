@@ -13,7 +13,7 @@ const {
 } = require('../src/commands/dashboard');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-dashboard-command-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-dashboard-command-'));
 }
 
 function createLogger() {
@@ -42,7 +42,7 @@ test('dashboard:init dry-run returns installation plan', async () => {
     options: {
       dir: dashboardDir,
       'dry-run': true,
-      repo: 'https://example.com/aios-lite-dashboard.git'
+      repo: 'https://example.com/aios-dashboard.git'
     },
     logger,
     t,
@@ -56,9 +56,35 @@ test('dashboard:init dry-run returns installation plan', async () => {
   assert.equal(result.dryRun, true);
   assert.equal(result.projectDir, path.resolve(projectDir));
   assert.equal(result.dashboardDir, path.resolve(dashboardDir));
-  assert.equal(result.repo, 'https://example.com/aios-lite-dashboard.git');
+  assert.equal(result.repo, 'https://example.com/aios-dashboard.git');
   assert.equal(result.cloned, true);
   assert.equal(result.installed, true);
+});
+
+test('dashboard:init dry-run uses Aios Forge defaults for repo and sibling directory', async () => {
+  const root = await makeTempDir();
+  const projectDir = path.join(root, 'project');
+  await fs.mkdir(projectDir, { recursive: true });
+
+  const { t } = createTranslator('en');
+  const logger = createLogger();
+
+  const result = await runDashboardInit({
+    args: [projectDir],
+    options: {
+      'dry-run': true
+    },
+    logger,
+    t,
+    dependencies: {
+      readConfig: async () => ({}),
+      writeConfig: async () => {}
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.dashboardDir, path.join(path.resolve(projectDir, '..'), 'aios-dashboard'));
+  assert.equal(result.repo, 'https://github.com/jaimevalasek/aios-dashboard.git');
 });
 
 test('dashboard:init reuses dashboard install and registers active project', async () => {
@@ -69,7 +95,7 @@ test('dashboard:init reuses dashboard install and registers active project', asy
   await fs.mkdir(path.join(dashboardDir, 'data'), { recursive: true });
   await fs.writeFile(
     path.join(dashboardDir, 'package.json'),
-    JSON.stringify({ name: 'aios-lite-dashboard' }, null, 2),
+    JSON.stringify({ name: 'aios-dashboard' }, null, 2),
     'utf8'
   );
 
@@ -115,7 +141,7 @@ test('dashboard:dev dry-run returns URL and persists active project in dashboard
   await fs.mkdir(path.join(dashboardDir, 'data'), { recursive: true });
   await fs.writeFile(
     path.join(dashboardDir, 'package.json'),
-    JSON.stringify({ name: 'aios-lite-dashboard' }, null, 2),
+    JSON.stringify({ name: 'aios-dashboard' }, null, 2),
     'utf8'
   );
 

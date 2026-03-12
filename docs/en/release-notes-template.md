@@ -1,6 +1,6 @@
 # Release Notes Template
 
-## AIOS Lite vX.Y.Z
+## AIOS Forge vX.Y.Z
 
 ### Highlights
 - [short summary 1]
@@ -29,10 +29,10 @@
 
 ### Upgrade notes
 1. Update package:
-   - `npx aios-lite@latest update`
+   - `npx aios-forge@latest update`
 2. Run health check:
-   - `aios-lite doctor`
-3. Verify local customizations in `.aios-lite/backups/` if applicable.
+   - `aios-forge doctor`
+3. Verify local customizations in `.aios-forge/backups/` if applicable.
 
 ### Checks
 - [ ] Lint passed

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://aios-lite.dev/schemas/workflow-plan.schema.json",
-  "title": "AIOS Lite workflow:plan --json output",
+  "$id": "https://aiosforge.dev/schemas/workflow-plan.schema.json",
+  "title": "AIOS Forge workflow:plan --json output",
   "type": "object",
   "required": ["ok", "targetDir", "contextExists", "contextParsed", "classification", "sequence", "commands", "notes"],
   "properties": {

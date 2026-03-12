@@ -12,7 +12,7 @@ const {
 const { readGenome } = require('../src/genome-files');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-genomes-compat-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-genomes-compat-'));
 }
 
 test('parseGenomeMarkdown supports legacy genome markdown', () => {
@@ -64,7 +64,7 @@ test('parseGenomeMarkdown tolerates markdown without frontmatter', () => {
 
 test('readGenome synthesizes metadata when .meta.json does not exist', async () => {
   const dir = await makeTempDir();
-  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const genomeDir = path.join(dir, '.aios-forge', 'genomas');
   await fs.mkdir(genomeDir, { recursive: true });
   await fs.writeFile(
     path.join(genomeDir, 'copywriting.md'),
@@ -108,7 +108,7 @@ Promessa e clareza definem a leitura.
 
 test('readGenome throws a clear error when metadata json is invalid', async () => {
   const dir = await makeTempDir();
-  const genomeDir = path.join(dir, '.aios-lite', 'genomas');
+  const genomeDir = path.join(dir, '.aios-forge', 'genomas');
   await fs.mkdir(genomeDir, { recursive: true });
   await fs.writeFile(path.join(genomeDir, 'storytelling-br.md'), '# Storytelling BR\n\nHeurísticas.\n', 'utf8');
   await fs.writeFile(path.join(genomeDir, 'storytelling-br.meta.json'), '{ invalid json', 'utf8');

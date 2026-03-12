@@ -1,6 +1,6 @@
-# Documentação AIOS Lite (Português)
+# Documentação AIOS Forge (Português)
 
-Bem-vindo à documentação em português do AIOS Lite — um framework leve de agentes de IA para projetos de software.
+Bem-vindo à documentação em português do AIOS Forge — um framework leve de agentes de IA para projetos de software.
 
 ## Guias
 
@@ -25,13 +25,13 @@ Para referências técnicas completas, consulte `docs/en/`:
 
 ```bash
 # 1. Instalar em um projeto existente
-npx aios-lite install
+npx aios-forge install
 
 # 2. Configurar contexto do projeto
-npx aios-lite setup:context
+npx aios-forge setup:context
 
 # 3. Verificar saúde
-npx aios-lite doctor
+npx aios-forge doctor
 ```
 
 Depois, abra seu AI IDE e digite `/setup` para começar.

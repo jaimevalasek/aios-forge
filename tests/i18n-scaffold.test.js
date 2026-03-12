@@ -8,7 +8,7 @@ const path = require('node:path');
 const { createLocaleScaffold } = require('../src/i18n/scaffold');
 
 async function makeTempDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-lite-i18n-'));
+  return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-i18n-'));
 }
 
 test('creates locale scaffold file for a valid locale', async () => {

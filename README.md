@@ -1,4 +1,4 @@
-# AIOS Lite
+# AIOS Forge
 
 Lightweight AI agent framework for software projects.
 
@@ -15,7 +15,7 @@ Lightweight AI agent framework for software projects.
 
 | Feature | Extra requirement |
 |---------|-------------------|
-| `scan:project` (brownfield scanner) | `aios-lite-models.json` with a cheap LLM API key (DeepSeek, OpenAI, Gemini, Groq, Together, Mistral, or Anthropic) |
+| `scan:project` (brownfield scanner) | `aios-forge-models.json` with a cheap LLM API key (DeepSeek, OpenAI, Gemini, Groq, Together, Mistral, or Anthropic) |
 | `qa:run` / `qa:scan` (browser QA) | Playwright + Chromium: `npm install -g playwright && npx playwright install chromium` |
 | `mcp:init` / `mcp:doctor` | MCP-compatible tool (Claude Code, Gemini CLI, OpenCode, or Codex CLI with MCP support) |
 | Web3 support | Project must use a supported chain toolchain (Hardhat, Foundry, Anchor, etc.) |
@@ -23,22 +23,22 @@ Lightweight AI agent framework for software projects.
 ## Install
 
 ```bash
-npx aios-lite init my-project
+npx aios-forge init my-project
 # or
-npx aios-lite install
+npx aios-forge install
 ```
 
 ## Legacy projects and custom stacks
-You can run AIOS Lite on existing/legacy projects (not only new projects).
+You can run AIOS Forge on existing/legacy projects (not only new projects).
 
 ```bash
 # inside an existing project
-npx aios-lite install .
-aios-lite setup:context . --defaults --framework="CodeIgniter 3" --backend="CodeIgniter 3" --database="MySQL"
+npx aios-forge install .
+aios-forge setup:context . --defaults --framework="CodeIgniter 3" --backend="CodeIgniter 3" --database="MySQL"
 
 # generate discovery.md + skeleton-system.md using a cheap LLM (saves tokens in your AI session)
-# requires aios-lite-models.json with your API key
-aios-lite scan:project
+# requires aios-forge-models.json with your API key
+aios-forge scan:project
 ```
 
 If your stack is not listed in menus, use free-text values via `--framework`, `--backend`, `--frontend`, `--database`, `--auth`, and `--uiux`.
@@ -46,114 +46,114 @@ If your stack is not listed in menus, use free-text values via `--framework`, `-
 ## Commands
 
 **Setup and install**
-- [`aios-lite init`](docs/en/cli-reference.md#init) `<project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
-- [`aios-lite install`](docs/en/cli-reference.md#install) `[path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
-- [`aios-lite update`](docs/en/cli-reference.md#update) `[path] [--lang=en|pt-BR|es|fr]`
-- [`aios-lite info`](docs/en/cli-reference.md#info) `[path] [--json]`
-- [`aios-lite doctor`](docs/en/cli-reference.md#doctor) `[path] [--fix] [--dry-run] [--json]`
-- [`aios-lite setup:context`](docs/en/cli-reference.md#setupcontext) `[path] [--defaults] [--framework=<name>] [--lang=en|pt-BR|es|fr]`
-- [`aios-lite context:validate`](docs/en/cli-reference.md#contextvalidate) `[path] [--json]`
-- [`aios-lite scan:project`](docs/en/cli-reference.md#scanproject) `[path] [--provider=<name>] [--dry-run] [--json]`
+- [`aios-forge init`](docs/en/cli-reference.md#init) `<project-name> [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
+- [`aios-forge install`](docs/en/cli-reference.md#install) `[path] [--lang=en|pt-BR|es|fr] [--tool=codex|claude|gemini|opencode]`
+- [`aios-forge update`](docs/en/cli-reference.md#update) `[path] [--lang=en|pt-BR|es|fr]`
+- [`aios-forge info`](docs/en/cli-reference.md#info) `[path] [--json]`
+- [`aios-forge doctor`](docs/en/cli-reference.md#doctor) `[path] [--fix] [--dry-run] [--json]`
+- [`aios-forge setup:context`](docs/en/cli-reference.md#setupcontext) `[path] [--defaults] [--framework=<name>] [--lang=en|pt-BR|es|fr]`
+- [`aios-forge context:validate`](docs/en/cli-reference.md#contextvalidate) `[path] [--json]`
+- [`aios-forge scan:project`](docs/en/cli-reference.md#scanproject) `[path] [--provider=<name>] [--dry-run] [--json]`
 
 **Agents**
-- [`aios-lite agents`](docs/en/cli-reference.md#agents)
-- [`aios-lite agent:prompt`](docs/en/cli-reference.md#agentprompt) `<agent> [--tool=codex|claude|gemini|opencode]`
-- [`aios-lite workflow:plan`](docs/en/cli-reference.md#workflowplan) `[path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
+- [`aios-forge agents`](docs/en/cli-reference.md#agents)
+- [`aios-forge agent:prompt`](docs/en/cli-reference.md#agentprompt) `<agent> [--tool=codex|claude|gemini|opencode]`
+- [`aios-forge workflow:plan`](docs/en/cli-reference.md#workflowplan) `[path] [--classification=MICRO|SMALL|MEDIUM] [--json]`
 
 **Locale**
-- [`aios-lite i18n:add`](docs/en/i18n.md#create-a-locale-scaffold) `<locale>`
-- [`aios-lite locale:apply`](docs/en/i18n.md#apply-localized-agent-prompts) `[path] [--lang=en|pt-BR|es|fr]`
+- [`aios-forge i18n:add`](docs/en/i18n.md#create-a-locale-scaffold) `<locale>`
+- [`aios-forge locale:apply`](docs/en/i18n.md#apply-localized-agent-prompts) `[path] [--lang=en|pt-BR|es|fr]`
 
 **Parallel orchestration**
-- [`aios-lite parallel:init`](docs/en/parallel.md) `[path] [--workers=2..6] [--force] [--dry-run] [--json]`
-- [`aios-lite parallel:assign`](docs/en/parallel.md#scope-assignment) `[path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json]`
-- [`aios-lite parallel:status`](docs/en/parallel.md#status-overview) `[path] [--json]`
-- [`aios-lite parallel:doctor`](docs/en/parallel.md#diagnose-and-repair) `[path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
+- [`aios-forge parallel:init`](docs/en/parallel.md) `[path] [--workers=2..6] [--force] [--dry-run] [--json]`
+- [`aios-forge parallel:assign`](docs/en/parallel.md#scope-assignment) `[path] [--source=auto|prd|architecture|discovery|<file>] [--workers=2..6] [--force] [--dry-run] [--json]`
+- [`aios-forge parallel:status`](docs/en/parallel.md#status-overview) `[path] [--json]`
+- [`aios-forge parallel:doctor`](docs/en/parallel.md#diagnose-and-repair) `[path] [--workers=2..6] [--fix] [--force] [--dry-run] [--json]`
 
 **MCP**
-- [`aios-lite mcp:init`](docs/en/mcp.md#mcpinit) `[path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
-- [`aios-lite mcp:doctor`](docs/en/mcp.md#mcpdoctor) `[path] [--strict-env] [--json]`
+- [`aios-forge mcp:init`](docs/en/mcp.md#mcpinit) `[path] [--tool=claude|codex|gemini|opencode] [--dry-run] [--json]`
+- [`aios-forge mcp:doctor`](docs/en/mcp.md#mcpdoctor) `[path] [--strict-env] [--json]`
 
 **Browser QA (Playwright)**
-- [`aios-lite qa:init`](docs/en/qa-browser.md#qainit) `[path] [--url=<app-url>] [--dry-run] [--json]`
-- [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor) `[path] [--json]`
-- [`aios-lite qa:run`](docs/en/qa-browser.md#qarun) `[path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]`
-- [`aios-lite qa:scan`](docs/en/qa-browser.md#qascan) `[path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]`
-- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport) `[path] [--html] [--json]`
+- [`aios-forge qa:init`](docs/en/qa-browser.md#qainit) `[path] [--url=<app-url>] [--dry-run] [--json]`
+- [`aios-forge qa:doctor`](docs/en/qa-browser.md#qadoctor) `[path] [--json]`
+- [`aios-forge qa:run`](docs/en/qa-browser.md#qarun) `[path] [--url=<app-url>] [--persona=naive|hacker|power|mobile] [--headed] [--html] [--json]`
+- [`aios-forge qa:scan`](docs/en/qa-browser.md#qascan) `[path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json]`
+- [`aios-forge qa:report`](docs/en/qa-browser.md#qareport) `[path] [--html] [--json]`
 
 **Testing and validation (CI / contributors)**
-- [`aios-lite test:smoke`](docs/en/cli-reference.md#testsmoke) `[workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
-- [`aios-lite test:package`](docs/en/cli-reference.md#testpackage) `[source-path] [--keep] [--dry-run] [--json]`
+- [`aios-forge test:smoke`](docs/en/cli-reference.md#testsmoke) `[workspace-path] [--lang=en|pt-BR|es|fr] [--web3=ethereum|solana|cardano] [--profile=standard|mixed|parallel] [--keep] [--json]`
+- [`aios-forge test:package`](docs/en/cli-reference.md#testpackage) `[source-path] [--keep] [--dry-run] [--json]`
 
 ## Agent usage helper
 
 If your AI CLI does not show a visual agent picker, these commands let you interact with agents directly from the terminal. See the [CLI reference](docs/en/cli-reference.md) for full docs on each.
 
 **Discover agents**
-- [`aios-lite agents`](docs/en/cli-reference.md#agents) — list all agents and their paths
-- [`aios-lite agent:prompt setup --tool=codex`](docs/en/cli-reference.md#agentprompt) — get activation prompt for any agent
-- [`aios-lite workflow:plan --classification=SMALL`](docs/en/cli-reference.md#workflowplan) — see the recommended agent sequence
+- [`aios-forge agents`](docs/en/cli-reference.md#agents) — list all agents and their paths
+- [`aios-forge agent:prompt setup --tool=codex`](docs/en/cli-reference.md#agentprompt) — get activation prompt for any agent
+- [`aios-forge workflow:plan --classification=SMALL`](docs/en/cli-reference.md#workflowplan) — see the recommended agent sequence
 
 **Setup and locale**
-- [`aios-lite init my-project --lang=pt-BR --tool=codex`](docs/en/cli-reference.md#init)
-- [`aios-lite install --lang=es --tool=claude`](docs/en/cli-reference.md#install)
-- [`aios-lite update --lang=fr`](docs/en/cli-reference.md#update)
-- [`aios-lite locale:apply --lang=pt-BR`](docs/en/i18n.md#apply-localized-agent-prompts)
+- [`aios-forge init my-project --lang=pt-BR --tool=codex`](docs/en/cli-reference.md#init)
+- [`aios-forge install --lang=es --tool=claude`](docs/en/cli-reference.md#install)
+- [`aios-forge update --lang=fr`](docs/en/cli-reference.md#update)
+- [`aios-forge locale:apply --lang=pt-BR`](docs/en/i18n.md#apply-localized-agent-prompts)
 
 **Maintenance**
-- [`aios-lite doctor --fix`](docs/en/cli-reference.md#doctor) — restore any missing managed files
+- [`aios-forge doctor --fix`](docs/en/cli-reference.md#doctor) — restore any missing managed files
 
 **Parallel orchestration**
-- [`aios-lite parallel:init --workers=3`](docs/en/parallel.md)
-- [`aios-lite parallel:assign --source=architecture --workers=3`](docs/en/parallel.md#scope-assignment)
-- [`aios-lite parallel:status`](docs/en/parallel.md#status-overview)
-- [`aios-lite parallel:doctor --fix --dry-run`](docs/en/parallel.md#diagnose-and-repair)
+- [`aios-forge parallel:init --workers=3`](docs/en/parallel.md)
+- [`aios-forge parallel:assign --source=architecture --workers=3`](docs/en/parallel.md#scope-assignment)
+- [`aios-forge parallel:status`](docs/en/parallel.md#status-overview)
+- [`aios-forge parallel:doctor --fix --dry-run`](docs/en/parallel.md#diagnose-and-repair)
 
 **MCP**
-- [`aios-lite mcp:init --dry-run`](docs/en/mcp.md#mcpinit)
-- [`aios-lite mcp:doctor --strict-env`](docs/en/mcp.md#mcpdoctor)
+- [`aios-forge mcp:init --dry-run`](docs/en/mcp.md#mcpinit)
+- [`aios-forge mcp:doctor --strict-env`](docs/en/mcp.md#mcpdoctor)
 
 **Browser QA**
-- [`aios-lite qa:init --url=http://localhost:3000`](docs/en/qa-browser.md#qainit)
-- [`aios-lite qa:doctor`](docs/en/qa-browser.md#qadoctor)
-- [`aios-lite qa:run --persona=hacker`](docs/en/qa-browser.md#qarun)
-- [`aios-lite qa:run --html`](docs/en/qa-browser.md#html-reports) — visual HTML report in `reports/`
-- [`aios-lite qa:scan --depth=2 --max-pages=30`](docs/en/qa-browser.md#qascan)
-- [`aios-lite qa:report --html`](docs/en/qa-browser.md#html-reports) — retroactive HTML from last run
-- [`aios-lite qa:report`](docs/en/qa-browser.md#qareport)
+- [`aios-forge qa:init --url=http://localhost:3000`](docs/en/qa-browser.md#qainit)
+- [`aios-forge qa:doctor`](docs/en/qa-browser.md#qadoctor)
+- [`aios-forge qa:run --persona=hacker`](docs/en/qa-browser.md#qarun)
+- [`aios-forge qa:run --html`](docs/en/qa-browser.md#html-reports) — visual HTML report in `reports/`
+- [`aios-forge qa:scan --depth=2 --max-pages=30`](docs/en/qa-browser.md#qascan)
+- [`aios-forge qa:report --html`](docs/en/qa-browser.md#html-reports) — retroactive HTML from last run
+- [`aios-forge qa:report`](docs/en/qa-browser.md#qareport)
 
 **Integration tests (CI)**
-- [`aios-lite test:smoke --lang=pt-BR`](docs/en/cli-reference.md#testsmoke)
-- [`aios-lite test:smoke --web3=ethereum`](docs/en/cli-reference.md#testsmoke)
-- [`aios-lite test:smoke --profile=parallel`](docs/en/cli-reference.md#testsmoke)
-- [`aios-lite test:package --dry-run`](docs/en/cli-reference.md#testpackage)
+- [`aios-forge test:smoke --lang=pt-BR`](docs/en/cli-reference.md#testsmoke)
+- [`aios-forge test:smoke --web3=ethereum`](docs/en/cli-reference.md#testsmoke)
+- [`aios-forge test:smoke --profile=parallel`](docs/en/cli-reference.md#testsmoke)
+- [`aios-forge test:package --dry-run`](docs/en/cli-reference.md#testpackage)
 
 Default planning includes `@product` → `@ux-ui` for SMALL/MEDIUM projects.
 
 ## JSON output for CI
 Use `--json` on selected commands. See [JSON schemas](docs/en/json-schemas.md) for output contracts.
-- `aios-lite init <project-name> --json`
-- `aios-lite install [path] --json`
-- `aios-lite update [path] --json`
-- `aios-lite agents [path] --json`
-- `aios-lite agent:prompt <agent> [path] --json`
-- `aios-lite locale:apply [path] --json`
-- `aios-lite setup:context [path] --defaults --json`
-- `aios-lite i18n:add <locale> --dry-run --json`
-- `aios-lite info --json`
-- `aios-lite doctor --json`
-- `aios-lite context:validate --json`
-- `aios-lite test:smoke --json`
-- `aios-lite parallel:init --json`
-- `aios-lite parallel:assign --json`
-- `aios-lite parallel:status --json`
-- `aios-lite parallel:doctor --json`
-- `aios-lite mcp:doctor --json`
-- `aios-lite qa:run --json`
-- `aios-lite qa:scan --json`
-- `aios-lite qa:doctor --json`
-- `aios-lite qa:report --json`
-- `aios-lite scan:project --json`
+- `aios-forge init <project-name> --json`
+- `aios-forge install [path] --json`
+- `aios-forge update [path] --json`
+- `aios-forge agents [path] --json`
+- `aios-forge agent:prompt <agent> [path] --json`
+- `aios-forge locale:apply [path] --json`
+- `aios-forge setup:context [path] --defaults --json`
+- `aios-forge i18n:add <locale> --dry-run --json`
+- `aios-forge info --json`
+- `aios-forge doctor --json`
+- `aios-forge context:validate --json`
+- `aios-forge test:smoke --json`
+- `aios-forge parallel:init --json`
+- `aios-forge parallel:assign --json`
+- `aios-forge parallel:status --json`
+- `aios-forge parallel:doctor --json`
+- `aios-forge mcp:doctor --json`
+- `aios-forge qa:run --json`
+- `aios-forge qa:scan --json`
+- `aios-forge qa:doctor --json`
+- `aios-forge qa:report --json`
+- `aios-forge scan:project --json`
 
 ## i18n
 CLI localization is supported with:
@@ -169,7 +169,7 @@ Localized agent packs are built-in for `en`, `pt-BR`, `es`, and `fr`.
 Generate a new locale scaffold:
 
 ```bash
-aios-lite i18n:add fr
+aios-forge i18n:add fr
 ```
 
 ## Multi-IDE support
@@ -223,16 +223,16 @@ See the [Web3 guide](docs/en/web3.md) for the full reference.
 Generate a local MCP server recommendation file from `project.context.md`:
 
 ```bash
-aios-lite mcp:init
-aios-lite mcp:init --dry-run
-aios-lite mcp:init --tool=codex
-aios-lite mcp:doctor
-aios-lite mcp:doctor --strict-env
+aios-forge mcp:init
+aios-forge mcp:init --dry-run
+aios-forge mcp:init --tool=codex
+aios-forge mcp:doctor
+aios-forge mcp:doctor --strict-env
 ```
 
 `mcp:init` generates:
-- `.aios-lite/mcp/servers.local.json` (project MCP plan)
-- `.aios-lite/mcp/presets/<tool>.json` (tool-specific preset templates)
+- `.aios-forge/mcp/servers.local.json` (project MCP plan)
+- `.aios-forge/mcp/presets/<tool>.json` (tool-specific preset templates)
 - Context7/Database presets in remote-endpoint mode (`mcp-remote`) using:
   - `CONTEXT7_MCP_URL`
   - `DATABASE_MCP_URL` (when database MCP is enabled)
