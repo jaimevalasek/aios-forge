@@ -61,12 +61,6 @@ module.exports = {
       'aios-forge genome:doctor <arquivo> [--json] [--locale=pt-BR]',
     help_genome_migrate:
       'aios-forge genome:migrate <arquivo-ou-diretorio> [--write] [--no-backup] [--json] [--locale=pt-BR]',
-    help_dashboard_init:
-      'aios-forge dashboard:init [path] [--dir=<path>] [--repo=<git-url>] [--project-name=<nome>] [--skip-install] [--dry-run] [--json] [--locale=pt-BR]',
-    help_dashboard_dev:
-      'aios-forge dashboard:dev [path] [--dir=<path>] [--host=127.0.0.1] [--port=3000] [--project-name=<nome>] [--dry-run] [--json] [--locale=pt-BR]',
-    help_dashboard_open:
-      'aios-forge dashboard:open [path] [--host=127.0.0.1] [--port=3000] [--url=<url>] [--dry-run] [--json] [--locale=pt-BR]',
     help_squad_status:
       'aios-forge squad:status [path] [--json] [--locale=pt-BR]',
     help_squad_doctor:
@@ -109,6 +103,9 @@ module.exports = {
       'aios-forge cloud:publish:squad [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--compatibility-min=<versao>] [--compatibility-max=<versao>] [--linked-genome-version=<versao>] [--dry-run] [--json] [--locale=pt-BR]',
     help_cloud_publish_genome:
       'aios-forge cloud:publish:genome [path] --slug=<slug> --resource-version=<versao> [--url=<publish-url>|--base-url=<site>] [--title=<texto>] [--summary=<texto>] [--source-kind=LOCAL|AIOSLITE|IMPORTED|REMOTE_PROVIDER] [--dry-run] [--json] [--locale=pt-BR]',
+    dashboard_moved:
+      'O fluxo `{command}` foi removido do CLI. O dashboard do AIOS Forge agora e instalado separadamente. Abra o app do dashboard no seu computador, crie ou adicione um projeto e selecione a pasta que ja contem `.aios-forge/`.',
+    dashboard_moved_line: '{message}\n',
     unknown_command: 'Comando desconhecido: {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erro: {message}'
@@ -710,28 +707,6 @@ module.exports = {
     show_line: '  {key} = {value}',
     get_line: '{key} = {value}',
     key_not_found: 'Chave nao encontrada: {key}'
-  },
-  dashboard: {
-    project_missing: 'O caminho do projeto nao existe ou nao e uma pasta: {path}',
-    init_dir_not_empty:
-      'O diretorio do dashboard ja existe e nao esta vazio: {path}. Use --dir com um caminho vazio ou reutilize a instalacao existente.',
-    not_initialized:
-      'O dashboard nao esta inicializado em: {path}. Execute `aios-forge dashboard:init` primeiro.',
-    clone_start: 'Clonando dashboard de {repo} para {path}...',
-    clone_failed: 'Falha ao clonar o dashboard: {detail}',
-    install_start: 'Instalando dependencias do dashboard em {path}...',
-    install_failed: 'Falha ao instalar dependencias do dashboard: {detail}',
-    init_ok: 'Dashboard pronto em: {path}',
-    project_registered: 'Projeto registrado no dashboard: {name} ({path})',
-    next_steps: 'Proximos passos:',
-    step_dev: '1. Inicie o dashboard: aios-forge dashboard:dev {path}',
-    step_open:
-      '2. Abra o dashboard no navegador: aios-forge dashboard:open --host={host} --port={port}',
-    dry_run_summary: '[dry-run] Comando do dashboard preparado para: {path}',
-    dev_start: 'Iniciando servidor dev do dashboard em {path} na URL http://{host}:{port} ...',
-    open_ready: 'URL do dashboard pronta: {url}',
-    open_start: 'Abrindo dashboard: {url}',
-    open_failed: 'Nao foi possivel abrir a URL do dashboard automaticamente: {detail}'
   },
   runtime: {
     option_required: 'Opcao obrigatoria ausente: {option}',

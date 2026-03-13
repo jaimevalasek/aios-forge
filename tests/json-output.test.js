@@ -171,24 +171,20 @@ test('agent:prompt --json returns structured payload without human logs', async 
   assert.equal(typeof parsed.prompt, 'string');
 });
 
-test('dashboard:init --dry-run --json returns structured payload without human logs', async () => {
+test('legacy dashboard commands return a structured migration error with --json', async () => {
   const dir = await makeTempDir();
-  const dashboardDir = path.join(dir, 'dashboard-install');
   const cli = await runCli([
     'dashboard:init',
     dir,
-    `--dir=${dashboardDir}`,
-    '--repo=https://example.com/aios-dashboard.git',
-    '--dry-run',
     '--json'
   ]);
-  assert.equal(cli.code, 0);
+  assert.equal(cli.code, 1);
   assert.equal(cli.stderr.trim(), '');
   const parsed = JSON.parse(cli.stdout);
-  assert.equal(parsed.ok, true);
-  assert.equal(parsed.dryRun, true);
-  assert.equal(parsed.dashboardDir, path.resolve(dashboardDir));
-  assert.equal(parsed.repo, 'https://example.com/aios-dashboard.git');
+  assert.equal(parsed.ok, false);
+  assert.equal(parsed.error.code, 'dashboard_moved');
+  assert.equal(parsed.error.command, 'dashboard:init');
+  assert.equal(parsed.error.message.includes('.aios-forge/'), true);
 });
 
 test('cloud:import:squad --dry-run --json returns structured payload without human logs', async () => {

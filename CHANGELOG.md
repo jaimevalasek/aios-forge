@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- `docs/pt/comandos-cli.md`: first Portuguese-first CLI reference page covering all public `aios-forge` commands with grouped descriptions, command map, examples, and practical usage recipes. Linked from `docs/pt/README.md` and `docs/pt/inicio-rapido.md`.
+
 ### Changed
+- Legacy `dashboard:*` CLI flow removed from the public surface. `aios-forge dashboard:init|dev|open` no longer appear in help or docs; if called, the CLI now returns a migration error instructing users to open the separately installed dashboard app and select the project folder that already contains `.aios-forge/`. Updated pt docs and agent guidance to match the new app-first dashboard flow.
 - `template/.aios-forge/skills/static/interface-design.md`: upgraded the interface-design craft guide by merging strengths from the upstream `interface-design` skill without losing AIOS Forge workflow fit. Added persistent design memory via `.interface-design/system.md`, existing-UI refinement rules (diagnose drift before re-theme), two fully specified directions (`Sophistication & Trust`, `Premium Dark Platform`), a mandatory pre-component decision checkpoint, and explicit memory update guidance for reusable UI patterns.
 
 ## [0.1.28] - 2026-03-04

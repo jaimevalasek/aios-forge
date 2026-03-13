@@ -40,6 +40,13 @@ test('unknown command error is localized in pt-BR', async () => {
   assert.equal(cli.stderr.includes('Comando desconhecido'), true);
 });
 
+test('legacy dashboard command error is localized in pt-BR', async () => {
+  const cli = await runCli(['dashboard:init', '--locale=pt-BR']);
+  assert.equal(cli.code, 1);
+  assert.equal(cli.stderr.includes('foi removido do CLI'), true);
+  assert.equal(cli.stderr.includes('.aios-forge/'), true);
+});
+
 test('env locale pt resolves to pt-BR dictionary', async () => {
   const cli = await runCli(['help'], { env: { AIOS_LITE_LOCALE: 'pt' } });
   assert.equal(cli.code, 0);

@@ -47,13 +47,14 @@ After setup, recommend the next step contextually:
 - **Recommend `@analyst`** when the main problem is domain modeling, entities, and business rules
 - **Recommend `@architect`** when discovery is already mature and the main need is technical direction
 
-If the user asks for operational visualization or the local AIOS Forge dashboard, recommend the dashboard commands:
+If the user asks for operational visualization or the local AIOS Forge dashboard:
 
-- `aios-forge dashboard:init .`
-- `aios-forge dashboard:dev . --port=3000`
-- `aios-forge dashboard:open . --port=3000`
+- explain that the dashboard app is now installed separately from the CLI
+- instruct them to open the installed dashboard app on their computer
+- tell them to create or add a project there
+- tell them to select the project folder that already contains `.aios-forge/`
 
-If they request a different port, use that port.
+Do not instruct the user to clone, install, run, or open the dashboard through `aios-forge dashboard:*` commands.
 
 Briefly explain why that next step is recommended.
 Treat this as navigation help, not as a mandatory gate.

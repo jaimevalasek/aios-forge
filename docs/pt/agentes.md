@@ -60,10 +60,10 @@ O AIOS Forge tem agentes oficiais de projeto e também pode criar agentes de squ
 - `@setup` continua sendo o primeiro agente
 - `@discovery-design-doc` entra como recomendação contextual, não como etapa obrigatória
 - se o pedido já estiver claro e pequeno, o fluxo pode seguir direto para `@dev`, `@analyst` ou `@architect`
-- se o usuário pedir o painel local do AIOS Forge, o fluxo correto é via CLI:
-  - `aios-forge dashboard:init .`
-  - `aios-forge dashboard:dev . --port=3000`
-  - `aios-forge dashboard:open . --port=3000`
+- se o usuário pedir o painel local do AIOS Forge, o fluxo correto agora é:
+  - abrir o app do dashboard já instalado no computador
+  - clicar em criar/adicionar projeto
+  - selecionar a pasta do projeto que já contém `.aios-forge/`
 
 ---
 
@@ -309,7 +309,7 @@ npx aios-forge parallel:status
 - Materializa o pacote minimo de contexto da squad para o runtime, dashboard e cloud
 - Pode organizar entregáveis estruturados como `content.json + index.html` por `content_key`
 - Usa `contentBlueprints` como contrato dinâmico do domínio; o framework fixa a casca do conteúdo, não os campos internos
-- Quando o usuário pedir painel local da squad, deve apontar para os comandos oficiais `dashboard:*` do AIOS Forge, não procurar um app manualmente no workspace
+- Quando o usuário pedir painel local da squad, deve apontar para o app do dashboard instalado separadamente e para a seleção da pasta que já contém `.aios-forge/`, sem mandar usar `dashboard:*`
 
 **Como ativar:**
 ```

@@ -39,13 +39,14 @@ Depois do setup, recomende o proximo passo de forma contextual:
 - **Recomendar `@analyst`** quando o problema principal for dominio, entidades e regras de negocio
 - **Recomendar `@architect`** quando discovery ja estiver madura e a principal necessidade for direcao tecnica
 
-Se o usuario pedir visualizacao operacional do projeto ou painel local do AIOS Forge, recomende os comandos de dashboard:
+Se o usuario pedir visualizacao operacional do projeto ou painel local do AIOS Forge:
 
-- `aios-forge dashboard:init .`
-- `aios-forge dashboard:dev . --port=3000`
-- `aios-forge dashboard:open . --port=3000`
+- explique que o app do dashboard agora e instalado separadamente do CLI
+- oriente a abrir o app do dashboard ja instalado no computador
+- diga para criar ou adicionar um projeto por la
+- diga para selecionar a pasta do projeto que ja contem `.aios-forge/`
 
-Se ele pedir outra porta, usar a porta informada.
+Nao mande clonar, instalar, iniciar ou abrir o dashboard por comandos `aios-forge dashboard:*`.
 
 Explique brevemente o por que da recomendacao.
 Trate isso como ajuda de navegacao, nao como gate obrigatorio.

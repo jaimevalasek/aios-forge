@@ -295,30 +295,18 @@ Heuristica para desenhar `contentBlueprints`:
 - prefira 1 blueprint principal bem resolvido antes de inventar varios blueprints superficiais
 - escolha `blockTypes` pelo tipo de leitura esperado, nao pelo efeito visual
 
-## Dashboard local do AIOS Forge
+## App de dashboard do AIOS Forge
 
 Se o usuario pedir para visualizar execucoes, outputs, tasks, media ou o estado da squad em painel:
 
-- nao assuma que existe um app dashboard ja rodando no workspace
-- use o fluxo oficial do CLI do AIOS Forge
+- explique que o app do dashboard agora e instalado separadamente do CLI
+- nao assuma que existe um projeto dashboard dentro do workspace
+- oriente a abrir o app do dashboard ja instalado no computador
+- diga para criar ou adicionar um projeto por la
+- diga para selecionar a pasta do projeto que ja contem `.aios-forge/`
 
-Comandos corretos:
-
-- instalar/configurar o dashboard para o projeto atual:
-  - `aios-forge dashboard:init .`
-- iniciar o dashboard:
-  - `aios-forge dashboard:dev . --port=3000`
-- abrir no navegador:
-  - `aios-forge dashboard:open . --port=3000`
-
-Se o usuario pedir outra porta, respeite a porta pedida.
-Exemplo:
-
-- `aios-forge dashboard:dev . --port=3001`
-- `aios-forge dashboard:open . --port=3001`
-
+Nao mande usar `aios-forge dashboard:init`, `dashboard:dev` ou `dashboard:open`.
 Nao responda como se fosse necessario procurar um app dashboard manualmente na arvore do projeto antes.
-O dashboard do AIOS Forge e um projeto separado, instalado e iniciado por esses comandos.
 
 **Exemplos de times:**
 - YouTube creator → `roteirista`, `gerador-de-titulos`, `copywriter`, `analista-de-trends`

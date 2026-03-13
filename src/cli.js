@@ -40,11 +40,6 @@ const { runSquadValidate } = require('./commands/squad-validate');
 const { runSquadExport } = require('./commands/squad-export');
 const { runSquadPipeline } = require('./commands/squad-pipeline');
 const {
-  runDashboardInit,
-  runDashboardDev,
-  runDashboardOpen
-} = require('./commands/dashboard');
-const {
   runRuntimeInit,
   runRuntimeIngest,
   runRuntimeTaskStart,
@@ -128,12 +123,6 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'genome-doctor',
   'genome:migrate',
   'genome-migrate',
-  'dashboard:init',
-  'dashboard-init',
-  'dashboard:dev',
-  'dashboard-dev',
-  'dashboard:open',
-  'dashboard-open',
   'squad:status',
   'squad-status',
   'squad:doctor',
@@ -179,6 +168,15 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'version',
   '--version',
   '-v'
+]);
+
+const LEGACY_DASHBOARD_COMMANDS = new Set([
+  'dashboard:init',
+  'dashboard-init',
+  'dashboard:dev',
+  'dashboard-dev',
+  'dashboard:open',
+  'dashboard-open'
 ]);
 
 function toText(value) {
@@ -242,9 +240,6 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_config');
   logHelpLine(t, logger, 'cli.help_genome_doctor');
   logHelpLine(t, logger, 'cli.help_genome_migrate');
-  logHelpLine(t, logger, 'cli.help_dashboard_init');
-  logHelpLine(t, logger, 'cli.help_dashboard_dev');
-  logHelpLine(t, logger, 'cli.help_dashboard_open');
   logHelpLine(t, logger, 'cli.help_squad_status');
   logHelpLine(t, logger, 'cli.help_squad_doctor');
   logHelpLine(t, logger, 'cli.help_squad_repair_genomes');
@@ -294,6 +289,24 @@ async function main() {
     if (jsonMode) {
       writeJson(result);
     }
+    return;
+  }
+
+  if (LEGACY_DASHBOARD_COMMANDS.has(command)) {
+    const message = t('cli.dashboard_moved', { command });
+    if (jsonMode) {
+      writeJson({
+        ok: false,
+        error: {
+          code: 'dashboard_moved',
+          message,
+          command
+        }
+      });
+    } else {
+      logger.error(t('cli.dashboard_moved_line', { message }));
+    }
+    process.exitCode = 1;
     return;
   }
 
@@ -384,12 +397,6 @@ async function main() {
       result = await runGenomeDoctor({ args, options, logger: commandLogger, t });
     } else if (command === 'genome:migrate' || command === 'genome-migrate') {
       result = await runGenomeMigrate({ args, options, logger: commandLogger, t });
-    } else if (command === 'dashboard:init' || command === 'dashboard-init') {
-      result = await runDashboardInit({ args, options, logger: commandLogger, t });
-    } else if (command === 'dashboard:dev' || command === 'dashboard-dev') {
-      result = await runDashboardDev({ args, options, logger: commandLogger, t });
-    } else if (command === 'dashboard:open' || command === 'dashboard-open') {
-      result = await runDashboardOpen({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:status' || command === 'squad-status') {
       result = await runSquadStatus({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:doctor' || command === 'squad-doctor') {

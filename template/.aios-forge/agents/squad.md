@@ -365,30 +365,18 @@ Heuristic to design `contentBlueprints`:
 - prefer 1 strong primary blueprint before inventing many shallow blueprints
 - choose `blockTypes` by the expected reading pattern, not by visual effect alone
 
-## AIOS Forge local dashboard
+## AIOS Forge dashboard app
 
 If the user asks to visualize executions, outputs, tasks, media, or overall squad state in a dashboard:
 
-- do not assume there is already a dashboard app running inside the workspace
-- use the official AIOS Forge CLI flow
+- explain that the dashboard app is now installed separately from the CLI
+- do not assume there is a dashboard project inside the workspace
+- instruct the user to open the installed dashboard app on their computer
+- tell them to create or add a project there
+- tell them to select the project folder that already contains `.aios-forge/`
 
-Correct commands:
-
-- install/configure the dashboard for the current project:
-  - `aios-forge dashboard:init .`
-- start the dashboard:
-  - `aios-forge dashboard:dev . --port=3000`
-- open it in the browser:
-  - `aios-forge dashboard:open . --port=3000`
-
-If the user asks for a different port, respect that port.
-Example:
-
-- `aios-forge dashboard:dev . --port=3001`
-- `aios-forge dashboard:open . --port=3001`
-
+Do not tell the user to use `aios-forge dashboard:init`, `dashboard:dev`, or `dashboard:open`.
 Do not answer as if you first need to manually search the project tree for a dashboard app.
-The AIOS Forge dashboard is a separate project installed and started through these commands.
 
 **Examples of role sets:**
 - YouTube creator → `scriptwriter`, `title-generator`, `copywriter`, `trend-analyst`

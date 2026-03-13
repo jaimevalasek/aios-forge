@@ -111,6 +111,7 @@ Se o pedido já estiver claro e pequeno, siga o fluxo normal.
 
 ## Próximos passos
 
+- [Referência completa dos comandos do CLI](./comandos-cli.md)
 - [Como usar com Claude Code, Codex e Gemini](./clientes-ai.md)
 - [Cenários completos com exemplos práticos](./cenarios.md)
 - [Guia de agentes: quando usar cada um](./agentes.md)

@@ -70,6 +70,9 @@ module.exports = {
       'aios-forge squad:export [path] --squad=<slug> [--locale=fr]',
     help_squad_pipeline:
       'aios-forge squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=fr]',
+    dashboard_moved:
+      'Le flux `{command}` a été supprimé du CLI. Le dashboard AIOS Forge est désormais installé séparément. Ouvrez l application dashboard sur votre ordinateur, créez ou ajoutez un projet, puis sélectionnez le dossier qui contient déjà `.aios-forge/`.',
+    dashboard_moved_line: '{message}\n',
     unknown_command: 'Commande inconnue : {command}',
     unknown_command_line: '{message}\n',
     error_prefix: 'Erreur : {message}'
