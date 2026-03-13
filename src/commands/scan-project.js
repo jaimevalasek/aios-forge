@@ -442,11 +442,14 @@ function renderEntryTreeLines(entries, predicate) {
   const lines = [];
   for (const entry of entries) {
     if (!predicate(entry)) continue;
-    const indent = '  '.repeat(entry.depth);
     const label = `${path.basename(entry.relPath)}${entry.type === 'dir' ? '/' : ''}`;
-    lines.push(`${indent}${label}`);
+    lines.push(renderTreeLine(label, entry.depth));
   }
   return lines;
+}
+
+function renderTreeLine(label, depth) {
+  return `${'|  '.repeat(Math.max(0, depth))}|-- ${label}`;
 }
 
 function normalizeFolderPath(value) {
@@ -572,13 +575,13 @@ function renderRequestedFolderTree(entries, folder) {
     return renderEntryTreeLines(entries, () => true);
   }
 
-  lines.push(`${normalized}/`);
+  lines.push(renderTreeLine(`${normalized}/`, 0));
   for (const entry of entries) {
     if (!isWithinPrefix(entry.relPath, normalized) || entry.relPath === normalized) continue;
     const relativePath = entry.relPath.slice(normalized.length + 1);
     const depth = relativePath.split('/').length;
     const label = `${path.basename(entry.relPath)}${entry.type === 'dir' ? '/' : ''}`;
-    lines.push(`${'  '.repeat(depth)}${label}`);
+    lines.push(renderTreeLine(label, depth));
   }
   return lines;
 }
@@ -610,13 +613,13 @@ function renderForgeSectionTree(entries, root, artifactPaths) {
   const sectionEntries = entries.filter((entry) => artifactPaths.has(entry.relPath) && isWithinPrefix(entry.relPath, root));
   if (sectionEntries.length === 0) return [];
 
-  const lines = [`${root}/`];
+  const lines = [renderTreeLine(`${root}/`, 0)];
   for (const entry of sectionEntries) {
     if (entry.relPath === root) continue;
     const relativePath = entry.relPath.slice(root.length + 1);
     const depth = relativePath.split('/').length;
     const label = `${path.basename(entry.relPath)}${entry.type === 'dir' ? '/' : ''}`;
-    lines.push(`${'  '.repeat(depth)}${label}`);
+    lines.push(renderTreeLine(label, depth));
   }
   return lines;
 }
