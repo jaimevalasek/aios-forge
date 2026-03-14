@@ -6,7 +6,10 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { createTranslator } = require('../src/i18n');
-const { runWorkflowNext } = require('../src/commands/workflow-next');
+const {
+  runWorkflowNext,
+  EVENTS_RELATIVE_PATH
+} = require('../src/commands/workflow-next');
 
 async function makeTempDir() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'aios-forge-workflow-next-'));
@@ -142,4 +145,30 @@ test('workflow:next allows skip until dev but not past dev', async () => {
       }),
     /Cannot skip past @dev/
   );
+});
+
+test('workflow:next appends workflow events for dashboard visibility', async () => {
+  const dir = await makeTempDir();
+  await writeProjectContext(dir, 'SMALL');
+  await writeFileEnsured(path.join(dir, '.aios-forge/context/prd.md'), '# PRD\n');
+
+  const { t } = createTranslator('en');
+  await runWorkflowNext({
+    args: [dir],
+    options: { tool: 'codex' },
+    logger: createQuietLogger(),
+    t
+  });
+
+  const eventsPath = path.join(dir, EVENTS_RELATIVE_PATH);
+  const raw = await fs.readFile(eventsPath, 'utf8');
+  const lines = raw.trim().split(/\r?\n/).filter(Boolean);
+  assert.equal(lines.length, 1);
+
+  const event = JSON.parse(lines[0]);
+  assert.equal(event.kind, 'workflow');
+  assert.equal(event.eventType, 'start');
+  assert.equal(event.current, 'analyst');
+  assert.equal(event.next, 'analyst');
+  assert.match(event.message, /Stage @analyst is active|Workflow initialized at @analyst/);
 });

@@ -9,6 +9,7 @@ const { exists, ensureDir } = require('../utils');
 
 const STATE_RELATIVE_PATH = '.aios-forge/context/workflow.state.json';
 const CONFIG_RELATIVE_PATH = '.aios-forge/context/workflow.config.json';
+const EVENTS_RELATIVE_PATH = '.aios-forge/context/workflow.events.jsonl';
 
 const DEFAULT_FEATURE_WORKFLOW_BY_CLASSIFICATION = {
   MICRO: ['product', 'dev', 'qa'],
@@ -72,6 +73,48 @@ async function readJsonIfExists(filePath) {
 async function writeJson(filePath, payload) {
   await ensureDir(path.dirname(filePath));
   await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+}
+
+async function appendJsonLine(filePath, payload) {
+  await ensureDir(path.dirname(filePath));
+  await fs.appendFile(filePath, `${JSON.stringify(payload)}\n`, 'utf8');
+}
+
+function buildWorkflowEventMessage({ created, state, activation, completedStage, options }) {
+  if (completedStage && activation.agent) {
+    return `Completed @${completedStage}. Next stage ready: @${activation.agent}.`;
+  }
+  if (completedStage && !activation.agent) {
+    return `Completed @${completedStage}. Workflow has no pending stage.`;
+  }
+  if (state.detour && state.detour.active) {
+    return `Detour started with @${state.detour.agent}. Return to ${
+      state.detour.returnTo ? `@${state.detour.returnTo}` : 'the main flow'
+    }.`;
+  }
+  if (options.skip && activation.agent) {
+    return `Workflow advanced to @${activation.agent} after skip.`;
+  }
+  if (activation.agent) {
+    return created
+      ? `Workflow initialized at @${activation.agent}.`
+      : `Stage @${activation.agent} is active.`;
+  }
+  return 'Workflow has no pending stage.';
+}
+
+function buildWorkflowEventType({ completedStage, state, activation, options }) {
+  if (completedStage) return 'completed';
+  if (state.detour && state.detour.active) return 'workflow';
+  if (options.skip) return 'workflow';
+  if (activation.agent) return 'start';
+  return 'workflow';
+}
+
+async function appendWorkflowEvent(targetDir, payload) {
+  const eventsPath = path.join(targetDir, EVENTS_RELATIVE_PATH);
+  await appendJsonLine(eventsPath, payload);
+  return eventsPath;
 }
 
 async function readWorkflowConfig(targetDir) {
@@ -445,6 +488,30 @@ async function runWorkflowNext({ args, options, logger, t }) {
   const activation = await activateStage(targetDir, state, locale, tool, requestedAgent);
   state = activation.state;
   const statePath = await persistState(targetDir, state);
+  const eventPayload = {
+    id: Date.now(),
+    kind: 'workflow',
+    createdAt: new Date().toISOString(),
+    eventType: buildWorkflowEventType({ completedStage, state, activation, options }),
+    message: buildWorkflowEventMessage({
+      created: loaded.created,
+      state,
+      activation,
+      completedStage,
+      options
+    }),
+    mode: state.mode,
+    classification: state.classification,
+    featureSlug: state.featureSlug,
+    current: state.current,
+    next: state.detour && state.detour.active ? state.detour.returnTo : state.next,
+    completedStage,
+    detour: state.detour,
+    completed: state.completed,
+    skipped: state.skipped,
+    sequence: state.sequence
+  };
+  await appendWorkflowEvent(targetDir, eventPayload);
 
   const payload = {
     ok: true,
@@ -500,6 +567,7 @@ async function runWorkflowNext({ args, options, logger, t }) {
 module.exports = {
   STATE_RELATIVE_PATH,
   CONFIG_RELATIVE_PATH,
+  EVENTS_RELATIVE_PATH,
   buildDefaultWorkflowConfig,
   parseFeaturesMarkdown,
   readWorkflowConfig,
