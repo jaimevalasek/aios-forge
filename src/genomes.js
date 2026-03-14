@@ -230,6 +230,12 @@ function normalizeGenome(input = {}) {
 
   const domain = normalizeText(merged.domain || merged.title || merged.name);
   const slug = slugify(merged.slug || merged.genome || domain);
+  const inputSections = input && typeof input.sections === 'object' ? input.sections : {};
+  const hasV3SectionSignals = ['cognitiveProfile', 'communicationStyle', 'biases', 'conflictResolution'].some((key) => {
+    const value = inputSections[key];
+    if (Array.isArray(value)) return value.length > 0;
+    return value !== undefined && value !== null && value !== '';
+  });
   const hasPersonaExtensions = Boolean(
     merged.personaSource ||
       merged.persona_source ||
@@ -245,13 +251,7 @@ function normalizeGenome(input = {}) {
       merged.confidence ||
       merged.hybridMode ||
       merged.hybrid_mode ||
-      (merged.sections &&
-        (
-          merged.sections.cognitiveProfile ||
-          merged.sections.communicationStyle ||
-          merged.sections.biases ||
-          merged.sections.conflictResolution
-        ))
+      hasV3SectionSignals
   );
   const version = normalizeGenomeVersion(
     merged.version,

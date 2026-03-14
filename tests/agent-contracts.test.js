@@ -457,13 +457,13 @@ test('profiler agent contracts ship with workflow and localized wrappers', async
   }
 
   const localeChecks = [
-    [researcherPt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-researcher.md'],
-    [enricherPt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-enricher.md'],
-    [forgePt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-forge.md']
+    [researcherPt, /INSTRU(?:CAO|ÇÃO) ABSOLUTA/, '.aios-forge/agents/profiler-researcher.md'],
+    [enricherPt, /INSTRU(?:CAO|ÇÃO) ABSOLUTA/, '.aios-forge/agents/profiler-enricher.md'],
+    [forgePt, /INSTRU(?:CAO|ÇÃO) ABSOLUTA/, '.aios-forge/agents/profiler-forge.md']
   ];
 
-  for (const [content, instructionToken, basePathToken] of localeChecks) {
-    assert.equal(content.includes(instructionToken), true, `missing profiler locale instruction: ${instructionToken}`);
+  for (const [content, instructionPattern, basePathToken] of localeChecks) {
+    assert.equal(instructionPattern.test(content), true, `missing profiler locale instruction: ${instructionPattern}`);
     assert.equal(content.includes(basePathToken), true, `missing profiler locale base path: ${basePathToken}`);
   }
 });
