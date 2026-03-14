@@ -17,7 +17,7 @@ Type `@agent-name` in the prompt. Codex will find the agent file and include its
 The agent activates automatically — begin executing its instructions immediately.
 Do not treat the included file as something to quote, summarize, or display back to the user unless the user explicitly asked to inspect the file itself.
 
-Examples: `@setup`, `@dev`, `@squad`, `@genoma`
+Examples: `@setup`, `@dev`, `@squad`, `@genoma`, `@profiler-researcher`
 
 **Option 2 — Natural language:**
 Describe your intent. The agent system will match and execute.
@@ -36,6 +36,9 @@ Describe your intent. The agent system will match and execute.
 | @orchestrator | "coordinate this session", "use the orchestrator agent" |
 | @squad | "assemble a squad", "use the squad agent", "montar squad" |
 | @genoma | "generate a genome", "use the genoma agent", "gerar genoma" |
+| @profiler-researcher | "start the profiler research", "profile this person", "pesquisar DNA mental" |
+| @profiler-enricher | "enrich this profile", "analyze this person's cognition", "consolidar perfil cognitivo" |
+| @profiler-forge | "generate the advisor", "forge the genome 3.0", "gerar advisor da persona" |
 
 When an agent file is included via @ or described via natural language, read the corresponding file and execute its instructions immediately from the first step.
 Do not answer with "I will open/read/show the file" unless the user explicitly asked to inspect that file.
@@ -53,6 +56,9 @@ Do not answer with "I will open/read/show the file" unless the user explicitly a
 - @orchestrator → `.aios-forge/agents/orchestrator.md`
 - @squad → `.aios-forge/agents/squad.md`
 - @genoma → `.aios-forge/agents/genoma.md`
+- @profiler-researcher → `.aios-forge/agents/profiler-researcher.md`
+- @profiler-enricher → `.aios-forge/agents/profiler-enricher.md`
+- @profiler-forge → `.aios-forge/agents/profiler-forge.md`
 
 ## Session protocol
 If `.aios-forge/context/spec.md` exists, read it at session start and update it at session end.

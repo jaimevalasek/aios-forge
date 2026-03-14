@@ -47,14 +47,14 @@ function buildSectionsFromLegacyObject(input = {}) {
   };
 }
 
-function hasExplicitV2MarkdownMarkers(input) {
+function hasExplicitModernMarkdownMarkers(input) {
   const text = String(input || '');
   return (
-    /\nformat:\s*genome-v2\s*$/im.test(text) ||
-    /\nversion:\s*2\s*$/im.test(text) ||
+    /\nformat:\s*genome-v[23]\s*$/im.test(text) ||
+    /\nversion:\s*[23]\s*$/im.test(text) ||
     /\nevidence_mode:\s*.+$/im.test(text) ||
     /\nsources_count:\s*\d+\s*$/im.test(text) ||
-    /^##\s+(Filosofias|Modelos mentais|Heurísticas|Heuristicas|Frameworks|Metodologias|Evidence|Application notes)\s*$/im.test(text)
+    /^##\s+(Filosofias|Modelos mentais|Heurísticas|Heuristicas|Frameworks|Metodologias|Perfil Cognitivo|Estilo de Comunicação|Vieses e Pontos Cegos|Evidence|Application notes)\s*$/im.test(text)
   );
 }
 
@@ -68,14 +68,12 @@ function hasLegacyMarkdownSignals(input) {
   );
 }
 
-function toV2GenomeDocument(input, options = {}) {
+function toCompatibleGenomeDocument(input, options = {}) {
   return normalizeGenome({
     ...(isObject(input) ? input : {}),
     sections: buildSectionsFromLegacyObject(input),
     legacyFormat: false,
     hasFrontmatter: true,
-    version: 2,
-    format: 'genome-v2',
     sourcePath: options.filePath || null
   });
 }
@@ -85,9 +83,13 @@ function detectGenomeFormat(input) {
 
   if (typeof input === 'string') {
     try {
-      if (hasExplicitV2MarkdownMarkers(input)) return 'v2-markdown';
+      if (hasExplicitModernMarkdownMarkers(input)) {
+        const parsed = parseGenomeMarkdown(input);
+        return parsed.version >= 3 || parsed.format === 'genome-v3' ? 'v3-markdown' : 'v2-markdown';
+      }
       if (hasLegacyMarkdownSignals(input)) return 'legacy-markdown';
       const genome = parseGenomeMarkdown(input);
+      if (genome.version >= 3 || genome.format === 'genome-v3') return 'v3-markdown';
       if (isGenomeV2(genome)) return 'v2-markdown';
       if (genome.legacyFormat) return 'legacy-markdown';
     } catch {
@@ -97,6 +99,8 @@ function detectGenomeFormat(input) {
   }
 
   if (isObject(input)) {
+    const normalized = normalizeGenome(input);
+    if (normalized.version >= 3 || normalized.format === 'genome-v3') return 'v3-object';
     if (isGenomeV2(input)) return 'v2-object';
     if (hasLegacyObjectSignals(input)) return 'legacy-object';
   }
@@ -107,19 +111,19 @@ function detectGenomeFormat(input) {
 function loadCompatibleGenome(input, options = {}) {
   const format = detectGenomeFormat(input);
 
-  if (format === 'v2-markdown' || format === 'legacy-markdown') {
+  if (format === 'v2-markdown' || format === 'v3-markdown' || format === 'legacy-markdown') {
     const parsed = parseGenomeMarkdown(input);
     return {
       format,
-      document: toV2GenomeDocument(parsed, options),
+      document: toCompatibleGenomeDocument(parsed, options),
       migrated: format === 'legacy-markdown'
     };
   }
 
-  if (format === 'v2-object') {
+  if (format === 'v2-object' || format === 'v3-object') {
     return {
       format,
-      document: toV2GenomeDocument(input, options),
+      document: toCompatibleGenomeDocument(input, options),
       migrated: false
     };
   }
@@ -127,16 +131,27 @@ function loadCompatibleGenome(input, options = {}) {
   if (format === 'legacy-object') {
     return {
       format,
-      document: toV2GenomeDocument(
+      document: toCompatibleGenomeDocument(
         {
           slug: input.slug || input.genome,
           domain: input.domain || input.title || input.name || input.slug || input.genome,
           type: input.type,
           language: input.language,
           depth: input.depth,
+          version: input.version,
+          format: input.format,
           evidenceMode: input.evidenceMode || input.evidence_mode,
           sourceCount: input.sourceCount ?? input.sourcesCount ?? input.sources_count,
           generated: input.generated,
+          personaSource: input.personaSource || input.persona_source,
+          personaSources: input.personaSources || input.persona_sources,
+          disc: input.disc,
+          enneagram: input.enneagram,
+          bigFive: input.bigFive || input.big_five,
+          mbti: input.mbti,
+          confidence: input.confidence,
+          profilerReport: input.profilerReport || input.profiler_report,
+          hybridMode: input.hybridMode || input.hybrid_mode,
           sections: buildSectionsFromLegacyObject(input)
         },
         options
@@ -149,7 +164,7 @@ function loadCompatibleGenome(input, options = {}) {
 }
 
 function serializeCompatibleGenome(document, options = {}) {
-  return serializeGenomeMarkdown(toV2GenomeDocument(document, options));
+  return serializeGenomeMarkdown(toCompatibleGenomeDocument(document, options));
 }
 
 function normalizeCompatibleBindings(bindings = {}) {

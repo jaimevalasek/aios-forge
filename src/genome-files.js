@@ -48,8 +48,19 @@ function mergeGenomeWithMeta(genome, rawMeta, slug) {
     type: genome.hasFrontmatter ? genome.type : rawMeta.type,
     language: genome.hasFrontmatter ? genome.language : rawMeta.language,
     depth: genome.hasFrontmatter ? genome.depth : rawMeta.depth,
+    version: genome.hasFrontmatter ? genome.version : rawMeta.version,
+    format: genome.hasFrontmatter ? genome.format : rawMeta.format,
     evidenceMode: genome.hasFrontmatter ? genome.evidenceMode : rawMeta.evidenceMode,
-    sourceCount: genome.hasFrontmatter ? genome.sourceCount : rawMeta.sourceCount
+    sourceCount: genome.hasFrontmatter ? genome.sourceCount : rawMeta.sourceCount,
+    personaSource: genome.hasFrontmatter ? genome.personaSource : rawMeta.personaSource,
+    personaSources: genome.hasFrontmatter ? genome.personaSources : rawMeta.personaSources,
+    disc: genome.hasFrontmatter ? genome.disc : rawMeta.disc,
+    enneagram: genome.hasFrontmatter ? genome.enneagram : rawMeta.enneagram,
+    bigFive: genome.hasFrontmatter ? genome.bigFive : rawMeta.bigFive,
+    mbti: genome.hasFrontmatter ? genome.mbti : rawMeta.mbti,
+    confidence: genome.hasFrontmatter ? genome.confidence : rawMeta.confidence,
+    profilerReport: genome.hasFrontmatter ? genome.profilerReport : rawMeta.profilerReport,
+    hybridMode: genome.hasFrontmatter ? genome.hybridMode : rawMeta.hybridMode
   });
 }
 
@@ -126,6 +137,9 @@ async function writeGenome(projectRoot, genomeInput, metaInput) {
     normalizeGenomeMeta({
       ...(existingMeta || {}),
       ...(metaInput || {}),
+      schemaVersion: normalizedGenome.version,
+      version: normalizedGenome.version,
+      format: normalizedGenome.format,
       genome: normalizedGenome,
       compat: {
         ...((existingMeta && existingMeta.compat) || {}),

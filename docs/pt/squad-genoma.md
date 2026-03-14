@@ -672,6 +672,97 @@ Evite:
 
 ---
 
+## Genoma 3.0 e o Sistema Profiler
+
+### O que é o Genoma 3.0
+
+O Genoma 3.0 estende o formato 2.0 com suporte a profiling de personas baseado em evidência. Enquanto o Genoma 2.0 responde "como pensar sobre um assunto", o Genoma 3.0 responde "como uma pessoa específica pensa sobre um assunto".
+
+### Tipos de output
+
+| Output | O que é | Onde vive |
+|--------|---------|-----------|
+| Genoma 3.0 | Conhecimento destilado + perfil cognitivo | `.aios-forge/genomas/` |
+| Advisor Agent | Conselheiro ativo com a lente da persona | `.aios-forge/advisors/` |
+
+### O pipeline profiler
+
+O sistema profiler é composto por 3 agentes:
+
+1. `@profiler-researcher`
+   Pesquisa web e coleta material
+2. `@profiler-enricher`
+   Consolida evidências, material do usuário e análise cognitiva
+3. `@profiler-forge`
+   Gera Genoma 3.0, Advisor ou ambos
+
+O pipeline pode começar:
+
+- diretamente com `@profiler-researcher [nome da pessoa]`
+- via redirect do `@genoma` quando `type: persona` for detectado
+
+### Dimensões capturadas
+
+O profiler cobre múltiplas camadas:
+
+- `DISC`
+- `Eneagrama`
+- `Big Five`
+- `MBTI`
+- Schwartz Values inferidos
+- frameworks de decisão
+- estilo de comunicação
+- vieses cognitivos
+- padrões de erro
+- expertise demonstrada
+
+Perfis psicométricos devem ser tratados como `INFERIDOS`, nunca como avaliação formal.
+
+### Advisors
+
+Advisor não é genoma.
+
+- genoma é passivo e serve para enriquecer executores
+- advisor é ativo e serve para opinar, questionar, analisar e aconselhar
+
+O advisor pode ter:
+
+- web search
+- decision log
+- challenge mode
+- estilo de comunicação coerente com a persona
+
+### Board de Conselheiros
+
+Múltiplos advisors podem operar como board para analisar a mesma pergunta sob perspectivas diferentes. Isso é especialmente útil em decisões de alto impacto, estratégia, oferta e posicionamento.
+
+### Relação entre Genoma 3.0 e Advisor
+
+O uso mais forte costuma ser combinado:
+
+- o Genoma 3.0 entra nos agentes executores do squad
+- o Advisor revisa, desafia e aconselha sobre os outputs produzidos
+
+Exemplo:
+
+```text
+Squad: youtube-creator
+  Executores: @roteirista-viral (com Genoma 3.0 aplicado)
+  Advisory: @stefan-advisor (analisa os roteiros produzidos)
+```
+
+### Relatórios intermediários do profiler
+
+```text
+.aios-forge/profiler-reports/{person-slug}/
+  research-report.md
+  enriched-profile.md
+```
+
+Esses arquivos são a fonte de verdade para genomas e advisors gerados.
+
+---
+
 ## O que ainda vem pela frente
 
 O modelo atual já suporta squads modulares, publish/import e genomas vinculados.

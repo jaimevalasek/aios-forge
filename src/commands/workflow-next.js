@@ -1,0 +1,511 @@
+'use strict';
+
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { getAgentDefinition, resolveInstructionPath, buildAgentPrompt } = require('../agents');
+const { resolveAgentLocale } = require('../locales');
+const { validateProjectContextFile } = require('../context');
+const { exists, ensureDir } = require('../utils');
+
+const STATE_RELATIVE_PATH = '.aios-forge/context/workflow.state.json';
+const CONFIG_RELATIVE_PATH = '.aios-forge/context/workflow.config.json';
+
+const DEFAULT_FEATURE_WORKFLOW_BY_CLASSIFICATION = {
+  MICRO: ['product', 'dev', 'qa'],
+  SMALL: ['product', 'analyst', 'dev', 'qa'],
+  MEDIUM: ['product', 'analyst', 'dev', 'qa']
+};
+
+function normalizeAgentName(input) {
+  return String(input || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, '');
+}
+
+function normalizeClassification(value, fallback = 'MICRO') {
+  const text = String(value || '').trim().toUpperCase();
+  if (text === 'MICRO' || text === 'SMALL' || text === 'MEDIUM') return text;
+  return fallback;
+}
+
+function buildDefaultWorkflowConfig() {
+  return {
+    version: 1,
+    project: {
+      MICRO: ['setup', 'dev'],
+      SMALL: ['setup', 'product', 'analyst', 'architect', 'dev', 'qa'],
+      MEDIUM: ['setup', 'product', 'analyst', 'architect', 'ux-ui', 'pm', 'orchestrator', 'dev', 'qa']
+    },
+    feature: DEFAULT_FEATURE_WORKFLOW_BY_CLASSIFICATION,
+    rules: {
+      required: ['dev'],
+      allowDetours: true
+    }
+  };
+}
+
+function parseFeaturesMarkdown(markdown) {
+  return String(markdown || '')
+    .split(/\r?\n/)
+    .slice(3)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => line.startsWith('|'))
+    .map((line) => line.split('|').map((part) => part.trim()))
+    .filter((parts) => parts.length >= 5)
+    .map((parts) => ({
+      slug: parts[1],
+      status: parts[2],
+      started: parts[3],
+      completed: parts[4]
+    }))
+    .filter((row) => row.slug && row.slug !== 'slug');
+}
+
+async function readJsonIfExists(filePath) {
+  if (!(await exists(filePath))) return null;
+  const content = await fs.readFile(filePath, 'utf8');
+  return JSON.parse(content);
+}
+
+async function writeJson(filePath, payload) {
+  await ensureDir(path.dirname(filePath));
+  await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+}
+
+async function readWorkflowConfig(targetDir) {
+  const configPath = path.join(targetDir, CONFIG_RELATIVE_PATH);
+  const userConfig = await readJsonIfExists(configPath);
+  const base = buildDefaultWorkflowConfig();
+  if (!userConfig || typeof userConfig !== 'object') {
+    return { configPath, config: base, exists: false };
+  }
+
+  const merged = {
+    ...base,
+    ...userConfig,
+    project: {
+      ...base.project,
+      ...(userConfig.project || {})
+    },
+    feature: {
+      ...base.feature,
+      ...(userConfig.feature || {})
+    },
+    rules: {
+      ...base.rules,
+      ...(userConfig.rules || {})
+    }
+  };
+
+  return { configPath, config: merged, exists: true };
+}
+
+async function resolveLocaleForTarget(targetDir, options) {
+  const fromOption = options.language || options.lang;
+  if (fromOption) return resolveAgentLocale(fromOption);
+
+  const context = await validateProjectContextFile(targetDir);
+  if (context.parsed && context.data && context.data.conversation_language) {
+    return resolveAgentLocale(context.data.conversation_language);
+  }
+
+  return 'en';
+}
+
+async function resolveExistingInstructionPath(targetDir, agent, locale) {
+  const candidate = resolveInstructionPath(agent, locale);
+  const candidateAbs = path.join(targetDir, candidate);
+  if (await exists(candidateAbs)) return candidate;
+  return agent.path;
+}
+
+async function detectWorkflowMode(targetDir) {
+  const prdPath = path.join(targetDir, '.aios-forge/context/prd.md');
+  const featuresPath = path.join(targetDir, '.aios-forge/context/features.md');
+  const hasProjectPrd = await exists(prdPath);
+  const featuresMarkdown = await fs.readFile(featuresPath, 'utf8').catch(() => '');
+  const features = parseFeaturesMarkdown(featuresMarkdown);
+  const activeFeature = features.find((feature) => feature.status === 'in_progress') || null;
+
+  if (activeFeature) {
+    return {
+      mode: 'feature',
+      featureSlug: activeFeature.slug,
+      features
+    };
+  }
+
+  return {
+    mode: hasProjectPrd ? 'project' : 'project',
+    featureSlug: null,
+    features
+  };
+}
+
+function getSequenceForMode(config, mode, classification) {
+  const group = mode === 'feature' ? config.feature : config.project;
+  const sequence = group[normalizeClassification(classification, 'MICRO')];
+  return Array.isArray(sequence) && sequence.length > 0 ? [...sequence] : [];
+}
+
+async function validateStageArtifacts(targetDir, state, stage) {
+  const base = path.join(targetDir, '.aios-forge/context');
+  const slug = state.featureSlug;
+
+  if (stage === 'setup') {
+    const context = await validateProjectContextFile(targetDir);
+    return context.valid;
+  }
+
+  if (stage === 'product') {
+    if (state.mode === 'feature' && slug) {
+      const prdFeature = path.join(base, `prd-${slug}.md`);
+      const prdFix = path.join(base, `prd-${slug}-fix.md`);
+      return (await exists(prdFeature)) || (await exists(prdFix));
+    }
+    return await exists(path.join(base, 'prd.md'));
+  }
+
+  if (stage === 'analyst') {
+    if (state.mode === 'feature' && slug) {
+      const requirements = path.join(base, `requirements-${slug}.md`);
+      const spec = path.join(base, `spec-${slug}.md`);
+      return (await exists(requirements)) && (await exists(spec));
+    }
+    return await exists(path.join(base, 'discovery.md'));
+  }
+
+  if (stage === 'architect') {
+    return await exists(path.join(base, 'architecture.md'));
+  }
+
+  if (stage === 'ux-ui') {
+    return await exists(path.join(base, 'ui-spec.md'));
+  }
+
+  if (stage === 'orchestrator') {
+    return await exists(path.join(base, 'parallel'));
+  }
+
+  return true;
+}
+
+function isRequiredAgent(config, agentName) {
+  return Array.isArray(config.rules?.required)
+    ? config.rules.required.map(normalizeAgentName).includes(agentName)
+    : false;
+}
+
+function buildStatePayload(input) {
+  return {
+    version: 1,
+    mode: input.mode,
+    classification: input.classification,
+    sequence: input.sequence,
+    current: input.current || null,
+    next: input.next || null,
+    completed: Array.isArray(input.completed) ? input.completed : [],
+    skipped: Array.isArray(input.skipped) ? input.skipped : [],
+    featureSlug: input.featureSlug || null,
+    detour: input.detour || null,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function findNextFromSequence(sequence, completed, skipped) {
+  const done = new Set([...(completed || []), ...(skipped || [])].map(normalizeAgentName));
+  return sequence.find((stage) => !done.has(normalizeAgentName(stage))) || null;
+}
+
+function isInferableStage(stage) {
+  return ['setup', 'product', 'analyst', 'architect', 'ux-ui', 'orchestrator'].includes(
+    normalizeAgentName(stage)
+  );
+}
+
+async function inferCompletedStages(targetDir, draftState) {
+  const completed = [];
+  for (const stage of draftState.sequence) {
+    if (!isInferableStage(stage)) break;
+    const valid = await validateStageArtifacts(targetDir, draftState, stage);
+    if (!valid) break;
+    completed.push(normalizeAgentName(stage));
+  }
+  return completed;
+}
+
+async function loadOrCreateState(targetDir, options = {}) {
+  const statePath = path.join(targetDir, STATE_RELATIVE_PATH);
+  const existing = await readJsonIfExists(statePath);
+  if (existing && typeof existing === 'object' && Array.isArray(existing.sequence)) {
+    return { statePath, state: existing, created: false };
+  }
+
+  const context = await validateProjectContextFile(targetDir);
+  const classification = normalizeClassification(
+    options.classification || (context.data && context.data.classification) || 'MICRO',
+    'MICRO'
+  );
+  const modeInfo = await detectWorkflowMode(targetDir);
+  const { config } = await readWorkflowConfig(targetDir);
+  const sequence = getSequenceForMode(config, modeInfo.mode, classification);
+  const draftState = buildStatePayload({
+    mode: modeInfo.mode,
+    classification,
+    sequence,
+    current: null,
+    next: null,
+    completed: [],
+    skipped: [],
+    featureSlug: modeInfo.featureSlug,
+    detour: null
+  });
+  const completed = await inferCompletedStages(targetDir, draftState);
+  const next = findNextFromSequence(sequence, completed, []);
+  const state = buildStatePayload({
+    mode: modeInfo.mode,
+    classification,
+    sequence,
+    current: null,
+    next,
+    completed,
+    skipped: [],
+    featureSlug: modeInfo.featureSlug,
+    detour: null
+  });
+
+  await writeJson(statePath, state);
+  return { statePath, state, created: true };
+}
+
+async function persistState(targetDir, nextState) {
+  const statePath = path.join(targetDir, STATE_RELATIVE_PATH);
+  await writeJson(statePath, nextState);
+  return statePath;
+}
+
+function ensureAgentInSequence(state, agentName) {
+  if (state.sequence.includes(agentName)) return;
+  throw new Error(`Agent ${agentName} is not part of the active workflow sequence.`);
+}
+
+function ensureSkippableTarget(config, state, targetAgent) {
+  const normalizedTarget = normalizeAgentName(targetAgent);
+  ensureAgentInSequence(state, normalizedTarget);
+
+  const currentIndex = state.next ? state.sequence.indexOf(state.next) : -1;
+  const targetIndex = state.sequence.indexOf(normalizedTarget);
+  const devIndex = state.sequence.indexOf('dev');
+
+  if (currentIndex === -1) {
+    throw new Error('No next stage is available to skip from.');
+  }
+  if (targetIndex === -1 || targetIndex < currentIndex) {
+    throw new Error(`Cannot skip backwards to ${targetAgent}.`);
+  }
+  if (normalizedTarget === 'dev') return;
+  if (devIndex !== -1 && targetIndex > devIndex) {
+    throw new Error('Cannot skip past @dev because @dev is mandatory.');
+  }
+  if (isRequiredAgent(config, normalizedTarget) && normalizedTarget !== 'dev') {
+    return;
+  }
+}
+
+async function finalizeCurrentStage(targetDir, config, state, stageName) {
+  const normalizedStage = normalizeAgentName(stageName || state.current || state.next);
+  if (!normalizedStage) {
+    throw new Error('No stage is active to complete.');
+  }
+
+  if (state.detour && state.detour.active && normalizeAgentName(state.detour.agent) === normalizedStage) {
+    const validDetour = await validateStageArtifacts(targetDir, state, normalizedStage);
+    if (!validDetour) {
+      throw new Error(`Cannot complete detour ${normalizedStage}; expected artifacts are missing.`);
+    }
+    const nextState = buildStatePayload({
+      ...state,
+      current: null,
+      next: state.detour.returnTo,
+      detour: null
+    });
+    return { state: nextState, completedStage: normalizedStage };
+  }
+
+  ensureAgentInSequence(state, normalizedStage);
+  const valid = await validateStageArtifacts(targetDir, state, normalizedStage);
+  if (!valid) {
+    throw new Error(`Cannot complete ${normalizedStage}; expected artifacts are missing.`);
+  }
+
+  const completed = Array.from(new Set([...(state.completed || []), normalizedStage]));
+  const next = findNextFromSequence(state.sequence, completed, state.skipped || []);
+  const nextState = buildStatePayload({
+    ...state,
+    completed,
+    current: null,
+    next,
+    detour: null
+  });
+
+  return { state: nextState, completedStage: normalizedStage };
+}
+
+function applySkip(config, state, target) {
+  const normalizedTarget = normalizeAgentName(target);
+  ensureSkippableTarget(config, state, normalizedTarget);
+  const currentIndex = state.sequence.indexOf(state.next);
+  const targetIndex = state.sequence.indexOf(normalizedTarget);
+  const toSkip = state.sequence.slice(currentIndex, targetIndex);
+  if (toSkip.some((agent) => normalizeAgentName(agent) === 'dev')) {
+    throw new Error('Cannot skip @dev because it is mandatory.');
+  }
+
+  const skipped = Array.from(new Set([...(state.skipped || []), ...toSkip]));
+  return buildStatePayload({
+    ...state,
+    skipped,
+    current: null,
+    next: normalizedTarget
+  });
+}
+
+async function activateStage(targetDir, state, locale, tool, explicitAgent = null) {
+  const stageName = normalizeAgentName(explicitAgent || state.current || state.next);
+  if (!stageName) {
+    return {
+      state,
+      agent: null,
+      instructionPath: null,
+      prompt: null
+    };
+  }
+
+  const agent = getAgentDefinition(stageName);
+  if (!agent) {
+    throw new Error(`Unknown agent: ${stageName}`);
+  }
+
+  const instructionPath = await resolveExistingInstructionPath(targetDir, agent, locale);
+  const prompt = buildAgentPrompt(agent, tool, { instructionPath });
+
+  let nextState = state;
+  if (explicitAgent && stageName !== normalizeAgentName(state.next)) {
+    nextState = buildStatePayload({
+      ...state,
+      current: stageName,
+      detour: {
+        active: true,
+        agent: stageName,
+        returnTo: state.next
+      }
+    });
+  } else {
+    nextState = buildStatePayload({
+      ...state,
+      current: stageName
+    });
+  }
+
+  return {
+    state: nextState,
+    agent: stageName,
+    instructionPath,
+    prompt
+  };
+}
+
+async function runWorkflowNext({ args, options, logger, t }) {
+  const targetDir = path.resolve(process.cwd(), args[0] || '.');
+  const tool = options.tool || 'codex';
+  const locale = await resolveLocaleForTarget(targetDir, options);
+  const { config } = await readWorkflowConfig(targetDir);
+  const loaded = await loadOrCreateState(targetDir, options);
+  let state = loaded.state;
+  let completedStage = null;
+
+  if (options.complete || options['complete-current']) {
+    const result = await finalizeCurrentStage(
+      targetDir,
+      config,
+      state,
+      options.complete === true ? state.current || state.next : options.complete
+    );
+    state = result.state;
+    completedStage = result.completedStage;
+  }
+
+  if (options.skip) {
+    state = applySkip(config, state, options.skip);
+  }
+
+  const requestedAgent = options.agent ? normalizeAgentName(options.agent) : null;
+  const activation = await activateStage(targetDir, state, locale, tool, requestedAgent);
+  state = activation.state;
+  const statePath = await persistState(targetDir, state);
+
+  const payload = {
+    ok: true,
+    targetDir,
+    locale,
+    tool,
+    statePath: STATE_RELATIVE_PATH,
+    configPath: CONFIG_RELATIVE_PATH,
+    created: loaded.created,
+    mode: state.mode,
+    classification: state.classification,
+    current: state.current,
+    next: state.detour && state.detour.active ? state.detour.returnTo : state.next,
+    detour: state.detour,
+    completed: state.completed,
+    skipped: state.skipped,
+    completedStage,
+    featureSlug: state.featureSlug,
+    agent: activation.agent,
+    instructionPath: activation.instructionPath,
+    prompt: activation.prompt
+  };
+
+  logger.log(t('workflow_next.title', {
+    mode: state.mode,
+    classification: state.classification
+  }));
+  if (completedStage) {
+    logger.log(t('workflow_next.completed', { agent: `@${completedStage}` }));
+  }
+  if (state.detour && state.detour.active) {
+    logger.log(
+      t('workflow_next.detour', {
+        agent: `@${state.detour.agent}`,
+        returnTo: `@${state.detour.returnTo}`
+      })
+    );
+  }
+  if (activation.agent) {
+    logger.log(t('workflow_next.current_agent', { agent: `@${activation.agent}` }));
+    if (payload.next) {
+      logger.log(t('workflow_next.next_agent', { agent: `@${payload.next}` }));
+    }
+    logger.log(activation.prompt);
+  } else {
+    logger.log(t('workflow_next.done'));
+  }
+  logger.log(t('workflow_next.state_file', { path: STATE_RELATIVE_PATH }));
+
+  return payload;
+}
+
+module.exports = {
+  STATE_RELATIVE_PATH,
+  CONFIG_RELATIVE_PATH,
+  buildDefaultWorkflowConfig,
+  parseFeaturesMarkdown,
+  readWorkflowConfig,
+  detectWorkflowMode,
+  loadOrCreateState,
+  finalizeCurrentStage,
+  applySkip,
+  runWorkflowNext
+};

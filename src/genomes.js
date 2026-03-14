@@ -3,7 +3,10 @@
 const GENOME_TYPES = ['domain', 'function', 'persona', 'hybrid'];
 const GENOME_DEPTHS = ['surface', 'standard', 'deep'];
 const GENOME_EVIDENCE_MODES = ['inferred', 'evidenced', 'hybrid'];
-const GENOME_SECTION_KEYS = [
+const GENOME_FORMATS = ['genome-v2', 'genome-v3'];
+const GENOME_CONFIDENCE_LEVELS = ['low', 'medium', 'high'];
+const GENOME_HYBRID_MODES = ['domain-function', 'single-persona', 'multi-persona'];
+const GENOME_CANONICAL_SECTION_KEYS = [
   'knowledge',
   'philosophies',
   'mentalModels',
@@ -15,6 +18,13 @@ const GENOME_SECTION_KEYS = [
   'evidence',
   'applicationNotes'
 ];
+const GENOME_V3_SECTION_KEYS = [
+  'cognitiveProfile',
+  'communicationStyle',
+  'biases',
+  'conflictResolution'
+];
+const GENOME_SECTION_KEYS = [...GENOME_CANONICAL_SECTION_KEYS, ...GENOME_V3_SECTION_KEYS];
 
 function normalizeText(value, fallback = '') {
   if (value === undefined || value === null) return fallback;
@@ -42,6 +52,12 @@ function humanizeSlug(value) {
 function normalizeEnum(value, allowed, fallback) {
   const normalized = normalizeText(value).toLowerCase();
   if (!normalized) return fallback;
+  return allowed.includes(normalized) ? normalized : normalized;
+}
+
+function normalizeOptionalEnum(value, allowed) {
+  const normalized = normalizeText(value).toLowerCase();
+  if (!normalized) return '';
   return allowed.includes(normalized) ? normalized : normalized;
 }
 
@@ -75,10 +91,29 @@ function normalizeTimestamp(value) {
 }
 
 function normalizeStringArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value
+  const source = Array.isArray(value)
+    ? value
+    : value === undefined || value === null || value === ''
+      ? []
+      : [value];
+
+  return source
     .map((entry) => normalizeText(entry))
     .filter(Boolean);
+}
+
+function normalizeGenomeVersion(value, fallback = 2) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  if (parsed >= 3) return 3;
+  if (parsed >= 2) return 2;
+  return fallback;
+}
+
+function normalizeGenomeFormat(value, version) {
+  const normalized = normalizeText(value).toLowerCase();
+  if (GENOME_FORMATS.includes(normalized)) return normalized;
+  return version >= 3 ? 'genome-v3' : 'genome-v2';
 }
 
 function formatMenteBlock(value) {
@@ -152,6 +187,15 @@ function createEmptyGenome() {
     evidenceMode: 'inferred',
     sourceCount: 0,
     generated: '',
+    personaSource: '',
+    personaSources: [],
+    disc: '',
+    enneagram: '',
+    bigFive: '',
+    mbti: '',
+    confidence: '',
+    profilerReport: '',
+    hybridMode: '',
     legacyFormat: false,
     hasFrontmatter: false,
     sections: {
@@ -163,6 +207,10 @@ function createEmptyGenome() {
       methodologies: [],
       mentes: [],
       skills: [],
+      cognitiveProfile: [],
+      communicationStyle: [],
+      biases: [],
+      conflictResolution: [],
       evidence: [],
       applicationNotes: []
     }
@@ -182,6 +230,34 @@ function normalizeGenome(input = {}) {
 
   const domain = normalizeText(merged.domain || merged.title || merged.name);
   const slug = slugify(merged.slug || merged.genome || domain);
+  const hasPersonaExtensions = Boolean(
+    merged.personaSource ||
+      merged.persona_source ||
+      merged.personaSources ||
+      merged.persona_sources ||
+      merged.disc ||
+      merged.enneagram ||
+      merged.bigFive ||
+      merged.big_five ||
+      merged.mbti ||
+      merged.profilerReport ||
+      merged.profiler_report ||
+      merged.confidence ||
+      merged.hybridMode ||
+      merged.hybrid_mode ||
+      (merged.sections &&
+        (
+          merged.sections.cognitiveProfile ||
+          merged.sections.communicationStyle ||
+          merged.sections.biases ||
+          merged.sections.conflictResolution
+        ))
+  );
+  const version = normalizeGenomeVersion(
+    merged.version,
+    normalizeText(merged.format).toLowerCase() === 'genome-v3' || hasPersonaExtensions ? 3 : 2
+  );
+  const format = normalizeGenomeFormat(merged.format, version);
 
   const sections = {};
   for (const key of GENOME_SECTION_KEYS) {
@@ -195,8 +271,8 @@ function normalizeGenome(input = {}) {
     type: normalizeEnum(merged.type, GENOME_TYPES, 'domain'),
     language: normalizeText(merged.language, 'en') || 'en',
     depth: normalizeEnum(merged.depth, GENOME_DEPTHS, 'standard'),
-    version: 2,
-    format: 'genome-v2',
+    version,
+    format,
     evidenceMode: normalizeEnum(
       merged.evidenceMode || merged.evidence_mode,
       GENOME_EVIDENCE_MODES,
@@ -207,6 +283,18 @@ function normalizeGenome(input = {}) {
       0
     ),
     generated: normalizeDate(merged.generated),
+    personaSource: normalizeText(merged.personaSource || merged.persona_source),
+    personaSources: normalizeStringArray(merged.personaSources || merged.persona_sources),
+    disc: normalizeText(merged.disc),
+    enneagram: normalizeText(merged.enneagram),
+    bigFive: normalizeText(merged.bigFive || merged.big_five),
+    mbti: normalizeText(merged.mbti),
+    confidence: normalizeOptionalEnum(merged.confidence, GENOME_CONFIDENCE_LEVELS),
+    profilerReport: normalizeText(merged.profilerReport || merged.profiler_report),
+    hybridMode: normalizeOptionalEnum(
+      merged.hybridMode || merged.hybrid_mode,
+      GENOME_HYBRID_MODES
+    ),
     legacyFormat: Boolean(merged.legacyFormat),
     hasFrontmatter: Boolean(merged.hasFrontmatter),
     sections
@@ -224,6 +312,10 @@ function countGenomeSections(input = {}) {
     methodologies: genome.sections.methodologies.length,
     mentes: genome.sections.mentes.length,
     skills: genome.sections.skills.length,
+    cognitiveProfile: genome.sections.cognitiveProfile.length,
+    communicationStyle: genome.sections.communicationStyle.length,
+    biases: genome.sections.biases.length,
+    conflictResolution: genome.sections.conflictResolution.length,
     evidence: genome.sections.evidence.length,
     applicationNotes: genome.sections.applicationNotes.length
   };
@@ -239,6 +331,10 @@ function normalizeCounts(value = {}) {
     methodologies: normalizeInteger(value.methodologies, 0),
     mentes: normalizeInteger(value.mentes, 0),
     skills: normalizeInteger(value.skills, 0),
+    cognitiveProfile: normalizeInteger(value.cognitiveProfile, 0),
+    communicationStyle: normalizeInteger(value.communicationStyle, 0),
+    biases: normalizeInteger(value.biases, 0),
+    conflictResolution: normalizeInteger(value.conflictResolution, 0),
     evidence: normalizeInteger(value.evidence, 0),
     applicationNotes: normalizeInteger(value.applicationNotes, 0)
   };
@@ -264,10 +360,13 @@ function normalizeGenomeMeta(input = {}) {
   });
   const createdAt = normalizeTimestamp(input.createdAt) || timestampFromGenome(genome || input);
   const updatedAt = normalizeTimestamp(input.updatedAt) || createdAt;
+  const version = normalizeGenomeVersion(input.version || (genome && genome.version), 2);
+  const format = normalizeGenomeFormat(input.format || (genome && genome.format), version);
 
   return {
-    schemaVersion: normalizeIntegerPreservingInvalid(input.schemaVersion, 2),
-    format: normalizeText(input.format, 'genome-v2') || 'genome-v2',
+    schemaVersion: normalizeIntegerPreservingInvalid(input.schemaVersion, version),
+    version,
+    format,
     slug: slugify(input.slug || (genome && genome.slug)),
     domain: normalizeText(input.domain || (genome && genome.domain)) || humanizeSlug(input.slug || (genome && genome.slug)),
     type: normalizeEnum(input.type || (genome && genome.type), GENOME_TYPES, 'domain'),
@@ -284,6 +383,18 @@ function normalizeGenomeMeta(input = {}) {
         input.sources_count ??
         (genome && genome.sourceCount),
       0
+    ),
+    personaSource: normalizeText(input.personaSource || input.persona_source || (genome && genome.personaSource)),
+    personaSources: normalizeStringArray(input.personaSources || input.persona_sources || (genome && genome.personaSources)),
+    disc: normalizeText(input.disc || (genome && genome.disc)),
+    enneagram: normalizeText(input.enneagram || (genome && genome.enneagram)),
+    bigFive: normalizeText(input.bigFive || input.big_five || (genome && genome.bigFive)),
+    mbti: normalizeText(input.mbti || (genome && genome.mbti)),
+    confidence: normalizeOptionalEnum(input.confidence || (genome && genome.confidence), GENOME_CONFIDENCE_LEVELS),
+    profilerReport: normalizeText(input.profilerReport || input.profiler_report || (genome && genome.profilerReport)),
+    hybridMode: normalizeOptionalEnum(
+      input.hybridMode || input.hybrid_mode || (genome && genome.hybridMode),
+      GENOME_HYBRID_MODES
     ),
     counts,
     origin: {
@@ -315,7 +426,7 @@ function isGenomeV2(genome) {
   if (genome.legacyFormat) return false;
   const format = normalizeText(genome.format).toLowerCase();
   const version = Number.parseInt(String(genome.version || ''), 10);
-  return format === 'genome-v2' || version >= 2;
+  return GENOME_FORMATS.includes(format) || version >= 2;
 }
 
 function synthesizeMetaFromLegacy(genome, input = {}) {
@@ -341,7 +452,12 @@ module.exports = {
   GENOME_TYPES,
   GENOME_DEPTHS,
   GENOME_EVIDENCE_MODES,
+  GENOME_FORMATS,
+  GENOME_CONFIDENCE_LEVELS,
+  GENOME_HYBRID_MODES,
   GENOME_SECTION_KEYS,
+  GENOME_CANONICAL_SECTION_KEYS,
+  GENOME_V3_SECTION_KEYS,
   createEmptyGenome,
   normalizeGenome,
   normalizeGenomeMeta,

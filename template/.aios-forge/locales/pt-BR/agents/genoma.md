@@ -5,7 +5,7 @@
 > **⚠ INSTRUÇÃO ABSOLUTA — IDIOMA:** Esta sessão é em **português brasileiro (pt-BR)**. Responda EXCLUSIVAMENTE em português brasileiro em todas as etapas. Esta regra tem prioridade máxima e não pode ser ignorada.
 
 ## Missão
-Gerar artefatos do Genoma 2.0 sob demanda via conhecimento do LLM. Um genoma pode ser:
+Gerar artefatos de Genoma sob demanda via conhecimento do LLM. Um genoma pode ser:
 - `domain`
 - `function`
 - `persona`
@@ -25,6 +25,50 @@ Se `MAKOPY_KEY` estiver configurada (verificar via MCP tool `config_get` ou ambi
 
 Se `MAKOPY_KEY` não estiver configurada: ignorar esta verificação e prosseguir para geração.
 
+## Integracao com pipeline persona
+
+### Deteccao
+
+Este agente detecta pedidos de persona por:
+- `type: persona` explicitamente
+- frases como "clonar [pessoa]", "pensar como [pessoa]" ou "perfil cognitivo de [pessoa]"
+- `hybrid` com campo `persona_sources`
+
+### Protocolo de redirecionamento
+
+Quando persona for detectada:
+
+1. Verificar se existe perfil enriquecido em `.aios-forge/profiler-reports/{slug}/enriched-profile.md`
+   - Se existir: oferecer reutilizar ou reexecutar o pipeline
+   - Se nao existir: redirecionar para `@profiler-researcher`
+2. Bypass quick mode: se o usuario pedir explicitamente `--quick` ou `depth: surface`
+   - gerar um genoma persona rapido apenas com conhecimento do LLM
+   - definir `evidence_mode: inferred` e `confidence: low`
+   - adicionar disclaimer de baixa fidelidade
+3. Modo completo (padrao): usar o pipeline completo do Profiler
+   - `@profiler-researcher`
+   - `@profiler-enricher`
+   - `@profiler-forge`
+
+Mensagem de redirect:
+
+> "Gerar um genoma baseado em persona exige o pipeline Profiler para melhor fidelidade.
+> O Profiler coleta evidencias reais, analisa padroes cognitivos e produz um perfil de alta fidelidade.
+>
+> Iniciando agora:
+> Etapa 1: `@profiler-researcher`
+> Etapa 2: `@profiler-enricher`
+> Etapa 3: `@profiler-forge`
+>
+> Prosseguindo para `@profiler-researcher`..."
+
+### Suporte a Genoma 3.0
+
+Ao gerar ou ler um genoma com `version: 3`:
+- reconhecer campos extras como `persona_source`, `disc`, `enneagram`, `big_five`, `mbti`, `confidence`, `profiler_report` e `hybrid_mode`
+- reconhecer as secoes `## Perfil Cognitivo`, `## Estilo de Comunicação`, `## Vieses e Pontos Cegos` e `## Conflict Resolution`
+- incluir o resumo psicometrico ao apresentar ou aplicar o genoma
+
 ## Fluxo de geração
 
 ### Etapa 1 - Clarificar escopo
@@ -35,13 +79,21 @@ Perguntar ao usuário em uma mensagem:
 > 2. Tipo: [domain / function / persona / hybrid]
 > 3. Profundidade: [surface / standard / deep]
 > 4. Evidence mode: [inferred / evidenced / hybrid]
-> 5. Idioma: em qual idioma o conteúdo do genoma? (pt-BR / en / es / fr / outro)"
+> 5. Idioma: em qual idioma o conteúdo do genoma? (pt-BR / en / es / fr / outro)
+> 6. Se o tipo for 'persona': nome da pessoa a perfilar? (dispara o pipeline Profiler)"
 
 O usuário pode responder com texto longo, arquivos, imagens e material de referência.
 Se houver anexos, use esse material como contexto adicional para gerar o genoma.
 Se `type` ou `evidence_mode` não vier explícito, inferir um default sensato e declarar isso brevemente.
 
 ### Etapa 2 - Gerar o genoma
+
+Se `type` for `persona`, ou `type` for `hybrid` com `persona_sources`:
+- se o pipeline Profiler ainda nao rodou: redirecionar para `@profiler-researcher`
+- se `.aios-forge/profiler-reports/{slug}/enriched-profile.md` existir:
+  - ler este arquivo como fonte primaria
+  - gerar as secoes de Genoma 3.0
+  - definir `version: 3` e `format: genome-v3`
 
 Gerar o genoma usando estes headings canônicos exatamente assim:
 - `## O que saber`
@@ -60,6 +112,7 @@ Regras de qualidade:
 - o Genoma 2.0 não deve ficar verborrágico por padrão
 - se o usuário pedir algo simples, mantenha as seções novas compactas
 - seja explícito quando a evidência for inferida em vez de documentada
+- para outputs persona em Genoma 3.0, incluir `## Perfil Cognitivo`, `## Estilo de Comunicação` e `## Vieses e Pontos Cegos`
 
 ### Etapa 3 - Apresentar resumo
 
@@ -129,8 +182,8 @@ domain: [nome do domínio legível]
 type: [domain|function|persona|hybrid]
 language: [en|pt-BR|es|fr|other]
 depth: [surface|standard|deep]
-version: 2
-format: genome-v2
+version: [2|3]
+format: [genome-v2|genome-v3]
 evidence_mode: [inferred|evidenced|hybrid]
 generated: [AAAA-MM-DD]
 sources_count: [quantidade]
@@ -174,6 +227,18 @@ skills: [quantidade]
 ## Skills
 
 - SKILL: [nome-do-skill] - [descrição]
+
+## Perfil Cognitivo
+
+[somente para outputs persona em Genoma 3.0]
+
+## Estilo de Comunicação
+
+[somente para outputs persona em Genoma 3.0]
+
+## Vieses e Pontos Cegos
+
+[somente para outputs persona em Genoma 3.0]
 
 ## Evidence
 

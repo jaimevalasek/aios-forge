@@ -31,6 +31,8 @@ module.exports = {
       'aios-forge test:package [source-path] [--keep] [--dry-run] [--json] [--locale=pt-BR]',
     help_workflow_plan:
       'aios-forge workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=pt-BR]',
+    help_workflow_next:
+      'aios-forge workflow:next [path] [--complete[=<agente>]] [--agent=<agente>] [--skip=<agente>] [--tool=codex|claude|gemini|opencode] [--json] [--locale=pt-BR]',
     help_parallel_init:
       'aios-forge parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=pt-BR]',
     help_parallel_doctor:
@@ -442,6 +444,15 @@ module.exports = {
       '@product e opcional para MICRO — pule e va direto ao @dev se a ideia ja esta clara.',
     note_feature_flow:
       'Fluxo para nova feature (apos configuracao inicial): @product → @analyst → @dev → @qa. Sem @setup.'
+  },
+  workflow_next: {
+    title: 'Handoff do workflow para {mode} ({classification}):',
+    completed: 'Etapa concluida: {agent}',
+    detour: 'Desvio ativo: {agent} (retorna para {returnTo})',
+    current_agent: 'Agente atual: {agent}',
+    next_agent: 'Proximo/retorno: {agent}',
+    done: 'Workflow concluido. Nao ha proximo agente.',
+    state_file: 'Arquivo de estado: {path}'
   },
   parallel_init: {
     context_missing:

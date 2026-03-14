@@ -7,7 +7,22 @@ const path = require('node:path');
 const { AGENT_DEFINITIONS } = require('../src/constants');
 
 const ROOT = path.resolve(__dirname, '..');
-const AGENTS = ['setup', 'discovery-design-doc', 'analyst', 'architect', 'ux-ui', 'pm', 'dev', 'qa', 'orchestrator', 'squad', 'genoma'];
+const AGENTS = [
+  'setup',
+  'discovery-design-doc',
+  'analyst',
+  'architect',
+  'ux-ui',
+  'pm',
+  'dev',
+  'qa',
+  'orchestrator',
+  'squad',
+  'genoma',
+  'profiler-researcher',
+  'profiler-enricher',
+  'profiler-forge'
+];
 
 async function read(filePath) {
   return fs.readFile(filePath, 'utf8');
@@ -361,6 +376,13 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '[4] Apply this genome to an existing squad/agent',
     'AgentGenomes:',
     'Do not modify official `.aios-forge/agents/` files with user custom genomes',
+    '## Persona Pipeline Integration',
+    '@profiler-researcher',
+    'version: 3',
+    'format: genome-v3',
+    '## Perfil Cognitivo',
+    '## Estilo de Comunicação',
+    '## Vieses e Pontos Cegos',
     'domain',
     'function',
     'persona',
@@ -383,6 +405,13 @@ test('squad and genoma contracts include genome binding workflow', async () => {
     '[4] Aplicar este genoma a um squad/agente já existente',
     'AgentGenomes:',
     'Não modifique agentes oficiais de `.aios-forge/agents/` com genomas customizados do usuário',
+    '## Integracao com pipeline persona',
+    '@profiler-researcher',
+    'version: 3',
+    'format: genome-v3',
+    '## Perfil Cognitivo',
+    '## Estilo de Comunicação',
+    '## Vieses e Pontos Cegos',
     'domain',
     'function',
     'persona',
@@ -405,4 +434,36 @@ test('squad and genoma contracts include genome binding workflow', async () => {
   for (const token of squadPtTokens) assert.equal(squadPt.includes(token), true, `missing squad pt token: ${token}`);
   for (const token of genomaTokens) assert.equal(genomaBase.includes(token), true, `missing genoma base token: ${token}`);
   for (const token of genomaPtTokens) assert.equal(genomaPt.includes(token), true, `missing genoma pt token: ${token}`);
+});
+
+test('profiler agent contracts ship with workflow and localized wrappers', async () => {
+  const researcherBase = await read(path.join(ROOT, 'template/.aios-forge/agents/profiler-researcher.md'));
+  const enricherBase = await read(path.join(ROOT, 'template/.aios-forge/agents/profiler-enricher.md'));
+  const forgeBase = await read(path.join(ROOT, 'template/.aios-forge/agents/profiler-forge.md'));
+  const researcherPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/profiler-researcher.md'));
+  const enricherPt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/profiler-enricher.md'));
+  const forgePt = await read(path.join(ROOT, 'template/.aios-forge/locales/pt-BR/agents/profiler-forge.md'));
+
+  const baseChecks = [
+    [researcherBase, ['## Mission', '## Step 2 - Research protocol', 'research-report.md', 'DECISION', 'WORK-SAMPLE', '## Hard constraints', '.aios-forge/context/']],
+    [enricherBase, ['## Mission', '## Step 3 - Extract the cognitive profile', 'DISC Profile', 'MBTI', 'enriched-profile.md', '## Hard constraints', '.aios-forge/context/']],
+    [forgeBase, ['## Mission', 'Genoma 3.0', 'Advisor Agent', 'genome-v3', '.aios-forge/advisors/{person-slug}-advisor.md', '## Hard constraints', '.aios-forge/context/']]
+  ];
+
+  for (const [content, tokens] of baseChecks) {
+    for (const token of tokens) {
+      assert.equal(content.includes(token), true, `missing profiler base token: ${token}`);
+    }
+  }
+
+  const localeChecks = [
+    [researcherPt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-researcher.md'],
+    [enricherPt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-enricher.md'],
+    [forgePt, 'INSTRUCAO ABSOLUTA', '.aios-forge/agents/profiler-forge.md']
+  ];
+
+  for (const [content, instructionToken, basePathToken] of localeChecks) {
+    assert.equal(content.includes(instructionToken), true, `missing profiler locale instruction: ${instructionToken}`);
+    assert.equal(content.includes(basePathToken), true, `missing profiler locale base path: ${basePathToken}`);
+  }
 });

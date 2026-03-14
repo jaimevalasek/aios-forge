@@ -27,6 +27,9 @@ const MANAGED_FILES = [
   '.aios-forge/agents/orchestrator.md',
   '.aios-forge/agents/squad.md',
   '.aios-forge/agents/genoma.md',
+  '.aios-forge/agents/profiler-researcher.md',
+  '.aios-forge/agents/profiler-enricher.md',
+  '.aios-forge/agents/profiler-forge.md',
   '.aios-forge/locales/en/agents/setup.md',
   '.aios-forge/locales/en/agents/discovery-design-doc.md',
   '.aios-forge/locales/en/agents/analyst.md',
@@ -39,6 +42,9 @@ const MANAGED_FILES = [
   '.aios-forge/locales/en/agents/orchestrator.md',
   '.aios-forge/locales/en/agents/squad.md',
   '.aios-forge/locales/en/agents/genoma.md',
+  '.aios-forge/locales/en/agents/profiler-researcher.md',
+  '.aios-forge/locales/en/agents/profiler-enricher.md',
+  '.aios-forge/locales/en/agents/profiler-forge.md',
   '.aios-forge/locales/pt-BR/agents/setup.md',
   '.aios-forge/locales/pt-BR/agents/discovery-design-doc.md',
   '.aios-forge/locales/pt-BR/agents/analyst.md',
@@ -51,6 +57,9 @@ const MANAGED_FILES = [
   '.aios-forge/locales/pt-BR/agents/orchestrator.md',
   '.aios-forge/locales/pt-BR/agents/squad.md',
   '.aios-forge/locales/pt-BR/agents/genoma.md',
+  '.aios-forge/locales/pt-BR/agents/profiler-researcher.md',
+  '.aios-forge/locales/pt-BR/agents/profiler-enricher.md',
+  '.aios-forge/locales/pt-BR/agents/profiler-forge.md',
   '.aios-forge/locales/es/agents/setup.md',
   '.aios-forge/locales/es/agents/discovery-design-doc.md',
   '.aios-forge/locales/es/agents/analyst.md',
@@ -63,6 +72,9 @@ const MANAGED_FILES = [
   '.aios-forge/locales/es/agents/orchestrator.md',
   '.aios-forge/locales/es/agents/squad.md',
   '.aios-forge/locales/es/agents/genoma.md',
+  '.aios-forge/locales/es/agents/profiler-researcher.md',
+  '.aios-forge/locales/es/agents/profiler-enricher.md',
+  '.aios-forge/locales/es/agents/profiler-forge.md',
   '.aios-forge/locales/fr/agents/setup.md',
   '.aios-forge/locales/fr/agents/discovery-design-doc.md',
   '.aios-forge/locales/fr/agents/analyst.md',
@@ -75,6 +87,9 @@ const MANAGED_FILES = [
   '.aios-forge/locales/fr/agents/orchestrator.md',
   '.aios-forge/locales/fr/agents/squad.md',
   '.aios-forge/locales/fr/agents/genoma.md',
+  '.aios-forge/locales/fr/agents/profiler-researcher.md',
+  '.aios-forge/locales/fr/agents/profiler-enricher.md',
+  '.aios-forge/locales/fr/agents/profiler-forge.md',
   '.aios-forge/skills/static/laravel-conventions.md',
   '.aios-forge/skills/static/tall-stack-patterns.md',
   '.aios-forge/skills/static/jetstream-setup.md',
@@ -115,7 +130,9 @@ const MANAGED_FILES = [
   '.aios-forge/tasks/squad-extend.md',
   '.aios-forge/tasks/squad-export.md',
   '.aios-forge/tasks/squad-repair.md',
-  '.aios-forge/tasks/squad-pipeline.md'
+  '.aios-forge/tasks/squad-pipeline.md',
+  '.aios-forge/profiler-reports/.gitkeep',
+  '.aios-forge/advisors/.gitkeep'
 ];
 
 const REQUIRED_FILES = [
@@ -262,6 +279,27 @@ const AGENT_DEFINITIONS = [
     path: '.aios-forge/agents/genoma.md',
     dependsOn: [],
     output: '.aios-forge/genomas/[slug].md + .aios-forge/genomas/[slug].meta.json + optional binding in .aios-forge/squads/{slug}/squad.md or .aios-forge/squads/{slug}/squad.manifest.json'
+  },
+  {
+    id: 'profiler-researcher',
+    command: '@profiler-researcher',
+    path: '.aios-forge/agents/profiler-researcher.md',
+    dependsOn: [],
+    output: '.aios-forge/profiler-reports/{person-slug}/research-report.md'
+  },
+  {
+    id: 'profiler-enricher',
+    command: '@profiler-enricher',
+    path: '.aios-forge/agents/profiler-enricher.md',
+    dependsOn: ['.aios-forge/profiler-reports/{person-slug}/research-report.md'],
+    output: '.aios-forge/profiler-reports/{person-slug}/enriched-profile.md'
+  },
+  {
+    id: 'profiler-forge',
+    command: '@profiler-forge',
+    path: '.aios-forge/agents/profiler-forge.md',
+    dependsOn: ['.aios-forge/profiler-reports/{person-slug}/enriched-profile.md'],
+    output: '.aios-forge/genomas/{person-slug}-{domain-slug}.md + .aios-forge/genomas/{person-slug}-{domain-slug}.meta.json + .aios-forge/advisors/{person-slug}-advisor.md'
   }
 ];
 

@@ -27,6 +27,13 @@ test('getAgentDefinition resolves ux-ui agent', () => {
   assert.equal(agent.output.includes('.aios-forge/context/ui-spec.md'), true);
 });
 
+test('getAgentDefinition resolves profiler-forge agent', () => {
+  const agent = getAgentDefinition('profiler-forge');
+  assert.equal(Boolean(agent), true);
+  assert.equal(agent.id, 'profiler-forge');
+  assert.equal(agent.output.includes('.aios-forge/advisors/{person-slug}-advisor.md'), true);
+});
+
 test('buildAgentPrompt includes target output', () => {
   const agent = getAgentDefinition('analyst');
   const prompt = buildAgentPrompt(agent, 'codex', {

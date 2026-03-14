@@ -308,6 +308,32 @@ The `SMALL` and MEDIUM outputs include a note reminding you of this sequence.
 
 ---
 
+## workflow:next
+
+Advance the active workflow, complete the current stage, trigger a controlled detour, or skip ahead until `@dev`.
+
+```bash
+aios-forge workflow:next
+aios-forge workflow:next ./my-project --tool=codex
+aios-forge workflow:next ./my-project --complete
+aios-forge workflow:next ./my-project --agent=ux-ui
+aios-forge workflow:next ./my-project --skip=dev
+```
+
+**What it does:**
+- initializes `.aios-forge/context/workflow.state.json` if it does not exist
+- infers the current project stage from existing artifacts like `project.context.md`, `prd.md`, `discovery.md`, and `architecture.md`
+- follows the default sequence by classification, or a custom `.aios-forge/context/workflow.config.json` if the project defines one
+- supports detours such as `--agent=ux-ui`, then returns to the saved next stage automatically
+- allows skipping ahead only until `@dev`; it never allows skipping past `@dev`
+
+**Notes:**
+- `workflow:next` is the canonical command
+- `agent:next` is an alias for compatibility
+- `workflow.config.json` and `workflow.state.json` live under `.aios-forge/context/`, so normal framework updates preserve them
+
+---
+
 ## test:smoke
 
 End-to-end integration test that installs AIOS Forge in a temporary directory, runs all major commands, and verifies the output. Used for CI and release validation.

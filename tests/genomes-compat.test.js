@@ -106,6 +106,95 @@ Promessa e clareza definem a leitura.
   assert.match(result.meta.createdAt, /^2026-03-10T/);
 });
 
+test('parseGenomeMarkdown preserves genome v3 persona fields and sections', () => {
+  const markdown = `---
+genome: naval-ravikant-leverage
+domain: Naval Ravikant - Leverage
+type: persona
+language: pt-BR
+depth: deep
+version: 3
+format: genome-v3
+evidence_mode: evidenced
+generated: 2026-03-13
+sources_count: 8
+mentes: 1
+skills: 1
+persona_source: Naval Ravikant
+disc: DC
+enneagram: 5w6
+big_five: O:H C:M E:L A:L N:L
+mbti: INTJ
+confidence: medium
+profiler_report: .aios-forge/profiler-reports/naval-ravikant/enriched-profile.md
+---
+
+# Genome: Naval Ravikant - Leverage
+
+## O que saber
+
+Leverage compounds through code and media.
+
+## Filosofias
+
+Play long-term games with long-term people.
+
+## Modelos mentais
+
+Look for asymmetric upside first.
+
+## Heurísticas
+
+Bound downside and keep upside open.
+
+## Frameworks
+
+Use leverage, accountability, and specific knowledge.
+
+## Metodologias
+
+Reduce choices to incentives and compounding.
+
+## Mentes
+
+### The Leverage Architect
+- Cognitive signature: searches for asymmetry
+
+## Skills
+
+- SKILL: leverage-audit — scores ideas by asymmetry
+
+## Perfil Cognitivo
+
+DISC DC inferred from direct and analytical behavior.
+
+## Estilo de Comunicação
+
+Compressed, analytical, high-certainty communication.
+
+## Vieses e Pontos Cegos
+
+May overweight leverage over operational constraints.
+
+## Evidence
+
+Essays, interviews, and public posts.
+
+## Application notes
+
+Use in strategy and market selection.
+`;
+
+  const genome = parseGenomeMarkdown(markdown);
+
+  assert.equal(genome.version, 3);
+  assert.equal(genome.format, 'genome-v3');
+  assert.equal(genome.personaSource, 'Naval Ravikant');
+  assert.equal(genome.sections.cognitiveProfile.length, 1);
+  assert.equal(genome.sections.communicationStyle.length, 1);
+  assert.equal(genome.sections.biases.length, 1);
+});
+
 test('readGenome throws a clear error when metadata json is invalid', async () => {
   const dir = await makeTempDir();
   const genomeDir = path.join(dir, '.aios-forge', 'genomas');

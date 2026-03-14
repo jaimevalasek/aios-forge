@@ -44,6 +44,7 @@
 | `agents` | Lista agentes registrados, paths, dependências e outputs | Quando quer entender o arsenal ativo |
 | `agent:prompt` | Gera o prompt pronto para ativar um agente em outro cliente de IA | Quando o cliente não suporta slash command |
 | `workflow:plan` | Sugere o fluxo de agentes adequado ao porte do projeto | Quando quer decidir a ordem de execução |
+| `workflow:next` | Avança o fluxo real, registra estado, aceita desvio e skip ate `@dev` | Quando quer handoff automatico entre agentes |
 | `test:agents` | Valida contratos e arquivos críticos dos agentes | Quando mexeu no sistema de agentes |
 | `test:smoke` | Roda um smoke test em workspace temporário | Quando quer validar o pacote de forma ampla |
 | `test:package` | Testa o pacote instalado a partir de uma origem local | Quando vai validar release ou empacotamento |
@@ -328,7 +329,28 @@ aios-forge scan:project . --folder=src --with-llm --provider=deepseek --summary-
 
 Nesse fluxo, providers como DeepSeek servem melhor como sintetizadores da arquitetura, relações e riscos do sistema, enquanto o trabalho pesado de mapear pastas solicitadas e filtrar o `.aios-forge/` fica no próprio CLI.
 
-### 12. Preparar orquestração paralela
+### 12. Avancar o workflow real entre agentes
+
+```bash
+aios-forge workflow:next .
+aios-forge workflow:next . --complete
+aios-forge workflow:next . --agent=ux-ui
+aios-forge workflow:next . --skip=dev
+```
+
+Use quando quiser que o CLI acompanhe a etapa atual e decida o proximo agente de forma consistente.
+
+Regras:
+- cria `.aios-forge/context/workflow.state.json` se ainda nao existir
+- usa `.aios-forge/context/workflow.config.json` se o projeto tiver uma orquestracao customizada
+- aceita desvio temporario com `--agent=<agente>` e depois retorna para a trilha principal
+- aceita `--skip=<agente>` so ate chegar no `@dev`
+- nunca permite pular o `@dev`
+
+Alias compativel:
+- `agent:next`
+
+### 13. Preparar orquestração paralela
 
 ```bash
 aios-forge parallel:init . --workers=3
@@ -344,7 +366,7 @@ Alias equivalentes:
 - `orchestrator:status`
 - `orchestrator:doctor`
 
-### 13. Inicializar e diagnosticar MCP
+### 14. Inicializar e diagnosticar MCP
 
 ```bash
 aios-forge mcp:init . --tool=codex
@@ -353,7 +375,7 @@ aios-forge mcp:doctor . --strict-env
 
 Use quando você quer preparar integrações MCP e confirmar se as variáveis e arquivos estão corretos.
 
-### 14. Rodar Browser QA
+### 15. Rodar Browser QA
 
 ```bash
 aios-forge qa:init . --url=http://localhost:8000
@@ -370,7 +392,7 @@ Use:
 - `qa:scan` para cobertura mais ampla de rotas
 - `qa:report` para rever o último relatório sem rodar tudo de novo
 
-### 15. Abrir o dashboard do AIOS Forge
+### 16. Abrir o dashboard do AIOS Forge
 
 O dashboard agora é instalado separadamente do CLI.
 

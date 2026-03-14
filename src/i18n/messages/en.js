@@ -29,6 +29,8 @@ module.exports = {
       'aios-forge test:package [source-path] [--keep] [--dry-run] [--json] [--locale=en]',
     help_workflow_plan:
       'aios-forge workflow:plan [path] [--classification=MICRO|SMALL|MEDIUM] [--json] [--locale=en]',
+    help_workflow_next:
+      'aios-forge workflow:next [path] [--complete[=<agent>]] [--agent=<agent>] [--skip=<agent>] [--tool=codex|claude|gemini|opencode] [--json] [--locale=en]',
     help_parallel_init:
       'aios-forge parallel:init [path] [--workers=2..6] [--force] [--dry-run] [--json] [--locale=en]',
     help_parallel_doctor:
@@ -427,6 +429,15 @@ module.exports = {
     note_micro_scope: 'Keep implementation scope minimal and avoid optional agents.',
     note_product_optional: '@product is optional for MICRO — skip it and go straight to @dev if the idea is already clear.',
     note_feature_flow: 'New feature workflow (after initial setup): @product → @analyst → @dev → @qa. No @setup required.'
+  },
+  workflow_next: {
+    title: 'Workflow handoff for {mode} ({classification}):',
+    completed: 'Completed stage: {agent}',
+    detour: 'Detour active: {agent} (return to {returnTo})',
+    current_agent: 'Current agent: {agent}',
+    next_agent: 'Return/next agent: {agent}',
+    done: 'Workflow is complete. No next agent remains.',
+    state_file: 'State file: {path}'
   },
   parallel_init: {
     context_missing: 'Context file not found: {path}. Run setup:context first.',

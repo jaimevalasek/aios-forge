@@ -51,6 +51,43 @@ function createGenomeFixture() {
   });
 }
 
+function createGenomeV3Fixture() {
+  return normalizeGenome({
+    domain: 'Naval Ravikant - Leverage',
+    language: 'pt-BR',
+    type: 'persona',
+    depth: 'deep',
+    version: 3,
+    format: 'genome-v3',
+    evidenceMode: 'evidenced',
+    sourceCount: 8,
+    generated: '2026-03-13',
+    personaSource: 'Naval Ravikant',
+    disc: 'DC',
+    enneagram: '5w6',
+    bigFive: 'O:H C:M E:L A:L N:L',
+    mbti: 'INTJ',
+    confidence: 'medium',
+    profilerReport: '.aios-forge/profiler-reports/naval-ravikant/enriched-profile.md',
+    sections: {
+      knowledge: ['Leverage comes from code, media, capital, and specific knowledge.'],
+      philosophies: ['Play long-term games with long-term people.'],
+      mentalModels: ['Start by asking where leverage compounds asymmetrically.'],
+      heuristics: ['If the upside scales and the downside is bounded, keep looking.'],
+      frameworks: ['Assess opportunity through leverage, accountability, and compounding.'],
+      methodologies: ['Distill complex markets into durable incentives and asymmetries.'],
+      mentes: ['### The Leverage Architect\n- Cognitive signature: looks for asymmetric upside first'],
+      skills: ['- SKILL: leverage-audit — evaluates work by scalability and compounding'],
+      cognitiveProfile: ['DISC DC with high dominance and compliance, inferred from direct and analytical communication.'],
+      communicationStyle: ['Analytical, compressed, aphoristic, and high-certainty.'],
+      biases: ['Tends to overweight leverage and underestimate execution drag in early teams.'],
+      conflictResolution: [],
+      evidence: ['Podcast interviews, essays, and public threads from 2018-2025.'],
+      applicationNotes: ['Best applied to strategic and market-selection decisions.']
+    }
+  });
+}
+
 test('normalizeGenome and countGenomeSections preserve genome v2 fields', () => {
   const genome = createGenomeFixture();
   const counts = countGenomeSections(genome);
@@ -84,6 +121,28 @@ test('serializeGenomeMarkdown writes canonical genome v2 sections', () => {
   assert.equal(parsed.sections.methodologies.length, 1);
 });
 
+test('normalizeGenome and serializeGenomeMarkdown preserve genome v3 persona fields', () => {
+  const genome = createGenomeV3Fixture();
+  const meta = normalizeGenomeMeta({ genome });
+  const markdown = serializeGenomeMarkdown(genome);
+  const parsed = parseGenomeMarkdown(markdown);
+
+  assert.equal(genome.version, 3);
+  assert.equal(genome.format, 'genome-v3');
+  assert.equal(genome.personaSource, 'Naval Ravikant');
+  assert.equal(genome.sections.cognitiveProfile.length, 1);
+  assert.equal(meta.schemaVersion, 3);
+  assert.equal(meta.version, 3);
+  assert.equal(meta.format, 'genome-v3');
+  assert.match(markdown, /format: genome-v3/);
+  assert.match(markdown, /persona_source: Naval Ravikant/);
+  assert.match(markdown, /## Perfil Cognitivo/);
+  assert.match(markdown, /## Estilo de Comunicação/);
+  assert.match(markdown, /## Vieses e Pontos Cegos/);
+  assert.equal(parsed.version, 3);
+  assert.equal(parsed.sections.communicationStyle.length, 1);
+});
+
 test('writeGenome persists markdown and meta files together', async () => {
   const dir = await makeTempDir();
   const genome = createGenomeFixture();
@@ -100,6 +159,24 @@ test('writeGenome persists markdown and meta files together', async () => {
   assert.deepEqual(await listGenomes(dir), ['growth-marketing']);
   assert.match(markdown, /# Genome: Growth Marketing/);
   assert.equal(meta.compat.synthesizedFromLegacy, false);
+});
+
+test('writeGenome persists genome v3 persona metadata', async () => {
+  const dir = await makeTempDir();
+  const genome = createGenomeV3Fixture();
+  const result = await writeGenome(dir, genome);
+
+  const markdownPath = path.join(dir, '.aios-forge', 'genomas', 'naval-ravikant-leverage.md');
+  const metaPath = path.join(dir, '.aios-forge', 'genomas', 'naval-ravikant-leverage.meta.json');
+  const markdown = await fs.readFile(markdownPath, 'utf8');
+  const meta = JSON.parse(await fs.readFile(metaPath, 'utf8'));
+
+  assert.equal(result.genome.version, 3);
+  assert.equal(result.meta.schemaVersion, 3);
+  assert.equal(meta.version, 3);
+  assert.equal(meta.format, 'genome-v3');
+  assert.equal(meta.personaSource, 'Naval Ravikant');
+  assert.match(markdown, /# Genome: Naval Ravikant - Leverage/);
 });
 
 test('managed files include genome schemas', () => {

@@ -171,6 +171,26 @@ test('agent:prompt --json returns structured payload without human logs', async 
   assert.equal(typeof parsed.prompt, 'string');
 });
 
+test('workflow:next --json returns structured payload without human logs', async () => {
+  const dir = await makeTempDir();
+  await fs.mkdir(path.join(dir, '.aios-forge/context'), { recursive: true });
+  await fs.writeFile(
+    path.join(dir, '.aios-forge/context/project.context.md'),
+    `---\nproject_name: "demo"\nproject_type: "web_app"\nprofile: "developer"\nframework: "Next.js"\nframework_installed: true\nclassification: "SMALL"\nconversation_language: "en"\naios_forge_version: "1.2.1"\n---\n\n# Project Context\n`,
+    'utf8'
+  );
+  await fs.writeFile(path.join(dir, '.aios-forge/context/prd.md'), '# PRD\n', 'utf8');
+
+  const cli = await runCli(['workflow:next', dir, '--tool=codex', '--json']);
+  assert.equal(cli.code, 0);
+  assert.equal(cli.stderr.trim(), '');
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.agent, 'analyst');
+  assert.equal(parsed.current, 'analyst');
+  assert.equal(parsed.statePath, '.aios-forge/context/workflow.state.json');
+});
+
 test('legacy dashboard commands return a structured migration error with --json', async () => {
   const dir = await makeTempDir();
   const cli = await runCli([

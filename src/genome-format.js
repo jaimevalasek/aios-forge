@@ -15,6 +15,10 @@ const SECTION_ORDER = [
   ['methodologies', 'Metodologias'],
   ['mentes', 'Mentes'],
   ['skills', 'Skills'],
+  ['cognitiveProfile', 'Perfil Cognitivo'],
+  ['communicationStyle', 'Estilo de Comunicação'],
+  ['biases', 'Vieses e Pontos Cegos'],
+  ['conflictResolution', 'Conflict Resolution'],
   ['evidence', 'Evidence'],
   ['applicationNotes', 'Application notes']
 ];
@@ -35,6 +39,14 @@ const SECTION_ALIASES = new Map([
   ['minds', 'mentes'],
   ['skills', 'skills'],
   ['habilidades', 'skills'],
+  ['perfil cognitivo', 'cognitiveProfile'],
+  ['cognitive profile', 'cognitiveProfile'],
+  ['estilo de comunicacao', 'communicationStyle'],
+  ['communication style', 'communicationStyle'],
+  ['vieses e pontos cegos', 'biases'],
+  ['biases and blind spots', 'biases'],
+  ['conflict resolution', 'conflictResolution'],
+  ['resolucao de conflito', 'conflictResolution'],
   ['evidence', 'evidence'],
   ['evidencias', 'evidence'],
   ['application notes', 'applicationNotes'],
@@ -56,6 +68,16 @@ function normalizeHeading(value) {
 function parseScalar(rawValue) {
   const value = String(rawValue || '').trim();
   if (!value) return '';
+  if (
+    (value.startsWith('[') && value.endsWith(']')) ||
+    (value.startsWith('{') && value.endsWith('}'))
+  ) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
     (value.startsWith("'") && value.endsWith("'"))
@@ -193,18 +215,10 @@ function splitListBlocks(text) {
 }
 
 function emptySections() {
-  return {
-    knowledge: [],
-    philosophies: [],
-    mentalModels: [],
-    heuristics: [],
-    frameworks: [],
-    methodologies: [],
-    mentes: [],
-    skills: [],
-    evidence: [],
-    applicationNotes: []
-  };
+  return GENOME_SECTION_KEYS.reduce((accumulator, key) => {
+    accumulator[key] = [];
+    return accumulator;
+  }, {});
 }
 
 function materializeSection(sectionKey, content) {
@@ -295,7 +309,7 @@ function parseGenomeMarkdown(markdown) {
 
   const detectedV2 =
     Number.parseInt(String(frontmatter.version || ''), 10) >= 2 ||
-    String(frontmatter.format || '').trim().toLowerCase() === 'genome-v2' ||
+    ['genome-v2', 'genome-v3'].includes(String(frontmatter.format || '').trim().toLowerCase()) ||
     Boolean(frontmatter.type) ||
     Boolean(frontmatter.evidence_mode) ||
     Boolean(frontmatter.sources_count) ||
@@ -310,6 +324,17 @@ function parseGenomeMarkdown(markdown) {
     evidenceMode: frontmatter.evidence_mode || frontmatter.evidenceMode,
     sourceCount: frontmatter.sources_count ?? frontmatter.sourceCount,
     generated: frontmatter.generated,
+    version: frontmatter.version,
+    format: frontmatter.format,
+    personaSource: frontmatter.persona_source || frontmatter.personaSource,
+    personaSources: frontmatter.persona_sources || frontmatter.personaSources,
+    disc: frontmatter.disc,
+    enneagram: frontmatter.enneagram,
+    bigFive: frontmatter.big_five || frontmatter.bigFive,
+    mbti: frontmatter.mbti,
+    confidence: frontmatter.confidence,
+    profilerReport: frontmatter.profiler_report || frontmatter.profilerReport,
+    hybridMode: frontmatter.hybrid_mode || frontmatter.hybridMode,
     hasFrontmatter: extracted.hasFrontmatter,
     legacyFormat: !detectedV2,
     sections: hasSectionContent
@@ -324,6 +349,7 @@ function parseGenomeMarkdown(markdown) {
 }
 
 function formatFrontmatterValue(value) {
+  if (Array.isArray(value)) return JSON.stringify(value);
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   const text = String(value || '').replace(/\r?\n/g, ' ').trim();
   if (!text) return '""';
@@ -334,6 +360,18 @@ function formatFrontmatterValue(value) {
 function renderSectionEntries(entries) {
   if (!Array.isArray(entries) || entries.length === 0) return '';
   return entries.map((entry) => String(entry || '').trim()).filter(Boolean).join('\n\n');
+}
+
+function shouldRenderSection(genome, key) {
+  if (['cognitiveProfile', 'communicationStyle', 'biases'].includes(key)) {
+    return genome.version >= 3;
+  }
+
+  if (key === 'conflictResolution') {
+    return genome.version >= 3 && (genome.hybridMode === 'multi-persona' || genome.sections[key].length > 0);
+  }
+
+  return true;
 }
 
 function serializeGenomeMarkdown(input) {
@@ -347,8 +385,8 @@ function serializeGenomeMarkdown(input) {
     `type: ${formatFrontmatterValue(genome.type)}`,
     `language: ${formatFrontmatterValue(genome.language)}`,
     `depth: ${formatFrontmatterValue(genome.depth)}`,
-    'version: 2',
-    'format: genome-v2',
+    `version: ${formatFrontmatterValue(genome.version)}`,
+    `format: ${formatFrontmatterValue(genome.format)}`,
     `evidence_mode: ${formatFrontmatterValue(genome.evidenceMode)}`,
     `generated: ${formatFrontmatterValue(generated)}`,
     `sources_count: ${formatFrontmatterValue(genome.sourceCount)}`,
@@ -357,12 +395,29 @@ function serializeGenomeMarkdown(input) {
     '---'
   ];
 
+  if (genome.version >= 3) {
+    frontmatter.splice(
+      frontmatter.length - 1,
+      0,
+      `persona_source: ${formatFrontmatterValue(genome.personaSource)}`,
+      `persona_sources: ${formatFrontmatterValue(genome.personaSources)}`,
+      `disc: ${formatFrontmatterValue(genome.disc)}`,
+      `enneagram: ${formatFrontmatterValue(genome.enneagram)}`,
+      `big_five: ${formatFrontmatterValue(genome.bigFive)}`,
+      `mbti: ${formatFrontmatterValue(genome.mbti)}`,
+      `confidence: ${formatFrontmatterValue(genome.confidence)}`,
+      `profiler_report: ${formatFrontmatterValue(genome.profilerReport)}`,
+      `hybrid_mode: ${formatFrontmatterValue(genome.hybridMode)}`
+    );
+  }
+
   const parts = [
     frontmatter.join('\n'),
     `# Genome: ${genome.domain}`
   ];
 
   for (const [key, heading] of SECTION_ORDER) {
+    if (!shouldRenderSection(genome, key)) continue;
     const body = renderSectionEntries(genome.sections[key]);
     parts.push(body ? `## ${heading}\n\n${body}` : `## ${heading}`);
   }

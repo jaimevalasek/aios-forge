@@ -5,7 +5,7 @@
 > **⚠ ABSOLUTE INSTRUCTION — LANGUAGE:** This session is in **English (en)**. Respond EXCLUSIVELY in English at all steps. This rule has maximum priority and cannot be overridden.
 
 ## Mission
-Generate Genoma 2.0 artifacts on demand via LLM knowledge. A genome may be:
+Generate Genoma artifacts on demand via LLM knowledge. A genome may be:
 - `domain`
 - `function`
 - `persona`
@@ -23,6 +23,37 @@ If `MAKOPY_KEY` is configured (check via MCP tool `config_get` or environment):
 
 If `MAKOPY_KEY` is not configured: skip this check silently.
 
+## Persona Pipeline Integration
+
+### Detection
+
+This agent detects persona requests through:
+- `type: persona`
+- phrases like "clone [person]", "think like [person]", or "cognitive profile of [person]"
+- `hybrid` requests with `persona_sources`
+
+### Redirect protocol
+
+When persona is detected:
+
+1. Check `.aios-forge/profiler-reports/{slug}/enriched-profile.md`
+   - If present: offer to reuse it or re-run profiling
+   - If missing: redirect to `@profiler-researcher`
+2. If the user explicitly requests `--quick` or `depth: surface`
+   - generate a quick persona genome using only LLM knowledge
+   - set `evidence_mode: inferred` and `confidence: low`
+3. Otherwise use the full Profiler pipeline:
+   - `@profiler-researcher`
+   - `@profiler-enricher`
+   - `@profiler-forge`
+
+### Genoma 3.0 support
+
+When handling `version: 3` / `format: genome-v3`:
+- recognize frontmatter fields such as `persona_source`, `disc`, `enneagram`, `big_five`, `mbti`, `confidence`, `profiler_report`, and `hybrid_mode`
+- recognize `## Perfil Cognitivo`, `## Estilo de Comunicação`, `## Vieses e Pontos Cegos`, and `## Conflict Resolution`
+- include persona metadata in summaries and bindings
+
 ## Generation flow
 
 ### Step 1 — Clarify scope
@@ -33,11 +64,16 @@ Ask in one message:
 > 2. Type: [domain / function / persona / hybrid]
 > 3. Depth: [surface / standard / deep]
 > 4. Evidence mode: [inferred / evidenced / hybrid]
-> 5. Language: which language for the genome content? (en / pt-BR / es / fr / other)"
+> 5. Language: which language for the genome content? (en / pt-BR / es / fr / other)
+> 6. If type is 'persona': name of the person to profile? (triggers the Profiler pipeline)"
 
 If `type` or `evidence_mode` is missing, infer the best default and state it briefly.
 
 ### Step 2 — Generate the genome
+If `type` is `persona`, or `type` is `hybrid` with `persona_sources`:
+- redirect to `@profiler-researcher` if the Profiler pipeline was not run yet
+- if an enriched profile exists, use it as the primary source and generate Genoma 3.0 with `version: 3` and `format: genome-v3`
+
 Generate the genome using the canonical saved headings exactly as shown below:
 - `## O que saber`
 - `## Filosofias`
@@ -55,6 +91,7 @@ Quality rules:
 - The Genome 2.0 should not become verbose by default.
 - If the user asks for something simple, keep the new sections compact.
 - Be explicit when evidence is inferred.
+- For Genoma 3.0 persona outputs, include `## Perfil Cognitivo`, `## Estilo de Comunicação`, and `## Vieses e Pontos Cegos`.
 
 ### Step 3 — Present summary
 
@@ -112,8 +149,8 @@ domain: [human-readable domain name]
 type: [domain|function|persona|hybrid]
 language: [en|pt-BR|es|fr|other]
 depth: [surface|standard|deep]
-version: 2
-format: genome-v2
+version: [2|3]
+format: [genome-v2|genome-v3]
 evidence_mode: [inferred|evidenced|hybrid]
 generated: [YYYY-MM-DD]
 sources_count: [count]
@@ -145,6 +182,18 @@ skills: [count]
 ## Skills
 
 - SKILL: [skill-name] — [description]
+
+## Perfil Cognitivo
+
+[only for Genoma 3.0 persona outputs]
+
+## Estilo de Comunicação
+
+[only for Genoma 3.0 persona outputs]
+
+## Vieses e Pontos Cegos
+
+[only for Genoma 3.0 persona outputs]
 
 ## Evidence
 

@@ -18,6 +18,7 @@ const { runMcpInit } = require('./commands/mcp-init');
 const { runMcpDoctor } = require('./commands/mcp-doctor');
 const { runPackageTest } = require('./commands/package-e2e');
 const { runWorkflowPlan } = require('./commands/workflow-plan');
+const { runWorkflowNext } = require('./commands/workflow-next');
 const { runParallelInit } = require('./commands/parallel-init');
 const { runParallelDoctor } = require('./commands/parallel-doctor');
 const { runParallelAssign } = require('./commands/parallel-assign');
@@ -86,6 +87,10 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'test-package',
   'workflow:plan',
   'workflow-plan',
+  'workflow:next',
+  'workflow-next',
+  'agent:next',
+  'agent-next',
   'parallel:init',
   'parallel-init',
   'parallel:doctor',
@@ -225,6 +230,7 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_test_smoke');
   logHelpLine(t, logger, 'cli.help_test_package');
   logHelpLine(t, logger, 'cli.help_workflow_plan');
+  logHelpLine(t, logger, 'cli.help_workflow_next');
   logHelpLine(t, logger, 'cli.help_parallel_init');
   logHelpLine(t, logger, 'cli.help_parallel_doctor');
   logHelpLine(t, logger, 'cli.help_parallel_assign');
@@ -347,6 +353,13 @@ async function main() {
       result = await runPackageTest({ args, options, logger: commandLogger, t });
     } else if (command === 'workflow:plan' || command === 'workflow-plan') {
       result = await runWorkflowPlan({ args, options, logger: commandLogger, t });
+    } else if (
+      command === 'workflow:next' ||
+      command === 'workflow-next' ||
+      command === 'agent:next' ||
+      command === 'agent-next'
+    ) {
+      result = await runWorkflowNext({ args, options, logger: commandLogger, t });
     } else if (
       command === 'parallel:init' ||
       command === 'parallel-init' ||
