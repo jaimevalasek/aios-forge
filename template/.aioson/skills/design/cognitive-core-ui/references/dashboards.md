@@ -1,0 +1,172 @@
+# Dashboard Presets — Cognitive Core UI
+
+Read after `design-tokens.md`, `components.md`, and `patterns.md`.
+
+These presets help choose a fitting operational composition instead of defaulting to random card grids.
+
+---
+
+## How to choose
+
+1. Start from the product's **main operational pressure**, not from a visual trope.
+2. Pick **one dominant preset** per screen.
+3. Mix small traits from another preset only when the primary composition is already clear.
+
+---
+
+## Preset 1: Inventory Operations Board
+
+**Best for:** stock control, inventory movement, replenishment monitoring, product catalog operations, supply dashboards.
+
+**Default theme:** Dark.
+
+**Layout composition:**
+```
+TOP BAR: Logo + product name + compact status badge + account/actions
+STATS ROW: 3-4 high-signal cards only
+SUBNAV: Dashboard | Products | Movements (or equivalent)
+MAIN GRID:
+  LEFT RAIL (220-260px): monitoring blocks, quick filters, credential/mode card
+  CENTER (flex: 1): stock radar / urgent items / operational summary
+  RIGHT RAIL (320-380px): recent movements / alerts / short activity feed
+```
+
+**Why it works:**
+- One central operational story above the fold
+- Urgent items visible without a product-wall overload
+- Movement history stays contextual, not dominant
+- Left rail gives monitoring without stealing the main stage
+
+**Rules:**
+- Do not render the full product catalog above the fold. Show 2–4 urgent cards in the central radar.
+- Use color semantics sparingly: green = stable, amber = low, red = zero/critical.
+- Prefer operational labels: `Baixo estoque`, `Zerados`, `Saude do estoque`, `Movimentacao recente`.
+- Keep the focal block calm. Do not turn it into a second dashboard shell inside the dashboard.
+- For tables: treat each row as an intentional operational lane — aligned numbers, consistent padding, enough breathing room around status chips.
+
+---
+
+## Preset 2: Premium Control Center
+
+**Best for:** AI systems, orchestration panels, intelligence products, multi-module operational platforms, command centers.
+
+**Default theme:** Dark.
+
+**Layout composition:**
+```
+TOP BAR: Logo + system subtitle + nav + status badge
+STATS ROW: 4 stat cards
+SECONDARY NAV: domain tabs
+MAIN GRID:
+  PRIMARY PANEL: single large analysis/control surface
+  SUPPORT PANEL: mode/status block
+  LOWER PANELS: grouped operational cards or capabilities
+```
+
+**Guardrail:**
+- Use only when the product genuinely needs command-center semantics.
+- DNA panels, mode panels, and labeled capability cards are optional, not default.
+- Do not use for inventory just because the product is dark and premium.
+
+---
+
+## Preset 3: Admin Analytics
+
+**Best for:** analytics, SaaS admin, revenue tracking, performance reporting dashboards.
+
+**Default theme:** Dark or Light.
+
+**Layout composition:**
+```
+TOP BAR
+STATS ROW
+FILTER / DATE BAR
+MAIN:
+  Chart panel (full width or 2/3)
+  Ranked list or summary panel (1/3)
+  Table or report panel (full width below)
+```
+
+**Guardrail:**
+- Let charts and tables do the work.
+- Do not overload with decorative status cards.
+
+---
+
+## Preset 4: Ops Cockpit
+
+**Best for:** system monitoring, logistics control, incident response, infra operations, real-time dashboards.
+
+**Default theme:** Dark.
+
+**Layout composition:**
+```
+TOP BAR
+STATUS ROW (alert counts + system health)
+MAIN GRID:
+  Alert feed (primary, left/center)
+  System status cluster (grouped service cards)
+  Quick stats / context rail (right)
+```
+
+**Guardrail:**
+- Alerts must be scannable first. Status color must carry meaning, not atmosphere.
+
+---
+
+## Preset 5: CRM / Contact Manager
+
+**Best for:** CRM, support tools, people directories, account management, talent pipelines.
+
+**Default theme:** Light or Dark.
+
+**Layout composition:**
+```
+TOP BAR
+TAB BAR (with filter badges)
+LIST-DETAIL SPLIT:
+  Entity list (340px, scrollable)
+  Active profile/detail view (flex: 1)
+    → Profile Header (compact) + Stat Cards + Tab sub-nav + Content
+```
+
+---
+
+## Operational Table Guardrails
+
+Dashboards often have tables. This is where otherwise-good boards lose quality.
+
+### Goals
+- Rows scannable in under 1 second
+- Same premium density as the rest of the board
+- Avoid the feeling of "spreadsheet leftovers pasted into a polished shell"
+
+### Rules
+1. Use `font-variant-numeric: tabular-nums` for quantities, prices, thresholds, and derived values.
+2. Keep status, quantity, and actions visually separated — they should not collapse into one dense block.
+3. Status chips must sit comfortably inside row rhythm. If they crowd neighboring columns, widen the lane.
+4. Action buttons in tables should read as a grouped control cluster, not as independent floating pills.
+5. Row hover must feel like a surface state, not a hard painted rectangle.
+6. `border-collapse: separate` + `td` surfaces = premium. `border-collapse: collapse` + `tr` backgrounds = amateur.
+
+### Failure signs
+- Serif fallback inside the table only → font scope bug in `td`
+- Row hover painting a hard rectangle → wrong collapse mode or `tr` background
+- Status chips squeezed → widen the column or reduce chip padding
+- Numbers misaligned → missing `font-variant-numeric: tabular-nums`
+- Page opens with a large hero-like block → reduce stat row height, tighten typography
+- Cards feel puffy and over-padded → reduce `padding`, `border-radius`, and grid gap
+- Layout reads like a polished demo instead of an operational surface → density is part of the identity
+
+---
+
+## Inventory Mapping Guide
+
+| Inventory concept | UI treatment |
+|---|---|
+| Low stock | Urgent card in stock radar |
+| Zero stock | Critical card in stock radar (semantic-red) |
+| Recent entry/exit | Right-rail activity list |
+| Valuation / total items | Top stat row |
+| Category / supplier monitoring | Left rail blocks or filters |
+| Replenishment threshold | Progress bar + limit helper |

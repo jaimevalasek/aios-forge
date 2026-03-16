@@ -11,6 +11,7 @@ const {
   writeProjectContext
 } = require('../context-writer');
 const { applyAgentLocale } = require('../locales');
+const { openRuntimeDb, logAgentEvent } = require('../runtime-store');
 const {
   BACKEND_CHOICES,
   FRONTEND_CHOICES,
@@ -633,6 +634,26 @@ async function runSetupContext({ args, options, logger, t }) {
       count: localeApplyResult.copied.length
     })
   );
+
+  try {
+    const handle = await openRuntimeDb(targetDir);
+    const { db, runtimeDir } = handle;
+    try {
+      await logAgentEvent(db, runtimeDir, {
+        agentName: '@setup',
+        message: `Project context created: ${data.projectName} (${data.classification} / ${data.framework})`,
+        type: 'completed',
+        taskTitle: `@setup — ${data.projectName}`,
+        finish: true,
+        status: 'completed',
+        summary: `Setup: ${data.projectType} · ${data.framework} · ${data.classification}`
+      });
+    } finally {
+      db.close();
+    }
+  } catch {
+    // Runtime DB may not exist yet on first setup — not a fatal error
+  }
 
   return {
     ok: true,

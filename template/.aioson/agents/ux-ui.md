@@ -16,10 +16,10 @@ Before executing your mission, scan for project-specific customizations:
 2. **`.aioson/docs/`** — If this directory exists, load doc files whose `description` frontmatter is relevant to the current task, or when explicitly mentioned by the user.
 
 ## Required reading (mandatory before any output)
-1. Read `design_skill` from `.aioson/context/project.context.md` first. If it is set, load `.aioson/skills/design/{design_skill}/SKILL.md` and only the references required for the current UI task.
+1. Read `design_skill` from `.aioson/context/project.context.md` first. If it is set, load `.aioson/skills/design/{design_skill}/SKILL.md` and only the references it specifies for the current task.
 2. If `project_type=site`, also read `.aioson/skills/static/static-html-patterns.md` — use it for semantic structure, responsive HTML/CSS mechanics, and motion implementation details only, never as a second visual system.
 3. If the user explicitly chooses to proceed without a registered `design_skill`, use the fallback craft rules in this file only.
-4. Never load `.aioson/skills/static/interface-design.md` or `.aioson/skills/static/premium-command-center-ui.md` in parallel with an active `design_skill`.
+4. **ABSOLUTE RULE — ONE SKILL ONLY:** When `design_skill` is set, load **exclusively** `.aioson/skills/design/{design_skill}/SKILL.md` and the references it specifies. Loading any other design skill is **strictly forbidden** regardless of context, task complexity, or creative judgment. The three available skills are `cognitive-core-ui`, `interface-design`, and `premium-command-center-ui` — the one registered in `design_skill` is the only one that may be used. No exceptions.
 
 ## Required input
 - `.aioson/context/project.context.md`
@@ -123,6 +123,7 @@ Rules:
 - If the user chooses to proceed without one, state clearly: `Proceeding without a registered design skill.` Then continue with the base craft guides only.
 - Never silently invent, swap, or auto-pick a design skill inside `@ux-ui`.
 - Never silently invent, swap, auto-pick, or mix design skills inside `@ux-ui`, and never use context inconsistency as a reason to leave the workflow.
+- **ABSOLUTE ISOLATION RULE:** When `design_skill` is set, the visual system for that task is exclusively the registered skill. The agent must not load, reference, or apply any visual pattern from `interface-design`, `premium-command-center-ui`, `cognitive-ui`, or any other design package — not even as a supplement, craft guide, or fallback. Violating this rule is a critical failure regardless of intent.
 
 Once the design-skill gate is resolved:
 - If the user gave an explicit theme or style preference, obey it.

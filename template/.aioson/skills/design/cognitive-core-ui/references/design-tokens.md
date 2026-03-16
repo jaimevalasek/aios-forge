@@ -1,0 +1,391 @@
+# Design Tokens — Cognitive Core UI
+
+All components and patterns depend on these tokens. Load this file first before any other reference.
+
+---
+
+## Typography strategy
+
+Default to **system fonts** first. Add Google Fonts only when the agent decides the stack, product context, and delivery constraints justify them.
+
+**System font stack (default — works everywhere, no CDN needed):**
+```css
+--font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+--font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+--font-mono:    ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+```
+
+**Google Fonts (optional — use when building the Mentes Sintéticas aesthetic explicitly):**
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+--font-display: 'Inter', system-ui, sans-serif;
+--font-body:    'Inter', system-ui, sans-serif;
+--font-mono:    'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+```
+
+---
+
+## Complete CSS Variables
+
+Include this full block in every project.
+
+```css
+/* ═══════════════════════════════════════════
+   SHARED TOKENS — in :root (see Token Scope Guardrails)
+   ═══════════════════════════════════════════ */
+:root {
+  /* Typography (set defaults here; override with Google Fonts if needed) */
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono:    ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Font Sizes */
+  --text-xs:   0.72rem;   /* 11.5px — micro labels, mono uppercase */
+  --text-sm:   0.82rem;   /* 13px */
+  --text-base: 0.95rem;   /* 15px — default body */
+  --text-lg:   1rem;      /* 16px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.6rem;    /* 25.6px */
+  --text-3xl:  2.2rem;    /* 35px */
+  --text-4xl:  3rem;      /* 48px — stat numbers */
+  --text-5xl:  4rem;      /* 64px — hero headings */
+
+  /* Font Weights */
+  --weight-light:    300;
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    800;
+
+  /* Letter Spacing */
+  --tracking-tight:   -0.025em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.04em;
+  --tracking-wider:   0.08em;
+  --tracking-widest:  0.12em;
+
+  /* Line Height */
+  --leading-none:    1;
+  --leading-tight:   1.08;
+  --leading-snug:    1.24;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.68;
+
+  /* Spacing */
+  --space-0:  0;
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Border Radius */
+  --radius-sm:   0.375rem;
+  --radius-md:   0.625rem;
+  --radius-lg:   0.875rem;
+  --radius-xl:   1.125rem;
+  --radius-2xl:  1.5rem;
+  --radius-full: 9999px;
+
+  /* Interactive element heights */
+  --control-xs: 1.75rem;
+  --control-sm: 2rem;
+  --control-md: 2.5rem;
+  --control-lg: 3rem;
+
+  /* Transitions */
+  --transition-fast:  140ms ease;
+  --transition-base:  200ms ease;
+  --transition-slow:  300ms ease;
+  --transition-theme: background 240ms ease, color 240ms ease, border-color 240ms ease, box-shadow 240ms ease;
+
+  /* Z-index */
+  --z-base:     0;
+  --z-elevated: 10;
+  --z-dropdown: 20;
+  --z-sticky:   30;
+  --z-modal:    50;
+  --z-toast:    60;
+}
+
+/* ═══════════════════════════════════════════
+   DARK THEME
+   ═══════════════════════════════════════════ */
+[data-theme="dark"] {
+  /* Backgrounds — layered navy depth */
+  --bg-void:     #060910;
+  --bg-base:     #0b0f15;
+  --bg-surface:  #111827;
+  --bg-elevated: #172133;
+  --bg-overlay:  #223148;
+
+  /* Borders */
+  --border-subtle:        rgba(255, 255, 255, 0.06);
+  --border-medium:        rgba(255, 255, 255, 0.10);
+  --border-strong:        rgba(255, 255, 255, 0.16);
+  --border-accent:        rgba(34, 211, 238, 0.26);
+  --border-accent-strong: rgba(34, 211, 238, 0.50);
+
+  /* Text */
+  --text-heading:   #f7fafc;
+  --text-primary:   #dbe4ee;
+  --text-secondary: #95a3b8;
+  --text-muted:     #6b778c;
+  --text-accent:    #34d8ff;
+  --text-inverse:   #081018;
+
+  /* Accent — teal/cyan */
+  --accent:        #22d3ee;
+  --accent-strong: #09bfe0;
+  --accent-dim:    rgba(34, 211, 238, 0.16);
+  --accent-glow:   rgba(34, 211, 238, 0.12);
+  --accent-subtle: rgba(34, 211, 238, 0.08);
+  --accent-hover:  #06b6d4;
+
+  /* Semantic */
+  --semantic-green:      #16c784;
+  --semantic-green-dim:  rgba(22, 199, 132, 0.18);
+  --semantic-amber:      #f4a91d;
+  --semantic-amber-dim:  rgba(244, 169, 29, 0.18);
+  --semantic-red:        #ff5a67;
+  --semantic-red-dim:    rgba(255, 90, 103, 0.18);
+  --semantic-blue:       #59a7ff;
+  --semantic-blue-dim:   rgba(89, 167, 255, 0.18);
+  --semantic-purple:     #a78bfa;
+  --semantic-purple-dim: rgba(167, 139, 250, 0.18);
+
+  /* Shadows */
+  --shadow-sm:          0 1px 2px rgba(0, 0, 0, 0.22);
+  --shadow-md:          0 8px 24px rgba(0, 0, 0, 0.32);
+  --shadow-lg:          0 16px 40px rgba(0, 0, 0, 0.44);
+  --shadow-glow:        0 0 0 1px rgba(34, 211, 238, 0.05), 0 10px 28px rgba(3, 12, 22, 0.42);
+  --shadow-glow-strong: 0 0 30px rgba(34, 211, 238, 0.20), 0 0 10px rgba(34, 211, 238, 0.10);
+
+  /* Scrollbar */
+  --scrollbar-track: #0b0f15;
+  --scrollbar-thumb: #172133;
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT THEME
+   ═══════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Backgrounds — layered white/gray */
+  --bg-void:     #edf3f9;
+  --bg-base:     #f5f8fc;
+  --bg-surface:  #ffffff;
+  --bg-elevated: #eaf0f6;
+  --bg-overlay:  #dde8f1;
+
+  /* Borders */
+  --border-subtle:        rgba(12, 23, 40, 0.07);
+  --border-medium:        rgba(12, 23, 40, 0.12);
+  --border-strong:        rgba(12, 23, 40, 0.18);
+  --border-accent:        rgba(14, 165, 233, 0.22);
+  --border-accent-strong: rgba(14, 165, 233, 0.42);
+
+  /* Text */
+  --text-heading:   #0f172a;
+  --text-primary:   #334155;
+  --text-secondary: #61748a;
+  --text-muted:     #8b9aae;
+  --text-accent:    #0f8cc7;
+  --text-inverse:   #f8fbff;
+
+  /* Accent — sky blue (legible on white) */
+  --accent:        #0ea5e9;
+  --accent-strong: #0284c7;
+  --accent-dim:    rgba(14, 165, 233, 0.10);
+  --accent-glow:   rgba(14, 165, 233, 0.08);
+  --accent-subtle: rgba(14, 165, 233, 0.05);
+  --accent-hover:  #0284c7;
+
+  /* Semantic */
+  --semantic-green:      #059669;
+  --semantic-green-dim:  rgba(5, 150, 105, 0.10);
+  --semantic-amber:      #d97706;
+  --semantic-amber-dim:  rgba(217, 119, 6, 0.10);
+  --semantic-red:        #dc2626;
+  --semantic-red-dim:    rgba(220, 38, 38, 0.10);
+  --semantic-blue:       #2563eb;
+  --semantic-blue-dim:   rgba(37, 99, 235, 0.10);
+  --semantic-purple:     #7c3aed;
+  --semantic-purple-dim: rgba(124, 58, 237, 0.10);
+
+  /* Shadows */
+  --shadow-sm:          0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md:          0 12px 30px rgba(15, 23, 42, 0.08);
+  --shadow-lg:          0 20px 48px rgba(15, 23, 42, 0.12);
+  --shadow-glow:        0 0 0 1px rgba(14, 165, 233, 0.04), 0 14px 28px rgba(15, 23, 42, 0.06);
+  --shadow-glow-strong: 0 4px 16px rgba(14, 165, 233, 0.12);
+
+  /* Scrollbar */
+  --scrollbar-track: #f5f8fc;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+/* ═══════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════ */
+body {
+  font-family: var(--font-body);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme] {
+  color: var(--text-primary);
+  background: var(--bg-base);
+  transition: var(--transition-theme);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-medium); }
+```
+
+---
+
+## Token Scope Guardrails
+
+**This is the most critical implementation rule.** Font and typography bugs almost always come from scope violations.
+
+**Rule 1:** Put typography, spacing, radius, and transition tokens in `:root` — not in `[data-theme]`.
+
+**Rule 2:** Put theme-specific colors and surface values on the theme owner (`[data-theme]`).
+
+**Rule 3:** If `body` consumes `var(--font-body)`, that variable must exist in `:root` or in a scope `body` inherits.
+
+**Rule 4:** If the theme lives on a shell container instead of `body`, either keep typography in `:root`, or apply `font-family` directly on that shell.
+
+**Safe — typography in :root:**
+```css
+:root { --font-body: system-ui, sans-serif; }
+body { font-family: var(--font-body); }
+.shell[data-theme="dark"] { --bg-base: #0b0f15; }
+```
+
+**Safe — theme on shell, font applied there:**
+```css
+:root { --font-body: system-ui, sans-serif; }
+.shell[data-theme="dark"] { --bg-base: #0b0f15; font-family: var(--font-body); }
+```
+
+**Unsafe (font breaks silently):**
+```css
+/* WRONG */
+.shell[data-theme="dark"] { --font-body: 'Inter', sans-serif; } /* defined on child */
+body { font-family: var(--font-body); } /* body can't inherit from .shell */
+```
+
+---
+
+## Typography Patterns
+
+### Mono Label — the system's most distinctive element
+
+```css
+font-family: var(--font-mono);
+font-size: var(--text-xs);
+font-weight: var(--weight-semibold);
+letter-spacing: var(--tracking-widest);
+text-transform: uppercase;
+color: var(--text-secondary);
+```
+
+Use for: section headers, stat labels, nav labels, badge text, timestamps, IDs.
+**Do not overuse** — if everything is uppercase mono, nothing has emphasis.
+
+### Display Heading
+
+```css
+font-family: var(--font-display);
+font-weight: var(--weight-bold);
+letter-spacing: var(--tracking-tight);
+line-height: var(--leading-tight);
+color: var(--text-heading);
+```
+
+Sizes: `--text-5xl` (hero) · `--text-3xl` (page title) · `--text-2xl` (section) · `--text-xl` (card title).
+
+### Stat Number
+
+```css
+font-family: var(--font-display);
+font-size: var(--text-4xl);
+font-weight: var(--weight-bold);
+line-height: var(--leading-none);
+color: var(--text-heading);
+font-variant-numeric: tabular-nums;
+```
+
+Pair with suffix: `font-size: var(--text-lg); color: var(--text-muted)`.
+
+### Body Text
+
+```css
+font-family: var(--font-body);
+font-size: var(--text-base);
+font-weight: var(--weight-normal);
+line-height: var(--leading-relaxed);
+color: var(--text-primary);
+```
+
+### Numbers in tables and lists
+
+```css
+font-variant-numeric: tabular-nums;
+font-feature-settings: "tnum" 1;
+```
+
+---
+
+## Alignment Rules
+
+1. Keep text on a shared rhythm — headings, helpers, and numbers should align to the same left edge inside a card.
+2. Avoid micro-copy smaller than `--text-xs` unless it is true metadata.
+3. In dashboards: one card = one dominant metric or one dominant action. Do not stack equal-priority text blocks.
+4. Above the fold: prefer 1 primary content block + 1 support block + 1 contextual rail — not a wall of equal cards.
+5. Mono labels are separators, not decoration. If everything is uppercase mono, nothing is important.
+6. In brownfield: fix cascade and token-scope errors before changing colors, layout, or density.
+
+---
+
+## Mode Guidance
+
+### Dashboard / Admin
+- Dark theme is often the best default.
+- Dense, compact spacing — tighter headings, shorter line-height, less breathing room than marketing.
+- Use mono labels selectively for status, timestamps, identifiers, section rails.
+- Favor grouped blocks over large card matrices above the fold.
+
+### Landing Page / Website
+- Much more vertical breathing room (use `--space-16` to `--space-24` between sections).
+- Prefer display + body pairings over mono-heavy layouts.
+- Accent glow sparingly — trust typography and section rhythm.
+- One message per section. No dashboard chrome (sidebars, status feeds, dense badges).
+
+---
+
+## Non-Negotiable Rules
+
+1. Use the token system — never freestyle random hex values.
+2. Keep at most **three surface levels** visible in the same viewport.
+3. Teal/cyan is the **only accent** — never change it.
+4. Do not default to Google Fonts when system stacks deliver the right tone.
+5. Do not use mono labels as the main reading experience.
+6. Keep **one obvious focal block** per viewport.
+7. Fix token scope and cascade bugs before redesigning colors or layout.

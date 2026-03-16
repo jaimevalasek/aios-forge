@@ -44,11 +44,31 @@ When an agent file is included via @ or described via natural language, read the
 Do not answer with "I will open/read/show the file" unless the user explicitly asked to inspect that file.
 
 ## Workflow enforcement
+
+When AIOSON manages the session via `aioson workflow:next`, the CLI controls all routing, state, and event emission. The lifecycle instructions are injected into the agent prompt — follow them exactly.
+
+When running Codex directly (without `aioson workflow:next`), these rules apply:
+
+**Hard constraints — no exceptions:**
 - For implementation requests (code changes, feature build, refactor, bugfix), default to workflow routing and execute via the next workflow stage agent (typically `@dev` after required upstream stages).
-- Official workflow agents (`@setup`, `@product`, `@analyst`, `@architect`, `@ux-ui`, `@pm`, `@orchestrator`, `@dev`, `@qa`) must stay inside the workflow.
+- Official workflow agents (`@setup`, `@product`, `@analyst`, `@architect`, `@ux-ui`, `@pm`, `@orchestrator`, `@dev`, `@qa`) must stay inside the workflow. Do not answer requests outside the current agent's scope.
+- Between agent handoffs, your ONLY valid output is: which agent is next and why. Do not continue into that agent's work.
 - If `project.context.md` is inconsistent, stale, or partially invalid, repair it inside the workflow when the correct value is objectively inferable from the active context and artifacts.
 - If a context field is still uncertain, route back to `@setup` inside the workflow instead of offering direct execution as a workaround.
 - Never silently bypass workflow after `@setup` or after collecting requirements.
+
+**Event emission (direct mode — always run these):**
+```bash
+# On activation:
+aioson runtime-log . --agent=@{agent} --title="{Agent} stage" --message="Starting {agent}"
+
+# After each significant step:
+aioson runtime-log . --agent=@{agent} --message="<what was done>"
+
+# On completion:
+aioson runtime-log . --agent=@{agent} --message="<summary>" --finish --status=completed --summary="<one-line>"
+aioson workflow:next . --complete
+```
 
 ## Agent files
 - @setup → `.aioson/agents/setup.md`

@@ -57,6 +57,27 @@ Optional Web3 context fields (recommended for `project_type=dapp`):
 - `@product` and `@ux-ui` can confirm or update that choice when it is still blank.
 - `@dev` must consume the chosen `design_skill`; it must never auto-select one.
 
+## Runtime lifecycle
+
+When AIOSON manages the session via `aioson workflow:next`, ALL orchestration is handled by the CLI:
+- Workflow state (which agent is next, what was completed)
+- Event emission to `.aioson/runtime/aios.sqlite` (read by the AIOSON Dashboard at /tasks and /logs)
+- Sequence enforcement and required-agent checks
+
+The agent `.md` files define WHAT each agent does. The CLI defines HOW the session is orchestrated.
+
+**Agents must call these commands to keep the dashboard in sync:**
+
+| Moment | Command |
+|---|---|
+| On activation | `aioson runtime-log . --agent=@{agent} --title="..." --message="Starting {agent}"` |
+| After each step | `aioson runtime-log . --agent=@{agent} --message="<what was done>"` |
+| On completion | `aioson runtime-log . --agent=@{agent} --finish --status=completed --summary="..."` |
+| Advance workflow | `aioson workflow:next . --complete` |
+
+These commands are injected into the agent prompt automatically by `aioson workflow:next`.
+In direct mode (LLM without CLI), agents call them manually following the rules in CLAUDE.md / AGENTS.md.
+
 ## Agent locale packs
 - Localized agent prompts are stored in `.aioson/locales/<locale>/agents/`.
 - Active runtime prompts are in `.aioson/agents/`.

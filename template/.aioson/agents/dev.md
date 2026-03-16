@@ -126,7 +126,7 @@ resources/views/<resource>/   ← plural folder (users/, orders/)
 ## Design skill conventions
 - Read `design_skill` from `.aioson/context/project.context.md` before implementing any user-facing UI.
 - If `design_skill` is set, load `.aioson/skills/design/{design_skill}/SKILL.md` and only the references needed for the current screen or component.
-- If `design_skill` is set, treat it as the only visual system for the task. Do not mix it with `.aioson/skills/static/interface-design.md` or `.aioson/skills/static/premium-command-center-ui.md`.
+- **ABSOLUTE ISOLATION RULE:** If `design_skill` is set, it is the **only** visual system permitted for the entire task. The three available skills are `cognitive-core-ui`, `interface-design`, and `premium-command-center-ui`. Loading, referencing, or applying visual patterns from any other skill — including `cognitive-ui`, `interface-design` (when not selected), `premium-command-center-ui` (when not selected), or any skill found by scanning `.aioson/skills/design/` — is strictly forbidden. This rule cannot be overridden by creative judgment, task complexity, or context. One registered skill, one visual system, no exceptions.
 - If UI work is in scope, `project_type` is `site` or `web_app`, `design_skill` is blank, and `ui-spec.md` is absent, stop and ask whether to route through `@ux-ui` or proceed explicitly without a registered design skill.
 - Never auto-select, replace, or reinterpret a design skill inside `@dev`.
 - When implementing design-skill tokens, make sure CSS variables exist in the same scope where they are consumed. If `body` consumes `var(--font-body)`, typography tokens must live in `:root` or the font must be applied on the themed shell instead.
@@ -177,13 +177,13 @@ Interface copy, onboarding text, email content, and marketing text are not withi
 For stacks not listed above, apply the same separation principles:
 - Isolate business logic from request handlers (controller/route/handler → service/use-case).
 - Validate all input at the system boundary before it touches business logic.
-- Follow the framework's own conventions — check `.aioson/skills/static/`, `.aioson/skills/dynamic/`, and `.aioson/skills/design/` for available skill files.
+- Follow the framework's own conventions — check `.aioson/skills/static/` and `.aioson/skills/dynamic/` for available skill files. For design, load **only** the skill explicitly named in `design_skill` — never scan `.aioson/skills/design/` broadly when a design skill is already set.
 - If no skill file exists for the stack, apply the general pattern and document deviations in architecture.md.
 
 ## Working rules
 - Keep changes small and reviewable.
 - Enforce server-side validation and authorization.
-- Reuse project skills in `.aioson/skills/static`, `.aioson/skills/dynamic`, and `.aioson/skills/design`.
+- Reuse project skills in `.aioson/skills/static` and `.aioson/skills/dynamic`. For `.aioson/skills/design`, load only the skill explicitly named in `design_skill` — never load other design skills from that folder.
 - Also reuse squad-installed skills in `.aioson/squads/{squad-slug}/skills/` when the task belongs to a squad package.
 - Load detailed skills and documents on demand, not all at once.
 - Decide the minimum context package for the current implementation batch before coding.

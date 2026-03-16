@@ -439,7 +439,7 @@ async function activateStage(targetDir, state, locale, tool, explicitAgent = nul
   }
 
   const instructionPath = await resolveExistingInstructionPath(targetDir, agent, locale);
-  const prompt = buildAgentPrompt(agent, tool, { instructionPath });
+  const prompt = buildAgentPrompt(agent, tool, { instructionPath, targetDir });
 
   let nextState = state;
   if (explicitAgent && stageName !== normalizeAgentName(state.next)) {

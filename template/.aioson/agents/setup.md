@@ -103,6 +103,28 @@ If framework is not detected:
 
 ## Profile onboarding
 
+### Step 0 — Scan workspace before asking anything
+
+Before asking the user any question, run:
+```bash
+aioson setup:context . --defaults --json
+```
+
+This returns the auto-inferred values. Show them to the user as a confirmation block:
+
+> **Auto-detected:**
+> - Name: `{projectName}` (from directory)
+> - Framework: `{framework}` (detected in workspace: `{frameworkInstalled}`)
+> - Type: `{projectType}` (inferred from framework)
+> - Classification: `{classification}` (auto-scored)
+> - Language: `{conversationLanguage}`
+>
+> "Does this look right? Tell me what to change, or confirm to proceed."
+
+Wait for the user's response. Apply any corrections as explicit `--option=value` flags when calling the final `aioson setup:context` command at Step 6.
+
+If `aioson` is not available (direct mode without CLI), skip this step and proceed directly to Step 1 with manual inference from the workspace.
+
 ### Step 1 — Understand the project
 Ask ONE open question. Do not show a form:
 > "Describe the project in one or two sentences — what does it do and who is it for?"
@@ -187,10 +209,18 @@ Before writing `project.context.md` for `site` or `web_app`, inspect `.aioson/sk
 - If no packaged design skills are installed, keep `design_skill` as an empty string and state that UI agents must decide the visual system later.
 - If exactly one design skill is installed, do not auto-select it. Ask for explicit confirmation before registering it.
 - If multiple design skills are installed, show the available folder names and ask the user to choose one.
+- Note: `interface-design` is a general craft package (not a specific visual style). Mention this distinction so the user knows it produces a clean, intentional UI without a preset aesthetic — unlike `cognitive-core-ui` or `premium-command-center-ui` which are specific visual systems. There are exactly three design skills available: `cognitive-core-ui` (command-center/Mentes Sintéticas aesthetic, dark/light, dashboards + websites), `premium-command-center-ui` (dark operational shell, tri-rail dashboards only), and `interface-design` (general craft, any visual direction).
 - If the user does not want to choose yet, write `design_skill: ""` and state clearly that the visual system is still pending.
 
 Question format:
-> "For the visual system, do you want to register one of the installed design skills now? Available: [skill list]. If not, I'll leave `design_skill` blank and the next UI agent must confirm it before designing."
+> "For the visual system, which design skill should I register?
+>
+> Available skills:
+> - **`cognitive-core-ui`** — Command-center aesthetic (Mentes Sintéticas style). Dark/light themes. Works for dashboards, admin panels, landing pages, and websites.
+> - **`premium-command-center-ui`** — Dark operational shell. Tri-rail layout. Dashboards and command centers only.
+> - **`interface-design`** — General craft package. Clean, intentional UI without a preset visual style.
+>
+> Choose one, or reply 'skip' to leave it blank (the next UI agent will ask before designing)."
 
 For `api`, `script`, and non-UI-first scopes, keep `design_skill` empty unless the user explicitly asks to register one.
 

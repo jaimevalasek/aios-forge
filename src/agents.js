@@ -27,24 +27,49 @@ function resolveInstructionPath(agent, locale) {
 function buildAgentPrompt(agent, tool, options = {}) {
   const safeTool = String(tool || 'codex').toLowerCase();
   const instructionPath = options.instructionPath || agent.path;
+  const targetDir = options.targetDir ? String(options.targetDir) : '.';
   const dependencyText =
     agent.dependsOn.length > 0
       ? `Check required context files first: ${agent.dependsOn.join(', ')}.`
       : 'No prerequisite context files are required.';
 
+  const lifecycleBlock = [
+    '',
+    '',
+    '## AIOSON Lifecycle — mandatory, do not skip',
+    '',
+    `**1. On activation — run before any other action:**`,
+    '```bash',
+    `aioson runtime-log ${targetDir} --agent=${agent.command} --title="${agent.displayName} stage" --message="Starting ${agent.command}"`,
+    '```',
+    '',
+    '**2. After each significant step — run to keep the dashboard in sync:**',
+    '```bash',
+    `aioson runtime-log ${targetDir} --agent=${agent.command} --message="<what was just done>"`,
+    '```',
+    '',
+    '**3. On completion — run before any handoff message:**',
+    '```bash',
+    `aioson runtime-log ${targetDir} --agent=${agent.command} --message="<completion summary>" --finish --status=completed --summary="<one-line summary>"`,
+    `aioson workflow:next ${targetDir} --complete`,
+    '```',
+    '',
+    `**Scope boundary:** You operate exclusively as ${agent.command}. Do not perform work that belongs to another agent. When your work is complete, output only the handoff — which agent is next and why. Do not continue into that agent\'s territory.`,
+  ].join('\n');
+
   if (safeTool === 'claude') {
-    return `Read ${instructionPath} and execute ${agent.command}. ${dependencyText} Write output to ${agent.output}.`;
+    return `Read ${instructionPath} and execute ${agent.command}. ${dependencyText} Write output to ${agent.output}.${lifecycleBlock}`;
   }
 
   if (safeTool === 'gemini') {
-    return `Run the Gemini command mapped to ${instructionPath} and execute ${agent.command}. ${dependencyText} Save result to ${agent.output}.`;
+    return `Run the Gemini command mapped to ${instructionPath} and execute ${agent.command}. ${dependencyText} Save result to ${agent.output}.${lifecycleBlock}`;
   }
 
   if (safeTool === 'opencode') {
-    return `Use agent "${agent.id}" from ${instructionPath}. ${dependencyText} Save output to ${agent.output}.`;
+    return `Use agent "${agent.id}" from ${instructionPath}. ${dependencyText} Save output to ${agent.output}.${lifecycleBlock}`;
   }
 
-  return `Read AGENTS.md and execute ${agent.command} using ${instructionPath}. ${dependencyText} Save output to ${agent.output}.`;
+  return `Read AGENTS.md and execute ${agent.command} using ${instructionPath}. ${dependencyText} Save output to ${agent.output}.${lifecycleBlock}`;
 }
 
 module.exports = {

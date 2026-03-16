@@ -378,16 +378,15 @@ test('living PRD contracts preserve downstream sections and QA hooks', async () 
   }
 });
 
-test('cognitive-ui packaged skill is shipped and managed', async () => {
+test('cognitive-core-ui packaged skill is shipped and managed', async () => {
   const managedPaths = [
-    '.aioson/skills/design/cognitive-ui/SKILL.md',
-    '.aioson/skills/design/cognitive-ui/references/foundations.md',
-    '.aioson/skills/design/cognitive-ui/references/components.md',
-    '.aioson/skills/design/cognitive-ui/references/patterns.md',
-    '.aioson/skills/design/cognitive-ui/references/motion.md',
-    '.aioson/skills/design/cognitive-ui/references/dashboards.md',
-    '.aioson/skills/design/cognitive-ui/references/websites.md',
-    '.aioson/skills/design/cognitive-ui/assets/cognitive-demo.jsx'
+    '.aioson/skills/design/cognitive-core-ui/SKILL.md',
+    '.aioson/skills/design/cognitive-core-ui/references/design-tokens.md',
+    '.aioson/skills/design/cognitive-core-ui/references/components.md',
+    '.aioson/skills/design/cognitive-core-ui/references/patterns.md',
+    '.aioson/skills/design/cognitive-core-ui/references/motion.md',
+    '.aioson/skills/design/cognitive-core-ui/references/dashboards.md',
+    '.aioson/skills/design/cognitive-core-ui/references/websites.md'
   ];
 
   for (const file of managedPaths) {
@@ -417,26 +416,26 @@ test('additional packaged design skills are shipped and managed', async () => {
   }
 });
 
-test('cognitive-ui documents token scope, brownfield usage, and premium table guardrails', async () => {
-  const skill = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-ui/SKILL.md'));
-  const foundations = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-ui/references/foundations.md'));
-  const components = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-ui/references/components.md'));
-  const patterns = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-ui/references/patterns.md'));
+test('cognitive-core-ui documents token scope, brownfield usage, and premium table guardrails', async () => {
+  const skill = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-core-ui/SKILL.md'));
+  const tokens_file = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-core-ui/references/design-tokens.md'));
+  const components = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-core-ui/references/components.md'));
+  const patterns = await read(path.join(ROOT, 'template/.aioson/skills/design/cognitive-core-ui/references/patterns.md'));
 
   const tokens = [
     '## Delivery modes',
-    'greenfield',
-    'brownfield',
-    '## Token scope guardrails',
+    'Greenfield',
+    'Brownfield',
+    '## Token Scope Guardrails',
     ':root {',
-    'Never define `--font-body` only inside a child theme container and then consume it on `body`.',
+    'If `body` consumes `var(--font-body)`, that variable must exist in `:root`',
     'border-collapse: separate;',
-    '## Greenfield vs brownfield application'
+    '### Brownfield'
   ];
 
   for (const token of tokens) {
-    const haystack = [skill, foundations, components, patterns].find((content) => content.includes(token));
-    assert.equal(Boolean(haystack), true, `missing cognitive-ui guidance token: ${token}`);
+    const haystack = [skill, tokens_file, components, patterns].find((content) => content.includes(token));
+    assert.equal(Boolean(haystack), true, `missing cognitive-core-ui guidance token: ${token}`);
   }
 });
 
