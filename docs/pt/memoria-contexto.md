@@ -230,6 +230,21 @@ Se estiver em dúvida, siga esta ordem:
 6. `architecture.md`
 7. `module-<pasta>.md` ou `scan-<pasta>.md` só se precisar aprofundar
 
+## O que pode ir para commit
+
+Regra prática:
+
+- pode versionar os arquivos de `.aioson/context/`
+- pode versionar squads e genomas do projeto quando eles forem parte real do trabalho
+- normalmente nao deve versionar arquivos gerenciados do framework em `.aioson/agents/`, `.aioson/locales/`, `.aioson/skills/`, `.aioson/schemas/`, `.aioson/tasks/`, `.aioson/templates/` e `.aioson/advisors/`
+
+O AIOSON agora reforça isso no `.gitignore` do projeto durante `install`, `update` e `scan:project`.
+
+Importante:
+
+- se esses arquivos ja estavam rastreados pelo Git antes, adicionar no `.gitignore` nao basta
+- nesse caso, remova-os do indice uma vez com `git rm --cached` para que parem de aparecer no status
+
 ## Resumo sem dúvida
 
 - `scan:project` cria os mapas e os derivados locais

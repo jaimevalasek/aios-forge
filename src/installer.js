@@ -21,6 +21,16 @@ const GITIGNORE_POLICY_LINES = [
   '!.gemini/**',
   '!.aioson/',
   '!.aioson/**',
+  '# AIOSON — managed framework files (do not commit)',
+  '.aioson/config.md',
+  '.aioson/agents/',
+  '.aioson/locales/',
+  '.aioson/skills/',
+  '.aioson/schemas/',
+  '.aioson/tasks/',
+  '.aioson/templates/',
+  '.aioson/advisors/',
+  '.aioson/mcp/servers.md',
   '# AIOSON — local-only artifacts',
   'aioson-models.json',
   '.aioson/backups/',
@@ -65,6 +75,10 @@ async function ensureGitignoreEntries(targetDir, entries) {
   const separator = content.length > 0 && !content.endsWith('\n') ? '\n' : '';
   await fs.writeFile(gitignorePath, `${content}${separator}${missing.join('\n')}\n`, 'utf8');
   return missing.length;
+}
+
+async function ensureProjectGitignorePolicy(targetDir) {
+  return ensureGitignoreEntries(targetDir, GITIGNORE_POLICY_LINES);
 }
 
 async function countProjectFiles(targetDir) {
@@ -204,7 +218,7 @@ async function installTemplate(targetDir, options = {}) {
 
     await writeInstallMetadata(targetDir, mode, frameworkDetection);
 
-    await ensureGitignoreEntries(targetDir, GITIGNORE_POLICY_LINES);
+    await ensureProjectGitignorePolicy(targetDir);
 
     runtime = await ensureProjectRuntime(targetDir);
   }
@@ -232,5 +246,6 @@ module.exports = {
   listFilesRecursive,
   ensureGitignoreEntry,
   ensureGitignoreEntries,
+  ensureProjectGitignorePolicy,
   countProjectFiles
 };

@@ -808,6 +808,10 @@ module.exports = {
     llm_missing_api_key:
       'The API key for provider "{provider}" is still missing in {file}. Fill providers.{provider}.api_key or choose another provider with --provider=...',
     llm_error: 'LLM call failed: {error}',
+    gitignore_policy_written:
+      '  Gitignore: AIOSON policy updated in {path} to ignore framework-managed files',
+    gitignore_tracked_note:
+      '  Gitignore: if those files were already tracked by Git before, you still need one git rm --cached pass for them to stop appearing in status',
     invalid_llm_output_discovery_empty:
       'The LLM returned an empty discovery.md. No existing files were overwritten. Keep the current backup and retry with a stronger model or fewer folders.',
     invalid_llm_output_skeleton_empty:

@@ -219,10 +219,12 @@ test('scan:project runs in local-only mode by default and writes folder-specific
     const foldersPath = path.join(projectDir, '.aioson/context/scan-folders.md');
     const srcPath = path.join(projectDir, '.aioson/context/scan-src.md');
     const forgePath = path.join(projectDir, '.aioson/context/scan-aioson.md');
+    const gitignorePath = path.join(projectDir, '.gitignore');
     const memoryIndexPath = path.join(projectDir, '.aioson/context/memory-index.md');
     const specCurrentPath = path.join(projectDir, '.aioson/context/spec-current.md');
     const specHistoryPath = path.join(projectDir, '.aioson/context/spec-history.md');
     const modulePath = path.join(projectDir, '.aioson/context/module-src.md');
+    const gitignoreContent = await fs.readFile(gitignorePath, 'utf8');
     const indexContent = await fs.readFile(indexPath, 'utf8');
     const foldersContent = await fs.readFile(foldersPath, 'utf8');
     const sourceContent = await fs.readFile(srcPath, 'utf8');
@@ -238,6 +240,10 @@ test('scan:project runs in local-only mode by default and writes folder-specific
     assert.match(indexContent, /spec-current\.md/);
     assert.match(indexContent, /spec-history\.md/);
     assert.match(indexContent, /module-src\.md/);
+    assert.match(gitignoreContent, /\.aioson\/agents\//);
+    assert.match(gitignoreContent, /\.aioson\/locales\//);
+    assert.match(gitignoreContent, /\.aioson\/skills\//);
+    assert.match(gitignoreContent, /\.aioson\/config\.md/);
     assert.match(indexContent, /### package\.json/);
     assert.doesNotMatch(indexContent, /- Summary:/);
     assert.match(foldersContent, /# Folder Map/);
@@ -266,6 +272,46 @@ test('scan:project runs in local-only mode by default and writes folder-specific
     assert.match(specHistoryContent, /Manter estrutura em src\//);
     assert.match(moduleContent, /# Module Memory: src/);
     assert.match(moduleContent, /scan-src\.md/);
+  } finally {
+    process.exitCode = originalExitCode;
+    await fs.rm(projectDir, { recursive: true, force: true });
+  }
+});
+
+test('scan:project refreshes gitignore policy for existing projects installed before the new ignore rules', async () => {
+  const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), 'aioson-scan-project-gitignore-refresh-'));
+  const originalExitCode = process.exitCode;
+  process.exitCode = undefined;
+
+  try {
+    await fs.writeFile(path.join(projectDir, '.gitignore'), '.aioson/\n!.aioson/**\n', 'utf8');
+    await fs.writeFile(path.join(projectDir, 'package.json'), '{ "name": "demo" }\n', 'utf8');
+    await fs.mkdir(path.join(projectDir, 'app'), { recursive: true });
+    await fs.writeFile(path.join(projectDir, 'app', 'page.js'), 'export default function Page() {}\n', 'utf8');
+
+    const { t } = createTranslator('en');
+    const logger = createCollectLogger();
+    const result = await runScanProject({
+      args: [projectDir],
+      options: { folder: 'app' },
+      logger,
+      t
+    });
+
+    const gitignore = await fs.readFile(path.join(projectDir, '.gitignore'), 'utf8');
+
+    assert.equal(result.ok, true);
+    assert.match(gitignore, /\.aioson\/agents\//);
+    assert.match(gitignore, /\.aioson\/locales\//);
+    assert.match(gitignore, /\.aioson\/skills\//);
+    assert.equal(
+      logger.lines.some((line) => line.includes('policy updated') || line.includes('framework-managed files')),
+      true
+    );
+    assert.equal(
+      logger.lines.some((line) => line.includes('git rm --cached')),
+      true
+    );
   } finally {
     process.exitCode = originalExitCode;
     await fs.rm(projectDir, { recursive: true, force: true });

@@ -842,6 +842,10 @@ module.exports = {
     llm_missing_api_key:
       'A chave de API do provider "{provider}" ainda nao foi configurada em {file}. Preencha providers.{provider}.api_key ou escolha outro provider com --provider=...',
     llm_error: 'Chamada LLM falhou: {error}',
+    gitignore_policy_written:
+      '  Gitignore: politica do AIOSON atualizada em {path} para ignorar arquivos gerenciados do framework',
+    gitignore_tracked_note:
+      '  Gitignore: se esses arquivos ja estavam rastreados pelo Git antes, ainda sera preciso remover do indice uma vez com git rm --cached para eles pararem de aparecer no status',
     invalid_llm_output_discovery_empty:
       'A LLM retornou discovery.md vazio. Nenhum arquivo existente foi sobrescrito. Mantenha o backup atual e tente um modelo mais forte ou menos pastas por execucao.',
     invalid_llm_output_skeleton_empty:

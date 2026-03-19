@@ -16,7 +16,7 @@ const fs = require('node:fs/promises');
 const https = require('node:https');
 const http = require('node:http');
 const { ensureDir, exists, copyFileWithDir, nowStamp, toRelativeSafe } = require('../utils');
-const { ensureGitignoreEntry } = require('../installer');
+const { ensureGitignoreEntry, ensureProjectGitignorePolicy } = require('../installer');
 const {
   MEMORY_INDEX_FILE,
   SPEC_CURRENT_FILE,
@@ -969,6 +969,14 @@ async function runScanProject({ args, options = {}, logger, t }) {
   let providerName = null;
   let providerCfg = null;
   let model = null;
+
+  if (!options['dry-run']) {
+    const gitignoreRulesAdded = await ensureProjectGitignorePolicy(targetDir);
+    if (gitignoreRulesAdded > 0) {
+      logger.log(t('scan_project.gitignore_policy_written', { path: path.join(targetDir, '.gitignore') }));
+      logger.log(t('scan_project.gitignore_tracked_note'));
+    }
+  }
 
   if (!llmRequested) {
     logger.log(t('scan_project.local_only'));
