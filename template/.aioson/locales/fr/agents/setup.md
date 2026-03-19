@@ -16,7 +16,7 @@ Si le contexte existant est valide, accueillir l'utilisateur avec un resume d'un
 > "Je vois que ce projet est deja configure : [nom_projet] — [framework] — [classification]. Que souhaitez-vous faire ?
 > → **Continuer** — aller directement a l'agent suivant.
 > → **Mettre a jour le contexte** — relancer le setup pour modifier des valeurs.
-> → **Scanner le code** — executer `aioson scan:project` pour analyser le code existant avant de continuer."
+> → **Scanner le code** — executer `aioson scan:project . --folder=src` pour cartographier le code existant avant de continuer."
 
 Si le contexte existant est incoherent, obsolete ou contient encore des placeholders comme `auto`, `null`, des valeurs vides ou des valeurs invalides comme `landpage`, NE PAS s'arreter d'abord au menu.
 
@@ -24,7 +24,7 @@ Comportement obligatoire pour les projets existants avec contexte incoherent :
 - Inspecter le workspace courant et inferer ce qui peut etre corrige automatiquement a partir des fichiers et du code existant.
 - Corriger `.aioson/context/project.context.md` avant de demander a l'utilisateur quoi faire ensuite.
 - Ajuster les champs inferables comme `project_type`, `framework`, `framework_installed`, `classification` et `design_skill` lorsqu'il existe des preuves suffisantes.
-- Si le depot contient deja une implementation et qu'une comprehension brownfield plus profonde est necessaire, inspecter le code ou executer `aioson scan:project` avant de demander des choix manuels a l'utilisateur.
+- Si le depot contient deja une implementation et qu'une comprehension brownfield plus profonde est necessaire, inspecter le code ou executer `aioson scan:project . --folder=src` avant de demander des choix manuels a l'utilisateur.
 - Apres la reparation, expliquer brievement ce qui a ete corrige et continuer dans le flux normal.
 - Ne demander une clarification que pour les champs qui restent reellement ambigus apres la passe de reparation.
 
@@ -346,7 +346,7 @@ updated: "<ISO-8601>"
 
 Si `framework_installed=true` (code detecte dans le workspace), toujours inclure ceci apres le setup :
 
-> "Votre projet a deja du code. Executez `aioson scan:project` pour analyser la base de code et generer `discovery.md` et `skeleton-system.md` dans votre dossier de contexte. Cela donne a @analyst et @dev une vue complete de la structure existante — recommande avant d'activer le prochain agent."
+> "Votre projet a deja du code. Executez `aioson scan:project . --folder=src` pour generer d'abord les cartes locales. A partir de la, vous avez deux chemins valides : (1) relancer avec `--with-llm --provider=<provider>` pour generer `discovery.md` automatiquement, ou (2) ouvrir Codex, Claude Code, Gemini CLI ou un autre client IA et activer `@analyst` pour generer `discovery.md` a partir des artefacts locaux du scan. `architecture.md` vient toujours ensuite avec @architect."
 
 ### 4. Indiquer a l'utilisateur quel agent activer ensuite
 

@@ -23,7 +23,7 @@ If the existing context is valid, greet the user with a one-line summary of the 
 > "I see this project is already configured: [project_name] — [framework] — [classification]. What would you like to do?
 > → **Continue** — go straight to the next agent.
 > → **Update context** — re-run setup to change any values.
-> → **Scan codebase** — run `aioson scan:project` to analyse existing code before proceeding."
+> → **Scan codebase** — run `aioson scan:project . --folder=src` to map existing code before proceeding."
 
 If the existing context is inconsistent, stale, or still contains placeholders such as `auto`, `null`, blank values, or invalid values such as `landpage`, do NOT stop at the menu first.
 
@@ -31,7 +31,7 @@ Mandatory behavior for inconsistent returning projects:
 - Inspect the current workspace and infer what can be repaired automatically from existing files and code.
 - Repair `.aioson/context/project.context.md` before asking the user what to do next.
 - Fix inferable fields such as `project_type`, `framework`, `framework_installed`, `classification`, and `design_skill` when there is enough evidence.
-- If the repository already contains an implementation and deeper brownfield understanding is required, inspect the codebase or run `aioson scan:project` before asking the user for manual choices.
+- If the repository already contains an implementation and deeper brownfield understanding is required, inspect the codebase or run `aioson scan:project . --folder=src` before asking the user for manual choices.
 - After repair, explain briefly what was corrected and continue inside the normal workflow.
 - Only ask for clarification for fields that remain genuinely ambiguous after the repair pass.
 
@@ -435,7 +435,7 @@ updated: "<ISO-8601>"
 
 If `framework_installed=true` (code was detected in the workspace), always include this after setup:
 
-> "Your project already has code. Run `aioson scan:project` to analyse the codebase and generate `discovery.md` and `skeleton-system.md` in your context folder. This gives @analyst and @dev a full picture of the existing structure — recommended before activating the next agent."
+> "Your project already has code. Run `aioson scan:project . --folder=src` to generate the local code maps first. From there you have two valid paths: (1) rerun with `--with-llm --provider=<provider>` to generate `discovery.md` automatically, or (2) open Codex, Claude Code, Gemini CLI, or another AI client and activate `@analyst` to generate `discovery.md` from the local scan artifacts. `architecture.md` still comes later from @architect."
 
 ### 4. Tell the user which agent to activate next
 

@@ -46,14 +46,26 @@ Verificar `framework_installed` em `project.context.md` antes de iniciar qualque
 - Ler `discovery.md` E `spec.md` (se existir) juntos — sao duas metades da memoria do projeto: discovery.md = estrutura, spec.md = decisoes de desenvolvimento.
 - Prosseguir para aprimorar ou atualizar o discovery.md conforme solicitado.
 
-**Se `framework_installed=true` E nao houver `discovery.md`:**
-> ⚠ Projeto existente detectado mas sem discovery.md. Para economizar tokens, rode o scanner primeiro:
+**Se `framework_installed=true` E nao houver `discovery.md`, mas os artefatos locais do scan ja existirem** (`scan-index.md`, `scan-folders.md`, pelo menos um `scan-<pasta>.md` ou `scan-aioson.md`):
+- Ler `scan-index.md` primeiro.
+- Ler `scan-folders.md` e `scan-aioson.md` se existirem.
+- Ler cada `scan-<pasta>.md` relevante para o escopo brownfield pedido.
+- Usar esses artefatos como memoria brownfield comprimida e gerar `.aioson/context/discovery.md` voce mesmo.
+- Esse caminho e valido para Codex, Claude Code, Gemini CLI e clientes parecidos mesmo quando o usuario nao usa chaves de API dentro do `aioson`.
+- Se o usuario quiser economizar tokens e o cliente permitir escolher modelo, ele pode usar um modelo menor/mais rapido nesta etapa.
+
+**Se `framework_installed=true` E nao houver `discovery.md` nem artefatos locais do scan:**
+> ⚠ Projeto existente detectado mas sem discovery.md. Rode primeiro o scanner local:
 > ```
-> aioson scan:project
+> aioson scan:project . --folder=src
+> ```
+> Caminho opcional com API:
+> ```
+> aioson scan:project . --folder=src --with-llm --provider=<provider>
 > ```
 > Depois inicie uma nova sessao e execute @analyst novamente.
 
-Parar aqui — nao executar as Fases 1–3 em um projeto existente grande sem discovery pre-gerado.
+Parar aqui apenas quando nao existir nem `discovery.md` nem artefato local do scan. Nao executar as Fases 1–3 em um projeto existente grande sem uma dessas duas memorias.
 
 > **Regra:** sempre que `discovery.md` estiver presente, ler `spec.md` junto — nunca um sem o outro.
 

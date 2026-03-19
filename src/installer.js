@@ -28,7 +28,11 @@ const GITIGNORE_POLICY_LINES = [
   '.aioson/runtime/',
   '.aioson/mcp/presets/',
   '.aioson/install.json',
-  '.aioson/mcp/servers.local.json'
+  '.aioson/mcp/servers.local.json',
+  '.aioson/profiler-reports/*',
+  '!.aioson/profiler-reports/.gitkeep',
+  '.claude/settings.local.json',
+  '*:Zone.Identifier'
 ];
 
 async function detectExistingInstall(targetDir) {

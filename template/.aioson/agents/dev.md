@@ -57,8 +57,12 @@ Proceed with the standard required input below.
 If `framework_installed=true` in `project.context.md`:
 - Check whether `.aioson/context/discovery.md` exists.
 - **If missing:** ⚠ Alert the user before proceeding:
-  > Existing project detected but no discovery.md found. Run the scanner first to save tokens:
-  > `aioson scan:project`
+  > Existing project detected but no discovery.md found.
+  > If local scan artifacts already exist (`scan-index.md`, `scan-folders.md`, `scan-<folder>.md`), activate `@analyst` now so it can turn them into `discovery.md`.
+  > If they do not exist yet, run at least:
+  > `aioson scan:project . --folder=src`
+  > Optional API path:
+  > `aioson scan:project . --folder=src --with-llm --provider=<provider>`
 - **If present:** read `skeleton-system.md` first (lightweight index), then `discovery.md` AND `spec.md` together — they are two halves of project memory. Never read one without the other.
 
 ## Context integrity

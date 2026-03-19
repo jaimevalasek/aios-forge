@@ -25,6 +25,20 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 
 > Para o fluxo completo de `@squad` e `@genoma`, veja também [Squad e Genoma](./squad-genoma.md).
 
+## Fluxo brownfield apos scan
+
+Quando o projeto ja existe e voce roda `scan:project`, o handoff correto agora e:
+
+```text
+scan:project -> @analyst -> @architect -> @dev
+```
+
+Regras do fluxo:
+- os artefatos locais do scan (`scan-index.md`, `scan-folders.md`, `scan-<pasta>.md`, `scan-aioson.md`) servem como mapas brutos do codigo
+- `discovery.md` continua sendo a memoria comprimida que os agentes usam para entender o sistema sem reler tudo
+- esse `discovery.md` pode ser gerado por `scan:project --with-llm` ou pelo `@analyst` usando os artefatos locais do scan
+- `@architect`, `@ux-ui`, `@pm`, `@qa` e o fluxo de `@dev` nao devem pular direto dos mapas brutos para a execucao quando a tarefa depende do comportamento atual do sistema
+
 ---
 
 ## @setup
@@ -77,6 +91,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 - detecta sinais visuais cedo e preserva a intenção no PRD
 - faz classificação preliminar do escopo
 - aponta o próximo agente do fluxo
+- em brownfield, usa `discovery.md` quando já existir e trata os artefatos locais do scan apenas como orientação estrutural, nunca como substituto do `@analyst`
 
 **Como ativar:**
 ```
@@ -106,6 +121,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 - Identifica integrações externas e riscos
 - Em modo feature, passa a consumir `design-doc.md` e `readiness.md` quando já existirem
 - Usa skills e documentos sob demanda para evitar reabrir discovery desnecessária
+- em brownfield, pode gerar `discovery.md` diretamente a partir de `scan-index.md`, `scan-folders.md`, `scan-<pasta>.md` e `scan-aioson.md`, mesmo sem API configurada no `aioson`
 
 **Como ativar:**
 ```
@@ -174,6 +190,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 - Define padrões de código para o time
 - Usa `design-doc.md` como documento de decisão do escopo atual
 - Respeita `readiness.md`; se a prontidão ainda estiver baixa, devolve bloqueios em vez de fingir certeza
+- só deve arquitetar em cima de `discovery.md`; se houver apenas artefatos brutos de scan, o passo correto ainda é `@analyst` antes
 
 **Como ativar:**
 ```
@@ -213,6 +230,7 @@ tests/
 - Decide dark/light e direção visual de forma autônoma quando o contexto já for suficiente
 - Só pergunta preferência estética quando a ambiguidade realmente mudar a solução
 - Carrega `premium-command-center-ui` apenas quando houver pedido explícito de interface operacional premium ou quando essa skill já estiver registrada no PRD
+- em brownfield, usa `discovery.md` como memória comprimida do sistema; se esse arquivo ainda não existir e o trabalho depender do comportamento atual da aplicação, o próximo passo correto é `@analyst`
 
 **Como ativar o agente UI/UX:**
 ```
@@ -239,6 +257,7 @@ tests/
 - Define ordem de entrega sem apagar a intenção original de produto
 - Adiciona critérios de aceite compactos quando isso trouxer clareza para execução e QA
 - Preserva identidade visual, visão, problema, usuários e demais seções já existentes
+- usa `discovery.md` e `architecture.md` como base; não deve priorizar diretamente a partir de mapas brutos de scan
 
 **Como ativar:**
 ```
@@ -411,6 +430,7 @@ Depois disso, ela passa a ser parte real do pacote local da squad e deve ser con
 - Escreve testes unitários e de integração
 - Identifica casos de borda não cobertos
 - Valida se os critérios de aceite foram atendidos
+- usa `discovery.md` como fonte de regras e relacionamentos; se só existirem artefatos de scan, o fluxo correto ainda passa por `@analyst`
 
 **Como ativar:**
 ```

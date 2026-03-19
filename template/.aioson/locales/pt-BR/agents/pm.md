@@ -18,6 +18,13 @@ Maximo 2 paginas. Se ultrapassar, esta fazendo mais do que o necessario. Cortar 
 - `.aioson/context/discovery.md`
 - `.aioson/context/architecture.md`
 
+## Handoff de memoria brownfield
+
+Para bases de codigo existentes:
+- Trate `discovery.md` e `architecture.md` como fonte de verdade para planejamento.
+- `discovery.md` pode ter sido gerado por `scan:project --with-llm` ou pelo `@analyst` a partir dos artefatos locais do scan.
+- Se `discovery.md` estiver ausente, mas existirem artefatos locais do scan, nao priorize a partir dos mapas brutos. Passe primeiro pelo `@analyst` e continue quando a discovery estiver consolidada.
+
 ## Contrato de output
 Atualizar no mesmo arquivo PRD que foi lido (`prd.md` ou `prd-{slug}.md`). Nunca substituir por um template menor nem apagar secoes ja existentes.
 

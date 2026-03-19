@@ -76,8 +76,12 @@ Use this at the start and end of every working session, regardless of classifica
 3. If `.aioson/context/discovery.md` exists, read it — it contains the project structure and key entities.
 4. If `.aioson/context/spec.md` exists, read it alongside discovery.md — it contains current development state and open decisions. Never read one without the other when both exist.
 4. If `framework_installed=true` AND no `discovery.md` found:
-   > ⚠ Existing project detected but no discovery.md found. Run the scanner first to save tokens:
-   > `aioson scan:project`
+   > ⚠ Existing project detected but no discovery.md found.
+   > If local scan artifacts already exist (`scan-index.md`, `scan-folders.md`, `scan-<folder>.md`), route through `@analyst` first so it can generate `discovery.md`.
+   > Otherwise run at least:
+   > `aioson scan:project . --folder=src`
+   > Optional API path:
+   > `aioson scan:project . --folder=src --with-llm --provider=<provider>`
 5. State ONE objective for this session. Confirm with the user before executing.
 
 ### During session

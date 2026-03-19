@@ -15,7 +15,14 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const https = require('node:https');
 const http = require('node:http');
-const { ensureDir, exists } = require('../utils');
+const { ensureDir, exists, copyFileWithDir, nowStamp, toRelativeSafe } = require('../utils');
+const { ensureGitignoreEntry } = require('../installer');
+const {
+  MEMORY_INDEX_FILE,
+  SPEC_CURRENT_FILE,
+  SPEC_HISTORY_FILE,
+  writeDerivedContextMemory
+} = require('../context-memory');
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -29,6 +36,7 @@ const CONTEXT_FILE   = '.aioson/context/project.context.md';
 const SPEC_FILE      = '.aioson/context/spec.md';
 const DELIMITER      = '<<<SKELETON>>>';
 const SUMMARY_MODES  = new Set(['titles', 'summaries', 'raw']);
+const CONTEXT_MODES  = new Set(['merge', 'rewrite']);
 const FORGE_SCAN_ROOTS = [
   '.aioson/context',
   '.aioson/squads',
@@ -62,6 +70,7 @@ const FORGE_SKIP_GENERATED_FILES = new Set([
   '.aioson/context/spec.md.template',
   '.aioson/install.json'
 ]);
+const BACKUPS_GITIGNORE_ENTRY = '.aioson/backups/';
 
 const SKIP_DIRS = new Set([
   '.git', 'node_modules', 'vendor', '.next', 'dist', 'build',
@@ -131,6 +140,30 @@ async function readFileSafe(filePath, maxChars) {
   } catch {
     return null;
   }
+}
+
+async function backupProjectFiles(targetDir, relPaths) {
+  const uniqueRelPaths = [...new Set(relPaths.filter(Boolean))];
+  if (uniqueRelPaths.length === 0) {
+    return { backupRoot: null, backedUp: [] };
+  }
+
+  const backupRoot = path.join(targetDir, '.aioson/backups', nowStamp());
+  const backedUp = [];
+
+  for (const relPath of uniqueRelPaths) {
+    const source = path.join(targetDir, relPath);
+    if (!(await exists(source))) continue;
+    const dest = path.join(backupRoot, relPath);
+    await copyFileWithDir(source, dest);
+    backedUp.push(toRelativeSafe(targetDir, dest));
+  }
+
+  if (backedUp.length === 0) {
+    return { backupRoot: null, backedUp: [] };
+  }
+
+  return { backupRoot, backedUp };
 }
 
 async function loadGitignorePatterns(root) {
@@ -291,11 +324,36 @@ function httpPost(url, headers, body) {
 
 async function callOpenAICompatible(baseUrl, apiKey, model, prompt) {
   const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
-  const text = await httpPost(
-    url,
-    { Authorization: `Bearer ${apiKey}` },
-    { model, messages: [{ role: 'user', content: prompt }], max_tokens: 4096, temperature: 0.2 }
-  );
+  const baseBody = {
+    model,
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.2
+  };
+
+  let text;
+  try {
+    text = await httpPost(
+      url,
+      { Authorization: `Bearer ${apiKey}` },
+      { ...baseBody, max_tokens: 4096 }
+    );
+  } catch (error) {
+    const message = String(error && error.message || '');
+    const requiresMaxCompletionTokens =
+      message.includes("Unsupported parameter: 'max_tokens'") &&
+      message.includes('max_completion_tokens');
+
+    if (!requiresMaxCompletionTokens) {
+      throw error;
+    }
+
+    text = await httpPost(
+      url,
+      { Authorization: `Bearer ${apiKey}` },
+      { ...baseBody, max_completion_tokens: 4096 }
+    );
+  }
+
   const data = JSON.parse(text);
   return data.choices[0].message.content;
 }
@@ -334,6 +392,11 @@ async function callLLM(providerName, providerCfg, prompt) {
 function resolveSummaryMode(value) {
   const normalized = String(value || '').trim().toLowerCase();
   return SUMMARY_MODES.has(normalized) ? normalized : 'summaries';
+}
+
+function resolveContextMode(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return CONTEXT_MODES.has(normalized) ? normalized : 'merge';
 }
 
 function formatBytesCompact(sizeBytes) {
@@ -664,7 +727,11 @@ function buildScanIndexMarkdown({
   foldersPath,
   folderScans = [],
   forgePath,
-  forgeArtifactCount = 0
+  forgeArtifactCount = 0,
+  memoryIndexPath = null,
+  specCurrentPath = null,
+  specHistoryPath = null,
+  moduleDocs = []
 }) {
   const lines = [
     '# Scan Index',
@@ -679,6 +746,18 @@ function buildScanIndexMarkdown({
       `| ${scan.relativePath} | Full folder and file map for requested folder \`${scan.folder}/\` |`
     ),
     `| ${FORGE_FILE} | Generated or project-specific artifacts inside .aioson/ |`,
+    ...(memoryIndexPath
+      ? [`| ${MEMORY_INDEX_FILE} | Read-this-first index of context docs and when to load them |`]
+      : []),
+    ...(specCurrentPath
+      ? [`| ${SPEC_CURRENT_FILE} | Current development snapshot derived from spec.md |`]
+      : []),
+    ...(specHistoryPath
+      ? [`| ${SPEC_HISTORY_FILE} | Historical implementation and decision view derived from spec.md |`]
+      : []),
+    ...moduleDocs.map((doc) =>
+      `| ${doc.relativePath} | Focused module memory for requested folder \`${doc.folder}/\` |`
+    ),
     '',
     `- Folder map: \`${foldersPath}\``,
     ...(
@@ -688,6 +767,10 @@ function buildScanIndexMarkdown({
     ),
     `- AIOSON generated map: \`${forgePath}\``,
     `- AIOSON generated entries: ${forgeArtifactCount}`,
+    ...(memoryIndexPath ? [`- Memory index: \`${memoryIndexPath}\``] : []),
+    ...(specCurrentPath ? [`- Spec current view: \`${specCurrentPath}\``] : []),
+    ...(specHistoryPath ? [`- Spec history view: \`${specHistoryPath}\``] : []),
+    ...moduleDocs.map((doc) => `- Module memory \`${doc.folder}/\`: \`${doc.absolutePath}\``),
     '',
     '## Top-level footprint',
     '| Path | Files | Approx size |',
@@ -726,6 +809,8 @@ function buildPrompt({
   keyContents,
   projectContext,
   specContent,
+  existingDiscoveryContent,
+  existingSkeletonContent,
   summaryMode
 }) {
   const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
@@ -752,10 +837,24 @@ function buildPrompt({
     parts.push(`## Development Memory (spec.md)\n\`\`\`\n${specContent}\n\`\`\`\n`);
   }
 
+  if (existingDiscoveryContent) {
+    parts.push(`## Existing Discovery Memory (update in place)\n\`\`\`md\n${existingDiscoveryContent}\n\`\`\`\n`);
+  }
+
+  if (existingSkeletonContent) {
+    parts.push(`## Existing Skeleton Memory (update in place)\n\`\`\`md\n${existingSkeletonContent}\n\`\`\`\n`);
+  }
+
   parts.push(`
 ## Task
 Generate TWO documents. Separate them with exactly this delimiter on its own line:
 <<<SKELETON>>>
+
+If existing discovery or skeleton documents were provided above, treat them as the current memory baseline and UPDATE them in place.
+- Preserve stable system knowledge, conventions, and still-valid human notes.
+- Remove or correct only what is clearly contradicted by the current scan, project.context.md, or spec.md.
+- Do not throw away useful prior context just because the current scan sample is smaller.
+- Keep the required output sections exactly as specified below.
 
 ### Document 1: \`.aioson/context/discovery.md\`
 Generate with exactly these sections:
@@ -844,8 +943,10 @@ function listTopLevelDirectories(entries) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function runScanProject({ args, options = {}, logger, t }) {
-  const targetDir = path.resolve(process.cwd(), args[0] || '.');
+  const targetArg = args[0] || '.';
+  const targetDir = path.resolve(process.cwd(), targetArg);
   const summaryMode = resolveSummaryMode(options['summary-mode']);
+  const contextMode = resolveContextMode(options['context-mode']);
   const requestedFolders = resolveRequestedFolders(options.folder);
   const llmRequested = Boolean(options['with-llm']);
   const llmModelOverride = String(options['llm-model'] || options.model || '').trim();
@@ -854,6 +955,13 @@ async function runScanProject({ args, options = {}, logger, t }) {
 
   if (requestedFolders.length === 0) {
     logger.error(t('scan_project.folder_required'));
+    logger.error(t('scan_project.folder_required_examples_title'));
+    logger.error(t('scan_project.folder_required_example_local'));
+    logger.error(t('scan_project.folder_required_example_multi'));
+    logger.error(t('scan_project.folder_required_example_llm'));
+    logger.error(t('scan_project.folder_required_example_cli'));
+    logger.error(t('scan_project.folder_required_example_prompt'));
+    logger.error(t('scan_project.folder_required_example_next'));
     process.exitCode = 1;
     return { ok: false, error: 'folder_required' };
   }
@@ -900,10 +1008,18 @@ async function runScanProject({ args, options = {}, logger, t }) {
   // Read context files
   const projectContext = await readFileSafe(path.join(targetDir, CONTEXT_FILE));
   const specContent    = await readFileSafe(path.join(targetDir, SPEC_FILE));
+  const existingDiscoveryPath = path.join(targetDir, OUTPUT_FILE);
+  const existingSkeletonPath = path.join(targetDir, SKELETON_FILE);
+  const existingDiscoveryContent = contextMode === 'merge' ? await readFileSafe(existingDiscoveryPath) : null;
+  const existingSkeletonContent = contextMode === 'merge' ? await readFileSafe(existingSkeletonPath) : null;
 
   if (projectContext) logger.log(t('scan_project.context_found'));
   else logger.log(t('scan_project.context_missing'));
   if (specContent) logger.log(t('scan_project.spec_found'));
+  if (llmRequested && existingDiscoveryContent) logger.log(t('scan_project.existing_discovery_found', { path: existingDiscoveryPath }));
+  if (llmRequested && existingSkeletonContent) logger.log(t('scan_project.existing_skeleton_found', { path: existingSkeletonPath }));
+  if (llmRequested && (existingDiscoveryContent || existingSkeletonContent)) logger.log(t('scan_project.context_update_mode'));
+  if (llmRequested) logger.log(t('scan_project.context_mode', { mode: contextMode }));
 
   // Walk project
   logger.log(t('scan_project.walking'));
@@ -953,34 +1069,37 @@ async function runScanProject({ args, options = {}, logger, t }) {
     };
   });
 
+  const scanIndexPath = path.join(targetDir, INDEX_FILE);
+  const scanFoldersPath = path.join(targetDir, FOLDERS_FILE);
+  const scanForgePath = path.join(targetDir, FORGE_FILE);
   const scanIndexMarkdown = buildScanIndexMarkdown({
     keyFiles,
     topLevelStats,
     generatedAt,
     includeSummaries: summaryMode !== 'titles',
-    foldersPath: path.join(targetDir, FOLDERS_FILE),
+    foldersPath: scanFoldersPath,
     folderScans,
-    forgePath: path.join(targetDir, FORGE_FILE),
+    forgePath: scanForgePath,
     forgeArtifactCount: forgeArtifacts.artifactCount
   });
-
-  const scanIndexPath = path.join(targetDir, INDEX_FILE);
-  const scanFoldersPath = path.join(targetDir, FOLDERS_FILE);
-  const scanForgePath = path.join(targetDir, FORGE_FILE);
+  let derivedArtifacts = {
+    memoryIndexPath: null,
+    specCurrentPath: null,
+    specHistoryPath: null,
+    moduleDocs: []
+  };
   if (!options['dry-run']) {
     await ensureDir(path.dirname(scanIndexPath));
-    await fs.writeFile(scanIndexPath, scanIndexMarkdown, 'utf8');
     await fs.writeFile(scanFoldersPath, folderMapMarkdown, 'utf8');
     for (const scan of folderScans) {
       await fs.writeFile(scan.absolutePath, scan.markdown, 'utf8');
     }
+    await fs.writeFile(scanIndexPath, scanIndexMarkdown, 'utf8');
     await fs.writeFile(scanForgePath, forgeArtifacts.markdown, 'utf8');
-    logger.log(t('scan_project.index_written', { path: scanIndexPath, mode: summaryMode }));
     logger.log(t('scan_project.folders_written', { path: scanFoldersPath }));
     for (const scan of folderScans) {
       logger.log(t('scan_project.folder_written', { folder: `${scan.folder}/`, path: scan.absolutePath }));
     }
-    logger.log(t('scan_project.forge_written', { path: scanForgePath }));
   }
 
   if (options['dry-run']) {
@@ -993,6 +1112,7 @@ async function runScanProject({ args, options = {}, logger, t }) {
       model,
       llmRequested,
       summaryMode,
+      contextMode,
       requestedFolders,
       scanIndexPath,
       scanFoldersPath,
@@ -1005,7 +1125,61 @@ async function runScanProject({ args, options = {}, logger, t }) {
   }
 
   if (!llmRequested) {
+    derivedArtifacts = await writeDerivedContextMemory({
+      targetDir,
+      generatedAt,
+      folderScans
+    });
+
+    const refreshedWalk = await walkProject(targetDir);
+    const refreshedForgeArtifacts = buildForgeArtifactsMarkdown({
+      entries: refreshedWalk.entries,
+      generatedAt,
+      managedForgePaths
+    });
+    const refreshedScanIndexMarkdown = buildScanIndexMarkdown({
+      keyFiles: refreshedWalk.keyFiles,
+      topLevelStats: refreshedWalk.topLevelStats,
+      generatedAt,
+      includeSummaries: summaryMode !== 'titles',
+      foldersPath: path.join(targetDir, FOLDERS_FILE),
+      folderScans,
+      forgePath: path.join(targetDir, FORGE_FILE),
+      forgeArtifactCount: refreshedForgeArtifacts.artifactCount,
+      memoryIndexPath: derivedArtifacts.memoryIndexPath,
+      specCurrentPath: derivedArtifacts.specCurrentPath,
+      specHistoryPath: derivedArtifacts.specHistoryPath,
+      moduleDocs: derivedArtifacts.moduleDocs
+    });
+
+    await fs.writeFile(scanIndexPath, refreshedScanIndexMarkdown, 'utf8');
+    await fs.writeFile(scanForgePath, refreshedForgeArtifacts.markdown, 'utf8');
+    logger.log(t('scan_project.index_written', { path: scanIndexPath, mode: summaryMode }));
+    logger.log(t('scan_project.forge_written', { path: scanForgePath }));
+    if (derivedArtifacts.memoryIndexPath) logger.log(t('scan_project.memory_index_written', { path: derivedArtifacts.memoryIndexPath }));
+    if (derivedArtifacts.specCurrentPath) logger.log(t('scan_project.spec_current_written', { path: derivedArtifacts.specCurrentPath }));
+    if (derivedArtifacts.specHistoryPath) logger.log(t('scan_project.spec_history_written', { path: derivedArtifacts.specHistoryPath }));
+    for (const doc of derivedArtifacts.moduleDocs) {
+      logger.log(t('scan_project.module_memory_written', { folder: `${doc.folder}/`, path: doc.absolutePath }));
+    }
+
     logger.log(t('scan_project.local_done', { path: scanIndexPath }));
+    logger.log(t('scan_project.local_missing'));
+    logger.log(t('scan_project.architecture_note'));
+    logger.log(t('scan_project.local_paths_title'));
+    logger.log(t('scan_project.local_path_api'));
+    logger.log(t('scan_project.local_next_steps', {
+      target: targetArg,
+      folders: requestedFolders.join(',')
+    }));
+    logger.log(t('scan_project.local_path_cli'));
+    logger.log(t('scan_project.local_cli_step_analyst'));
+    logger.log(t('scan_project.local_cli_step_prompt_codex'));
+    logger.log(t('scan_project.local_cli_step_prompt_claude'));
+    logger.log(t('scan_project.local_cli_step_model_hint'));
+    logger.log(t('scan_project.local_workflow_title'));
+    logger.log(t('scan_project.local_step_architect'));
+    logger.log(t('scan_project.local_step_dev'));
     return {
       ok: true,
       targetDir,
@@ -1013,11 +1187,16 @@ async function runScanProject({ args, options = {}, logger, t }) {
       model: null,
       llmRequested: false,
       summaryMode,
+      contextMode,
       requestedFolders,
       scanIndexPath,
       scanFoldersPath,
       scanFolderPaths: folderScans.map((scan) => scan.absolutePath),
       scanForgePath,
+      memoryIndexPath: derivedArtifacts.memoryIndexPath,
+      specCurrentPath: derivedArtifacts.specCurrentPath,
+      specHistoryPath: derivedArtifacts.specHistoryPath,
+      moduleDocPaths: derivedArtifacts.moduleDocs.map((doc) => doc.absolutePath),
       discoveryPath: null,
       skeletonPath: null
     };
@@ -1032,6 +1211,8 @@ async function runScanProject({ args, options = {}, logger, t }) {
     keyContents,
     projectContext,
     specContent,
+    existingDiscoveryContent,
+    existingSkeletonContent,
     summaryMode
   });
   logger.log(t('scan_project.calling_llm', { provider: providerName, model }));
@@ -1050,8 +1231,8 @@ async function runScanProject({ args, options = {}, logger, t }) {
   }
 
   // Parse and write both documents
-  const outputPath   = path.join(targetDir, OUTPUT_FILE);
-  const skeletonPath = path.join(targetDir, SKELETON_FILE);
+  const outputPath = existingDiscoveryPath;
+  const skeletonPath = existingSkeletonPath;
 
   await ensureDir(path.dirname(outputPath));
 
@@ -1065,6 +1246,37 @@ async function runScanProject({ args, options = {}, logger, t }) {
     skeletonContent  = null;
   }
 
+  if (!discoveryContent) {
+    logger.error(t('scan_project.invalid_llm_output_discovery_empty'));
+    process.exitCode = 1;
+    return { ok: false, error: 'empty_discovery' };
+  }
+
+  if (result.includes(DELIMITER) && !skeletonContent) {
+    logger.error(t('scan_project.invalid_llm_output_skeleton_empty'));
+    process.exitCode = 1;
+    return { ok: false, error: 'empty_skeleton' };
+  }
+
+  const contextFilesToBackup = [];
+  if (await exists(existingDiscoveryPath)) contextFilesToBackup.push(OUTPUT_FILE);
+  if (skeletonContent && await exists(existingSkeletonPath)) contextFilesToBackup.push(SKELETON_FILE);
+
+  if (contextFilesToBackup.length > 0) {
+    const gitignoreChanged = await ensureGitignoreEntry(targetDir, BACKUPS_GITIGNORE_ENTRY);
+    if (gitignoreChanged) {
+      logger.log(t('scan_project.gitignore_backups_written', { path: path.join(targetDir, '.gitignore') }));
+    }
+
+    const backupResult = await backupProjectFiles(targetDir, contextFilesToBackup);
+    if (backupResult.backedUp.length > 0) {
+      logger.log(t('scan_project.backups_written', {
+        count: backupResult.backedUp.length,
+        path: backupResult.backupRoot
+      }));
+    }
+  }
+
   await fs.writeFile(outputPath, discoveryContent, 'utf8');
   logger.log(t('scan_project.discovery_written', { path: outputPath, chars: discoveryContent.length }));
 
@@ -1075,8 +1287,46 @@ async function runScanProject({ args, options = {}, logger, t }) {
     logger.log(t('scan_project.skeleton_missing'));
   }
 
+  derivedArtifacts = await writeDerivedContextMemory({
+    targetDir,
+    generatedAt,
+    folderScans
+  });
+  const refreshedWalk = await walkProject(targetDir);
+  const refreshedForgeArtifacts = buildForgeArtifactsMarkdown({
+    entries: refreshedWalk.entries,
+    generatedAt,
+    managedForgePaths
+  });
+  const refreshedScanIndexMarkdown = buildScanIndexMarkdown({
+    keyFiles: refreshedWalk.keyFiles,
+    topLevelStats: refreshedWalk.topLevelStats,
+    generatedAt,
+    includeSummaries: summaryMode !== 'titles',
+    foldersPath: path.join(targetDir, FOLDERS_FILE),
+    folderScans,
+    forgePath: path.join(targetDir, FORGE_FILE),
+    forgeArtifactCount: refreshedForgeArtifacts.artifactCount,
+    memoryIndexPath: derivedArtifacts.memoryIndexPath,
+    specCurrentPath: derivedArtifacts.specCurrentPath,
+    specHistoryPath: derivedArtifacts.specHistoryPath,
+    moduleDocs: derivedArtifacts.moduleDocs
+  });
+  await fs.writeFile(scanIndexPath, refreshedScanIndexMarkdown, 'utf8');
+  await fs.writeFile(scanForgePath, refreshedForgeArtifacts.markdown, 'utf8');
+  logger.log(t('scan_project.index_written', { path: scanIndexPath, mode: summaryMode }));
+  logger.log(t('scan_project.forge_written', { path: scanForgePath }));
+  if (derivedArtifacts.memoryIndexPath) logger.log(t('scan_project.memory_index_written', { path: derivedArtifacts.memoryIndexPath }));
+  if (derivedArtifacts.specCurrentPath) logger.log(t('scan_project.spec_current_written', { path: derivedArtifacts.specCurrentPath }));
+  if (derivedArtifacts.specHistoryPath) logger.log(t('scan_project.spec_history_written', { path: derivedArtifacts.specHistoryPath }));
+  for (const doc of derivedArtifacts.moduleDocs) {
+    logger.log(t('scan_project.module_memory_written', { folder: `${doc.folder}/`, path: doc.absolutePath }));
+  }
+
+  logger.log(t('scan_project.architecture_note'));
   logger.log(t('scan_project.next_steps'));
   logger.log(t('scan_project.step_analyst'));
+  logger.log(t('scan_project.step_architect'));
   logger.log(t('scan_project.step_dev'));
 
   const output = {
@@ -1086,11 +1336,16 @@ async function runScanProject({ args, options = {}, logger, t }) {
     model,
     llmRequested: true,
     summaryMode,
+    contextMode,
     requestedFolders,
     scanIndexPath,
     scanFoldersPath,
     scanFolderPaths: folderScans.map((scan) => scan.absolutePath),
     scanForgePath,
+    memoryIndexPath: derivedArtifacts.memoryIndexPath,
+    specCurrentPath: derivedArtifacts.specCurrentPath,
+    specHistoryPath: derivedArtifacts.specHistoryPath,
+    moduleDocPaths: derivedArtifacts.moduleDocs.map((doc) => doc.absolutePath),
     discoveryPath: outputPath,
     skeletonPath: skeletonContent ? skeletonPath : null
   };
@@ -1101,6 +1356,7 @@ async function runScanProject({ args, options = {}, logger, t }) {
 module.exports = {
   runScanProject,
   resolveSummaryMode,
+  resolveContextMode,
   resolveRequestedFolders,
   buildScanIndexMarkdown,
   buildPrompt

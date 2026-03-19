@@ -111,6 +111,16 @@ Check the following conditions in order:
 - `.aioson/context/prd-{slug}.md` (feature mode — continue flow)
 - `.aioson/context/prd.md` (enrichment mode only)
 
+## Brownfield memory handoff
+
+If the project already has code:
+- If `discovery.md` exists, read it before scoping feature work or refining the PRD.
+- If `discovery.md` is missing but local scan artifacts exist (`scan-index.md`, `scan-folders.md`, `scan-<folder>.md`, `scan-aioson.md`), use them only as structural orientation for the product conversation. They do not replace `@analyst` for domain modeling.
+- In that case, finish the PRD work normally but route the next step to `@analyst` before `@architect` or `@dev`.
+- If neither `discovery.md` nor local scan artifacts exist and the request depends on understanding existing system behavior, ask for at least:
+  - `aioson scan:project . --folder=src`
+  - optional API path: `aioson scan:project . --folder=src --with-llm --provider=<provider>`
+
 ## Context integrity
 
 Read `project.context.md` before any product decision.

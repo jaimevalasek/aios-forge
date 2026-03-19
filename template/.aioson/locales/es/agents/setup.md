@@ -16,7 +16,7 @@ Si el contexto existente es valido, saludar al usuario con un resumen de una lin
 > "Veo que este proyecto ya esta configurado: [nombre_proyecto] — [framework] — [classification]. Que deseas hacer?
 > → **Continuar** — ir directamente al siguiente agente.
 > → **Actualizar contexto** — reejecutar el setup para cambiar algun valor.
-> → **Escanear codigo** — ejecutar `aioson scan:project` para analizar el codigo existente antes de continuar."
+> → **Escanear codigo** — ejecutar `aioson scan:project . --folder=src` para mapear el codigo existente antes de continuar."
 
 Si el contexto existente esta inconsistente, desactualizado o todavia contiene placeholders como `auto`, `null`, valores vacios o valores invalidos como `landpage`, NO detenerse primero en el menu.
 
@@ -24,7 +24,7 @@ Comportamiento obligatorio para proyectos existentes con contexto inconsistente:
 - Inspeccionar el workspace actual e inferir lo que pueda corregirse automaticamente a partir de los archivos y del codigo existente.
 - Corregir `.aioson/context/project.context.md` antes de preguntar al usuario que hacer a continuacion.
 - Ajustar campos inferibles como `project_type`, `framework`, `framework_installed`, `classification` y `design_skill` cuando haya evidencia suficiente.
-- Si el repositorio ya tiene implementacion y se necesita comprension brownfield mas profunda, inspeccionar el codigo o ejecutar `aioson scan:project` antes de pedir elecciones manuales al usuario.
+- Si el repositorio ya tiene implementacion y se necesita comprension brownfield mas profunda, inspeccionar el codigo o ejecutar `aioson scan:project . --folder=src` antes de pedir elecciones manuales al usuario.
 - Despues de la reparacion, explicar brevemente lo que fue corregido y continuar dentro del flujo normal.
 - Solo pedir aclaracion para campos que sigan genuinamente ambiguos despues de la etapa de reparacion.
 
@@ -346,7 +346,7 @@ updated: "<ISO-8601>"
 
 Si `framework_installed=true` (codigo detectado en el workspace), incluir siempre esto despues del setup:
 
-> "Tu proyecto ya tiene codigo. Ejecuta `aioson scan:project` para analizar la base de codigo y generar `discovery.md` y `skeleton-system.md` en la carpeta de contexto. Esto da a @analyst y @dev una vision completa de la estructura existente — recomendado antes de activar el siguiente agente."
+> "Tu proyecto ya tiene codigo. Ejecuta `aioson scan:project . --folder=src` para generar primero los mapas locales. Desde ahi tienes dos caminos validos: (1) volver a ejecutar con `--with-llm --provider=<provider>` para generar `discovery.md` automaticamente, o (2) abrir Codex, Claude Code, Gemini CLI u otro cliente de IA y activar `@analyst` para generar `discovery.md` a partir de los artefactos locales del scan. `architecture.md` sigue viniendo despues con @architect."
 
 ### 4. Informar al usuario el siguiente agente
 

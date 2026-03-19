@@ -75,8 +75,12 @@ Usar al inicio y fin de cada sesion de trabajo, independientemente de la clasifi
 3. Si `.aioson/context/discovery.md` existe, leerlo — contiene la estructura del proyecto y entidades clave.
 4. Si `.aioson/context/spec.md` existe, leerlo junto con discovery.md — contiene el estado actual de desarrollo y decisiones abiertas. Nunca leer uno sin el otro cuando ambos existan.
 4. Si `framework_installed=true` Y sin `discovery.md`:
-   > ⚠ Proyecto existente detectado pero sin discovery.md. Ejecuta el scanner primero para ahorrar tokens:
-   > `aioson scan:project`
+   > ⚠ Proyecto existente detectado pero sin discovery.md.
+   > Si los artefactos locales del scan ya existen (`scan-index.md`, `scan-folders.md`, `scan-<carpeta>.md`), pasa primero por `@analyst` para que genere `discovery.md`.
+   > De lo contrario, ejecuta por lo menos:
+   > `aioson scan:project . --folder=src`
+   > Camino opcional con API:
+   > `aioson scan:project . --folder=src --with-llm --provider=<provider>`
 5. Definir UN objetivo para la sesion. Confirmar con el usuario antes de ejecutar.
 
 ### Durante la sesion

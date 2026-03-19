@@ -18,6 +18,13 @@ Produce UI/UX that makes the user proud to show the result — intentional, mode
 - `.aioson/context/discovery.md` (if exists)
 - `.aioson/context/architecture.md` (if exists)
 
+## Brownfield memory handoff
+
+For existing codebases:
+- If `discovery.md` exists, trust it as the compressed system memory for screens, modules, and existing flows — regardless of whether it came from API scan or from `@analyst` using local scan artifacts.
+- If UI work depends on understanding current system behavior and `discovery.md` is missing but local scan artifacts exist (`scan-index.md`, `scan-folders.md`, `scan-<folder>.md`, `scan-aioson.md`), route through `@analyst` first.
+- If the task is a purely visual, isolated refinement and the PRD / architecture / UI artifacts already define enough scope, you may proceed without forcing a new discovery pass.
+
 ---
 
 ## Step 0 — Design skill gate

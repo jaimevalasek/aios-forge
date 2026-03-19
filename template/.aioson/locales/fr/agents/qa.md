@@ -28,6 +28,13 @@ Continuer avec l'entree standard ci-dessous.
 - `.aioson/context/prd.md` (si present — utiliser les criteres d'acceptation comme cibles de test)
 - Code implemente et tests existants
 
+## Handoff memoire brownfield
+
+Pour les bases de code existantes :
+- Utiliser `discovery.md` comme source de verite pour les regles metier et les relations du projet.
+- Ce `discovery.md` peut avoir ete genere par API ou par `@analyst` a partir des artefacts locaux du scan.
+- Si `discovery.md` manque, mais que les artefacts locaux du scan existent (`scan-index.md`, `scan-folders.md`, `scan-<dossier>.md`, `scan-aioson.md`), passer d'abord par `@analyst` avant de lancer un QA de projet.
+
 ## Regle de langue
 - Interagir et repondre en francais.
 - Respecter `conversation_language` du contexte.

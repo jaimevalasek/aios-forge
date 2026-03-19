@@ -28,7 +28,23 @@ Container components also need:
 - Validate on blur (not on keystroke, not on submit only).
 - Inline field errors directly below the field. One global summary for multi-field failures.
 - Disable the submit button and show progress during async operations.
-- Input height minimum: 40px (desktop), 44px (mobile/touch).
+- Input height minimum: 40px (desktop), 44px (mobile/touch) — **consumer/public-facing forms only.**
+
+**Admin / operational form scale (settings, config, entity managers):**
+
+```
+Label  : text-[0.65rem]  mb: 2px          ← not text-sm mb-2
+Input  : px-3 py-2  text-xs  radius 10–12px  (height ~32px)
+Select : px-3 py-2  text-xs  radius 10–12px
+Button : px-3 py-2  text-xs  radius 10–12px
+```
+
+The 40px minimum only applies to authenticated public flows (login, onboarding, checkout). In dense admin contexts, 32px controls reduce visual weight without usability loss — the audience is power users, not first-time visitors.
+
+**Entity add/edit forms → Modal, not inline expansion:**
+- Inline accordions (RevealPanel, details-based expansion) inside entity cards cause layout shift and make the page feel unstable
+- Correct pattern: `+ Add` button + `Edit` button each open a centered modal (`max-w-448px`, `backdrop-blur overlay`)
+- Modal form: single-column, `gap: 10px`, compact controls, full-width submit button
 
 ---
 

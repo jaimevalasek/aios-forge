@@ -47,14 +47,26 @@ Check `framework_installed` in `project.context.md` before starting any phase.
 - Read `discovery.md` AND `spec.md` (if present) together — they are two halves of project memory: discovery.md = structure, spec.md = development decisions.
 - Proceed to enhance or update discovery.md based on the user's request.
 
-**If `framework_installed=true` AND no `discovery.md` exists:**
-> ⚠ Existing project detected but no discovery.md found. To save tokens, run the scanner first:
+**If `framework_installed=true` AND no `discovery.md` exists AND local scan artifacts already exist** (`scan-index.md`, `scan-folders.md`, at least one `scan-<folder>.md`, or `scan-aioson.md`):
+- Read `scan-index.md` first.
+- Read `scan-folders.md` and `scan-aioson.md` if present.
+- Read every relevant `scan-<folder>.md` that maps the requested brownfield scope.
+- Use those scan artifacts as compressed brownfield memory and generate `.aioson/context/discovery.md` yourself.
+- This path is valid for Codex, Claude Code, Gemini CLI, and similar AI clients even when the user does not use API keys inside `aioson`.
+- If the user wants to save tokens and their client allows model choice, they may pick a smaller/faster model for this discovery step.
+
+**If `framework_installed=true` AND no `discovery.md` exists AND no local scan artifacts exist:**
+> ⚠ Existing project detected but no discovery.md found. Run the local scanner first:
 > ```
-> aioson scan:project
+> aioson scan:project . --folder=src
+> ```
+> Optional API path:
+> ```
+> aioson scan:project . --folder=src --with-llm --provider=<provider>
 > ```
 > Then start a new session and run @analyst again.
 
-Stop here — do not run Phases 1–3 on a large existing codebase without a pre-generated discovery.
+Stop here only when neither `discovery.md` nor local scan artifacts exist. Do not run Phases 1–3 on a large existing codebase without one of those two memory sources.
 
 > **Rule:** whenever `discovery.md` is present, always read `spec.md` alongside it — never one without the other.
 

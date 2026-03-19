@@ -19,6 +19,8 @@ module.exports = {
     help_agent_prompt:
       'aioson agent:prompt <agent> [path] [--tool=codex|claude|gemini|opencode] [--lang=en|pt-BR|es|fr] [--locale=es]',
     help_context_validate: 'aioson context:validate [path] [--json] [--locale=es]',
+    help_context_pack:
+      'aioson context:pack [path] [--agent=<agente>] [--goal=<texto>] [--module=<modulo-o-carpeta>] [--max-files=8] [--json] [--locale=es]',
     help_setup_context:
       'aioson setup:context [path] [--defaults] [--project-type=web_app|api|site|script|dapp] [--framework=<name>] [--backend=<name>] [--frontend=<name>] [--database=<name>] [--auth=<name>] [--uiux=<name>] [--language=es] [--web3-enabled=true|false] [--locale=es]',
     help_locale_apply: 'aioson locale:apply [path] [--lang=en|pt-BR|es|fr] [--dry-run] [--locale=es]',
@@ -53,7 +55,7 @@ module.exports = {
     help_qa_report:
       'aioson qa:report [path] [--html] [--json] [--locale=es]',
     help_scan_project:
-      'aioson scan:project [path] --folder=<ruta[,ruta2]> [--summary-mode=titles|summaries|raw] [--with-llm] [--provider=<name>] [--llm-model=<name>] [--dry-run] [--json] [--locale=es]',
+      'aioson scan:project [path] --folder=<ruta[,ruta2]> [--summary-mode=titles|summaries|raw] [--context-mode=merge|rewrite] [--with-llm] [--provider=<name>] [--llm-model=<name>] [--dry-run] [--json] [--locale=es]',
     help_config:
       'aioson config <set KEY=value|show|get KEY> [--json] [--locale=es]',
     help_genome_doctor:
@@ -106,7 +108,7 @@ module.exports = {
     existing_project_detected:
       '⚠ Proyecto existente detectado ({count} archivos). Ejecuta el scanner antes de comenzar:',
     existing_project_scan_hint:
-      '  aioson scan:project --folder=src   (genera scan-index.md localmente; agrega --with-llm para discovery.md)'
+      '  aioson scan:project . --folder=src --with-llm --provider=<provider>   (genera discovery.md + skeleton-system.md; sin --with-llm genera solo mapas locales)'
   },
   update: {
     not_installed: 'No se encontro instalacion de AIOSON en {targetDir}.',
@@ -233,6 +235,13 @@ module.exports = {
     invalid_fields: 'El archivo de contexto fue parseado pero tiene problemas de validacion:',
     issue_line: '- {issue}',
     valid: 'El archivo de contexto es valido.'
+  },
+  context_pack: {
+    generated: 'Context pack escrito en: {path}',
+    no_matches: 'Todavia no se seleccionaron archivos de contexto relevantes. Ejecuta setup/context/scan antes de empaquetar.',
+    selected_title: 'Archivos incluidos en el pack:',
+    selected_line: '  {index}. {path} — {reason}',
+    hint_use: 'Usa {path} como contexto minimo inicial en tu sesion de IA.'
   },
   setup_context: {
     detected: 'Framework detectado: {framework} (installed={installed})',
@@ -686,6 +695,19 @@ module.exports = {
     scanning: 'aioson scan:project — escaneando {dir}',
     folder_required:
       'Usa --folder=<ruta[,ruta2]> para generar mapas completos de carpetas especificas. Ejemplo: --folder=src o --folder=app.',
+    folder_required_examples_title: '\x1b[33mGuia rapido:\x1b[0m',
+    folder_required_example_local:
+      '  Mapas locales   : aioson scan:project . --folder=src',
+    folder_required_example_multi:
+      '  Varias carpetas : aioson scan:project . --folder=src,app',
+    folder_required_example_llm:
+      '  API automatica  : aioson scan:project . --folder=src --with-llm --provider=openai',
+    folder_required_example_cli:
+      '  Sin API LLM     : aioson scan:project . --folder=src  -> luego ejecuta @analyst en Codex/Claude/Gemini',
+    folder_required_example_prompt:
+      '  Prompt listo    : aioson agent:prompt analyst --tool=codex',
+    folder_required_example_next:
+      '  Flujo tras escaneo completo: @analyst -> @architect -> @dev',
     folder_not_found: 'La carpeta "{folder}" no existe en este proyecto. Directorios de nivel superior detectados: {available}',
     config_missing: '{file} no encontrado. Para usar el modo con LLM, copia aioson-models.json y completa tus claves de API.',
     config_invalid: 'JSON invalido en aioson-models.json: {error}',
@@ -695,6 +717,10 @@ module.exports = {
     context_found: '  Contexto : project.context.md encontrado',
     context_missing: '  Contexto : project.context.md no encontrado (ejecuta aioson setup:context primero)',
     spec_found: '  Spec     : spec.md encontrado — memoria de desarrollo incluida',
+    existing_discovery_found: '  Contexto : discovery.md existente encontrado en {path}',
+    existing_skeleton_found: '  Contexto : skeleton-system.md existente encontrado en {path}',
+    context_update_mode: '  Modo     : update/merge del contexto existente activado para discovery.md + skeleton-system.md',
+    context_mode: '  Contexto : context-mode={mode} (valor recomendado por defecto para brownfield: merge)',
     local_only: '  LLM      : desactivada por defecto — solo escaneo local (usa --with-llm para generar discovery.md + skeleton-system.md)',
     walking: '  Escaneando estructura del proyecto...',
     walk_done: '  Archivos : {files} entradas mapeadas | Archivos clave: {keys} leidos',
@@ -702,17 +728,41 @@ module.exports = {
     folders_written: '  Carpetas : mapa de carpetas escrito en {path}',
     folder_written: '  Carpeta  : mapa completo de {folder} escrito en {path}',
     forge_written: '  AIOS     : mapa util de .aioson escrito en {path}',
+    memory_index_written: '  Memoria  : memory-index.md escrito en {path}',
+    spec_current_written: '  Memoria  : spec-current.md escrito en {path}',
+    spec_history_written: '  Memoria  : spec-history.md escrito en {path}',
+    module_memory_written: '  Modulo   : memoria enfocada de {folder} escrita en {path}',
     dry_run_done: '[dry-run] Escanearia {treeCount} entradas y {keyCount} archivos clave — sin llamada LLM.',
     local_done: '  Resultado: escaneo local completado — indice, mapa de carpetas, scans solicitados y .aioson listos.',
+    local_missing: '  Falta    : discovery.md + skeleton-system.md todavia no fueron generados en este escaneo local.',
+    architecture_note: '  Nota     : architecture.md no lo genera scan:project; ese archivo viene despues con @architect.',
+    local_paths_title: '\n\x1b[33m  Como generar discovery ahora:\x1b[0m',
+    local_path_api: '  \x1b[32mCamino A — API automatica\x1b[0m',
     calling_llm: '  Llamando {provider} ({model})...',
     llm_missing_api_key:
       'La API key del provider "{provider}" todavia no esta configurada en {file}. Completa providers.{provider}.api_key o elige otro provider con --provider=...',
     llm_error: 'Llamada LLM fallo: {error}',
+    invalid_llm_output_discovery_empty:
+      'La LLM devolvio un discovery.md vacio. No se sobrescribio ningun archivo existente. Conserva el backup actual e intenta con un modelo mas fuerte o menos carpetas por ejecucion.',
+    invalid_llm_output_skeleton_empty:
+      'La LLM devolvio un skeleton-system.md vacio despues del delimitador. No se sobrescribio ningun archivo existente. Intenta otra vez con un modelo mas fuerte o un alcance menor.',
+    gitignore_backups_written: '  Gitignore: regla de backup local garantizada en {path}',
+    backups_written: '  Backup   : {count} archivo(s) guardado(s) en {path}',
     discovery_written: 'discovery.md escrito: {path} ({chars} chars)',
     skeleton_written: 'skeleton-system.md escrito: {path} ({chars} chars)',
     skeleton_missing: 'Delimitador skeleton no encontrado en respuesta LLM — skeleton-system.md no escrito.',
+    local_next_steps: '  1. Ejecuta: aioson scan:project {target} --folder={folders} --with-llm --provider=<provider>',
+    local_path_cli: '  \x1b[36mCamino B — Tu AI CLI (sin API dentro de aioson)\x1b[0m',
+    local_cli_step_analyst: '  2. En Codex, Claude Code u otro cliente, ejecuta @analyst — puede usar scan-index.md + scan-folders.md + scan-<pasta>.md para escribir discovery.md',
+    local_cli_step_prompt_codex: '  3. Si el cliente no entiende @analyst, genera un prompt listo: aioson agent:prompt analyst --tool=codex',
+    local_cli_step_prompt_claude: '  4. Cambia --tool=codex por --tool=claude o --tool=gemini cuando haga falta',
+    local_cli_step_model_hint: '  5. Si tu cliente permite elegir modelo, usa uno rapido/barato para esta etapa de discovery',
+    local_workflow_title: '\n\x1b[33m  Despues del discovery:\x1b[0m',
+    local_step_architect: '  3. Ejecuta @architect — genera architecture.md a partir del discovery consolidado',
+    local_step_dev: '  4. Ejecuta @dev — empieza a codificar solo despues de tener discovery.md + architecture.md',
     next_steps: '\n  Proximos pasos:',
-    step_analyst: '  1. Abre tu sesion de IA y ejecuta @analyst — lee discovery.md + skeleton-system.md automaticamente',
-    step_dev: '  2. Ejecuta @dev — lee skeleton-system.md primero, luego discovery.md + spec.md'
+    step_analyst: '  1. Abre tu sesion de IA y ejecuta @analyst — revisa discovery.md + skeleton-system.md y consolida el alcance actual',
+    step_architect: '  2. Ejecuta @architect — genera architecture.md a partir del discovery consolidado',
+    step_dev: '  3. Ejecuta @dev — lee skeleton-system.md primero, luego discovery.md + architecture.md + spec.md'
   }
 };

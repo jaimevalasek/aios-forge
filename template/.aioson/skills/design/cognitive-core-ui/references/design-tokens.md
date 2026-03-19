@@ -380,6 +380,104 @@ font-feature-settings: "tnum" 1;
 
 ---
 
+## Admin / Operational Compact Density
+
+Use these values whenever building settings pages, admin panels, config screens, entity lists, or any dense operational UI. These replace the more generous defaults in those contexts.
+
+### Card container scale
+
+| Level | Use | Padding | Border Radius |
+|---|---|---|---|
+| L1 — page card | top-level section card | `var(--space-4)` (16px) | `22px` |
+| L2 — nested card | card inside a card | `var(--space-3)` (12px) | `18px` |
+| L3 — inset block | info block, disclosure body | `10px` | `14px` |
+
+Between L1 cards: `gap: var(--space-3)` — not `--space-4` or `--space-6`.
+
+### Card heading inside a panel
+
+```
+Eyebrow  : text-[0.68rem] uppercase tracking-[0.28em] color: var(--text-muted)
+Title    : text-base (15px) font-semibold  ← never text-xl or text-2xl inside a card
+Meta     : font-mono text-[0.62rem] color: var(--text-muted) truncate  ← path, ID, single-line
+```
+
+**Do not write verbose description paragraphs inside admin cards.** Replace with: mono path text, status badges, or a single collapsed `<details>` block.
+
+### Form controls — admin context
+
+```
+Input    : px-3 py-2  text-xs  border-radius: var(--radius-md)  (height ~32px)
+Select   : px-3 py-2  text-xs  border-radius: var(--radius-md)
+Label    : text-[0.65rem]  mb: 2px (mb-0.5)
+Button   : px-3 py-2  text-xs  border-radius: var(--radius-md)
+```
+
+These override the default `px-4 py-3 text-sm rounded-2xl` — that scale is for consumer/marketing UI, not admin density.
+
+### List / row items
+
+```
+Row padding  : py-2 (8px top/bottom)  — not py-3 or py-4
+Row gap      : gap-2.5 (10px)
+Provider dot : h-2 w-2  — not h-2.5 w-2.5
+Name column  : w-24 text-xs font-medium  — not w-28 text-sm
+```
+
+### Badges / chips — compact
+
+```
+Status badge : px-2 py-0.5  text-[0.6rem]  rounded-full
+Tag badge    : px-2 py-0.5  text-[0.58rem]  rounded-full
+```
+
+Never use `px-3 py-1 text-xs` for inline status chips — that scale is for navigation and page-level badges.
+
+### Entity grid (projects, providers, squads)
+
+Never full-width stack same-type entities. Use:
+
+```css
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+/* or explicit: sm:grid-cols-2 lg:grid-cols-3 */
+gap: var(--space-3);
+```
+
+### Modal pattern for add / edit forms
+
+Entity add/edit forms belong in a modal, not inline expansion (accordion/RevealPanel):
+
+```
+Modal max-width : 448px (28rem)
+Modal padding   : var(--space-5)
+Overlay         : bg-black/50 backdrop-blur-sm
+Border radius   : var(--radius-xl) — 22px
+Max height      : 90vh  overflow-y: auto
+```
+
+### Disclosure / collapse pattern
+
+Secondary tools (sync assistant, cloud connect, advanced config) go behind `<details>`:
+
+```
+Summary row : flex items-center justify-between px-3 py-2.5
+              label (text-xs) + status badge (left) + action button (right)
+Body        : border-t px-3 pb-3 pt-2
+```
+
+Never keep secondary tools always visible — they crowd the primary content.
+
+### Anti-patterns in admin/operational UI
+
+- `p-6 rounded-[28px]` on inner section cards — too large, use L1/L2/L3 scale above
+- `text-xl` or `text-2xl` headings inside settings/admin cards
+- Verbose description paragraphs (`text-sm leading-7`) in every card — remove them
+- Full-width stacked cards for entity lists (projects, providers) — use the grid
+- Inline accordion/RevealPanel for add/edit forms — use a modal
+- `px-4 py-3 text-sm` for inputs and buttons in dense admin context
+
+---
+
 ## Non-Negotiable Rules
 
 1. Use the token system — never freestyle random hex values.
@@ -389,3 +487,4 @@ font-feature-settings: "tnum" 1;
 5. Do not use mono labels as the main reading experience.
 6. Keep **one obvious focal block** per viewport.
 7. Fix token scope and cascade bugs before redesigning colors or layout.
+8. In admin/operational UI, apply the **Compact Density** scale — never carry consumer/marketing spacing into dense panels.

@@ -80,6 +80,93 @@ Never use arbitrary values. Every measurement is a multiple of 4.
 
 ---
 
+## Admin panel density — settings, config, entity management
+
+The premium command center uses **tight operational spacing** for admin and config screens. These values are concrete — apply them directly.
+
+### Card scale
+
+| Level | Use | Padding | Radius |
+|---|---|---|---|
+| L1 | top-level section card | `16px` | `22px` |
+| L2 | nested card inside L1 | `12px` | `18px` |
+| L3 | inset block, disclosure body, info row | `10px` | `14px` |
+
+Section gap between L1 cards: `12px`.
+
+### Card headers
+
+```
+Eyebrow : font-mono 10–11px  uppercase  letter-spacing: 0.28em  color: muted
+Title   : 15px  font-weight: 600  — max size inside a card
+Meta    : font-mono 10px  truncate single line  — path, ID, workspace name
+```
+
+**No paragraph descriptions inside admin cards.** One eyebrow + one title + optional single-line meta is sufficient. Everything else belongs in a collapsed disclosure or a tooltip.
+
+### Controls in admin context
+
+```
+Input / Select : height 32px  (py-2 px-3)  font-size 12px  border-radius 10–12px
+Label          : font-size 10–11px  margin-bottom 2px
+Button action  : py-2 px-3  font-size 12px  border-radius 10–12px
+Button micro   : py-1 px-2.5  font-size 10–11px  border-radius 10px
+```
+
+### Row items (provider lists, agent lists)
+
+```
+Row padding : py-2 (8px)  divide-y separator
+Name width  : 96px (fixed)  text-xs  font-medium
+Model       : flex-1 truncate  font-mono  font-size 10–11px
+Badges      : px-2 py-0.5  font-size 9–10px
+Edit btn    : px-2.5 py-1  font-size 10–11px
+```
+
+### Entity grids (projects, agents, squads)
+
+Same-type entities go in a grid — never full-width stacked:
+```
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))
+gap: 12px
+Card: rounded-18 p-3
+Card header: name (text-sm semibold) + ID (mono 9px truncate)
+Card badges: px-2 py-0.5 text-[9-10px]
+Card actions: compact row, py-1.5, font-size 10–11px
+```
+
+### Add/Edit forms → Modal pattern
+
+Entity add/edit always opens a modal — not inline expansion:
+```
+Modal: max-w-448px  centered  rounded-22px  p-20px
+Overlay: bg-black/50 backdrop-blur
+Header: eyebrow + title (text-base) + close button (top right)
+Form: single-column grid  gap: 10px
+Submit: full-width  py-2  text-xs
+```
+
+### Disclosure — secondary tools
+
+Sync, cloud connect, advanced settings behind `<details>`:
+```
+Summary: flex row  px-3 py-2.5
+  Left: label (text-xs) + status badge (alinhado / N diffs)
+  Right: action button (micro size)
+Body: border-t px-3 pb-3 pt-2  compact rows
+```
+
+### Anti-patterns — never do this in admin panels
+
+- `padding: 24px` on inner section cards
+- `font-size: 20–24px` headings inside cards
+- Verbose description paragraphs in admin cards
+- Full-width stacked entity cards (projects, providers)
+- Inline accordion for add/edit forms
+- `height: 40px+` inputs/buttons in dense tool contexts
+
+---
+
 ## Depth — borders-first
 
 Three surface levels maximum:

@@ -21,6 +21,16 @@ Before executing your mission, scan for project-specific customizations:
 - `.aioson/context/readiness.md` (if present)
 - `.aioson/context/discovery.md`
 
+## Brownfield memory handoff
+
+For existing codebases:
+- `discovery.md` is the required compressed system memory for architecture work.
+- That `discovery.md` may have come from either:
+  - `scan:project --with-llm`
+  - `@analyst` reading local scan artifacts (`scan-index.md`, `scan-folders.md`, `scan-<folder>.md`, `scan-aioson.md`)
+- If `discovery.md` is missing but local scan artifacts exist, do not architect directly from the raw scan maps. Route through `@analyst` first.
+- If neither `discovery.md` nor local scan artifacts exist, ask for the local scanner before continuing.
+
 ## Rules
 - Do not redesign entities produced by `@analyst`. Consume the data design as-is.
 - Keep architecture proportional to classification. Never apply MEDIUM patterns to a MICRO project.

@@ -77,6 +77,16 @@ Verificar as seguintes condicoes em ordem:
 - `.aioson/context/prd-{slug}.md` (modo feature — fluxo de continuacao)
 - `.aioson/context/prd.md` (apenas no modo enriquecimento)
 
+## Handoff de memoria brownfield
+
+Se o projeto ja tiver codigo:
+- Se `discovery.md` existir, leia esse arquivo antes de escopar features ou refinar o PRD.
+- Se `discovery.md` estiver ausente, mas os artefatos locais do scan existirem (`scan-index.md`, `scan-folders.md`, `scan-<pasta>.md`, `scan-aioson.md`), use-os apenas como orientacao estrutural para a conversa de produto. Eles nao substituem o `@analyst` para modelagem de dominio.
+- Nesse caso, conclua o trabalho de PRD normalmente, mas direcione o proximo passo para `@analyst` antes de `@architect` ou `@dev`.
+- Se nao existir nem `discovery.md` nem artefato local do scan e o pedido depender do comportamento atual do sistema, peça pelo menos:
+  - `aioson scan:project . --folder=src`
+  - caminho opcional com API: `aioson scan:project . --folder=src --with-llm --provider=<provider>`
+
 ## Integridade do contexto
 
 Ler `project.context.md` antes de qualquer decisao de produto.

@@ -127,24 +127,73 @@ For viewing a single entity (person, product, contact, project).
 
 ---
 
-## 3. Settings Page
+## 3. Settings / Config Page
+
+Apply the **Compact Density** scale from `design-tokens.md` throughout. Settings pages are operational UI, not marketing — no generous whitespace.
 
 ```
 ┌────────────────────────────────────────────────────────┐
 │  TOP BAR                                               │
 ├───────────┬────────────────────────────────────────────┤
-│ SIDEBAR   │  SETTINGS TITLE + description              │
-│           │  ┌─ Card ─────────────────────────────┐   │
-│ General   │  │ SECTION LABEL                       │   │
-│ Security  │  │ [Label] [Input field]               │   │
-│ Billing   │  │ [Label] [Select]                    │   │
-│ Team      │  │             [Save Button]           │   │
+│ SIDEBAR   │  SETTINGS TITLE (text-2xl, no description) │
+│           │                                            │
+│ General   │  ┌─ Entity grid ──────────────────────┐   │
+│ Security  │  │ [Card 280px] [Card 280px] [Card]    │   │ ← 3-col auto-fill
+│ Billing   │  │  name + ID + status badges          │   │
+│ Team      │  │  [Ativar btn] [Editar btn]          │   │
 │ API       │  └─────────────────────────────────────┘   │
+│           │                                            │
+│           │  ┌─ Section card (p-4 rounded-[22px]) ─┐   │
+│           │  │ eyebrow (mono xs) + title (text-base)│   │
+│           │  │ [row] dot · name  model  badges Editar│  │ ← divide-y py-2
+│           │  │ [row] dot · name  model  badges Editar│  │
+│           │  │  ▸ Sync / secondary tool (details)  │   │ ← collapsed
+│           │  └─────────────────────────────────────┘   │
+│           │                                            │
 │           │  ┌─ Danger Zone Card ──────────────────┐   │
 │           │  │ border: var(--semantic-red-dim)      │   │
 │           │  └─────────────────────────────────────┘   │
 └───────────┴────────────────────────────────────────────┘
 ```
+
+**Page heading:** `text-2xl` max — no verbose description subtitle on the page header.
+
+**Entity cards (projects, providers, squads):**
+- Grid: `grid-cols-[repeat(auto-fill,minmax(280px,1fr))]`, `gap: var(--space-3)`
+- Card: `rounded-[18px] p-3`
+- Name: `text-sm font-semibold truncate`
+- ID: `font-mono text-[0.58rem] truncate`
+- Status badges: `px-2 py-0.5 text-[0.58rem]`
+- Actions: compact row at bottom — `py-1.5 text-[0.62rem]`
+
+**Add/Edit forms → Modal pattern (not inline expansion):**
+```
++ Adicionar button → opens modal (max-w-md, centered, backdrop)
+Editar button      → opens same modal pre-filled
+Never use accordion/RevealPanel inside entity cards
+```
+
+**Section cards (provider lists, license, LLM config):**
+- Card: `rounded-[22px] p-4`
+- Header row: eyebrow + title + right-side control (select, badge) in one flex row
+- File path or meta: `font-mono text-[0.62rem] truncate` — one line below title, no card for it
+- Row items: `divide-y divide-[border]` with `py-2`, `text-xs` names, `text-[0.65rem]` models
+- Edit button: `px-2.5 py-1 text-[0.65rem] rounded-xl`
+
+**Disclosure pattern for secondary tools:**
+```html
+<details class="rounded-[16px] border bg-elevated mt-3">
+  <summary> <!-- flex: label + status badge + action button in one row --> </summary>
+  <div class="border-t px-3 pb-3 pt-2">
+    <!-- compact diff rows or secondary form -->
+  </div>
+</details>
+```
+
+**Form inputs inside modals and cards:**
+- Input/Select: `px-3 py-2 text-xs rounded-xl`
+- Label: `text-[0.65rem] mb-0.5`
+- Submit button: `w-full px-3 py-2 text-xs rounded-xl`
 
 ---
 

@@ -100,3 +100,74 @@ Size alone is never enough. Use weight + tracking + opacity to create layers.
 
 Never animate layout properties (width, height, padding). Animate `transform` and `opacity` only.
 Always provide `prefers-reduced-motion: reduce` fallback.
+
+---
+
+## Operational density — admin / config / settings pages
+
+Settings pages, admin panels, config screens, and entity managers use a **compact scale** that overrides the default generous consumer spacing. Apply this whenever the user is operating a tool, not reading content.
+
+### Decision checkpoint for operational density
+
+> Depth: borders-first • Surfaces: 3-level (page / card / elevated) • Spacing base: 4px • Controls: 32px • Card padding: 16px outer / 12px nested • Type: xs-base range, text-base max for card headings • Radius: 22px outer / 18px nested / 14px deep
+
+### Card padding — 3-level scale
+
+| Level | Context | Padding | Radius |
+|---|---|---|---|
+| L1 | top-level section card | `16px` | `22px` |
+| L2 | card nested inside L1 | `12px` | `18px` |
+| L3 | inset block, disclosure body | `10px` | `14px` |
+
+Section gap: `12px` — not 16px or 24px.
+
+### Card headings
+
+- Section eyebrow: `0.68rem` uppercase mono, `tracking: 0.28em`
+- Section title: `text-base` (15–16px), `font-weight: 600` — **never `text-xl` or `text-2xl` inside a card**
+- Sub-info (path, ID): `font-mono text-[0.62rem]` single truncated line below title — no card for it
+- **No verbose description paragraphs** in admin cards — remove them or collapse to `<details>`
+
+### Form controls
+
+```
+Label  : 10–11px  margin-bottom: 2px
+Input  : px-3 py-2  (height ~32px)  text-xs  radius: 10–12px
+Select : same
+Button : px-3 py-2  text-xs  radius: 10–12px
+```
+
+The default 40px `min-height` rule in `## Forms` applies to consumer/public-facing forms. Admin/operational forms use 32px controls. Reduce only in authenticated tool contexts — never on public-facing login or onboarding.
+
+### List rows
+
+```
+Row     : py-2 (8px)  divide-y
+Gap     : gap-2.5
+Name    : text-xs font-medium  — not text-sm
+Model   : font-mono text-[0.65rem]  truncate
+Badges  : px-2 py-0.5 text-[0.6rem]  — not px-3 py-1
+Edit btn: px-2.5 py-1 text-[0.65rem]
+```
+
+### Entity grids (same-type objects: projects, agents, providers)
+
+Never stack same-type entities full-width. Use:
+```css
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 12px;
+/* Entity card: rounded-[18px] p-3 */
+```
+
+### Add/Edit → Modal, not accordion
+
+Inline form expansion (accordion, RevealPanel) inside entity cards creates visual clutter and unpredictable layout shifts. Use a modal:
+- `max-width: 448px`, centered, backdrop `bg-black/50 backdrop-blur-sm`
+- Single "+ Add" button outside the grid → opens modal
+- "Edit" button on each card → same modal pre-filled
+
+### Disclosure for secondary tools
+
+Sync assistants, cloud connect, advanced config, and other secondary actions go behind `<details>`:
+- Summary row: `flex items-center justify-between px-3 py-2.5` — label + status badge on left, action button on right
+- Never show secondary tools open by default in an already-dense panel

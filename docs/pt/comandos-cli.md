@@ -33,6 +33,7 @@
 |---|---|---|
 | `setup:context` | Cria ou atualiza `.aioson/context/project.context.md` | Logo após instalar o framework |
 | `context:validate` | Valida o `project.context.md` | Depois de editar o contexto manualmente |
+| `context:pack` | Monta um pacote mínimo de contexto para uma tarefa específica | Quando você quer enviar para a IA só a memória relevante |
 | `locale:apply` | Reaplica um pack de idioma nos agentes gerenciados pelo AIOSON | Quando quer trocar o idioma em que os agentes do framework operam no projeto |
 | `locale:diff` | Compara um agente com o pack de idioma esperado | Quando quer detectar drift de tradução |
 | `i18n:add` | Gera o scaffold de um novo locale do próprio AIOSON | Quando vai adicionar outro idioma oficial ao CLI do framework |
@@ -178,6 +179,33 @@ aioson context:validate .
 
 Use quando o projeto já está claro e você quer gerar o contexto sem passar pelo wizard interativo.
 
+### 6A. Montar um pacote mínimo de contexto
+
+```bash
+aioson context:pack .
+aioson context:pack . --agent=dev --goal="ajustar captions do YouTube" --module=src
+aioson context:pack . --agent=qa --goal="validar regressao do checkout" --module=app --max-files=10
+```
+
+Use quando você quer mandar para Codex, Claude Code, Gemini ou outro cliente só o contexto mais relevante para a tarefa atual.
+
+O comando escreve `.aioson/context/context-pack.md` e normalmente seleciona:
+
+- `project.context.md`
+- `memory-index.md`
+- `skeleton-system.md`
+- `discovery.md`
+- `spec-current.md`
+- `spec-history.md`
+- `architecture.md`
+- `module-<pasta>.md` e `scan-<pasta>.md` quando houver foco em um módulo
+
+Importante:
+
+- `context:pack` não substitui `discovery.md` nem `spec.md`
+- ele apenas monta um pacote mínimo para reduzir carga, custo e ruído no contexto
+- antes de montar o pack, o comando atualiza os derivados locais como `memory-index.md`, `spec-current.md`, `spec-history.md` e `module-<pasta>.md`
+
 ### 7. Trocar idioma do projeto
 
 ```bash
@@ -282,6 +310,14 @@ O comando agora trabalha em duas etapas:
 1. O JavaScript faz uma análise local do projeto e gera `.aioson/context/scan-index.md`.
 2. Se você ativar `--with-llm`, a LLM usa esse índice compacto para produzir `discovery.md` e `skeleton-system.md`.
 
+Importante:
+
+- `scan:project` sozinho nao gera `discovery.md`
+- `scan:project` nunca gera `architecture.md`
+- se `discovery.md` e `skeleton-system.md` ja existirem e voce rodar com `--with-llm`, o scanner agora entra em modo de atualizacao por padrao: usa os arquivos atuais como memoria base, gera a nova versao consolidada e cria backup automatico em `.aioson/backups/` antes de sobrescrever
+- em projetos SMALL brownfield, o fluxo tipico depois do scan completo e `@analyst` -> `@architect` -> `@dev`
+- sem API LLM configurada, o fluxo local tambem e valido: `scan:project --folder=...` -> `@analyst` no seu Codex/Claude/Gemini -> `@architect` -> `@dev`
+
 O parâmetro `--folder` agora é obrigatório. Ele define quais pastas do projeto devem ganhar um mapa completo com pastas e arquivos. Você pode informar uma pasta ou várias separadas por vírgula.
 
 Artefatos locais gerados pelo scan:
@@ -290,6 +326,13 @@ Artefatos locais gerados pelo scan:
 - `scan-folders.md`: mapa somente de pastas do projeto
 - `scan-<pasta>.md`: mapa completo da pasta pedida em `--folder`, incluindo toda a estrutura de pastas e arquivos
 - `scan-aioson.md`: mapa útil do `.aioson/`, mostrando só artefatos gerados no uso do projeto
+- `memory-index.md`: índice de leitura com “leia isto quando precisar de X”
+- `module-<pasta>.md`: memória focada para cada pasta pedida em `--folder`
+
+Se existir `.aioson/context/spec.md`, o scanner também deriva:
+
+- `spec-current.md`: recorte curto do estado atual, trabalho em andamento e decisões abertas
+- `spec-history.md`: recorte histórico com implementações concluídas e decisões tomadas
 
 No caso de `.aioson/`, o scanner oculta o que é padrão do framework:
 
@@ -312,6 +355,8 @@ Modos de resumo:
 - `--summary-mode=titles`: envia só títulos, tamanhos e estrutura. É o modo mais leve.
 - `--summary-mode=summaries`: envia títulos + resumos curtos. É o modo padrão.
 - `--summary-mode=raw`: além do índice, envia também o conteúdo bruto dos arquivos-chave. É o modo mais pesado.
+- `--context-mode=merge`: padrão para brownfield. Se já existir `discovery.md` ou `skeleton-system.md`, tenta atualizar sem apagar contexto útil.
+- `--context-mode=rewrite`: reescreve a memória a partir do scan atual. Use quando quiser regenerar do zero.
 - `--with-llm`: ativa a etapa opcional de enriquecimento por LLM.
 - `--llm-model=<name>`: sobrescreve o modelo configurado para esta execução.
 
@@ -321,6 +366,13 @@ Quando usar cada modo:
 - Se quiser mais contexto sem mandar arquivos brutos, use `summaries`.
 - Se quiser máxima riqueza de contexto e aceitar um prompt maior, use `raw`.
 
+Fluxos recomendados:
+
+- **Com API no aioson:** `scan:project --folder=src --with-llm --provider=...` -> `@analyst` -> `@architect` -> `@dev`
+- **Sem API no aioson:** `scan:project --folder=src` -> abrir seu AI CLI -> `@analyst` -> `@architect` -> `@dev`
+- **Com contexto mínimo para tarefa específica:** `scan:project --folder=src` -> `context:pack --agent=dev --goal="..." --module=src`
+- Se o seu cliente nao entender `@analyst`, gere um prompt pronto com `aioson agent:prompt analyst --tool=codex` ou troque `--tool` para o cliente correto
+
 Exemplo prático para reduzir carga no provider:
 
 ```bash
@@ -328,6 +380,18 @@ aioson scan:project . --folder=src --with-llm --provider=deepseek --summary-mode
 ```
 
 Nesse fluxo, providers como DeepSeek servem melhor como sintetizadores da arquitetura, relações e riscos do sistema, enquanto o trabalho pesado de mapear pastas solicitadas e filtrar o `.aioson/` fica no próprio CLI.
+
+Exemplo prático para atualizar memória existente sem perder contexto:
+
+```bash
+aioson scan:project . --folder=src,app --with-llm --provider=openai
+```
+
+Exemplo prático para reescrever do zero:
+
+```bash
+aioson scan:project . --folder=src,app --with-llm --provider=openai --context-mode=rewrite
+```
 
 ### 12. Avancar o workflow real entre agentes
 

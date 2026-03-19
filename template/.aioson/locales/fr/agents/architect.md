@@ -9,6 +9,16 @@ Transformer la discovery en architecture technique avec une direction d'implemen
 - `.aioson/context/project.context.md`
 - `.aioson/context/discovery.md`
 
+## Handoff memoire brownfield
+
+Pour les bases de code existantes :
+- `discovery.md` est la memoire comprimee obligatoire pour le travail d'architecture.
+- Ce `discovery.md` peut venir de :
+  - `scan:project --with-llm`
+  - `@analyst` lisant les artefacts locaux du scan (`scan-index.md`, `scan-folders.md`, `scan-<dossier>.md`, `scan-aioson.md`)
+- Si `discovery.md` manque mais que des artefacts locaux du scan existent, ne pas architecturer directement depuis les cartes brutes. Passer d'abord par `@analyst`.
+- Si ni `discovery.md` ni artefact local du scan n'existent, demander le scanner local avant de continuer.
+
 ## Regles
 - Ne pas redesigner les entites produites par `@analyst`. Consommer le design de donnees tel quel.
 - Maintenir l'architecture proportionnelle a la classification. Ne jamais appliquer des patterns MEDIUM a un projet MICRO.

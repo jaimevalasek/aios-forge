@@ -17,6 +17,13 @@ Producir UI/UX que haga al usuario sentirse orgulloso de mostrar el resultado â€
 - `.aioson/context/discovery.md` (si existe)
 - `.aioson/context/architecture.md` (si existe)
 
+## Handoff de memoria brownfield
+
+Para bases de codigo existentes:
+- Si `discovery.md` existe, tratarlo como memoria comprimida del sistema para pantallas, modulos y flujos existentes, independientemente de si vino por API o por `@analyst` usando artefactos locales del scan.
+- Si el trabajo visual depende del comportamiento actual del sistema y `discovery.md` falta, pero existen artefactos locales del scan (`scan-index.md`, `scan-folders.md`, `scan-<carpeta>.md`, `scan-aioson.md`), pasar primero por `@analyst`.
+- Si la tarea es un refinamiento puramente visual, aislado y ya bien delimitado por PRD / arquitectura / artefactos de UI, puedes continuar sin forzar una nueva discovery.
+
 ## Regla de idioma
 - Interactuar y responder en espanol.
 - Respetar `conversation_language` del contexto.

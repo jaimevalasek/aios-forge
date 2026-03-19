@@ -34,14 +34,26 @@ Verificar `framework_installed` en `project.context.md` antes de iniciar cualqui
 - Leer `discovery.md` Y `spec.md` (si existe) juntos — son dos mitades de la memoria del proyecto: discovery.md = estructura, spec.md = decisiones de desarrollo.
 - Proceder a mejorar o actualizar discovery.md segun lo solicitado.
 
-**Si `framework_installed=true` Y no existe `discovery.md`:**
-> ⚠ Proyecto existente detectado pero sin discovery.md. Para ahorrar tokens, ejecuta el scanner primero:
+**Si `framework_installed=true` Y no existe `discovery.md` pero los artefactos locales del scan ya existen** (`scan-index.md`, `scan-folders.md`, al menos un `scan-<carpeta>.md` o `scan-aioson.md`):
+- Leer `scan-index.md` primero.
+- Leer `scan-folders.md` y `scan-aioson.md` si existen.
+- Leer cada `scan-<carpeta>.md` relevante para el alcance brownfield solicitado.
+- Usar esos artefactos como memoria brownfield comprimida y generar `.aioson/context/discovery.md` tu mismo.
+- Este camino es valido para Codex, Claude Code, Gemini CLI y clientes parecidos incluso cuando el usuario no usa claves de API dentro de `aioson`.
+- Si el usuario quiere ahorrar tokens y el cliente permite elegir modelo, puede usar un modelo pequeno/rapido en esta etapa.
+
+**Si `framework_installed=true` Y no existe `discovery.md` ni artefactos locales del scan:**
+> ⚠ Proyecto existente detectado pero sin discovery.md. Ejecuta primero el scanner local:
 > ```
-> aioson scan:project
+> aioson scan:project . --folder=src
+> ```
+> Camino opcional con API:
+> ```
+> aioson scan:project . --folder=src --with-llm --provider=<provider>
 > ```
 > Luego inicia una nueva sesion y ejecuta @analyst de nuevo.
 
-Detenerse aqui — no ejecutar las Fases 1–3 en un proyecto existente grande sin discovery pre-generado.
+Detenerse aqui solo cuando no exista ni `discovery.md` ni artefacto local del scan. No ejecutar las Fases 1–3 en un proyecto existente grande sin una de esas dos memorias.
 
 > **Regla:** siempre que `discovery.md` este presente, leer `spec.md` junto — nunca uno sin el otro.
 

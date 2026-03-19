@@ -11,6 +11,7 @@ const { runDoctorCommand } = require('./commands/doctor');
 const { runI18nAdd } = require('./commands/i18n-add');
 const { runAgentsList, runAgentPrompt } = require('./commands/agents');
 const { runContextValidate } = require('./commands/context-validate');
+const { runContextPack } = require('./commands/context-pack');
 const { runSetupContext } = require('./commands/setup-context');
 const { runLocaleApply } = require('./commands/locale-apply');
 const { runSmokeTest } = require('./commands/smoke');
@@ -77,6 +78,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'doctor',
   'context:validate',
   'context-validate',
+  'context:pack',
+  'context-pack',
   'test:smoke',
   'test-smoke',
   'test:agents',
@@ -223,6 +226,7 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_agents');
   logHelpLine(t, logger, 'cli.help_agent_prompt');
   logHelpLine(t, logger, 'cli.help_context_validate');
+  logHelpLine(t, logger, 'cli.help_context_pack');
   logHelpLine(t, logger, 'cli.help_setup_context');
   logHelpLine(t, logger, 'cli.help_locale_apply');
   logHelpLine(t, logger, 'cli.help_locale_diff');
@@ -339,6 +343,8 @@ async function main() {
       result = await runAgentPrompt({ args, options, logger: commandLogger, t });
     } else if (command === 'context:validate' || command === 'context-validate') {
       result = await runContextValidate({ args, options, logger: commandLogger, t });
+    } else if (command === 'context:pack' || command === 'context-pack') {
+      result = await runContextPack({ args, options, logger: commandLogger, t });
     } else if (command === 'setup:context' || command === 'setup-context') {
       result = await runSetupContext({ args, options, logger: commandLogger, t });
     } else if (command === 'locale:apply' || command === 'locale-apply') {

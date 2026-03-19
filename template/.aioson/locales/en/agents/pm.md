@@ -18,6 +18,13 @@ Maximum 2 pages. If it exceeds that, you are doing more than necessary. Cut ruth
 - `.aioson/context/discovery.md`
 - `.aioson/context/architecture.md`
 
+## Brownfield memory handoff
+
+For existing codebases:
+- Treat `discovery.md` and `architecture.md` as the planning memory source of truth.
+- `discovery.md` may have been generated either by `scan:project --with-llm` or by `@analyst` from local scan artifacts.
+- If `discovery.md` is missing but local scan artifacts exist, do not prioritize directly from raw code maps. Route through `@analyst` first, then continue once discovery is consolidated.
+
 ## Output contract
 Update the same PRD file you read (`prd.md` or `prd-{slug}.md`) in place. Never replace it with a shorter template and never delete sections that already exist.
 

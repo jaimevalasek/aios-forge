@@ -40,12 +40,41 @@ O scanner cria estes arquivos localmente:
 - `.aioson/context/scan-folders.md`
 - `.aioson/context/scan-<pasta>.md`
 - `.aioson/context/scan-aioson.md`
+- `.aioson/context/memory-index.md`
+- `.aioson/context/module-<pasta>.md`
+
+Se existir `.aioson/context/spec.md`, ele tambem deriva:
+
+- `.aioson/context/spec-current.md`
+- `.aioson/context/spec-history.md`
 
 Se você também quiser gerar `discovery.md` e `skeleton-system.md`, ative a etapa opcional com LLM:
 
 ```bash
 npx @jaimevalasek/aioson scan:project . --folder=src --with-llm --provider=openai
 ```
+
+Se `discovery.md` e `skeleton-system.md` ja existirem, o comportamento padrao agora e `merge`, com backup automatico em `.aioson/backups/`. Para regenerar do zero:
+
+```bash
+npx @jaimevalasek/aioson scan:project . --folder=src --with-llm --provider=openai --context-mode=rewrite
+```
+
+Se você nao usa API LLM no `aioson`, o caminho manual tambem funciona:
+
+1. Rode `scan:project . --folder=src`
+2. Opcional: rode `context:pack . --agent=analyst --goal="consolidar discovery brownfield" --module=src`
+3. Abra seu Codex, Claude Code, Gemini CLI ou cliente equivalente
+4. Execute `@analyst`
+5. O `@analyst` usa os arquivos de scan para gerar `discovery.md`
+
+Quando voce quiser montar um pacote minimo de contexto para uma tarefa especifica, use:
+
+```bash
+npx @jaimevalasek/aioson context:pack . --agent=dev --goal="ajustar captions do YouTube" --module=src
+```
+
+Esse comando gera `.aioson/context/context-pack.md` com os arquivos e trechos mais relevantes para a tarefa.
 
 ---
 
