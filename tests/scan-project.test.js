@@ -240,7 +240,7 @@ test('scan:project runs in local-only mode by default and writes folder-specific
     assert.match(indexContent, /spec-current\.md/);
     assert.match(indexContent, /spec-history\.md/);
     assert.match(indexContent, /module-src\.md/);
-    assert.match(gitignoreContent, /\.aioson\/agents\//);
+    assert.doesNotMatch(gitignoreContent, /\.aioson\/agents\//, 'agents/ must NOT be gitignored (Codex @ resolution)');
     assert.match(gitignoreContent, /\.aioson\/locales\//);
     assert.match(gitignoreContent, /\.aioson\/skills\//);
     assert.match(gitignoreContent, /\.aioson\/config\.md/);
@@ -301,7 +301,7 @@ test('scan:project refreshes gitignore policy for existing projects installed be
     const gitignore = await fs.readFile(path.join(projectDir, '.gitignore'), 'utf8');
 
     assert.equal(result.ok, true);
-    assert.match(gitignore, /\.aioson\/agents\//);
+    assert.doesNotMatch(gitignore, /\.aioson\/agents\//, 'agents/ must NOT be gitignored (Codex @ resolution)');
     assert.match(gitignore, /\.aioson\/locales\//);
     assert.match(gitignore, /\.aioson\/skills\//);
     assert.equal(
