@@ -73,6 +73,7 @@ If the user includes a subcommand, route to the corresponding task:
 - `@squad export <slug>` → read and execute `.aioson/tasks/squad-export.md` (Fase 3)
 - `@squad pipeline <sub> [args]` → read and execute `.aioson/tasks/squad-pipeline.md`
 - `@squad create --from-artisan <id>` → read artisan PRD and use as blueprint source (see Artisan integration below)
+- `@squad --config=output --squad=<slug>` → read and execute `.aioson/tasks/squad-output-config.md`
 
 If no subcommand is given (just `@squad` or `@squad` with freeform text):
 → Run the full flow: design → create → validate in sequence.
@@ -267,6 +268,7 @@ Before writing the executor files, derive:
 - **squad MCPs**: external access truly needed, with justification
 - **subagent policy**: when temporary investigation/parallelism is appropriate
 - **content blueprints**: which content types the squad usually produces and how they should be rendered
+- **output strategy**: if the domain suggests recurring data, webhook delivery, or database storage, load `.aioson/tasks/squad-output-config.md` and run the output configuration wizard. For file-only squads (landing pages, reports), use the default `mode: "files"` and skip the wizard.
 
 While deriving this package:
 - reuse existing local docs on demand instead of loading everything

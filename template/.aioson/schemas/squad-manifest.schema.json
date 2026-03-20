@@ -409,6 +409,74 @@
       }
     }
   },
+  "outputStrategy": {
+    "type": "object",
+    "description": "How the squad routes, stores and delivers its outputs",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "enum": ["files", "sqlite", "hybrid"],
+        "default": "hybrid",
+        "description": "Primary output strategy: files (physical output only), sqlite (database only), hybrid (both)"
+      },
+      "fileOutput": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": true },
+          "dir": { "type": "string", "description": "Output directory path" },
+          "formats": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["html", "md", "json", "pdf", "csv"] },
+            "description": "Enabled export formats"
+          }
+        }
+      },
+      "dataOutput": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": true },
+          "storage": { "type": "string", "enum": ["sqlite"], "default": "sqlite" },
+          "table": { "type": "string", "default": "content_items" },
+          "contentItems": { "type": "boolean", "default": true, "description": "Use the content_items model for structured data" }
+        }
+      },
+      "delivery": {
+        "type": "object",
+        "properties": {
+          "webhooks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["slug", "trigger"],
+              "properties": {
+                "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                "url": { "type": "string", "description": "Webhook URL or {{ENV:VAR}} placeholder" },
+                "trigger": {
+                  "type": "string",
+                  "enum": ["on-publish", "on-create", "manual"],
+                  "default": "on-publish",
+                  "description": "When to fire the webhook"
+                },
+                "format": {
+                  "type": "string",
+                  "enum": ["json", "form-data"],
+                  "default": "json"
+                },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" },
+                  "description": "Custom headers (supports {{ENV:VAR}} placeholders)"
+                },
+                "worker": { "type": "string", "description": "Path to delivery worker script" }
+              }
+            }
+          },
+          "cloudPublish": { "type": "boolean", "default": false, "description": "Publish to aioson.com cloud" },
+          "autoPublish": { "type": "boolean", "default": false, "description": "Auto-publish on content creation (opt-in)" }
+        }
+      }
+    }
+  },
   "ports": {
     "type": "object",
     "description": "Declaração de inputs e outputs para conexão inter-squad",

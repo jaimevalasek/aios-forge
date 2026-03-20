@@ -66,6 +66,7 @@ Se o usuário incluir um subcomando, roteie para a task correspondente:
 - `@squad extend <slug>` → leia e execute `.aioson/tasks/squad-extend.md` (Fase 3)
 - `@squad repair <slug>` → leia e execute `.aioson/tasks/squad-repair.md` (Fase 4)
 - `@squad export <slug>` → leia e execute `.aioson/tasks/squad-export.md` (Fase 3)
+- `@squad --config=output --squad=<slug>` → leia e execute `.aioson/tasks/squad-output-config.md`
 
 Se nenhum subcomando for fornecido (apenas `@squad` ou `@squad` com texto livre):
 → Execute o fluxo completo: design → create → validate em sequência.
@@ -218,6 +219,7 @@ Antes de escrever os agentes, derive:
 - **MCPs da squad**: acessos externos realmente necessários, com justificativa
 - **política de subagentes**: quando vale usar investigação/paralelismo temporário
 - **blueprints de conteudo**: quais tipos de conteudo a squad costuma gerar e como devem ser renderizados
+- **output strategy**: se o domínio sugerir dados recorrentes, delivery via webhook ou armazenamento em banco, carregue `.aioson/tasks/squad-output-config.md` e rode o wizard de configuração de saída. Para squads de arquivos puros (landing pages, relatórios), use o default `mode: "files"` e pule o wizard.
 
 Ao derivar esse pacote:
 - reutilize documentos locais existentes sob demanda, em vez de carregar tudo
