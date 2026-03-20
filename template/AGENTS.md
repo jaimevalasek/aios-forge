@@ -17,7 +17,7 @@ Type `@agent-name` in the prompt. Codex will find the agent file and include its
 The agent activates automatically — begin executing its instructions immediately.
 Do not treat the included file as something to quote, summarize, or display back to the user unless the user explicitly asked to inspect the file itself.
 
-Examples: `@setup`, `@dev`, `@squad`, `@genoma`, `@profiler-researcher`
+Examples: `@setup`, `@deyvin`, `@dev`, `@squad`, `@genoma`, `@profiler-researcher`
 
 **Option 2 — Natural language:**
 Describe your intent. The agent system will match and execute.
@@ -30,6 +30,7 @@ Describe your intent. The agent system will match and execute.
 | @architect | "design the architecture", "use the architect agent" |
 | @ux-ui | "design the UI", "use the UI/UX agent" |
 | @product | "define the product vision", "use the product agent", "start the product wizard" |
+| @deyvin | "continue what we were doing", "use the deyvin agent", "let's fix this together" |
 | @pm | "create the user stories", "use the pm agent" |
 | @dev | "implement the feature", "use the dev agent" |
 | @qa | "write the tests", "use the qa agent" |
@@ -51,6 +52,7 @@ When running Codex directly (without `aioson workflow:next`), these rules apply:
 
 **Hard constraints — no exceptions:**
 - For implementation requests (code changes, feature build, refactor, bugfix), default to workflow routing and execute via the next workflow stage agent (typically `@dev` after required upstream stages).
+- Exception: if the user explicitly activates `@deyvin` (or the compatibility alias `@pair`), it may work directly as a continuity / pair-programming agent. `@deyvin` must still hand off to `@product`, `@discovery-design-doc`, `@analyst`, `@architect`, `@ux-ui`, `@dev`, or `@qa` when the task clearly belongs there.
 - Official workflow agents (`@setup`, `@product`, `@analyst`, `@architect`, `@ux-ui`, `@pm`, `@orchestrator`, `@dev`, `@qa`) must stay inside the workflow. Do not answer requests outside the current agent's scope.
 - Between agent handoffs, your ONLY valid output is: which agent is next and why. Do not continue into that agent's work.
 - If `project.context.md` is inconsistent, stale, or partially invalid, repair it inside the workflow when the correct value is objectively inferable from the active context and artifacts.
@@ -77,6 +79,7 @@ aioson workflow:next . --complete
 - @architect → `.aioson/agents/architect.md`
 - @ux-ui → `.aioson/agents/ux-ui.md`
 - @product → `.aioson/agents/product.md`
+- @deyvin → `.aioson/agents/deyvin.md` (`@pair` remains as a compatibility alias)
 - @pm → `.aioson/agents/pm.md`
 - @dev → `.aioson/agents/dev.md`
 - @qa → `.aioson/agents/qa.md`

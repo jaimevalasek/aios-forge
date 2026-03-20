@@ -32,6 +32,7 @@ Digite `/` para abrir o autocomplete e depois `aioson/`:
 /aioson/setup
 /aioson/analyst
 /aioson/architect
+/aioson/deyvin
 /aioson/ux-ui
 /aioson/pm
 /aioson/dev
@@ -50,6 +51,16 @@ Digite `/` para abrir o autocomplete e depois `aioson/`:
 /aioson/dev implementar autenticação JWT com refresh token
 ```
 > O agente @dev recebe o argumento como contexto extra e começa a implementação em steps atômicos.
+
+```
+/aioson/deyvin veja o que fizemos ontem e vamos continuar
+```
+> O agente @deyvin prioriza memoria + runtime + rules/docs antes de olhar Git e segue em modo companheiro tecnico.
+
+Alias compativel:
+```text
+/aioson/pair
+```
 
 ```
 /aioson/qa
@@ -102,6 +113,11 @@ use the @setup agent to onboard this project
 use @dev to implement user registration with email verification, atomic steps
 ```
 
+**Continuar sessao anterior:**
+```
+use @deyvin to review the latest runtime/tasks, tell me where we stopped, and continue with me
+```
+
 **Revisar plano:**
 ```
 use @analyst to analyze the requirements in prd.md and identify gaps
@@ -127,6 +143,7 @@ Quando você menciona `@setup`, o Codex lê o arquivo correspondente e segue tod
 ### Dicas para Codex
 
 - **Seja explícito**: `use @dev` funciona melhor que apenas "implemente"
+- **Para continuidade**: `use @deyvin` funciona melhor que "ve o que fizemos ontem"
 - **Passe contexto**: `use @dev to implement X — read spec.md first`
 - **Comece sempre com @setup** se `project.context.md` não existir
 - O Codex também lê o contexto do agente selecionado automaticamente via `AGENTS.md`
@@ -149,6 +166,7 @@ Digite `/aios-` para ver os comandos disponíveis no autocomplete:
 /aios-setup
 /aios-analyst
 /aios-architect
+/aios-deyvin
 /aios-ux-ui
 /aios-pm
 /aios-dev
@@ -167,6 +185,16 @@ Digite `/aios-` para ver os comandos disponíveis no autocomplete:
 /aios-dev
 ```
 > Ativa o agente de desenvolvimento.
+
+```
+/aios-deyvin
+```
+> Ativa o agente de continuidade e pair programming.
+
+Alias compativel:
+```text
+/aios-pair
+```
 
 ```
 /aios-orchestrator
@@ -207,6 +235,7 @@ Independente de qual CLI você usa, todos leem os mesmos arquivos:
   context/
     project.context.md   ← gerado pelo @setup, lido por todos
     spec.md              ← documento vivo, atualizado pelo @orchestrator
+    runtime/aios.sqlite  ← tasks, runs e logs consultados pelo @deyvin e pelo dashboard
 ```
 
 Você pode começar um projeto com Claude Code, continuar com Codex no dia seguinte, e o contexto persiste — todos os agentes leem o mesmo `project.context.md`.

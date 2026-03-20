@@ -120,6 +120,8 @@ O agente `@setup` detecta o framework, faz as perguntas e gera o `project.contex
 
 > Cada CLI tem uma forma diferente de invocar agentes. Consulte o [Guia de CLIs de IA](./clientes-ai.md) para exemplos detalhados de Claude Code, Codex e Gemini.
 
+Se voce estiver entrando num projeto ja existente e quiser um companheiro tecnico para retomar uma sessao, diagnosticar algo pequeno ou implementar aos poucos, pode chamar `@deyvin` depois que o contexto minimo estiver pronto.
+
 ---
 
 ## Qual sequência usar?
@@ -145,6 +147,20 @@ Exemplos:
 
 Esse passo de `@discovery-design-doc` é **recomendado quando agrega clareza**, não obrigatório.
 Se o pedido já estiver claro e pequeno, siga o fluxo normal.
+
+### Atalho de continuidade
+
+Quando o projeto ja tem memoria suficiente e voce quer retomar trabalho sem abrir uma feature nova:
+
+```text
+@deyvin -> pequeno lote -> validar -> seguir ou fazer handoff
+```
+
+Exemplos:
+- continuar o que foi feito ontem
+- revisar logs/tasks recentes do runtime
+- corrigir um bug pequeno junto
+- ajustar um fluxo ja conhecido sem abrir PRD novo
 
 **Não sabe o tamanho?** Responda 3 perguntas:
 1. Quantos tipos de usuário? (1=0pt, 2=1pt, 3+=2pt)

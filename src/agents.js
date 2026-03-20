@@ -12,7 +12,10 @@ function normalizeAgentName(input) {
 
 function getAgentDefinition(name) {
   const normalized = normalizeAgentName(name);
-  return AGENT_DEFINITIONS.find((agent) => agent.id === normalized) || null;
+  return AGENT_DEFINITIONS.find((agent) => {
+    if (agent.id === normalized) return true;
+    return Array.isArray(agent.aliases) && agent.aliases.includes(normalized);
+  }) || null;
 }
 
 function listAgentDefinitions() {

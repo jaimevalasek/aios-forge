@@ -86,6 +86,38 @@ test('agent:prompt bootstraps direct runtime handoff for non-workflow agents', a
   await assert.doesNotReject(() => fs.access(path.join(dir, 'aioson-logs')));
 });
 
+test('agent:prompt keeps deyvin as a direct official agent outside workflow routing', async () => {
+  const dir = await makeTempDir();
+  await writeProjectContext(dir, 'SMALL');
+  const { t } = createTranslator('en');
+  const logger = createCollectLogger();
+
+  const result = await runAgentPrompt({
+    args: ['deyvin', dir],
+    options: { tool: 'codex' },
+    logger,
+    t
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.agent, 'deyvin');
+  assert.equal(result.requestedAgent, 'deyvin');
+  assert.equal(result.routed, false);
+  assert.equal(Boolean(result.runtime), true);
+
+  const runtime = await openRuntimeDb(dir, { mustExist: true });
+  try {
+    const run = runtime.db.prepare("SELECT agent_name, agent_kind, source, status FROM agent_runs ORDER BY updated_at DESC LIMIT 1").get();
+
+    assert.equal(run.agent_name, '@deyvin');
+    assert.equal(run.agent_kind, 'official');
+    assert.equal(run.source, 'direct');
+    assert.equal(run.status, 'queued');
+  } finally {
+    runtime.db.close();
+  }
+});
+
 test('agent:prompt classifies squad handoff as squad runtime activity', async () => {
   const dir = await makeTempDir();
   const { t } = createTranslator('en');

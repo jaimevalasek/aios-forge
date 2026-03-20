@@ -9,6 +9,7 @@ Bem-vindo à documentação em português do AIOSON — um framework leve de age
 | [Início Rápido](./inicio-rapido.md) | Instale, configure e comece em menos de 10 minutos |
 | [Comandos CLI](./comandos-cli.md) | Referência em português dos comandos do `aioson`, com descrição, exemplos e usos práticos |
 | [Memória e Contexto](./memoria-contexto.md) | Guia prático dos arquivos de memória, descoberta, índices e pacotes mínimos de contexto |
+| [Deyvin](./deyvin.md) | Guia do agente de continuidade e pair programming do AIOSON |
 | [Cenários de Uso](./cenarios.md) | Exemplos completos e práticos para projetos MICRO, SMALL e MEDIUM |
 | [Guia de Agentes](./agentes.md) | Quando usar cada agente e o que ele entrega |
 | [Squad e Genoma](./squad-genoma.md) | Como criar squads modulares, diferenciar skill de genoma, aplicar genomas e publicar entregáveis HTML |
@@ -44,6 +45,8 @@ Fluxo recomendado:
 - se existir `spec.md`, o scan local também deriva `spec-current.md` e `spec-history.md`
 - depois rode novamente com `--with-llm` para gerar ou atualizar `discovery.md` e `skeleton-system.md`
 - quando quiser mandar só o contexto mínimo para uma tarefa, use `context:pack`
+- quando quiser entender como o `@deyvin` trabalha, leia [Deyvin](./deyvin.md)
+- quando quiser continuar uma sessao, corrigir um recorte pequeno ou trabalhar em modo companheiro tecnico, use `@deyvin`
 - `@discovery-design-doc` quando o escopo ainda estiver vago ou a feature for grande
 - `@analyst` / `@architect` / `@dev` conforme a clareza e o tipo do trabalho
 

@@ -11,6 +11,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 ```
 @setup        ← sempre o primeiro
 @product      ← gera o PRD base vivo e roteia o fluxo
+@deyvin       ← companheiro tecnico para continuidade e pequenas implementacoes
 @discovery-design-doc ← quando precisa clarear escopo e gerar design doc vivo
 @analyst      ← projetos SMALL e MEDIUM
 @architect    ← projetos SMALL e MEDIUM
@@ -24,6 +25,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 ```
 
 > Para o fluxo completo de `@squad` e `@genoma`, veja também [Squad e Genoma](./squad-genoma.md).
+> Para uma explicação focada no agente de continuidade, veja também [Deyvin](./deyvin.md).
 
 ## Fluxo brownfield apos scan
 
@@ -38,6 +40,7 @@ Regras do fluxo:
 - `discovery.md` continua sendo a memoria comprimida que os agentes usam para entender o sistema sem reler tudo
 - esse `discovery.md` pode ser gerado por `scan:project --with-llm` ou pelo `@analyst` usando os artefatos locais do scan
 - `@architect`, `@ux-ui`, `@pm`, `@qa` e o fluxo de `@dev` nao devem pular direto dos mapas brutos para a execucao quando a tarefa depende do comportamento atual do sistema
+- para continuidade de sessao, pequenas correcoes e implementacoes guiadas, `@deyvin` pode entrar depois que a memoria minima estiver pronta
 
 ---
 
@@ -107,6 +110,63 @@ Regras do fluxo:
 - identidade visual inicial, quando houver sinal suficiente
 
 > Se o pedido mencionar explicitamente um command center premium, control tower, tri-rail shell ou estilo AIOS Dashboard, o `@product` deve registrar a skill `premium-command-center-ui` na seção de identidade visual do PRD.
+
+---
+
+## @deyvin
+
+**Quando usar:** Quando voce quer continuar uma sessao anterior, entender o que foi feito por ultimo, corrigir uma tarefa pequena, investigar um bug ou implementar em modo colaborativo.
+
+**O que faz:**
+- atua como um companheiro tecnico de continuidade
+- le primeiro a memoria do projeto e o runtime antes de ir ao Git
+- verifica sempre `.aioson/rules/` e os docs apontados por essas rules
+- resume o que ja esta confirmado sobre o estado atual
+- pergunta o que voce quer fazer agora
+- toca passos pequenos de implementacao, correcao e validacao
+- encaminha para `@product`, `@discovery-design-doc`, `@analyst`, `@architect`, `@ux-ui`, `@dev` ou `@qa` quando a tarefa sair do modo pair
+
+**Ordem mental de contexto do `@deyvin`:**
+1. `project.context.md`
+2. `.aioson/rules/`
+3. `.aioson/docs/`
+4. `context-pack.md` quando existir e combinar com a tarefa
+5. `memory-index.md`
+6. `spec-current.md` + `spec-history.md`
+7. `spec.md`
+8. `features.md` e artefatos da feature em andamento, se houver
+9. `skeleton-system.md`, `discovery.md`, `architecture.md`
+10. runtime SQLite
+11. Git como fallback
+
+**Como ativar:**
+```
+/deyvin
+```
+
+Alias compativel:
+```text
+@pair
+```
+
+**Exemplos bons de uso:**
+```text
+@deyvin ve o que fizemos ontem e vamos continuar
+@deyvin revisa as ultimas tasks do runtime e me diga onde paramos
+@deyvin vamos corrigir esse bug pequeno juntos
+@deyvin leia as rules ativas, veja os docs relacionados e ajuste esse fluxo
+```
+
+**Entrega esperada:**
+- resumo curto do ultimo contexto confirmado
+- proximo passo pequeno e objetivo
+- implementacao/correcao em lote pequeno
+- atualizacao de `spec.md` ou `spec-{slug}.md` quando fizer sentido
+
+**Regra importante:**
+- `@deyvin` nao substitui discovery, produto ou arquitetura formal
+- quando a demanda cresce demais ou fica vaga, ele deve fazer handoff em vez de fingir que tudo cabe numa sessao de continuidade
+- se voce quiser uma explicacao mais direta e focada no uso dele, consulte [Deyvin](./deyvin.md)
 
 ---
 

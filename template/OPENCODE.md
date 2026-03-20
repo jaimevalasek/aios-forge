@@ -7,9 +7,13 @@
 
 ## Available agents
 - setup -> `.aioson/agents/setup.md`
+- discovery-design-doc -> `.aioson/agents/discovery-design-doc.md`
 - analyst -> `.aioson/agents/analyst.md`
 - architect -> `.aioson/agents/architect.md`
 - ux-ui (UI/UX) -> `.aioson/agents/ux-ui.md`
+- product -> `.aioson/agents/product.md`
+- deyvin -> `.aioson/agents/deyvin.md`
+- pair -> `.aioson/agents/deyvin.md` (compatibility alias)
 - pm -> `.aioson/agents/pm.md`
 - dev -> `.aioson/agents/dev.md`
 - qa -> `.aioson/agents/qa.md`

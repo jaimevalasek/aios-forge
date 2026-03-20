@@ -10,6 +10,8 @@ const ROOT = path.resolve(__dirname, '..');
 const AGENTS = [
   'setup',
   'discovery-design-doc',
+  'product',
+  'deyvin',
   'analyst',
   'architect',
   'ux-ui',
@@ -443,12 +445,57 @@ test('agent definitions expose PRD dependencies for the living PRD flow', () => 
   const product = AGENT_DEFINITIONS.find((agent) => agent.id === 'product');
   const ux = AGENT_DEFINITIONS.find((agent) => agent.id === 'ux-ui');
   const pm = AGENT_DEFINITIONS.find((agent) => agent.id === 'pm');
+  const pair = AGENT_DEFINITIONS.find((agent) => agent.id === 'deyvin');
 
   assert.equal(product.dependsOn.includes('.aioson/context/project.context.md'), true);
+  assert.equal(pair.dependsOn.includes('.aioson/context/project.context.md'), true);
+  assert.equal(String(pair.output).includes('continuity'), true);
+  assert.deepEqual(pair.aliases, ['pair']);
   assert.equal(ux.dependsOn.some((dep) => dep.includes('prd')), true);
   assert.equal(pm.dependsOn.some((dep) => dep.includes('prd')), true);
   assert.equal(String(ux.output).includes('Visual identity enrichment'), true);
   assert.equal(String(pm.output).includes('acceptance criteria'), true);
+});
+
+test('deyvin contract prioritizes rules, memory, runtime, and git fallback', async () => {
+  const baseContent = await read(path.join(ROOT, 'template/.aioson/agents/deyvin.md'));
+  const ptContent = await read(path.join(ROOT, 'template/.aioson/locales/pt-BR/agents/deyvin.md'));
+
+  const baseTokens = [
+    'Project rules & docs',
+    '.aioson/rules/',
+    '.aioson/docs/',
+    'memory-index.md',
+    'spec-current.md',
+    'spec-history.md',
+    '.aioson/runtime/aios.sqlite',
+    'Git is a fallback',
+    '@product',
+    '@analyst',
+    '@architect'
+  ];
+
+  const ptTokens = [
+    'Ordem de leitura no inicio da sessao',
+    '.aioson/rules/',
+    '.aioson/docs/',
+    'memory-index.md',
+    'spec-current.md',
+    'spec-history.md',
+    '.aioson/runtime/aios.sqlite',
+    'Git e fallback',
+    '@product',
+    '@analyst',
+    '@architect'
+  ];
+
+  for (const token of baseTokens) {
+    assert.equal(baseContent.includes(token), true, `missing deyvin base token: ${token}`);
+  }
+
+  for (const token of ptTokens) {
+    assert.equal(ptContent.includes(token), true, `missing deyvin pt token: ${token}`);
+  }
 });
 
 test('squad and genoma contracts include genome binding workflow', async () => {

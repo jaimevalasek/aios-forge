@@ -28,6 +28,21 @@ test('getAgentDefinition resolves ux-ui agent', () => {
   assert.equal(agent.output.includes('.aioson/context/ui-spec.md'), true);
 });
 
+test('getAgentDefinition resolves deyvin agent', () => {
+  const agent = getAgentDefinition('deyvin');
+  assert.equal(Boolean(agent), true);
+  assert.equal(agent.id, 'deyvin');
+  assert.equal(agent.displayName, 'Deyvin');
+  assert.equal(agent.output.includes('continuity'), true);
+});
+
+test('getAgentDefinition keeps pair as a compatibility alias', () => {
+  const agent = getAgentDefinition('pair');
+  assert.equal(Boolean(agent), true);
+  assert.equal(agent.id, 'deyvin');
+  assert.equal(agent.command, '@deyvin');
+});
+
 test('getAgentDefinition resolves profiler-forge agent', () => {
   const agent = getAgentDefinition('profiler-forge');
   assert.equal(Boolean(agent), true);
