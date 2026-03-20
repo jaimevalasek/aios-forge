@@ -59,7 +59,8 @@ When running Codex directly (without `aioson workflow:next`), these rules apply:
 - If a context field is still uncertain, route back to `@setup` inside the workflow instead of offering direct execution as a workaround.
 - Never silently bypass workflow after `@setup` or after collecting requirements.
 
-**Event emission (direct mode — always run these):**
+**Event emission (direct mode):**
+If the `aioson` CLI is available, run these commands to keep the dashboard in sync. If `aioson` is not installed in this environment, skip them and continue with the agent work normally — do not let missing CLI block execution.
 ```bash
 # On activation:
 aioson runtime-log . --agent=@{agent} --title="{Agent} stage" --message="Starting {agent}"

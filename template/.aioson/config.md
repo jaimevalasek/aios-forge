@@ -66,7 +66,7 @@ When AIOSON manages the session via `aioson workflow:next`, ALL orchestration is
 
 The agent `.md` files define WHAT each agent does. The CLI defines HOW the session is orchestrated.
 
-**Agents must call these commands to keep the dashboard in sync:**
+**Agents should call these commands to keep the dashboard in sync (skip if `aioson` CLI is not installed):**
 
 | Moment | Command |
 |---|---|

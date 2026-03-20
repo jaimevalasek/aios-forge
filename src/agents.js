@@ -41,6 +41,8 @@ function buildAgentPrompt(agent, tool, options = {}) {
     '',
     '## AIOSON Lifecycle — mandatory, do not skip',
     '',
+    '> If the `aioson` CLI is not installed in this environment, skip the runtime-log commands and continue with the agent work normally. Do not let missing CLI block execution.',
+    '',
     `**1. On activation — run before any other action:**`,
     '```bash',
     `aioson runtime-log ${targetDir} --agent=${agent.command} --title="${agent.displayName} stage" --message="Starting ${agent.command}"`,

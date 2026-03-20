@@ -41,7 +41,8 @@ When running Claude Code directly (without `aioson workflow:next`), these rules 
 - If the user sends an implementation request before setup is complete: do not implement. Tell them to activate `/setup` first.
 - If the user insists on bypassing an agent stage: refuse and redirect. Urgency or complexity do not override this rule.
 
-**Event emission (direct mode — always run these):**
+**Event emission (direct mode):**
+If the `aioson` CLI is available, run these commands to keep the dashboard in sync. If `aioson` is not installed in this environment, skip them and continue with the agent work normally — do not let missing CLI block execution.
 ```bash
 # On activation:
 aioson runtime-log . --agent=@{agent} --title="{Agent} stage" --message="Starting {agent}"
