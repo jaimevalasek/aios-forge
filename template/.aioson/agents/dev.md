@@ -181,12 +181,38 @@ test(appointments): cover cancellation business rules
 
 Interface copy, onboarding text, email content, and marketing text are not within `@dev` scope — those come from external content sources when needed.
 
-## Any-stack conventions
-For stacks not listed above, apply the same separation principles:
-- Isolate business logic from request handlers (controller/route/handler → service/use-case).
-- Validate all input at the system boundary before it touches business logic.
-- Follow the framework's own conventions — check `.aioson/skills/static/` and `.aioson/skills/dynamic/` for available skill files. For design, load **only** the skill explicitly named in `design_skill` — never scan `.aioson/skills/design/` broadly when a design skill is already set.
-- If no skill file exists for the stack, apply the general pattern and document deviations in architecture.md.
+## Framework skill mapping
+
+Before implementing, read `framework` from `.aioson/context/project.context.md` and load the matching skill file **on demand**:
+
+| `framework` value | Skill file to load | Dynamic reference |
+|---|---|---|
+| `Laravel` | `.aioson/skills/static/laravel-conventions.md` | `.aioson/skills/dynamic/laravel-docs.md` |
+| `Laravel` + TALL stack | also `.aioson/skills/static/tall-stack-patterns.md` | |
+| `Laravel` + Jetstream | also `.aioson/skills/static/jetstream-setup.md` | |
+| `Laravel` + Filament | also `.aioson/skills/static/filament-patterns.md` | |
+| `Laravel` + Livewire + Flux UI | also `.aioson/skills/static/flux-ui-components.md` | `.aioson/skills/dynamic/flux-ui-docs.md` |
+| `Django` | `.aioson/skills/static/django-patterns.md` | |
+| `FastAPI` | `.aioson/skills/static/fastapi-patterns.md` | |
+| `Rails` | `.aioson/skills/static/rails-conventions.md` | |
+| `Next.js` | `.aioson/skills/static/nextjs-patterns.md` | `.aioson/skills/dynamic/npm-packages.md` |
+| `React` | `.aioson/skills/static/react-motion-patterns.md` (if visual) | `.aioson/skills/dynamic/npm-packages.md` |
+| `Express` or `Fastify` | `.aioson/skills/static/node-express-patterns.md` | `.aioson/skills/dynamic/npm-packages.md` |
+| Node.js + TypeScript | `.aioson/skills/static/node-typescript-patterns.md` | `.aioson/skills/dynamic/npm-packages.md` |
+
+For `project_type=dapp`, also load the matching Web3 skills:
+
+| `web3_networks` value | Skill file | Dynamic reference |
+|---|---|---|
+| `ethereum` | `.aioson/skills/static/web3-ethereum-patterns.md` | `.aioson/skills/dynamic/ethereum-docs.md` |
+| `solana` | `.aioson/skills/static/web3-solana-patterns.md` | `.aioson/skills/dynamic/solana-docs.md` |
+| `cardano` | `.aioson/skills/static/web3-cardano-patterns.md` | `.aioson/skills/dynamic/cardano-docs.md` |
+| any | `.aioson/skills/static/web3-security-checklist.md` | |
+
+**Rules:**
+- Load only the skill(s) matching the detected framework — never load all skills.
+- For design, load **only** the skill explicitly named in `design_skill` — never scan `.aioson/skills/design/` broadly.
+- If the `framework` value does not match any row above, apply generic separation principles (controller → service/use-case) and document deviations in architecture.md.
 
 ## Working rules
 - Keep changes small and reviewable.
