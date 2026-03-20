@@ -1113,6 +1113,7 @@ async function runDevlogSync({ args, options = {}, logger, t }) {
 
   const { db, dbPath } = await openRuntimeDb(targetDir);
   let synced = 0;
+  const parsedDevlogs = [];
 
   try {
     for (const file of devlogFiles) {
@@ -1126,6 +1127,9 @@ async function runDevlogSync({ args, options = {}, logger, t }) {
       const sessionStart = fm.session_start || null;
       const sessionEnd = fm.session_end || null;
       const status = fm.status || 'completed';
+      const body = raw.replace(/^---[\s\S]*?---\s*/, '');
+
+      parsedDevlogs.push({ filename: file, agent, summary, sessionStart, sessionEnd, status, body });
 
       // Create task + run
       const taskKey = startTask(db, {
@@ -1145,7 +1149,6 @@ async function runDevlogSync({ args, options = {}, logger, t }) {
       });
 
       // Extract body sections as events
-      const body = raw.replace(/^---[\s\S]*?---\s*/, '');
       const sections = body.split(/^## /m).filter(Boolean);
       for (const section of sections) {
         const firstLine = section.split('\n')[0].trim();
@@ -1183,10 +1186,90 @@ async function runDevlogSync({ args, options = {}, logger, t }) {
     }
 
     logger.log(`Synced ${synced} devlog(s) into ${dbPath}`);
+
+    // Cloud sync
+    if (options.cloud) {
+      const cloudResult = await syncDevlogsToCloud(targetDir, parsedDevlogs, options, logger);
+      return { ok: true, synced, dbPath, cloud: cloudResult };
+    }
+
     return { ok: true, synced, dbPath };
   } finally {
     db.close();
   }
+}
+
+/**
+ * Sends parsed devlogs to the cloud endpoint.
+ * Reads cloud config from .aioson/install.json or --url / --token options.
+ */
+async function syncDevlogsToCloud(targetDir, devlogs, options, logger) {
+  const cloudUrl = options.url || options['cloud-url'] || await resolveCloudUrl(targetDir);
+  const cloudToken = options.token || options['cloud-token'] || await resolveCloudToken(targetDir);
+
+  if (!cloudUrl) {
+    logger.error('Cloud URL not configured. Use --url or set cloudBaseUrl in dashboard project settings.');
+    return { ok: false, error: 'missing_cloud_url' };
+  }
+  if (!cloudToken) {
+    logger.error('Cloud token not configured. Use --token or set cloudApiToken in dashboard project settings.');
+    return { ok: false, error: 'missing_cloud_token' };
+  }
+
+  const endpoint = `${cloudUrl.replace(/\/+$/, '')}/api/publish/runtime`;
+  const payload = {
+    tasks: [],
+    devlogs: devlogs.map(d => ({
+      filename: d.filename,
+      agent: d.agent,
+      sessionStart: d.sessionStart,
+      sessionEnd: d.sessionEnd,
+      status: d.status,
+      summary: d.summary,
+      body: d.body
+    }))
+  };
+
+  logger.log(`  Pushing ${devlogs.length} devlog(s) to ${endpoint}...`);
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'content-type': 'application/json',
+      'authorization': `Bearer ${cloudToken}`
+    },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(15000)
+  });
+
+  const text = await response.text();
+  let result;
+  try { result = JSON.parse(text); } catch { result = { ok: false, error: text }; }
+
+  if (result.ok) {
+    logger.log(`  Cloud sync OK: ${result.devlogsStored || 0} devlog(s) stored.`);
+  } else {
+    logger.error(`  Cloud sync failed: ${result.error || response.status}`);
+  }
+
+  return result;
+}
+
+async function resolveCloudUrl(targetDir) {
+  try {
+    const raw = await fs.readFile(path.join(targetDir, '.aioson/install.json'), 'utf8');
+    const meta = JSON.parse(raw);
+    return meta.cloudBaseUrl || null;
+  } catch { return null; }
+}
+
+async function resolveCloudToken(targetDir) {
+  try {
+    const raw = await fs.readFile(path.join(targetDir, '.aioson/install.json'), 'utf8');
+    const meta = JSON.parse(raw);
+    return meta.cloudApiToken || null;
+  } catch { return null; }
 }
 
 /**
