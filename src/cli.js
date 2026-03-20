@@ -52,7 +52,8 @@ const {
   runRuntimeTaskFail,
   runRuntimeFail,
   runRuntimeStatus,
-  runRuntimeLog
+  runRuntimeLog,
+  runDeliver
 } = require('./commands/runtime');
 const {
   runCloudImportSquad,
@@ -165,6 +166,7 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'runtime-status',
   'runtime:log',
   'runtime-log',
+  'deliver',
   'cloud:import:squad',
   'cloud-import-squad',
   'cloud:import:genome',
@@ -450,6 +452,8 @@ async function main() {
       result = await runRuntimeStatus({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:log' || command === 'runtime-log') {
       result = await runRuntimeLog({ args, options, logger: commandLogger, t });
+    } else if (command === 'deliver') {
+      result = await runDeliver({ args, options, logger: commandLogger, t });
     } else if (command === 'cloud:import:squad' || command === 'cloud-import-squad') {
       result = await runCloudImportSquad({ args, options, logger: commandLogger, t });
     } else if (command === 'cloud:import:genome' || command === 'cloud-import-genome') {

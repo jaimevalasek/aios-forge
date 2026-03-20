@@ -354,6 +354,23 @@ async function openRuntimeDb(targetDir, options = {}) {
 
     CREATE INDEX IF NOT EXISTS idx_artisan_squads_status ON artisan_squads(status, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_artisan_messages_artisan ON artisan_messages(artisan_id, created_at ASC);
+
+    CREATE TABLE IF NOT EXISTS delivery_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      squad_slug TEXT NOT NULL,
+      content_key TEXT,
+      webhook_slug TEXT,
+      trigger_type TEXT NOT NULL,
+      url TEXT NOT NULL,
+      status_code INTEGER,
+      response_body TEXT,
+      error_message TEXT,
+      attempt INTEGER DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_delivery_log_squad ON delivery_log(squad_slug);
+    CREATE INDEX IF NOT EXISTS idx_delivery_log_content ON delivery_log(content_key);
   `);
 
   ensureLegacyColumns(db);

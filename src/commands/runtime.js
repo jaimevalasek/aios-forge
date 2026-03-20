@@ -15,6 +15,7 @@ const {
   getStatusSnapshot,
   logAgentEvent
 } = require('../runtime-store');
+const { runAutoDelivery } = require('../delivery-runner');
 
 const ALLOWED_LAYOUTS = new Set(['document', 'tabs', 'accordion', 'stack', 'mixed']);
 const DEFAULT_TEXT_FIELDS = ['content', 'text', 'body', 'lyrics', 'markdown'];
@@ -418,6 +419,14 @@ async function ingestContentCandidate(db, targetDir, absolutePath, options = {})
       createdByAgent: options.agent || content.createdByAgent || content.created_by_agent || null
     });
 
+    // Fire auto-delivery if configured (non-blocking)
+    runAutoDelivery(db, {
+      projectDir: targetDir,
+      squadSlug,
+      contentKey: content.contentKey,
+      contentPayload: content
+    }).catch(() => {}); // Swallow errors — delivery failure should not break ingestion
+
     return { indexed: true, kind: 'content-json', contentKey: content.contentKey };
   }
 
@@ -457,6 +466,14 @@ async function ingestContentCandidate(db, targetDir, absolutePath, options = {})
       : null,
     createdByAgent: options.agent || null
   });
+
+  // Fire auto-delivery if configured (non-blocking)
+  runAutoDelivery(db, {
+    projectDir: targetDir,
+    squadSlug,
+    contentKey: payload.contentKey,
+    contentPayload: payload
+  }).catch(() => {}); // Swallow errors — delivery failure should not break ingestion
 
   return { indexed: true, kind: path.extname(absolutePath).toLowerCase(), contentKey: payload.contentKey };
 }
@@ -933,6 +950,52 @@ async function runRuntimeLog({ args, options = {}, logger, t }) {
   }
 }
 
+async function runDeliver({ args, options = {}, logger, t }) {
+  const targetDir = resolveTargetDir(args);
+  const squadSlug = requireOption(options, 'squad', t);
+  const contentKey = options['content-key'] || options.contentKey || null;
+  const triggerType = options.trigger || 'manual';
+
+  const { db, dbPath } = await withRuntimeDb(targetDir, t);
+
+  try {
+    const { runManualDelivery } = require('../delivery-runner');
+
+    // Optionally load content payload from DB
+    let contentPayload = null;
+    if (contentKey) {
+      const row = db.prepare('SELECT payload_json FROM content_items WHERE content_key = ? AND squad_slug = ?').get(contentKey, squadSlug);
+      if (row && row.payload_json) {
+        try { contentPayload = JSON.parse(row.payload_json); } catch { /* ignore */ }
+      }
+    }
+
+    const result = await runManualDelivery(db, {
+      projectDir: targetDir,
+      squadSlug,
+      contentKey,
+      triggerType,
+      contentPayload
+    });
+
+    if (!result.delivered) {
+      logger.log(`Delivery skipped: ${result.reason}`);
+      return { ok: false, ...result };
+    }
+
+    for (const r of result.results || []) {
+      const status = r.ok ? 'OK' : 'FAIL';
+      logger.log(`  ${status} ${r.webhookSlug} — ${r.statusCode || 'no response'} (${r.attempts} attempt${r.attempts > 1 ? 's' : ''})`);
+      if (r.error) logger.log(`    Error: ${r.error}`);
+    }
+
+    logger.log(`\nDelivery ${result.allOk ? 'completed' : 'completed with errors'}.`);
+    return { ok: result.allOk, ...result };
+  } finally {
+    db.close();
+  }
+}
+
 module.exports = {
   runRuntimeInit,
   runRuntimeIngest,
@@ -944,5 +1007,6 @@ module.exports = {
   runRuntimeTaskFail,
   runRuntimeFail,
   runRuntimeStatus,
-  runRuntimeLog
+  runRuntimeLog,
+  runDeliver
 };
