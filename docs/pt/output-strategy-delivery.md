@@ -26,6 +26,18 @@ O **Delivery Runner** é o sistema que:
 
 Todo squad tem um arquivo `squad.manifest.json` que controla a estratégia:
 
+### Informação importante: Método HTTP
+
+⚠️ **Webhooks SEMPRE usam POST** com `Content-Type: application/json`
+
+Seu servidor deve estar preparado para receber:
+```
+POST /seu-endpoint HTTP/1.1
+Content-Type: application/json
+
+{ payload JSON aqui }
+```
+
 ### Estrutura básica
 
 ```json
@@ -163,6 +175,9 @@ Se `true`, o delivery runner dispara webhooks automaticamente após content inge
 ---
 
 ## Payloads de Webhook
+
+**Método HTTP:** Sempre `POST`
+**Content-Type:** `application/json` (por padrão)
 
 ### Formato JSON (padrão)
 
@@ -522,8 +537,9 @@ Isso envia um payload de teste e mostra a resposta.
 **Checklist:**
 
 - [ ] URL é acessível? (`curl -I https://...`)
-- [ ] Método é POST? (sempre é)
-- [ ] Seu servidor espera JSON? (padrão é `Content-Type: application/json`)
+- [ ] ✅ Método é **sempre POST** (não configurável)
+- [ ] ✅ Content-Type é **sempre JSON** (não configurável)
+- [ ] Seu servidor está listening em POST na URL?
 - [ ] Variáveis de ambiente foram resolvidas? (não há `{{ENV:X}}` no payload final)
 - [ ] Token/auth está correto?
 
