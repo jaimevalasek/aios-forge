@@ -204,6 +204,7 @@ Toda squad nova deve nascer com:
 - executores permanentes (agents, clones, assistants) em `.aioson/squads/{squad-slug}/agents/`
 - workers (scripts determinísticos, sem LLM) em `.aioson/squads/{squad-slug}/workers/`
 - workflows (pipelines com fases e handoffs) em `.aioson/squads/{squad-slug}/workflows/`
+- checklists (validação de qualidade) em `.aioson/squads/{squad-slug}/checklists/`
 - metadata em `.aioson/squads/{slug}/squad.md`
 - diretórios de `output/`, `aios-logs/` e `media/`
 
@@ -448,6 +449,7 @@ Crie também `.aioson/squads/{squad-slug}/squad.manifest.json` com este schema m
     "agentsDir": ".aioson/squads/{squad-slug}/agents",
     "workersDir": ".aioson/squads/{squad-slug}/workers",
     "workflowsDir": ".aioson/squads/{squad-slug}/workflows",
+    "checklistsDir": ".aioson/squads/{squad-slug}/checklists",
     "skillsDir": ".aioson/squads/{squad-slug}/skills",
     "templatesDir": ".aioson/squads/{squad-slug}/templates",
     "docsDir": ".aioson/squads/{squad-slug}/docs"
@@ -501,6 +503,7 @@ Crie também `.aioson/squads/{squad-slug}/squad.manifest.json` com este schema m
       "genomes": []
     }
   ],
+  "checklists": [],
   "workflows": [],
   "genomes": []
 }
@@ -763,6 +766,56 @@ Níveis de ação do gate:
 - `approve` — humano deve aprovar antes de prosseguir (alto risco)
 - `block` — não pode prosseguir sem autorização humana explícita (crítico)
 
+### Passo 3c — Gere o checklist de qualidade
+
+Gere `.aioson/squads/{squad-slug}/checklists/quality.md` para todo squad.
+O checklist deve ser derivado do domínio — valide os entregáveis reais, não use critérios genéricos.
+
+```markdown
+# Checklist: Revisão de Qualidade — {squad-name}
+
+## {Seção específica do domínio 1}
+- [ ] {Critério verificável}
+- [ ] {Critério verificável}
+
+## {Seção específica do domínio 2}
+- [ ] {Critério verificável}
+- [ ] {Critério verificável}
+
+## Integridade do output
+- [ ] Todos os entregáveis salvos em `output/{squad-slug}/`
+- [ ] Latest HTML gerado e acessível
+- [ ] Nenhum arquivo de output de outro squad sobrescrito
+
+## Cobertura de executores
+- [ ] Cada executor declarado produziu output nesta sessão
+- [ ] Workers (se houver) completaram sem erros
+- [ ] Human gates (se houver) foram acionados e resolvidos
+```
+
+Registre no `squad.manifest.json`:
+```json
+"checklists": [
+  {
+    "slug": "quality",
+    "title": "Revisão de Qualidade",
+    "file": ".aioson/squads/{squad-slug}/checklists/quality.md",
+    "scope": "squad"
+  }
+]
+```
+
+Se o squad tiver workflow, gere também um checklist por fase quando relevante:
+```json
+{
+  "slug": "workflow-review",
+  "title": "Revisão por Fase do Workflow",
+  "file": ".aioson/squads/{squad-slug}/checklists/workflow-review.md",
+  "scope": "workflow",
+  "appliesTo": "{workflow-slug}"
+}
+```
+
 ### Passo 4 — Registre os agentes nos gateways do projeto
 
 Adicione uma seção de Squad ao `CLAUDE.md` na raiz do projeto:
@@ -820,23 +873,59 @@ Subagents:
 
 ## Apos a geracao — confirme e rode o aquecimento (obrigatorio)
 
-Informe ao usuário quais agentes foram criados:
+Informe ao usuário quais executores foram criados, depois mostre a verificação de classificação e o score de cobertura:
 
 ```
 Squad **{squad-name}** pronto.
 
-Agentes criados em `.aioson/squads/{squad-slug}/agents/`:
-- @{role1} — [descrição em uma linha]
-- @{role2} — [descrição em uma linha]
-- @{role3} — [descrição em uma linha]
-- @orquestrador — coordena o time
+Executores criados em `.aioson/squads/{squad-slug}/`:
+- @{role1} (agent) — [descrição em uma linha]
+- @{role2} (agent) — [descrição em uma linha]
+- {worker-slug} (worker) — [script, sem LLM]
+- @orquestrador (agent) — coordena o time
 
 Você pode invocar qualquer agente diretamente (ex: `@roteirista`) para trabalho focado,
 ou trabalhar via @orquestrador para sessões coordenadas.
 
 CLAUDE.md e AGENTS.md atualizados com atalhos.
-Manifestos da squad criados em `.aioson/squads/{squad-slug}/agents/agents.md` e `.aioson/squads/{squad-slug}/squad.manifest.json`.
 ```
+
+**Verificação de classificação de executores (obrigatória antes do aquecimento):**
+
+Após confirmar a criação, valide a classificação:
+
+```
+Verificação de classificação:
+- {executor-slug} → type: {type} ✓ (motivo: {justificativa em uma linha})
+- {executor-slug} → type: {type} ✓ (motivo: ...)
+- {executor-slug} → type: {type} ✓ (motivo: ...)
+
+Todos os executores classificados. Nenhum executor sem tipo.
+```
+
+Se algum executor não tiver `type`, sinalize:
+```
+⚠ {executor-slug} sem tipo. Recomendado: {type} — motivo: {razão}.
+```
+
+**Score de cobertura (mostrar após a verificação de classificação):**
+
+```
+Score de cobertura do squad: {N}/5
+
+✓ Executores tipados        ({n} de {total} com tipo explícito)
+✓ Workflow definido         (1 workflow, {n} fases)
+✓ Checklists presentes      (quality.md)
+○ Tasks definidas           (nenhuma — adicione tasks/ para procedimentos recorrentes)
+○ Workers presentes         (nenhum script determinístico — avalie se alguma etapa é automável)
+
+Cobertura: {score}% — {Excelente | Boa | Mínima}
+```
+
+Limiares de score:
+- 5/5 → Excelente
+- 3-4/5 → Boa
+- 1-2/5 → Mínima — sugira o que adicionar em seguida
 
 Depois execute imediatamente o aquecimento — mostre como cada especialista abordaria o objetivo declarado AGORA com substância mínima:
 - leitura do problema

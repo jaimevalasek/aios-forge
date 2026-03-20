@@ -253,6 +253,7 @@ Every new squad must also include:
 - permanent executors (agents, clones, assistants) in `.aioson/squads/{squad-slug}/agents/`
 - workers (deterministic scripts, no LLM) in `.aioson/squads/{squad-slug}/workers/`
 - workflows (phase pipelines with handoffs) in `.aioson/squads/{squad-slug}/workflows/`
+- checklists (quality validation) in `.aioson/squads/{squad-slug}/checklists/`
 - metadata at `.aioson/squads/{slug}/squad.md`
 - `output/`, `aios-logs/`, and `media/` directories
 
@@ -504,6 +505,7 @@ Also create `.aioson/squads/{squad-slug}/squad.manifest.json` with this minimum 
     "agentsDir": ".aioson/squads/{squad-slug}/agents",
     "workersDir": ".aioson/squads/{squad-slug}/workers",
     "workflowsDir": ".aioson/squads/{squad-slug}/workflows",
+    "checklistsDir": ".aioson/squads/{squad-slug}/checklists",
     "skillsDir": ".aioson/squads/{squad-slug}/skills",
     "templatesDir": ".aioson/squads/{squad-slug}/templates",
     "docsDir": ".aioson/squads/{squad-slug}/docs"
@@ -557,6 +559,7 @@ Also create `.aioson/squads/{squad-slug}/squad.manifest.json` with this minimum 
       "genomes": []
     }
   ],
+  "checklists": [],
   "workflows": [],
   "genomes": []
 }
@@ -808,6 +811,56 @@ Gate action levels:
 - `approve` — human must approve before proceeding (high risk)
 - `block` — cannot proceed without explicit human authorization (critical)
 
+### Step 3c — Generate quality checklist
+
+Generate `.aioson/squads/{squad-slug}/checklists/quality.md` for every squad.
+The checklist is derived from the squad domain — it must validate the squad's actual deliverables, not be generic.
+
+```markdown
+# Checklist: Quality Review — {squad-name}
+
+## {Domain-specific section 1}
+- [ ] {Verifiable criterion}
+- [ ] {Verifiable criterion}
+
+## {Domain-specific section 2}
+- [ ] {Verifiable criterion}
+- [ ] {Verifiable criterion}
+
+## Output integrity
+- [ ] All deliverables saved to `output/{squad-slug}/`
+- [ ] Latest HTML generated and accessible
+- [ ] No output files from other squads overwritten
+
+## Executor coverage
+- [ ] Every declared executor produced output for this session
+- [ ] Worker scripts (if any) completed without errors
+- [ ] Human gates (if any) were triggered and resolved
+```
+
+Register in `squad.manifest.json`:
+```json
+"checklists": [
+  {
+    "slug": "quality",
+    "title": "Quality Review",
+    "file": ".aioson/squads/{squad-slug}/checklists/quality.md",
+    "scope": "squad"
+  }
+]
+```
+
+If the squad has a workflow, also generate a phase-level checklist when relevant:
+```json
+{
+  "slug": "workflow-review",
+  "title": "Workflow Phase Review",
+  "file": ".aioson/squads/{squad-slug}/checklists/workflow-review.md",
+  "scope": "workflow",
+  "appliesTo": "{workflow-slug}"
+}
+```
+
 ### Step 4 — Register agents in the project gateways
 
 Append a Squad section to `CLAUDE.md` at the project root:
@@ -865,23 +918,59 @@ Subagents:
 
 ## After generation — confirm and warm-up round (mandatory)
 
-Tell the user which agents were created:
+Tell the user which agents were created, then show the executor classification validation and coverage score:
 
 ```
 Squad **{squad-name}** is ready.
 
-Agents created in `.aioson/squads/{squad-slug}/agents/`:
-- @{role1} — [one-line description]
-- @{role2} — [one-line description]
-- @{role3} — [one-line description]
-- @orquestrador — coordinates the team
+Executors created in `.aioson/squads/{squad-slug}/`:
+- @{role1} (agent) — [one-line description]
+- @{role2} (agent) — [one-line description]
+- {worker-slug} (worker) — [script, no LLM]
+- @orquestrador (agent) — coordinates the team
 
 You can invoke any agent directly (e.g. `@scriptwriter`) for focused work,
 or work through @orquestrador for coordinated sessions.
 
 CLAUDE.md and AGENTS.md updated with shortcuts.
-Squad manifests created at `.aioson/squads/{squad-slug}/agents/agents.md` and `.aioson/squads/{squad-slug}/squad.manifest.json`.
 ```
+
+**Executor classification validation (mandatory before warm-up):**
+
+After confirming creation, validate executor classification:
+
+```
+Executor classification review:
+- {executor-slug} → type: {type} ✓ (reason: {one-line justification})
+- {executor-slug} → type: {type} ✓ (reason: ...)
+- {executor-slug} → type: {type} ✓ (reason: ...)
+
+All executors classified. No untyped executors.
+```
+
+If any executor lacks a `type`, flag it:
+```
+⚠ {executor-slug} has no type. Recommended: {type} because {reason}.
+```
+
+**Coverage score (show after classification validation):**
+
+```
+Squad coverage score: {N}/5
+
+✓ Executors typed       ({n} of {total} have explicit type)
+✓ Workflow defined      (1 workflow, {n} phases)
+✓ Checklists present    (quality.md)
+○ Tasks defined         (none — add tasks/ for repeatable procedures)
+○ Workers present       (no deterministic scripts — consider if any step is automatable)
+
+Coverage: {score}% — {Good | Needs improvement | Minimal}
+```
+
+Score thresholds:
+- 5/5 → Excellent
+- 3-4/5 → Good
+- 1-2/5 → Minimal — suggest what to add next
 
 Then immediately run the warm-up — show how each specialist would approach the stated goal RIGHT NOW with minimum substance:
 - problem reading

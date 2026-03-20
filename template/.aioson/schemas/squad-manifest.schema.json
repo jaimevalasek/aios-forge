@@ -61,6 +61,7 @@
         "agentsDir": { "type": "string" },
         "workersDir": { "type": "string", "description": "Directory for deterministic worker scripts (no LLM)" },
         "workflowsDir": { "type": "string", "description": "Directory for workflow .md files with phases and handoffs" },
+        "checklistsDir": { "type": "string", "description": "Directory for quality checklist .md files" },
         "skillsDir": { "type": "string" },
         "templatesDir": { "type": "string" },
         "docsDir": { "type": "string" }
@@ -282,6 +283,29 @@
           }
         }
       ]
+    },
+    "checklists": {
+      "type": "array",
+      "description": "Quality checklists for post-execution validation",
+      "items": {
+        "type": "object",
+        "required": ["slug", "file"],
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "title": { "type": "string" },
+          "file": { "type": "string", "description": "Path to the checklist .md file" },
+          "scope": {
+            "type": "string",
+            "enum": ["squad", "workflow", "phase", "executor"],
+            "default": "squad",
+            "description": "When this checklist applies"
+          },
+          "appliesTo": {
+            "type": "string",
+            "description": "Slug of the workflow, phase, or executor this checklist validates"
+          }
+        }
+      }
     },
     "workflows": {
       "type": "array",

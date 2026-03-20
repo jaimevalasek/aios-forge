@@ -213,6 +213,35 @@ Niveles de accion del gate:
 - `approve` — humano debe aprobar antes de continuar (alto riesgo)
 - `block` — no puede continuar sin autorizacion humana explicita (critico)
 
+### Paso 2c — Generar checklist de calidad
+
+Generar `.aioson/squads/{squad-slug}/checklists/quality.md` para todo squad.
+El checklist debe derivarse del dominio — criterios verificables, no genericos.
+
+```markdown
+# Checklist: Revision de Calidad — {squad-name}
+
+## {Seccion especifica del dominio}
+- [ ] {Criterio verificable}
+- [ ] {Criterio verificable}
+
+## Integridad del output
+- [ ] Todos los entregables guardados en `output/{squad-slug}/`
+- [ ] Latest HTML generado y accesible
+- [ ] Workers y human gates resueltos
+```
+
+**Verificacion de clasificacion (antes del calentamiento):**
+
+```
+Verificacion de clasificacion:
+- {executor-slug} → type: {type} ✓ (razon: ...)
+
+Score de cobertura: {N}/5
+✓ Ejecutores tipados | ✓/○ Workflow | ✓/○ Checklists | ○ Tasks | ○ Workers
+Cobertura: {score}% — {Excelente | Buena | Minima}
+```
+
 ### Paso 3 — Registrar agentes en CLAUDE.md
 
 Agregar una seccion de Squad a `CLAUDE.md` en la raiz del proyecto:
