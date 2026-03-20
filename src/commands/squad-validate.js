@@ -142,7 +142,62 @@ async function validateSemanticDeep(projectDir, slug, manifest) {
     }
   } catch { warnings.push('AGENTS.md not found'); }
 
-  // 5. Readiness não contradiz blockers
+  // 5. Output strategy validation
+  const outputStrategy = manifest.outputStrategy && typeof manifest.outputStrategy === 'object'
+    ? manifest.outputStrategy
+    : null;
+
+  if (outputStrategy) {
+    const validModes = ['files', 'sqlite', 'hybrid'];
+    if (outputStrategy.mode && !validModes.includes(outputStrategy.mode)) {
+      errors.push(`Invalid outputStrategy.mode: "${outputStrategy.mode}" (expected: ${validModes.join(', ')})`);
+    }
+
+    const delivery = outputStrategy.delivery && typeof outputStrategy.delivery === 'object'
+      ? outputStrategy.delivery
+      : null;
+
+    if (delivery) {
+      const webhooks = Array.isArray(delivery.webhooks) ? delivery.webhooks : [];
+      for (const wh of webhooks) {
+        if (!wh.slug) {
+          errors.push('Webhook missing required "slug" field');
+        }
+        if (!wh.trigger) {
+          errors.push(`Webhook "${wh.slug || '?'}" missing required "trigger" field`);
+        }
+        const validTriggers = ['on-publish', 'on-create', 'manual'];
+        if (wh.trigger && !validTriggers.includes(wh.trigger)) {
+          warnings.push(`Webhook "${wh.slug}" has unknown trigger: "${wh.trigger}"`);
+        }
+        if (wh.url && wh.url.includes('{{ENV:')) {
+          const envMatch = wh.url.match(/\{\{ENV:(\w+)\}\}/);
+          if (envMatch && !process.env[envMatch[1]]) {
+            warnings.push(`Webhook "${wh.slug}" references unset env var: ${envMatch[1]}`);
+          }
+        }
+        if (wh.worker) {
+          const workerPath = path.join(projectDir, wh.worker);
+          if (!(await pathExists(workerPath))) {
+            warnings.push(`Webhook "${wh.slug}" worker not found: ${wh.worker}`);
+          }
+        }
+      }
+
+      if (delivery.autoPublish && webhooks.length === 0 && !delivery.cloudPublish) {
+        warnings.push('autoPublish is enabled but no webhooks or cloudPublish configured');
+      }
+    }
+
+    if (outputStrategy.mode === 'files' && outputStrategy.dataOutput && outputStrategy.dataOutput.enabled) {
+      warnings.push('outputStrategy.mode is "files" but dataOutput.enabled is true — consider "hybrid"');
+    }
+    if (outputStrategy.mode === 'sqlite' && outputStrategy.fileOutput && outputStrategy.fileOutput.enabled) {
+      warnings.push('outputStrategy.mode is "sqlite" but fileOutput.enabled is true — consider "hybrid"');
+    }
+  }
+
+  // 6. Readiness não contradiz blockers
   if (manifest.readiness) {
     for (const [dim, val] of Object.entries(manifest.readiness)) {
       if (val && val.status === 'ready' && val.blocker) {
@@ -207,6 +262,7 @@ async function runSquadValidate({ args = [], options = {}, logger = console } = 
   logger.log(`  Structure:      ${structure.errors.length === 0 ? '\u2705 PASS' : '\u274c FAIL'}`);
   logger.log(`  Semantics:      ${semantics.errors.length === 0 ? (semantics.warnings.length > 0 ? '\u26a0\ufe0f  WARNINGS' : '\u2705 PASS') : '\u274c FAIL'}`);
   logger.log(`  Semantic deep:  ${semanticDeep.errors.length === 0 ? (semanticDeep.warnings.length > 0 ? '\u26a0\ufe0f  WARNINGS' : '\u2705 PASS') : '\u274c FAIL'}`);
+  logger.log(`  Output strategy: ${manifest.outputStrategy ? `${manifest.outputStrategy.mode || 'unknown'} mode` : 'not configured'}`);
 
   if (allErrors.length > 0) {
     logger.log('');

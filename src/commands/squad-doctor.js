@@ -209,6 +209,56 @@ async function runSquadDoctor({ args, options = {}, logger, t }) {
   checks.push(makeCheck('output_dir', outputExists, outputExists ? 'info' : 'warn', t('squad_doctor.check_output_dir', { path: paths.outputDir })));
   checks.push(makeCheck('media_dir', mediaExists, mediaExists ? 'info' : 'warn', t('squad_doctor.check_media_dir', { path: paths.mediaDir })));
 
+  // Output strategy checks
+  const outputStrategy = manifest.outputStrategy && typeof manifest.outputStrategy === 'object'
+    ? manifest.outputStrategy
+    : null;
+
+  if (outputStrategy) {
+    const delivery = outputStrategy.delivery && typeof outputStrategy.delivery === 'object'
+      ? outputStrategy.delivery
+      : {};
+    const webhooks = Array.isArray(delivery.webhooks) ? delivery.webhooks : [];
+    const hasDelivery = webhooks.length > 0 || delivery.cloudPublish;
+
+    checks.push(makeCheck(
+      'output_strategy',
+      true,
+      'info',
+      `Output strategy: mode=${outputStrategy.mode || 'unknown'}, webhooks=${webhooks.length}, cloudPublish=${Boolean(delivery.cloudPublish)}, autoPublish=${Boolean(delivery.autoPublish)}`
+    ));
+
+    if (delivery.autoPublish && !hasDelivery) {
+      checks.push(makeCheck(
+        'output_auto_publish',
+        false,
+        'warn',
+        'autoPublish is enabled but no delivery targets configured (no webhooks, no cloudPublish)'
+      ));
+    }
+
+    for (const wh of webhooks) {
+      if (wh.url && wh.url.includes('{{ENV:')) {
+        const envMatch = wh.url.match(/\{\{ENV:(\w+)\}\}/);
+        if (envMatch && !process.env[envMatch[1]]) {
+          checks.push(makeCheck(
+            `webhook_env_${wh.slug}`,
+            false,
+            'warn',
+            `Webhook "${wh.slug}" references unset env var: ${envMatch[1]}`
+          ));
+        }
+      }
+    }
+  } else {
+    checks.push(makeCheck(
+      'output_strategy',
+      true,
+      'info',
+      'No output strategy configured (default file output will be used)'
+    ));
+  }
+
   const runtimeHandle = await openRuntimeDb(targetDir, { mustExist: true });
   if (!runtimeHandle) {
     checks.push(makeCheck('runtime_store', false, 'warn', t('squad_doctor.check_runtime_missing')));
