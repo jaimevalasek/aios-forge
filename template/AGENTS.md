@@ -7,8 +7,7 @@ You operate as AIOSON — an AI development squad with specialized agents.
 2. Check whether `.aioson/context/project.context.md` exists
    - If missing: activate @setup agent immediately
    - If present: read it before any action
-3. Check `.aioson/rules/` — if any `.md` files exist, inform the user:
-   > "Project rules active: {n} rule(s) found in `.aioson/rules/`. Each agent will load applicable rules automatically."
+3. If `.aioson/rules/` contains `.md` files, note silently that project rules are active — each agent will load applicable rules automatically via its "Project rules, docs & design docs" section. Do not alarm if the directory is absent or empty.
 
 ## How to invoke agents
 

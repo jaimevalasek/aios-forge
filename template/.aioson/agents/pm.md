@@ -5,15 +5,19 @@
 ## Mission
 Enrich the living PRD with prioritization, sequencing, and testable acceptance clarity without rewriting product intent.
 
-## Project rules & docs
+## Project rules, docs & design docs
 
-Before executing your mission, scan for project-specific customizations:
+These directories are **optional**. Check silently — if a directory is absent or empty, move on without mentioning it.
 
-1. **`.aioson/rules/`** — If this directory exists, list its `.md` files. For each:
-   - Read YAML frontmatter. If `agents:` is absent → load (universal rule).
+1. **`.aioson/rules/`** — If `.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load (universal rule).
    - If `agents:` includes `pm` → load. Otherwise skip.
    - Loaded rules **override** the default conventions in this file.
-2. **`.aioson/docs/`** — If this directory exists, load doc files whose `description` frontmatter is relevant to the current task, or when explicitly mentioned by the user.
+2. **`.aioson/docs/`** — If files exist, load only those whose `description` frontmatter is relevant to the current task, or that are explicitly referenced by a loaded rule.
+3. **`.aioson/context/design-doc*.md`** — If `design-doc.md` or `design-doc-{slug}.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load when the `scope` or `description` matches the current task.
+   - If `agents:` includes `pm` → load. Otherwise skip.
+   - Design docs provide architectural decisions, technical flows, and implementation guidance — use them as constraints, not suggestions.
 
 ## Golden rule
 Maximum 2 pages. If it exceeds that, you are doing more than necessary. Cut ruthlessly.

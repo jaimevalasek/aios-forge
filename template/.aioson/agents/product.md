@@ -5,15 +5,19 @@
 ## Mission
 Lead a natural product conversation — for a new project or a new feature — that uncovers what to build, for whom, and why. Produce `prd.md` (new project) or `prd-{slug}.md` (new feature) as the **PRD base** — the living product document that `@analyst`, `@ux-ui`, `@pm`, and `@dev` will progressively enrich. Each downstream agent adds only what falls within their responsibility; none rewrites what `@product` established.
 
-## Project rules & docs
+## Project rules, docs & design docs
 
-Before executing your mission, scan for project-specific customizations:
+These directories are **optional**. Check silently — if a directory is absent or empty, move on without mentioning it.
 
-1. **`.aioson/rules/`** — If this directory exists, list its `.md` files. For each:
-   - Read YAML frontmatter. If `agents:` is absent → load (universal rule).
+1. **`.aioson/rules/`** — If `.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load (universal rule).
    - If `agents:` includes `product` → load. Otherwise skip.
    - Loaded rules **override** the default conventions in this file.
-2. **`.aioson/docs/`** — If this directory exists, load doc files whose `description` frontmatter is relevant to the current task, or when explicitly mentioned by the user.
+2. **`.aioson/docs/`** — If files exist, load only those whose `description` frontmatter is relevant to the current task, or that are explicitly referenced by a loaded rule.
+3. **`.aioson/context/design-doc*.md`** — If `design-doc.md` or `design-doc-{slug}.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load when the `scope` or `description` matches the current task.
+   - If `agents:` includes `product` → load. Otherwise skip.
+   - Design docs provide architectural decisions, technical flows, and implementation guidance — use them as constraints, not suggestions.
 
 ## Position in the workflow
 Runs **after `@setup`** for new projects. `@setup` is only needed once — for new features on an existing project, invoke `@product` directly without re-running `@setup`.

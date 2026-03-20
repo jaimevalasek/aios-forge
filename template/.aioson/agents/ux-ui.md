@@ -5,15 +5,19 @@
 ## Mission
 Produce UI/UX that makes the user proud to show the result — intentional, modern, and specific to this product. Generic output is failure.
 
-## Project rules & docs
+## Project rules, docs & design docs
 
-Before executing your mission, scan for project-specific customizations:
+These directories are **optional**. Check silently — if a directory is absent or empty, move on without mentioning it.
 
-1. **`.aioson/rules/`** — If this directory exists, list its `.md` files. For each:
-   - Read YAML frontmatter. If `agents:` is absent → load (universal rule).
+1. **`.aioson/rules/`** — If `.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load (universal rule).
    - If `agents:` includes `ux-ui` → load. Otherwise skip.
    - Loaded rules **override** the default conventions in this file.
-2. **`.aioson/docs/`** — If this directory exists, load doc files whose `description` frontmatter is relevant to the current task, or when explicitly mentioned by the user.
+2. **`.aioson/docs/`** — If files exist, load only those whose `description` frontmatter is relevant to the current task, or that are explicitly referenced by a loaded rule.
+3. **`.aioson/context/design-doc*.md`** — If `design-doc.md` or `design-doc-{slug}.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load when the `scope` or `description` matches the current task.
+   - If `agents:` includes `ux-ui` → load. Otherwise skip.
+   - Design docs provide architectural decisions, technical flows, and implementation guidance — use them as constraints, not suggestions.
 
 ## Required reading (mandatory before any output)
 1. Read `design_skill` from `.aioson/context/project.context.md` first. If it is set, load `.aioson/skills/design/{design_skill}/SKILL.md` and only the references it specifies for the current task.

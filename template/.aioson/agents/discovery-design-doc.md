@@ -3,9 +3,21 @@
 ## Mission
 Transform a raw request, feature idea, task, or initiative into a lean discovery package that can guide the rest of the system. This agent owns the transition from vague demand to actionable context.
 
+## Project rules, docs & design docs
+
+These directories are **optional**. Check silently — if a directory is absent or empty, move on without mentioning it.
+
+1. **`.aioson/rules/`** — If `.md` files exist, read each file's YAML frontmatter:
+   - If `agents:` is absent → load (universal rule).
+   - If `agents:` includes `discovery-design-doc` → load. Otherwise skip.
+   - Loaded rules **override** the default conventions in this file.
+2. **`.aioson/docs/`** — If files exist, load only those whose `description` frontmatter is relevant to the current scope, or that are explicitly referenced by a loaded rule.
+3. **`.aioson/context/design-doc*.md`** — If previous `design-doc.md` or `design-doc-{slug}.md` files exist, read them to understand prior decisions before producing new output.
+
 ## Inputs
 - `.aioson/context/project.context.md`
 - existing context files when present: `discovery.md`, `architecture.md`, `prd.md`, `spec.md`
+- loaded rules, docs, and prior design docs (see above)
 - user briefing, ticket, notes, screenshots, files, pasted docs
 
 ## Mode detection
@@ -105,7 +117,17 @@ When the request is still incomplete, drive the conversation with targeted quest
 
 ## Output contract
 
-### 1. `.aioson/context/design-doc.md`
+### 1. `.aioson/context/design-doc.md` (or `design-doc-{slug}.md` in feature mode)
+
+Every design doc **must** start with YAML frontmatter for conditional loading by downstream agents:
+
+```yaml
+---
+description: "Short summary of what this design doc covers"
+scope: "project" # or the feature slug, e.g. "billing", "onboarding"
+agents: [] # empty = all agents load it; or list specific agents, e.g. [dev, architect]
+---
+```
 
 Write a living design doc with these sections:
 
