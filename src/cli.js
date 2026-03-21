@@ -41,6 +41,7 @@ const { runSquadRepairGenomes } = require('./commands/squad-repair-genomes');
 const { runSquadValidate } = require('./commands/squad-validate');
 const { runSquadExport } = require('./commands/squad-export');
 const { runSquadPipeline } = require('./commands/squad-pipeline');
+const { runSquadAgentCreate } = require('./commands/squad-agent-create');
 const {
   runRuntimeInit,
   runRuntimeIngest,
@@ -157,6 +158,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'squad-export',
   'squad:pipeline',
   'squad-pipeline',
+  'squad:agent-create',
+  'squad-agent-create',
   'runtime:init',
   'runtime-init',
   'runtime:ingest',
@@ -283,6 +286,7 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_squad_validate');
   logHelpLine(t, logger, 'cli.help_squad_export');
   logHelpLine(t, logger, 'cli.help_squad_pipeline');
+  logHelpLine(t, logger, 'cli.help_squad_agent_create');
   logHelpLine(t, logger, 'cli.help_runtime_init');
   logHelpLine(t, logger, 'cli.help_runtime_ingest');
   logHelpLine(t, logger, 'cli.help_runtime_task_start');
@@ -460,6 +464,8 @@ async function main() {
       result = await runSquadExport({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:pipeline' || command === 'squad-pipeline') {
       result = await runSquadPipeline({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:agent-create' || command === 'squad-agent-create') {
+      result = await runSquadAgentCreate({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:init' || command === 'runtime-init') {
       result = await runRuntimeInit({ args, options, logger: commandLogger, t });
     } else if (command === 'runtime:ingest' || command === 'runtime-ingest') {

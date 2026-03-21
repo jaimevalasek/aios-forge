@@ -75,6 +75,8 @@ module.exports = {
       'aioson squad:export [path] --squad=<slug> [--locale=en]',
     help_squad_pipeline:
       'aioson squad:pipeline [path] [--sub=list|show|status] [--pipeline=<slug>] [--locale=en]',
+    help_squad_agent_create:
+      'aioson squad:agent-create [path] --name=<name> [--scope=my-agents|squad] [--squad=<slug>] [--mission=<text>] [--locale=en]',
     help_runtime_init:
       'aioson runtime:init [path] [--json] [--locale=en]',
     help_runtime_ingest:
@@ -747,6 +749,14 @@ module.exports = {
     latest_html: '    Latest HTML : {value}',
     logs: '    Logs        : {count} ({path})',
     genomes: '    Genomes     : {count} squad-level / {agent_count} agent bindings'
+  },
+  squad_agent_create: {
+    no_name: 'Usage: aioson squad:agent-create [path] --name=<agent-name> [--scope=my-agents|squad] [--squad=<slug>]',
+    invalid_scope: 'Invalid scope: "{scope}". Use "my-agents" or "squad".',
+    no_squads: 'No squads found. Create a squad first with @squad or provide --squad=<slug>.',
+    squad_required: '--squad=<slug> required when scope is "squad".',
+    squad_not_found: 'Squad "{squad}" not found.',
+    already_exists: 'Agent already exists: {path}'
   },
   squad_doctor: {
     prefix_ok: 'OK',

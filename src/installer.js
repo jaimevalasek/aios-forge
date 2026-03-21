@@ -33,6 +33,9 @@ const GITIGNORE_POLICY_LINES = [
   '# AIOSON — user-installed skills (versioned with project)',
   '!.aioson/installed-skills/',
   '!.aioson/installed-skills/**',
+  '# AIOSON — custom agents (versioned with project)',
+  '!.aioson/my-agents/',
+  '!.aioson/my-agents/**',
   '# AIOSON — local-only artifacts',
   'aioson-models.json',
   '.aioson/backups/',
@@ -123,6 +126,8 @@ function shouldSkipTemplatePath(rel) {
   if (rel === '.aioson/context/.gitkeep') return false;
   // Never overwrite user-installed skills (only the .gitkeep is created)
   if (rel.startsWith('.aioson/installed-skills/') && rel !== '.aioson/installed-skills/.gitkeep') return true;
+  // Never overwrite custom agents (only the .gitkeep is created)
+  if (rel.startsWith('.aioson/my-agents/') && rel !== '.aioson/my-agents/.gitkeep') return true;
   return false;
 }
 
