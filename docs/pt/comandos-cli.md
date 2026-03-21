@@ -89,6 +89,7 @@
 | `squad:validate` | Valida a estrutura e o manifesto de uma squad específica | Antes de exportar ou publicar |
 | `squad:export` | Exporta uma squad local para snapshot/entrega | Quando quer empacotar a squad |
 | `squad:pipeline` | Lista, inspeciona ou acompanha pipelines declarados na squad | Quando a squad define pipelines reutilizáveis |
+| `squad:agent-create` | Cria agente customizado em `.aioson/my-agents/` ou dentro de uma squad | Quando quer criar agente personalizado. Veja [Agentes Customizados](./agentes-customizados.md) |
 | `output-strategy:export` | Exporta a estratégia de output (webhooks, delivery) de uma squad | Quando quer copiar configuração para outra squad ou documentar |
 | `output-strategy:import` | Importa estratégia de output de um arquivo ou outra squad | Quando quer replicar webhooks/delivery entre squads |
 | `deliver` | Dispara delivery manual de conteúdo para webhooks configurados | Quando quer reenviar conteúdo ou testar webhooks |
@@ -108,6 +109,17 @@
 | `runtime:fail` | Finaliza uma execução com falha | Quando a run falhou |
 | `runtime:status` | Mostra snapshot do runtime | Quando quer uma visão atual das runs |
 | `runtime:log` | Logger stateful de uma linha para agentes oficiais | Quando quer registrar eventos sem orquestrar vários comandos |
+| `runtime:backup` | Faz backup incremental do SQLite para S3 ou HTTP do cliente | Quando quer persistir dados de runtime na nuvem do cliente |
+| `runtime:restore` | Restaura dados de runtime a partir de um backup remoto | Quando quer recuperar dados em outra máquina ou após perda |
+| `runtime:prune` | Remove registros antigos do SQLite de runtime | Quando o banco está grande e quer liberar espaço |
+
+### Skills
+
+| Comando | O que faz | Quando usar |
+|---|---|---|
+| `skill:install` | Instala skill de terceiros via npm, cloud ou path local | Quando quer adicionar capacidade ao projeto. Veja [Skills](./skills.md) |
+| `skill:list` | Lista skills instaladas em `.aioson/installed-skills/` | Quando quer saber quais skills estão ativas |
+| `skill:remove` | Remove skill instalada e limpa diretórios de ferramentas | Quando uma skill não é mais necessária |
 
 ### Cloud
 

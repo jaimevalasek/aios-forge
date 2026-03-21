@@ -25,6 +25,7 @@ O AIOSON tem agentes oficiais de projeto e também pode criar agentes de squad. 
 ```
 
 > Para o fluxo completo de `@squad` e `@genoma`, veja também [Squad e Genoma](./squad-genoma.md).
+> Para criar agentes customizados (my-agents e squad agents), veja [Agentes Customizados](./agentes-customizados.md).
 > Para uma explicação focada no agente de continuidade, veja também [Deyvin](./deyvin.md).
 
 ## Fluxo brownfield apos scan

@@ -190,6 +190,8 @@ Exemplo:
 
 Esses agentes não são os agentes oficiais da aioson. Eles são executores do seu projeto.
 
+> Para criar agentes customizados via CLI com template enriquecido (Voice DNA, anti-patterns, infra operacional), veja [Agentes Customizados](./agentes-customizados.md).
+
 ---
 
 ## O que é um genoma
