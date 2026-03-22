@@ -40,7 +40,24 @@ For existing codebases:
 
 ---
 
-## Entry check — run before Step 0
+## Submodes
+
+`@ux-ui` can be invoked with an optional submode to activate a focused workflow. When no submode is specified, the agent runs the standard creation flow (Entry check → Step 0–3 → Output).
+
+| Submode | Trigger | Output |
+|---------|---------|--------|
+| *(default)* | `@ux-ui` | `ui-spec.md` + `index.html` (if site) |
+| `research` | `@ux-ui research` | `ui-research.md` |
+| `audit` | `@ux-ui audit` | `ui-audit.md` |
+| `tokens` | `@ux-ui tokens` | `ui-tokens.md` |
+| `component-map` | `@ux-ui component-map` | `ui-component-map.md` |
+| `a11y` | `@ux-ui a11y` | `ui-a11y.md` |
+
+All artifacts go to `.aioson/context/`. Each submode is self-contained — run it, get the artifact, done. The default creation flow may reference submode artifacts if they already exist (e.g., use `ui-research.md` to inform design direction).
+
+---
+
+## Entry check — run before Step 0 (default mode only)
 
 Check for existing UI artifacts in this order:
 
@@ -64,15 +81,27 @@ Check for existing UI artifacts in this order:
 
 ## Audit mode
 
-Activate only when the user chooses **Audit** from the entry check.
+Activate when the user chooses **Audit** from the entry check, or via `@ux-ui audit`.
 
 ### Audit step 1 — Read existing artifacts
 Read all of the following that exist:
 - `index.html` (or main template file)
 - `ui-spec.md`
-- Up to 3 component files from `src/`, `components/`, `app/`, or `pages/` — prioritize layout-level files
+- Up to 5 component files from `src/`, `components/`, `app/`, or `pages/` — prioritize layout-level files
 
-### Audit step 2 — Run quality checks against the code
+### Audit step 2 — Inventory scan
+
+Before running quality checks, build a quick inventory of what exists:
+
+| Inventory | What to capture |
+|-----------|----------------|
+| **Colors** | List every unique color value (hex, hsl, rgb, named). Flag hardcoded values not in CSS custom properties. |
+| **Spacing** | List unique margin/padding values. Flag values not aligned to any scale. |
+| **Radius** | List unique border-radius values. Flag inconsistencies. |
+| **Typography** | List font families, sizes, weights used. Flag values not in a type scale. |
+| **Components** | List visually repeated patterns (cards, buttons, inputs, modals). Flag near-duplicates that should be consolidated. |
+
+### Audit step 3 — Run quality checks against the code
 
 Apply each check and record findings:
 
@@ -87,13 +116,20 @@ Apply each check and record findings:
 | **Accessibility** | Is contrast ≥ 4.5:1? Are focus rings visible? Is semantic HTML used? |
 | **Mobile-first** | Are breakpoints defined? Does the layout degrade gracefully below 768px? |
 | **Motion safety** | Is `prefers-reduced-motion` respected for any animation? |
+| **Visual continuity** | Are shared surfaces (header, sidebar, cards) visually consistent across screens? |
 
-### Audit step 3 — Produce the audit report
+### Audit step 4 — Produce the audit report
 
 Group findings by severity:
 
 ```
 ## UI Audit — [Project Name]
+
+### Inventory
+- Colors: X unique values (Y hardcoded)
+- Spacing: X unique values
+- Radius: X unique values
+- Components: X patterns (Y near-duplicates)
 
 ### 🔴 Critical (blocks quality bar)
 - [Issue]: [specific location in code] → [concrete fix]
@@ -106,18 +142,201 @@ Group findings by severity:
 
 ### ✅ What's working
 - [Specific decision that is intentional and effective]
+
+### Consolidation plan
+- [Pattern A and Pattern B] → consolidate into [single component]
+- [N hardcoded colors] → extract to [semantic tokens]
 ```
 
 Rules for the audit report:
 - Every finding must reference a **specific element or line** — never generic ("spacing is inconsistent").
 - Every critical or important finding must include a **concrete fix** — not just a description of the problem.
 - At least one "What's working" entry — never only negative.
+- Include a consolidation plan when near-duplicates or hardcoded values are found.
 - End with: "Want me to apply the critical fixes now, or go through them one by one?"
 
 ### Audit output
 - Write the report to `.aioson/context/ui-audit.md`
 - Do **not** modify `index.html`, component files, or `ui-spec.md` during audit — propose only
 - After the user confirms which fixes to apply, switch to targeted edits
+
+---
+
+## Research mode
+
+Activate via `@ux-ui research`. Produces a visual research document before the main design phase.
+
+### Research step 1 — Gather context
+Read all available artifacts: `project.context.md`, `prd.md`, `discovery.md`, `architecture.md`.
+
+### Research step 2 — Visual benchmarking
+For the product domain, identify and document:
+1. **3–5 reference products** — competitors or adjacent products with strong UI. For each: what works, what doesn't, and one specific detail worth borrowing.
+2. **Visual patterns** — recurring design patterns in this domain (data tables, card layouts, form flows, etc.).
+3. **Anti-patterns** — common UI mistakes in this domain to avoid.
+4. **User expectations** — what visual language does the target audience already understand?
+
+### Research step 3 — Directional hypotheses
+Propose 2–3 design direction hypotheses, each with:
+- Direction name and rationale
+- Mood description (texture, not adjectives)
+- Color palette sketch (3–5 colors)
+- Typography suggestion
+- Risk: what could go wrong with this direction
+
+### Research output
+- Write to `.aioson/context/ui-research.md`
+- The default creation flow will consume this artifact in Step 1 (Intent) and Step 2 (Domain exploration) if it exists
+
+---
+
+## Tokens mode
+
+Activate via `@ux-ui tokens`. Produces a formal design token contract.
+
+### When to use
+- When the project needs a shared token system between design and code
+- When multiple developers or squads will implement UI from the same spec
+- When migrating from hardcoded values to a token-based system
+
+### Tokens step 1 — Analyze current state
+- If UI code exists: extract all hardcoded values (colors, spacing, radius, shadows, typography)
+- If `ui-spec.md` exists: extract the token block
+- If `design_skill` is set: load the skill's token definitions as the source of truth
+
+### Tokens step 2 — Build token contract
+
+```markdown
+## Token Contract — [Project Name]
+
+### Primitive tokens
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--color-slate-50` | `hsl(210, 40%, 98%)` | lightest background |
+| ... | ... | ... |
+
+### Semantic tokens
+| Token | Light value | Dark value | Usage |
+|-------|-------------|------------|-------|
+| `--color-bg-primary` | `var(--color-slate-50)` | `var(--color-slate-900)` | main background |
+| ... | ... | ... | ... |
+
+### Spacing scale
+| Token | Value |
+|-------|-------|
+| `--space-1` | `4px` |
+| `--space-2` | `8px` |
+| ... | ... |
+
+### Typography scale
+| Token | Size | Weight | Line-height | Usage |
+|-------|------|--------|-------------|-------|
+| `--text-xs` | `12px` | `400` | `1.5` | captions |
+| ... | ... | ... | ... | ... |
+
+### Token ownership
+- `:root` → primitives + light-mode semantics
+- `[data-theme="dark"]` → dark-mode semantic overrides
+- Component-level → component-specific tokens only
+```
+
+### Tokens output
+- Write to `.aioson/context/ui-tokens.md`
+- If `ui-spec.md` exists, update its token block to reference `ui-tokens.md` as the source of truth
+
+---
+
+## Component-map mode
+
+Activate via `@ux-ui component-map`. Maps reusable components from the current UI or from the spec.
+
+### Component-map step 1 — Scan
+- If code exists: scan `src/`, `components/`, `app/`, `pages/` for visual patterns
+- If `ui-spec.md` exists: extract the component list from the spec
+- If `design_skill` is set: load the skill's component catalog
+
+### Component-map step 2 — Classify
+
+For each component found:
+
+| Component | Category | Variants | States | Used in |
+|-----------|----------|----------|--------|---------|
+| `Button` | atom | primary, secondary, ghost | default, hover, focus, active, disabled, loading | Header, Hero CTA, Forms |
+| `Card` | molecule | feature, pricing, testimonial | default, hover | Features section, Pricing |
+| ... | ... | ... | ... | ... |
+
+Categories follow Atomic Design: atom → molecule → organism → template.
+
+### Component-map step 3 — Gap analysis
+- Components that exist in the spec but not in code
+- Components that exist in code but not in the spec
+- Near-duplicate components that should be consolidated
+- Missing states or variants
+
+### Component-map output
+- Write to `.aioson/context/ui-component-map.md`
+
+---
+
+## Accessibility mode (a11y)
+
+Activate via `@ux-ui a11y`. Produces a focused accessibility audit and remediation plan.
+
+### A11y step 1 — Scan
+Read UI code and check each category:
+
+| Category | Checks |
+|----------|--------|
+| **Perceivable** | Color contrast ≥ 4.5:1 (text), ≥ 3:1 (large text, UI components). Alt text on images. Captions for media. |
+| **Operable** | All interactive elements reachable via keyboard. Visible focus rings. No keyboard traps. Skip-to-content link. |
+| **Understandable** | `lang` attribute set. Form labels associated. Error messages clear and specific. |
+| **Robust** | Semantic HTML (`<nav>`, `<main>`, `<section>`, `<button>`). ARIA roles only when semantic HTML is insufficient. No div-as-button. |
+| **Motion** | `prefers-reduced-motion` respected. No auto-playing animations > 5s without pause control. |
+
+### A11y step 2 — Produce findings
+
+```markdown
+## Accessibility Report — [Project Name]
+
+### Summary
+- WCAG 2.1 AA compliance: [estimated %]
+- Critical issues: [count]
+- Total issues: [count]
+
+### 🔴 Critical (WCAG violation)
+- [Issue]: [specific element] → [concrete fix]
+
+### 🟡 Important (usability impact)
+- [Issue]: [specific element] → [concrete fix]
+
+### 🟢 Enhancement (beyond AA)
+- [Suggestion]: [specific element] → [improvement]
+
+### ✅ Already compliant
+- [Specific accessibility decision that is correct]
+```
+
+### A11y step 3 — Integration with @qa
+If `@qa` is the next agent in the workflow, add an `## Accessibility` section to the a11y report with:
+- Automated checks to add to the test suite (`axe-core`, `pa11y`, or framework-specific)
+- Manual checks that require human verification
+
+### A11y output
+- Write to `.aioson/context/ui-a11y.md`
+- Do **not** modify code during audit — propose only
+
+---
+
+## Visual continuity (cross-screen consistency)
+
+This is not a separate submode — it is a working principle that activates automatically when the agent works on **more than one screen** in a single session, or when `ui-spec.md` already defines screens.
+
+Rules:
+- Shared surfaces (header, sidebar, footer, navigation) must be visually identical across screens. Never redesign a shared surface for a new screen.
+- Token values must be consistent. If Screen A uses `--space-4` for card padding, Screen B must use the same token for the same purpose.
+- Component variants must be reused, not reinvented. If a `Card` component exists, new screens use the existing card — they do not create a new card style.
+- Depth strategy (borders vs shadows) must be consistent across all screens.
+- When adding a new screen to an existing spec, explicitly reference which existing components and tokens are being reused.
 
 ---
 
@@ -403,8 +622,14 @@ If the user explicitly proceeds without a registered `design_skill`, use the fal
 - `.aioson/context/ui-spec.md` — token block, token ownership (`:root` vs theme container), screen map, component state matrix, responsive rules, handoff notes
 - `.aioson/context/project.context.md` — update `design_skill` if the selection was confirmed during this session
 
-**Audit mode:**
-- `.aioson/context/ui-audit.md` — findings grouped by severity, each with specific location and concrete fix
+**Submode outputs:**
+- `@ux-ui research` → `.aioson/context/ui-research.md` — visual benchmarking, direction hypotheses
+- `@ux-ui audit` → `.aioson/context/ui-audit.md` — inventory, findings by severity, consolidation plan
+- `@ux-ui tokens` → `.aioson/context/ui-tokens.md` — formal token contract (primitives, semantics, scales, ownership)
+- `@ux-ui component-map` → `.aioson/context/ui-component-map.md` — component inventory, classification, gap analysis
+- `@ux-ui a11y` → `.aioson/context/ui-a11y.md` — WCAG audit, findings by severity, @qa integration notes
+
+**Audit and submode rules:**
 - No modifications to existing UI files until user confirms which fixes to apply
 
 **PRD enrichment (always, if prd.md or prd-{slug}.md exists):**

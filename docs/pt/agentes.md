@@ -298,12 +298,28 @@ tests/
 /ux-ui
 ```
 
-**Entrega:** Arquivo `.aioson/context/ui-spec.md` com:
+**Submodos disponíveis:**
+```
+/ux-ui research       → pesquisa visual e hipóteses de direção
+/ux-ui audit          → auditoria com inventário, achados por severidade e plano de consolidação
+/ux-ui tokens         → contrato formal de design tokens (primitivos, semânticos, escalas)
+/ux-ui component-map  → mapeamento de componentes (Atomic Design), gap analysis
+/ux-ui a11y           → auditoria WCAG focada, integração com @qa
+```
+
+**Entrega principal:** Arquivo `.aioson/context/ui-spec.md` com:
 - Sistema de design (tokens, cores, tipografia)
 - Componentes principais e estados
 - Fluxos de navegação
 - Checklist de acessibilidade
 - Enriquecimento da seção `Identidade visual` do PRD, sem reescrever visão, problema ou usuários
+
+**Entregas dos submodos** (opcionais, em `.aioson/context/`):
+- `ui-research.md` — benchmarking visual e direções
+- `ui-audit.md` — inventário + achados + plano de consolidação
+- `ui-tokens.md` — contrato de tokens com posse (`:root` vs `[data-theme]`)
+- `ui-component-map.md` — catálogo de componentes com variantes e estados
+- `ui-a11y.md` — relatório WCAG com checks automatizados e manuais
 
 > Se o usuário disser para o agente seguir sozinho, o comportamento esperado é decidir a direção visual com base no contexto do produto e continuar sem abrir questionário de estilo.
 
