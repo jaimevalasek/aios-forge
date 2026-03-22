@@ -362,11 +362,61 @@ async function runSkillInstall({ args, options = {}, logger, t }) {
   };
 }
 
+/**
+ * Scan a directory for .md files with SKILL.md or frontmatter descriptions.
+ * Returns array of { slug, name, description, type, path }.
+ */
+async function scanSourceSkillDir(baseDir, type) {
+  const results = [];
+  if (!(await exists(baseDir))) return results;
+
+  try {
+    const entries = await fs.readdir(baseDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue;
+
+      if (entry.isDirectory()) {
+        // Look for SKILL.md inside the directory
+        const skillMdPath = path.join(baseDir, entry.name, 'SKILL.md');
+        if (await exists(skillMdPath)) {
+          const raw = await fs.readFile(skillMdPath, 'utf8');
+          const fm = parseSkillFrontmatter(raw);
+          results.push({
+            slug: entry.name,
+            name: fm.name || entry.name,
+            description: fm.description || '',
+            type,
+            path: path.relative(process.cwd(), path.join(baseDir, entry.name))
+          });
+        }
+      } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'README.md') {
+        // Read frontmatter from .md file directly
+        const filePath = path.join(baseDir, entry.name);
+        const raw = await fs.readFile(filePath, 'utf8');
+        const fm = parseSkillFrontmatter(raw);
+        const slug = entry.name.replace(/\.md$/, '');
+        results.push({
+          slug,
+          name: fm.name || slug,
+          description: fm.description || '',
+          type,
+          path: path.relative(process.cwd(), filePath)
+        });
+      }
+    }
+  } catch {
+    // Directory not readable
+  }
+
+  return results;
+}
+
 async function runSkillList({ args, options = {}, logger, t }) {
   const targetDir = resolveTargetDir(args);
   const skillsDir = path.join(targetDir, INSTALLED_SKILLS_DIR);
+  const showAll = options.all !== undefined;
 
-  const skills = [];
+  const installed = [];
 
   // Installed skills
   try {
@@ -385,7 +435,7 @@ async function runSkillList({ args, options = {}, logger, t }) {
         source = meta.source || 'unknown';
       } catch { /* no meta */ }
 
-      skills.push({
+      installed.push({
         slug,
         name: fm.name || slug,
         description: fm.description || '',
@@ -397,11 +447,27 @@ async function runSkillList({ args, options = {}, logger, t }) {
     // Dir may not exist
   }
 
-  if (skills.length === 0) {
-    logger.log('No installed skills. Use `aioson skill:install --slug=<name>` to add one.');
-  } else {
-    logger.log(`Installed skills (${skills.length}):\n`);
-    for (const s of skills) {
+  // Source skills (design, static, dynamic)
+  const sourceBase = path.join(targetDir, '.aioson/skills');
+  const designSkills = await scanSourceSkillDir(path.join(sourceBase, 'design'), 'design');
+  const designSystemSkills = await scanSourceSkillDir(sourceBase, 'design-system')
+    .then(r => r.filter(s => s.slug === 'design-system'));
+  const staticSkills = await scanSourceSkillDir(path.join(sourceBase, 'static'), 'static');
+  const dynamicSkills = await scanSourceSkillDir(path.join(sourceBase, 'dynamic'), 'dynamic');
+
+  // Check active design skill
+  let activeDesignSkill = null;
+  try {
+    const contextPath = path.join(targetDir, '.aioson/context/project.context.md');
+    const contextRaw = await fs.readFile(contextPath, 'utf8');
+    const match = contextRaw.match(/design_skill:\s*(.+)/);
+    if (match) activeDesignSkill = match[1].trim();
+  } catch { /* no context */ }
+
+  // Output
+  if (installed.length > 0) {
+    logger.log(`Installed skills (${installed.length}):\n`);
+    for (const s of installed) {
       logger.log(`  ${s.slug} (${s.source})`);
       if (s.description) {
         logger.log(`    ${s.description.slice(0, 100)}`);
@@ -409,9 +475,49 @@ async function runSkillList({ args, options = {}, logger, t }) {
       logger.log(`    ${s.path}/SKILL.md`);
       logger.log('');
     }
+  } else {
+    logger.log('No installed skills.\n');
   }
 
-  return { ok: true, skills };
+  // Always show source skills summary
+  const allSource = [...designSkills, ...staticSkills, ...dynamicSkills];
+
+  if (designSkills.length > 0) {
+    logger.log(`Design skills (${designSkills.length}) — ONE active per project:`);
+    for (const s of designSkills) {
+      const active = activeDesignSkill === s.slug ? ' [active]' : '';
+      logger.log(`  ${s.slug}${active}`);
+      if (s.description) logger.log(`    ${s.description.slice(0, 100)}`);
+    }
+    logger.log('');
+  }
+
+  if (staticSkills.length > 0) {
+    logger.log(`Static skills (${staticSkills.length}) — loaded by framework match:`);
+    for (const s of staticSkills) {
+      logger.log(`  ${s.slug}`);
+      if (showAll && s.description) logger.log(`    ${s.description.slice(0, 100)}`);
+    }
+    logger.log('');
+  }
+
+  if (dynamicSkills.length > 0) {
+    logger.log(`Dynamic skills (${dynamicSkills.length}) — loaded by task context:`);
+    for (const s of dynamicSkills) {
+      logger.log(`  ${s.slug}`);
+      if (showAll && s.description) logger.log(`    ${s.description.slice(0, 100)}`);
+    }
+    logger.log('');
+  }
+
+  if (installed.length === 0 && allSource.length === 0) {
+    logger.log('Use `aioson skill:install --slug=<name>` to add a skill.');
+  } else {
+    logger.log('Source skills are loaded automatically by agents — no installation needed.');
+    logger.log('Use --all for full descriptions. Use `aioson skill:install` for third-party skills.');
+  }
+
+  return { ok: true, installed, source: { design: designSkills, static: staticSkills, dynamic: dynamicSkills } };
 }
 
 async function runSkillRemove({ args, options = {}, logger, t }) {
