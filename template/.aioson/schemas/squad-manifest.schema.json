@@ -482,6 +482,97 @@
         }
       }
     },
+    "contextMonitor": {
+      "type": "object",
+      "description": "Context window monitoring configuration (Fase 1 — PRD 19.2 §3.1)",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable context window monitoring for this squad"
+        },
+        "windowSize": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "Override context window size in tokens (default: inferred from model tier)"
+        },
+        "thresholds": {
+          "type": "object",
+          "description": "Warning level thresholds as ratios (0–1)",
+          "properties": {
+            "warning":  { "type": "number", "minimum": 0, "maximum": 1, "default": 0.85 },
+            "critical": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.95 }
+          }
+        },
+        "notify": {
+          "type": "object",
+          "description": "Which events trigger notifications",
+          "properties": {
+            "contextWarning":  { "type": "boolean", "default": true,  "description": "Notify at warning threshold (default 85%)" },
+            "contextCritical": { "type": "boolean", "default": true,  "description": "Notify at critical threshold (default 95%)" }
+          }
+        }
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "description": "Execution isolation strategy for agent branches (Fase 2 — PRD 19.2 §3.5)",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["worktree", "branch-only", "shared"],
+          "default": "shared",
+          "description": "worktree: separate git worktree per agent. branch-only: create branch but no worktree. shared: no isolation."
+        },
+        "branchPrefix": {
+          "type": "string",
+          "default": "aioson",
+          "description": "Prefix for auto-created branches: {prefix}/{squadSlug}/{agentSlug}"
+        },
+        "autoMerge": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically fast-forward merge when agent task completes"
+        },
+        "cleanupOnComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remove worktree/branch after successful merge"
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "description": "Context recovery configuration after a compact event (Fase 3 — PRD 19.2 §3.6)",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic recovery-context.md generation"
+        },
+        "autoInject": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically inject recovery-context.md when a compact is detected (>30% drop in context)"
+        },
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 500,
+          "maximum": 4000,
+          "default": 2000,
+          "description": "Maximum token budget for the generated recovery-context.md"
+        },
+        "refreshOn": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["task_completed", "decision_made", "handoff"]
+          },
+          "default": ["task_completed", "decision_made", "handoff"],
+          "description": "Runtime event types that trigger an automatic recovery context refresh"
+        }
+      }
+    },
     "contentBlueprints": {
       "type": "array",
       "items": {

@@ -54,6 +54,9 @@ const { runSquadDaemon } = require('./commands/squad-daemon');
 const { runSquadMcp } = require('./commands/squad-mcp');
 const { runSquadRoi } = require('./commands/squad-roi');
 const { runSquadScore } = require('./commands/squad-score');
+const { runSquadProcesses } = require('./commands/squad-processes');
+const { runSquadWorktrees, runSquadMerge } = require('./commands/squad-worktrees');
+const { runSquadRecovery } = require('./commands/squad-recovery');
 const {
   runRuntimeInit,
   runRuntimeIngest,
@@ -200,6 +203,14 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'squad-roi',
   'squad:score',
   'squad-score',
+  'squad:processes',
+  'squad-processes',
+  'squad:worktrees',
+  'squad-worktrees',
+  'squad:merge',
+  'squad-merge',
+  'squad:recovery',
+  'squad-recovery',
   'plan:show',
   'plan:status',
   'plan:checkpoint',
@@ -587,6 +598,14 @@ async function main() {
       result = await runSquadRoi({ args, options: { ...options, sub }, logger: commandLogger, t });
     } else if (command === 'squad:score' || command === 'squad-score') {
       result = await runSquadScore({ args, options, logger: commandLogger, translator: t });
+    } else if (command === 'squad:processes' || command === 'squad-processes') {
+      result = await runSquadProcesses({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:worktrees' || command === 'squad-worktrees') {
+      result = await runSquadWorktrees({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:merge' || command === 'squad-merge') {
+      result = await runSquadMerge({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:recovery' || command === 'squad-recovery') {
+      result = await runSquadRecovery({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:plan' || command === 'squad-plan') {
       result = await runSquadPlan({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:learning' || command === 'squad-learning') {

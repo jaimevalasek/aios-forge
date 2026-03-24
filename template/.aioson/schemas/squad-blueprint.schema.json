@@ -45,6 +45,12 @@
             "type": "string",
             "enum": ["powerful", "balanced", "fast", "none"]
           },
+          "autonomyLevel": {
+            "type": "string",
+            "enum": ["autonomous", "semi", "approve-each"],
+            "default": "semi",
+            "description": "Controls how much human approval this agent requires: autonomous (runs freely), semi (pauses on key decisions), approve-each (requires approval for every action)"
+          },
           "skills": { "type": "array", "items": { "type": "string" } },
           "genomes": {
             "type": "array",
