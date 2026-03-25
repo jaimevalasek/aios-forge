@@ -139,6 +139,47 @@ async function writeProjectContext(targetDir, content) {
   return filePath;
 }
 
+async function renderSquadApiSection(projectDir) {
+  const squadsDir = path.join(projectDir, '.aioson', 'squads');
+  let slugs = [];
+  try {
+    const entries = await fs.readdir(squadsDir, { withFileTypes: true });
+    slugs = entries.filter(e => e.isDirectory()).map(e => e.name);
+  } catch {
+    return '';
+  }
+
+  const endpointRows = [];
+  for (const slug of slugs) {
+    let squadJson = null;
+    try {
+      const raw = await fs.readFile(path.join(squadsDir, slug, 'squad.json'), 'utf8');
+      squadJson = JSON.parse(raw);
+    } catch { continue; }
+
+    if (!Array.isArray(squadJson?.api_endpoints) || squadJson.api_endpoints.length === 0) continue;
+    for (const ep of squadJson.api_endpoints) {
+      endpointRows.push(
+        `| ${slug} | \`${ep.method || 'POST'} http://localhost:${squadJson.port || '?'}/api${ep.path}\` | ${ep.description || ''} |`
+      );
+    }
+  }
+
+  if (endpointRows.length === 0) return '';
+
+  return [
+    '## Squad API Endpoints',
+    '',
+    'Endpoints HTTP expostos pelos squad-daemons para chamadas do frontend.',
+    '',
+    '| Squad | Endpoint | Descrição |',
+    '|-------|----------|-----------|',
+    ...endpointRows,
+    '',
+    'Use estes endpoints ao implementar componentes frontend que precisam consultar dados dos squads.',
+  ].join('\n');
+}
+
 module.exports = {
   toPositiveInt,
   scoreUserTypes,
@@ -148,5 +189,6 @@ module.exports = {
   classificationFromScore,
   normalizeBoolean,
   renderProjectContext,
-  writeProjectContext
+  writeProjectContext,
+  renderSquadApiSection
 };

@@ -260,6 +260,36 @@ async function runSquadDoctor({ args, options = {}, logger, t }) {
     ));
   }
 
+  // Webhook production checks (from squad.json, optional file)
+  const squadJsonPath = path.join(paths.packageDir, 'squad.json');
+  let squadConfig = null;
+  try {
+    const raw = await fs.readFile(squadJsonPath, 'utf8');
+    squadConfig = JSON.parse(raw);
+  } catch { /* squad.json is optional */ }
+
+  if (squadConfig && squadConfig.webhook?.validate_signature) {
+    const envKey = squadConfig.webhook.signature_env || 'WEBHOOK_SECRET';
+    const defined = Boolean(process.env[envKey]);
+    checks.push(makeCheck(
+      `webhook_env_${envKey}`,
+      defined,
+      defined ? 'info' : 'error',
+      defined
+        ? `Env ${envKey} definida (HMAC validation enabled)`
+        : `Env ${envKey} não definida — webhook HMAC validation está ativo mas a variável está ausente`
+    ));
+  }
+
+  if (squadConfig && squadConfig.webhook?.public) {
+    checks.push(makeCheck(
+      'webhook_public_deploy',
+      null,
+      'warn',
+      'Config nginx: execute aioson squad:deploy para gerar nginx.conf'
+    ));
+  }
+
   const runtimeHandle = await openRuntimeDb(targetDir, { mustExist: true });
   if (!runtimeHandle) {
     checks.push(makeCheck('runtime_store', false, 'warn', t('squad_doctor.check_runtime_missing')));

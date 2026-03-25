@@ -83,6 +83,61 @@ const BUILT_IN_CONNECTORS = {
     },
     baseUrl: 'https://www.googleapis.com/calendar/v3',
     healthPath: '/users/me/calendarList'
+  },
+
+  'mysql': {
+    name: 'MySQL / MariaDB',
+    configSchema: {
+      host:     { type: 'string', env: 'DB_HOST',     secret: false, required: true  },
+      port:     { type: 'number', env: 'DB_PORT',     secret: false, required: false },
+      database: { type: 'string', env: 'DB_NAME',     secret: false, required: true  },
+      user:     { type: 'string', env: 'DB_USER',     secret: false, required: true  },
+      password: { type: 'string', env: 'DB_PASSWORD', secret: true,  required: true  },
+      ssl:      { type: 'string', env: 'DB_SSL',      secret: false, required: false }
+    },
+    actions: {
+      query:        { input: ['sql', 'params'], output: ['rows', 'rowCount'] },
+      query_one:    { input: ['sql', 'params'], output: ['row']              },
+      execute:      { input: ['sql', 'params'], output: ['affectedRows']     },
+      table_schema: { input: ['table'],         output: ['columns']          }
+    },
+    baseUrl: null,
+    healthPath: null
+  },
+
+  'postgres': {
+    name: 'PostgreSQL',
+    configSchema: {
+      host:     { type: 'string', env: 'DB_HOST',     secret: false, required: true  },
+      port:     { type: 'number', env: 'DB_PORT',     secret: false, required: false },
+      database: { type: 'string', env: 'DB_NAME',     secret: false, required: true  },
+      user:     { type: 'string', env: 'DB_USER',     secret: false, required: true  },
+      password: { type: 'string', env: 'DB_PASSWORD', secret: true,  required: true  },
+      ssl:      { type: 'string', env: 'DB_SSL',      secret: false, required: false }
+    },
+    actions: {
+      query:        { input: ['sql', 'params'], output: ['rows', 'rowCount'] },
+      query_one:    { input: ['sql', 'params'], output: ['row']              },
+      execute:      { input: ['sql', 'params'], output: ['affectedRows']     },
+      table_schema: { input: ['table'],         output: ['columns']          }
+    },
+    baseUrl: null,
+    healthPath: null
+  },
+
+  'sqlite-external': {
+    name: 'SQLite (arquivo externo)',
+    configSchema: {
+      path: { type: 'string', env: 'SQLITE_PATH', secret: false, required: true }
+    },
+    actions: {
+      query:        { input: ['sql', 'params'], output: ['rows', 'rowCount'] },
+      query_one:    { input: ['sql', 'params'], output: ['row']              },
+      execute:      { input: ['sql', 'params'], output: ['affectedRows']     },
+      table_schema: { input: ['table'],         output: ['columns']          }
+    },
+    baseUrl: null,
+    healthPath: null
   }
 };
 
@@ -185,6 +240,20 @@ function buildWorkerMcpEnv(projectDir, squadSlug, mcpSlugs, integrationConfigs) 
 }
 
 // ---------------------------------------------------------------------------
+// DB lazy-load helpers
+// ---------------------------------------------------------------------------
+
+function requireMysql() {
+  try { return require('mysql2/promise'); }
+  catch { throw new Error('mysql2 não instalado. Execute: npm install mysql2'); }
+}
+
+function requirePg() {
+  try { const { Client } = require('pg'); return Client; }
+  catch { throw new Error('pg não instalado. Execute: npm install pg'); }
+}
+
+// ---------------------------------------------------------------------------
 // HTTP execution helpers
 // ---------------------------------------------------------------------------
 
@@ -260,6 +329,202 @@ const EXECUTORS = {
         signal: AbortSignal.timeout(15000)
       });
       return { status: res.status, ok: res.ok };
+    }
+  },
+
+  'mysql': {
+    async query({ sql, params }, cfg) {
+      const mysql = requireMysql();
+      const conn = await mysql.createConnection({
+        host: cfg.host, port: cfg.port || 3306,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      try {
+        const [rows] = await conn.execute(sql, params || []);
+        return { rows, rowCount: rows.length };
+      } finally {
+        await conn.end();
+      }
+    },
+    async query_one({ sql, params }, cfg) {
+      const mysql = requireMysql();
+      const conn = await mysql.createConnection({
+        host: cfg.host, port: cfg.port || 3306,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      try {
+        const [rows] = await conn.execute(sql, params || []);
+        return { row: rows[0] || null };
+      } finally {
+        await conn.end();
+      }
+    },
+    async execute({ sql, params }, cfg) {
+      const mysql = requireMysql();
+      const conn = await mysql.createConnection({
+        host: cfg.host, port: cfg.port || 3306,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      try {
+        const [result] = await conn.execute(sql, params || []);
+        return { affectedRows: result.affectedRows };
+      } finally {
+        await conn.end();
+      }
+    },
+    async table_schema({ table }, cfg) {
+      const mysql = requireMysql();
+      const conn = await mysql.createConnection({
+        host: cfg.host, port: cfg.port || 3306,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      try {
+        const [rows] = await conn.execute(`SHOW COLUMNS FROM \`${table}\``);
+        const columns = rows.map(r => ({
+          name: r.Field,
+          type: r.Type.split('(')[0].toLowerCase(),
+          nullable: r.Null === 'YES',
+          pk: r.Key === 'PRI'
+        }));
+        return { columns };
+      } finally {
+        await conn.end();
+      }
+    }
+  },
+
+  'postgres': {
+    async query({ sql, params }, cfg) {
+      const Client = requirePg();
+      const client = new Client({
+        host: cfg.host, port: cfg.port || 5432,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      await client.connect();
+      try {
+        const result = await client.query(sql, params || []);
+        return { rows: result.rows, rowCount: result.rowCount };
+      } finally {
+        await client.end();
+      }
+    },
+    async query_one({ sql, params }, cfg) {
+      const Client = requirePg();
+      const client = new Client({
+        host: cfg.host, port: cfg.port || 5432,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      await client.connect();
+      try {
+        const result = await client.query(sql, params || []);
+        return { row: result.rows[0] || null };
+      } finally {
+        await client.end();
+      }
+    },
+    async execute({ sql, params }, cfg) {
+      const Client = requirePg();
+      const client = new Client({
+        host: cfg.host, port: cfg.port || 5432,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      await client.connect();
+      try {
+        const result = await client.query(sql, params || []);
+        return { affectedRows: result.rowCount };
+      } finally {
+        await client.end();
+      }
+    },
+    async table_schema({ table }, cfg) {
+      const Client = requirePg();
+      const client = new Client({
+        host: cfg.host, port: cfg.port || 5432,
+        database: cfg.database, user: cfg.user, password: cfg.password,
+        ssl: cfg.ssl ? { rejectUnauthorized: false } : undefined
+      });
+      await client.connect();
+      try {
+        const result = await client.query(
+          `SELECT column_name, data_type, is_nullable,
+                  (SELECT COUNT(*) FROM information_schema.table_constraints tc
+                   JOIN information_schema.key_column_usage kcu
+                     ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_name = kcu.table_name
+                   WHERE tc.constraint_type = 'PRIMARY KEY'
+                     AND kcu.table_name = $1
+                     AND kcu.column_name = c.column_name) > 0 AS pk
+           FROM information_schema.columns c
+           WHERE table_name = $1
+           ORDER BY ordinal_position`,
+          [table]
+        );
+        const columns = result.rows.map(r => ({
+          name: r.column_name,
+          type: r.data_type,
+          nullable: r.is_nullable === 'YES',
+          pk: r.pk
+        }));
+        return { columns };
+      } finally {
+        await client.end();
+      }
+    }
+  },
+
+  'sqlite-external': {
+    async query({ sql, params }, cfg) {
+      const Database = require('better-sqlite3');
+      const db = new Database(cfg.path, { readonly: true });
+      try {
+        const rows = db.prepare(sql).all(params || []);
+        return { rows, rowCount: rows.length };
+      } finally {
+        db.close();
+      }
+    },
+    async query_one({ sql, params }, cfg) {
+      const Database = require('better-sqlite3');
+      const db = new Database(cfg.path, { readonly: true });
+      try {
+        const row = db.prepare(sql).get(params || []) || null;
+        return { row };
+      } finally {
+        db.close();
+      }
+    },
+    async execute({ sql, params }, cfg) {
+      const Database = require('better-sqlite3');
+      const db = new Database(cfg.path);
+      try {
+        const result = db.prepare(sql).run(params || []);
+        return { affectedRows: result.changes };
+      } finally {
+        db.close();
+      }
+    },
+    async table_schema({ table }, cfg) {
+      const Database = require('better-sqlite3');
+      const db = new Database(cfg.path, { readonly: true });
+      try {
+        const rows = db.prepare(`PRAGMA table_info(${table})`).all();
+        const columns = rows.map(r => ({
+          name: r.name,
+          type: r.type.split('(')[0].toLowerCase(),
+          nullable: r.notnull === 0,
+          pk: r.pk > 0
+        }));
+        return { columns };
+      } finally {
+        db.close();
+      }
     }
   }
 };

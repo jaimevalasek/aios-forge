@@ -64,6 +64,18 @@ async function validateStructure(projectDir, slug, manifest) {
     }
   }
 
+  // Check api_endpoints workers
+  const apiEndpoints = Array.isArray(manifest.api_endpoints) ? manifest.api_endpoints : [];
+  for (const ep of apiEndpoints) {
+    if (ep.worker) {
+      const workerDir = path.join(squadDir, 'workers', ep.worker);
+      if (!(await pathExists(workerDir))) {
+        const rel = path.relative(projectDir, workerDir).replace(/\\/g, '/');
+        errors.push(`api_endpoints: worker "${ep.worker}" not found at ${rel}`);
+      }
+    }
+  }
+
   // Check output dir (warning only)
   const outputDir = path.join(projectDir, 'output', slug);
   if (!(await pathExists(outputDir))) {

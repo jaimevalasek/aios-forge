@@ -80,6 +80,7 @@ class SquadDaemon {
     this.squadSlug = squadSlug;
     this.webhookPort = options.port || 0;
     this.pollInterval = options.poll || 10000;
+    this.config = options.config || {};
     this.running = false;
     this.db = null;
     this.httpServer = null;
@@ -138,6 +139,8 @@ class SquadDaemon {
     this._upsertDaemonRecord('running');
 
     this.running = true;
+    await this._processInbox();
+
     this.startedAt = new Date().toISOString();
     this.log('info', 'Daemon started', {
       port: this.webhookPort,
@@ -198,7 +201,8 @@ class SquadDaemon {
         await this._handleWebhook(req, res);
       });
       server.on('error', reject);
-      server.listen(this.webhookPort, '127.0.0.1', () => {
+      const bindAddr = this.config.webhook?.bind || '127.0.0.1';
+      server.listen(this.webhookPort, bindAddr, () => {
         this.webhookPort = server.address().port;
         resolve(server);
       });
@@ -206,19 +210,103 @@ class SquadDaemon {
   }
 
   async _handleWebhook(req, res) {
-    // POST /webhook/:workerSlug
-    if (req.method !== 'POST') {
+    const segments = (req.url || '').replace(/\/+$/, '').split('/').filter(Boolean);
+
+    // Status aceita GET e POST (health check externo)
+    if (segments[0] === 'status' && segments.length === 1) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(this.getStatus()));
+      return;
+    }
+
+    if (req.method !== 'POST' && req.method !== 'OPTIONS') {
       res.writeHead(405, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Method not allowed' }));
       return;
     }
 
-    const segments = (req.url || '').replace(/\/+$/, '').split('/').filter(Boolean);
+    // Read raw body (must be before JSON.parse so HMAC validates original bytes)
+    let rawBody = '';
+    for await (const chunk of req) rawBody += chunk;
 
-    // GET /status (special endpoint)
-    if (req.method === 'GET' || (segments[0] === 'status' && segments.length === 1)) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(this.getStatus()));
+    // HMAC signature validation
+    if (this.config.webhook?.validate_signature) {
+      const { createHmac, timingSafeEqual } = require('node:crypto');
+      const envKey = this.config.webhook.signature_env || 'WEBHOOK_SECRET';
+      const headerKey = (this.config.webhook.signature_header || 'x-hub-signature-256').toLowerCase();
+      const secret = process.env[envKey];
+      const receivedSig = req.headers[headerKey];
+
+      if (!secret || !receivedSig) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'signature_required' }));
+        return;
+      }
+      const expected = 'sha256=' + createHmac('sha256', secret).update(rawBody).digest('hex');
+      try {
+        if (!timingSafeEqual(Buffer.from(receivedSig), Buffer.from(expected))) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'invalid_signature' }));
+          return;
+        }
+      } catch {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'invalid_signature' }));
+        return;
+      }
+    }
+
+    let payload;
+    try {
+      payload = JSON.parse(rawBody || '{}');
+    } catch {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+      return;
+    }
+
+    // POST /call/:worker (inter-squad)
+    if (segments[0] === 'call' && segments[1]) {
+      const depth = payload?._inter_squad?.depth ?? 0;
+      if (depth > 5) {
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'cascade_guard' }));
+        return;
+      }
+      const result = await this._executeWorker(segments[1], payload, 'inter-squad');
+      res.writeHead(result.ok ? 200 : 500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result));
+      return;
+    }
+
+    // /api/:path (public API endpoints)
+    if (segments[0] === 'api' && segments[1]) {
+      const apiPath = '/' + segments[1];
+      const endpoint = (this.config.api_endpoints || []).find(e => e.path === apiPath);
+
+      if (!endpoint) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'api_endpoint_not_found' }));
+        return;
+      }
+
+      const origin = req.headers['origin'];
+      const corsOrigins = endpoint.cors_origins || [];
+      if (origin && corsOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', endpoint.method || 'POST');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Vary', 'Origin');
+      }
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      const result = await this._executeWorker(endpoint.worker, payload, 'api');
+      res.writeHead(result.ok ? 200 : 500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result));
       return;
     }
 
@@ -229,19 +317,6 @@ class SquadDaemon {
     }
 
     const workerSlug = segments[1];
-
-    // Read body
-    let body = '';
-    for await (const chunk of req) body += chunk;
-
-    let payload;
-    try {
-      payload = JSON.parse(body || '{}');
-    } catch {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Invalid JSON body' }));
-      return;
-    }
 
     this.log('info', `Webhook received for ${workerSlug}`, { payload });
 
@@ -313,6 +388,9 @@ class SquadDaemon {
     // Log to runtime store
     if (this.db) {
       try {
+        const conversationId = triggerType === 'inter-squad'
+          ? inputPayload?._inter_squad?.conversationId
+          : undefined;
         insertWorkerRun(this.db, {
           squadSlug: this.squadSlug,
           workerSlug,
@@ -322,7 +400,8 @@ class SquadDaemon {
           status: result.ok ? 'completed' : 'failed',
           errorMessage: result.ok ? null : result.error,
           durationMs: result.durationMs || 0,
-          attempt: result.attempt || 1
+          attempt: result.attempt || 1,
+          conversationId
         });
       } catch (err) {
         this.log('error', 'Failed to log worker run', { error: err.message });
@@ -335,6 +414,30 @@ class SquadDaemon {
     });
 
     return result;
+  }
+
+  async _processInbox() {
+    const inboxDir = path.join(this.projectDir, '.aioson', 'squads', this.squadSlug, 'inbox');
+    let entries;
+    try { entries = await fs.readdir(inboxDir); } catch { return; }
+
+    for (const file of entries.filter(f => f.endsWith('.json'))) {
+      const filePath = path.join(inboxDir, file);
+      try {
+        const raw = await fs.readFile(filePath, 'utf8');
+        const msg = JSON.parse(raw);
+        const result = await this._executeWorker(msg.worker, msg.payload, 'inter-squad');
+        if (result.ok) {
+          await fs.unlink(filePath);
+        } else {
+          const failDir = path.join(inboxDir, 'failed');
+          await fs.mkdir(failDir, { recursive: true });
+          await fs.rename(filePath, path.join(failDir, file));
+        }
+      } catch {
+        // arquivo corrompido — mover para failed
+      }
+    }
   }
 
   _upsertDaemonRecord(status) {

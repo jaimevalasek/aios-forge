@@ -8,7 +8,8 @@ const {
   calculateClassification,
   normalizeBoolean,
   renderProjectContext,
-  writeProjectContext
+  writeProjectContext,
+  renderSquadApiSection
 } = require('../context-writer');
 const { applyAgentLocale } = require('../locales');
 const { openRuntimeDb, logAgentEvent } = require('../runtime-store');
@@ -616,7 +617,9 @@ async function runSetupContext({ args, options, logger, t }) {
   }
 
   const content = renderProjectContext(data);
-  const filePath = await writeProjectContext(targetDir, content);
+  const squadApiSection = await renderSquadApiSection(targetDir);
+  const fullContent = squadApiSection ? content + '\n' + squadApiSection + '\n' : content;
+  const filePath = await writeProjectContext(targetDir, fullContent);
   const localeApplyResult = await applyAgentLocale(targetDir, data.conversationLanguage, {
     dryRun: false
   });

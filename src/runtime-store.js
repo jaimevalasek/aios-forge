@@ -691,6 +691,8 @@ function ensureLegacyColumns(db) {
   if (!contentItemColumnNames.has('used_skills_json')) {
     db.exec('ALTER TABLE content_items ADD COLUMN used_skills_json TEXT');
   }
+
+  try { db.exec('ALTER TABLE worker_runs ADD COLUMN conversation_id TEXT'); } catch { /* já existe */ }
 }
 
 function insertEvent(db, record) {
@@ -2324,11 +2326,11 @@ function deleteSquadMetric(db, squadSlug, metricKey, period) {
 
 // --- Worker Runs CRUD ---
 
-function insertWorkerRun(db, { squadSlug, workerSlug, triggerType, inputJson, outputJson, status, errorMessage, durationMs, attempt }) {
+function insertWorkerRun(db, { squadSlug, workerSlug, triggerType, inputJson, outputJson, status, errorMessage, durationMs, attempt, conversationId }) {
   const now = nowIso();
   return db.prepare(`
-    INSERT INTO worker_runs (squad_slug, worker_slug, trigger_type, input_json, output_json, status, error_message, duration_ms, attempt, created_at, completed_at)
-    VALUES (@squad_slug, @worker_slug, @trigger_type, @input_json, @output_json, @status, @error_message, @duration_ms, @attempt, @created_at, @completed_at)
+    INSERT INTO worker_runs (squad_slug, worker_slug, trigger_type, input_json, output_json, status, error_message, duration_ms, attempt, conversation_id, created_at, completed_at)
+    VALUES (@squad_slug, @worker_slug, @trigger_type, @input_json, @output_json, @status, @error_message, @duration_ms, @attempt, @conversation_id, @created_at, @completed_at)
   `).run({
     squad_slug: String(squadSlug).trim(),
     worker_slug: String(workerSlug).trim(),
@@ -2339,6 +2341,7 @@ function insertWorkerRun(db, { squadSlug, workerSlug, triggerType, inputJson, ou
     error_message: errorMessage || null,
     duration_ms: durationMs != null ? Number(durationMs) : null,
     attempt: Number(attempt || 1),
+    conversation_id: conversationId || null,
     created_at: now,
     completed_at: (status === 'completed' || status === 'failed') ? now : null
   });

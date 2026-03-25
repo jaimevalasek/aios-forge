@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const { SquadDaemon } = require('../squad-daemon');
 const { openRuntimeDb } = require('../runtime-store');
@@ -10,9 +11,16 @@ async function handleStart(projectDir, squadSlug, options, { logger, t }) {
     return { ok: false };
   }
 
+  let squadConfig = {};
+  try {
+    const squadJsonPath = path.join(projectDir, '.aioson', 'squads', squadSlug, 'squad.json');
+    squadConfig = JSON.parse(await fs.readFile(squadJsonPath, 'utf8'));
+  } catch { /* squad.json is optional */ }
+
   const daemon = new SquadDaemon(projectDir, squadSlug, {
     port: options.port ? Number(options.port) : 0,
-    poll: options.poll ? Number(options.poll) : 10000
+    poll: options.poll ? Number(options.poll) : 10000,
+    config: squadConfig
   });
 
   try {
