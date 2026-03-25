@@ -229,6 +229,7 @@ See the [Web3 guide](docs/en/web3.md) for the full reference.
 - [JSON schemas](docs/en/json-schemas.md) — `--json` output contracts for all commands
 - [AI clients guide (PT-BR)](docs/pt/clientes-ai.md) — tracked usage with Codex, Claude, Gemini, and OpenCode
 - [Runtime observability (PT-BR)](docs/pt/runtime-observability.md) — `live:start`, `runtime:emit`, `live:handoff`, `live:status`, `live:close`, and dashboard projections
+- [Squad Dashboard](docs/en/squad-dashboard.md) — `squad:dashboard`, real-time monitoring of agents, context, tokens, logs and metrics
 
 **Release (internal)**
 - [Release guide](docs/en/release.md)
@@ -242,6 +243,7 @@ See the [Web3 guide](docs/en/web3.md) for the full reference.
 - [Cenários de uso](docs/pt/cenarios.md)
 - [Clientes AI](docs/pt/clientes-ai.md)
 - [Guia do engenheiro](docs/pt/guia-engineer.md)
+- [Squad Dashboard](docs/pt/squad-dashboard.md) — monitoramento em tempo real de agentes, contexto, tokens, logs e métricas
 
 ## MCP bootstrap
 Generate a local MCP server recommendation file from `project.context.md`:

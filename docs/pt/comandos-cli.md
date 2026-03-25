@@ -90,6 +90,13 @@
 | `squad:export` | Exporta uma squad local para snapshot/entrega | Quando quer empacotar a squad |
 | `squad:pipeline` | Lista, inspeciona ou acompanha pipelines declarados na squad | Quando a squad define pipelines reutilizáveis |
 | `squad:agent-create` | Cria agente customizado em `.aioson/my-agents/` ou dentro de uma squad | Quando quer criar agente personalizado. Veja [Agentes Customizados](./agentes-customizados.md) |
+| `squad:dashboard` | Painel web local para monitorar squads em tempo real | Quando quer ver agentes rodando, contexto, tokens e métricas. Veja [Squad Dashboard](./squad-dashboard.md) |
+| `squad:worker` | Executa, lista e testa workers não-LLM de uma squad | Quando quer rodar workers determinísticos manualmente |
+| `squad:daemon` | Inicia/para/monitora daemon de workers automáticos | Quando quer execução 24/7 com cron e webhooks |
+| `squad:mcp` | Configura e testa conectores MCP (WhatsApp, Telegram, etc.) | Quando quer integrar canais reais à squad |
+| `squad:roi` | Define modelo de precificação e registra métricas de resultado | Quando quer calcular e reportar ROI da squad |
+| `squad:processes` | Lista e encerra processos ativos de uma squad | Quando quer inspecionar ou parar agentes sem usar o dashboard |
+| `squad:recovery` | Gera contexto de recovery para reinjecting após compact | Quando um agente perdeu contexto após compactação |
 | `output-strategy:export` | Exporta a estratégia de output (webhooks, delivery) de uma squad | Quando quer copiar configuração para outra squad ou documentar |
 | `output-strategy:import` | Importa estratégia de output de um arquivo ou outra squad | Quando quer replicar webhooks/delivery entre squads |
 | `deliver` | Dispara delivery manual de conteúdo para webhooks configurados | Quando quer reenviar conteúdo ou testar webhooks |
@@ -519,7 +526,52 @@ Use:
 - `squad:export` para empacotar a squad
 - `squad:pipeline` para inspecionar pipelines definidos dentro da squad
 
-### 18. Reparar bindings de genome em squads
+### 18. Monitorar squads com o Squad Dashboard
+
+```bash
+# Levantar o dashboard na raiz do projeto
+aioson squad:dashboard
+
+# Porta customizada
+aioson squad:dashboard --port=4200
+
+# Abrir direto em um squad específico
+aioson squad:dashboard --squad=marketing-odonto
+```
+
+Acesse `http://localhost:4180` no browser. O dashboard mostra todos os squads do projeto com agentes rodando, uso de contexto, tokens, logs de execução e métricas em tempo real.
+
+Para documentação completa: [Squad Dashboard](./squad-dashboard.md)
+
+### 19. Workers, Daemon e Integrações
+
+```bash
+# Listar workers de uma squad
+aioson squad:worker . --sub=list --squad=clinica
+
+# Executar um worker manualmente
+aioson squad:worker . --sub=run --squad=clinica --worker=confirma-consulta --input='{"phone":"5511999999999"}'
+
+# Iniciar daemon (workers automáticos 24/7)
+aioson squad:daemon . --sub=start --squad=clinica
+
+# Ver status do daemon
+aioson squad:daemon . --sub=status
+
+# Configurar integração WhatsApp
+aioson squad:mcp . --sub=configure --squad=clinica --mcp=whatsapp --connector=whatsapp-business
+
+# Testar conexão
+aioson squad:mcp . --sub=test --squad=clinica --mcp=whatsapp
+
+# Registrar métrica de ROI
+aioson squad:roi . --sub=metric --squad=clinica --key=no_show_rate --value=8 --unit=% --baseline=20 --target=5
+
+# Ver relatório de ROI
+aioson squad:roi . --sub=report --squad=clinica
+```
+
+### 20. Reparar bindings de genome em squads
 
 ```bash
 aioson squad:repair-genomes .aioson/squads/marketing/squad.manifest.json --write
