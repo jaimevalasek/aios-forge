@@ -356,18 +356,20 @@ Both files use exactly these sections:
 After the PRD is produced, tell the user which agent to activate next:
 
 **New project (`prd.md`):**
-| classification | Next step |
-|---|---|
-| MICRO | **@dev** — reads prd.md directly |
-| SMALL | **@analyst** — maps requirements from prd.md |
-| MEDIUM | **@analyst** — then @architect → @ux-ui → @pm → @orchestrator |
+| classification | UI spec? | Next step |
+|---|---|---|
+| MICRO | No specific visual spec | **@dev** — reads prd.md directly |
+| MICRO | Has detailed visual spec (design tokens, custom theme, futuristic/branded UI) | **@ux-ui** → then @dev |
+| SMALL | — | **@analyst** — maps requirements from prd.md |
+| MEDIUM | — | **@analyst** — then @architect → @ux-ui → @pm → @orchestrator |
 
 **New feature (`prd-{slug}.md`):**
-| feature complexity | Next step |
-|---|---|
-| MICRO (no new entities, UI/CRUD only) | **@dev** — reads prd-{slug}.md directly |
-| SMALL (new entities or business logic) | **@analyst** — maps requirements from prd-{slug}.md |
-| MEDIUM (new architecture, external service) | **@analyst** → @architect → @dev → @qa |
+| feature complexity | UI spec? | Next step |
+|---|---|---|
+| MICRO (no new entities, UI/CRUD only) | No specific visual spec | **@dev** — reads prd-{slug}.md directly |
+| MICRO (no new entities, UI/CRUD only) | Has detailed visual spec | **@ux-ui** → then @dev |
+| SMALL (new entities or business logic) | — | **@analyst** — maps requirements from prd-{slug}.md |
+| MEDIUM (new architecture, external service) | — | **@analyst** → @architect → @dev → @qa |
 
 **Correction (`prd-{slug}-fix.md`):**
 | correction scope | Next step |
@@ -376,7 +378,9 @@ After the PRD is produced, tell the user which agent to activate next:
 | Logic change or new validation | **@analyst** — re-maps requirements delta from prd-{slug}-fix.md |
 | Architectural impact | **@analyst** → @architect → @dev → @qa |
 
-Assess feature complexity from the conversation. Tell the user clearly: "This looks like a SMALL feature — activate **@analyst** next."
+**UI spec detection rule:** a PRD has a "detailed visual spec" when it describes two or more of: specific color palette, typography choices, animation/motion requirements, glassmorphism/depth effects, custom theme tokens, or an overall aesthetic direction (futuristic, cyberpunk, branded, etc.). A generic "clean and responsive" does NOT qualify.
+
+Assess feature complexity from the conversation. Tell the user clearly: "This looks like a SMALL feature — activate **@analyst** next." For MICRO with UI spec: "This is MICRO but has a detailed visual spec — activate **@ux-ui** first to produce `ui-spec.md`, then **@dev**."
 
 ## Framework skill awareness
 
