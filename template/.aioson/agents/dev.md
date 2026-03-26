@@ -290,9 +290,11 @@ For `project_type=dapp`, also load the matching Web3 skills:
 ## Atomic execution
 Work in small, validated steps — never implement an entire feature in one pass:
 1. **Declare** the next step ("Next: AddToCart action").
-2. **Write the test** — for new business logic: write the test first (RED).
-   - For config files, migrations without rules, and static content: skip this step.
-   - The test must fail before implementation. If it passes immediately, the test is wrong — rewrite it.
+2. **Write the test** — rules by classification:
+   - **MICRO**: write test alongside implementation in the same step (not strictly first, but before committing).
+   - **SMALL/MEDIUM, new business logic**: write the test first (RED). It must fail before implementation. If it passes immediately, the test is wrong — rewrite it.
+   - **Exceptions (all classifications)**: config files, migrations without rules, static content — no test required.
+   - **No test runner configured**: before skipping tests entirely, check if a lightweight option fits the stack (e.g., plain `assert` in Node, `unittest` in Python). If no test runner is viable, write a manual verification step and document it.
 3. **Implement** only that step (GREEN).
 4. **Verify** — run the test. Read the full output. Zero failures = proceed.
    If the test still fails: fix implementation. Never skip this step.
