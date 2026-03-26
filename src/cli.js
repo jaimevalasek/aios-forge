@@ -58,6 +58,7 @@ const { runSquadProcesses } = require('./commands/squad-processes');
 const { runSquadWorktrees, runSquadMerge } = require('./commands/squad-worktrees');
 const { runSquadRecovery } = require('./commands/squad-recovery');
 const { runSquadDeploy } = require('./commands/squad-deploy');
+const { runSquadWebhook } = require('./commands/squad-webhook');
 const {
   runRuntimeInit,
   runRuntimeIngest,
@@ -217,6 +218,8 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'squad-recovery',
   'squad:deploy',
   'squad-deploy',
+  'squad:webhook',
+  'squad-webhook',
   'plan:show',
   'plan:status',
   'plan:checkpoint',
@@ -620,6 +623,9 @@ async function main() {
       result = await runSquadRecovery({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:deploy' || command === 'squad-deploy') {
       result = await runSquadDeploy({ args, options, logger: commandLogger, t });
+    } else if (command === 'squad:webhook' || command === 'squad-webhook') {
+      const sub = options.sub || 'start';
+      result = await runSquadWebhook({ args, options: { ...options, sub }, logger: commandLogger, t });
     } else if (command === 'squad:plan' || command === 'squad-plan') {
       result = await runSquadPlan({ args, options, logger: commandLogger, t });
     } else if (command === 'squad:learning' || command === 'squad-learning') {
