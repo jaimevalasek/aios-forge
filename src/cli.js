@@ -32,6 +32,8 @@ const { runQaInit } = require('./commands/qa-init');
 const { runQaRun } = require('./commands/qa-run');
 const { runQaScan } = require('./commands/qa-scan');
 const { runQaReport } = require('./commands/qa-report');
+const { runWebMap } = require('./commands/web-map');
+const { runWebScrape } = require('./commands/web-scrape');
 const { runScanProject } = require('./commands/scan-project');
 const { runConfig } = require('./commands/config');
 const { runGenomeDoctor } = require('./commands/genome-doctor');
@@ -172,6 +174,10 @@ const JSON_SUPPORTED_COMMANDS = new Set([
   'qa-scan',
   'qa:report',
   'qa-report',
+  'web:map',
+  'web-map',
+  'web:scrape',
+  'web-scrape',
   'scan:project',
   'scan-project',
   'config',
@@ -375,6 +381,8 @@ function printHelp(t, logger) {
   logHelpLine(t, logger, 'cli.help_qa_run');
   logHelpLine(t, logger, 'cli.help_qa_scan');
   logHelpLine(t, logger, 'cli.help_qa_report');
+  logHelpLine(t, logger, 'cli.help_web_map');
+  logHelpLine(t, logger, 'cli.help_web_scrape');
   logHelpLine(t, logger, 'cli.help_scan_project');
   logHelpLine(t, logger, 'cli.help_config');
   logHelpLine(t, logger, 'cli.help_genome_doctor');
@@ -571,6 +579,10 @@ async function main() {
       result = await runQaScan({ args, options, logger: commandLogger, t });
     } else if (command === 'qa:report' || command === 'qa-report') {
       result = await runQaReport({ args, options, logger: commandLogger, t });
+    } else if (command === 'web:map' || command === 'web-map') {
+      result = await runWebMap({ args, options, logger: commandLogger, t });
+    } else if (command === 'web:scrape' || command === 'web-scrape') {
+      result = await runWebScrape({ args, options, logger: commandLogger, t });
     } else if (command === 'scan:project' || command === 'scan-project') {
       result = await runScanProject({ args, options, logger: commandLogger, t });
     } else if (command === 'config') {

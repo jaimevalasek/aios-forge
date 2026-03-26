@@ -59,6 +59,10 @@ module.exports = {
       'aioson qa:scan [path] [--url=<app-url>] [--depth=3] [--max-pages=50] [--headed] [--html] [--json] [--locale=pt-BR]',
     help_qa_report:
       'aioson qa:report [path] [--html] [--json] [--locale=pt-BR]',
+    help_web_map:
+      'aioson web:map [path] --url=<url> [--depth=<N>] [--max-pages=<N>] [--include-external] [--json] [--locale=pt-BR]',
+    help_web_scrape:
+      'aioson web:scrape [path] --url=<url> [--format=markdown|text|html|links] [--json] [--locale=pt-BR]',
     help_scan_project:
       'aioson scan:project [path] --folder=<pasta[,pasta2]> [--summary-mode=titles|summaries|raw] [--context-mode=merge|rewrite] [--with-llm] [--provider=<name>] [--llm-model=<name>] [--dry-run] [--json] [--locale=pt-BR]',
     help_config:
@@ -769,6 +773,23 @@ module.exports = {
   qa_report: {
     not_found: 'Nenhum relatorio QA encontrado. Execute: aioson qa:run ou aioson qa:scan',
     html_report_written: 'Relatorio HTML escrito: {path}'
+  },
+  web_map: {
+    url_missing: 'Opcao obrigatoria ausente: --url=<url>.',
+    starting: 'Mapeando site: {url}',
+    pages_found: 'Paginas descobertas: {count}',
+    page_line: '- {url} | profundidade={depth} | status={status} | links={links}',
+    done: 'Mapa web concluido.',
+    failed: 'Falha no mapa web: {error}'
+  },
+  web_scrape: {
+    url_missing: 'Opcao obrigatoria ausente: --url=<url>.',
+    invalid_format: 'Valor invalido para --format: {format}. Use markdown, text, html ou links.',
+    fetching: 'Buscando pagina: {url}',
+    title_line: 'Titulo: {title}',
+    status_line: 'Status: {status} | Content-Type: {type}',
+    done: 'Web scrape concluido ({format}).',
+    failed: 'Falha no web scrape: {error}'
   },
   config: {
     usage_error:

@@ -77,6 +77,13 @@
 | `qa:scan` | Faz crawl automático do app e procura riscos | Quando quer inspeção ampla de rotas |
 | `qa:report` | Reexibe ou exporta o último relatório | Quando quer consultar ou regenerar o relatório |
 
+### Web nativa
+
+| Comando | O que faz | Quando usar |
+|---|---|---|
+| `web:map` | Descobre URLs internas de um site por crawl simples | Quando quer mapear docs, páginas públicas ou áreas navegáveis sem serviço externo |
+| `web:scrape` | Extrai conteúdo principal de uma página em markdown, text, html ou links | Quando quer transformar HTML em contexto utilizável para agentes |
+
 ### Genomes e squads
 
 | Comando | O que faz | Quando usar |
